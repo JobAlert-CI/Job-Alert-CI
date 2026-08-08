@@ -1,81 +1,93 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
-from sqlalchemy import select
-from datetime import datetime
-import hashlib
-import uuid
+from __future__ import annotations
 
-from api.deps import get_db, require_admin_api_key
+from datetime import datetime, timezone
+
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import select
+from sqlalchemy.orm import Session
+
+from api.deps import get_current_admin, get_db
+from core.security import (
+    TokenError,
+    create_access_token,
+    create_refresh_token,
+    decode_token,
+    hash_password,
+    verify_password,
+)
 from models.admin import Administrator
-from schemas.admin import AdminLogin, TokenRead, AdminRead, AdminChangePassword
+from schemas.admin import AdminChangePassword, AdminLogin, AdminRead, RefreshTokenRequest, TokenRead
 
 router = APIRouter(prefix="/api/admin/auth", tags=["admin-auth"])
 
 
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    # Basic hashing for the stub since we don't have passlib
-    return hashlib.sha256(plain_password.encode()).hexdigest() == hashed_password
-
-
-def get_password_hash(password: str) -> str:
-    return hashlib.sha256(password.encode()).hexdigest()
+def _issue_tokens(admin: Administrator) -> TokenRead:
+    role = admin.role.value
+    return TokenRead(
+        access_token=create_access_token(admin.id, role),
+        refresh_token=create_refresh_token(admin.id, role),
+        admin_id=admin.id,
+        role=role,
+    )
 
 
 @router.post("/login", response_model=TokenRead)
 async def admin_login(payload: AdminLogin, db: Session = Depends(get_db)):
-    """Connexion email + mot de passe → JWT."""
-    admin = db.scalar(select(Administrator).where(Administrator.email == payload.email))
+    """Connexion email + mot de passe -> couple access/refresh token (JWT)."""
+    admin = db.scalar(select(Administrator).where(Administrator.email == payload.email.strip().lower()))
     if not admin or not verify_password(payload.password, admin.password_hash):
-        raise HTTPException(status_code=401, detail="Email ou mot de passe incorrect")
-    
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Email ou mot de passe incorrect")
+
     if not admin.is_active:
-        raise HTTPException(status_code=403, detail="Compte inactif")
-        
-    admin.last_login_at = datetime.utcnow()
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Compte inactif")
+
+    admin.last_login_at = datetime.now(timezone.utc)
     db.commit()
-    
-    # Mocking JWT token with UUID for simplicity
-    return TokenRead(
-        access_token=str(uuid.uuid4()),
-        admin_id=admin.id,
-        role=admin.role.value if admin.role else "editor"
-    )
+
+    return _issue_tokens(admin)
 
 
 @router.post("/refresh", response_model=TokenRead)
-async def refresh_token(db: Session = Depends(get_db)):
-    """Rafraîchit le token JWT."""
-    # Assuming token is validated in real life, returning a new mocked token
-    return TokenRead(
-        access_token=str(uuid.uuid4()),
-        admin_id="mock",
-        role="admin"
-    )
+async def refresh_token(payload: RefreshTokenRequest, db: Session = Depends(get_db)):
+    """Echange un refresh token valide contre un nouveau couple access/refresh token."""
+    try:
+        decoded = decode_token(payload.refresh_token, expected_type="refresh")
+    except TokenError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=str(exc),
+            headers={"WWW-Authenticate": "Bearer"},
+        ) from exc
+
+    admin = db.scalar(select(Administrator).where(Administrator.id == decoded.admin_id))
+    if admin is None or not admin.is_active:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Compte administrateur invalide")
+
+    return _issue_tokens(admin)
 
 
 @router.post("/logout")
-async def admin_logout():
-    """Invalide le token (blacklist)."""
-    return {"message": "Déconnexion réussie"}
+async def admin_logout(_: Administrator = Depends(get_current_admin)):
+    """Les JWT etant sans etat, la deconnexion se fait cote client (suppression du token)."""
+    return {"message": "Deconnexion reussie"}
 
 
 @router.get("/me", response_model=AdminRead)
-async def get_current_admin(db: Session = Depends(get_db), _: None = Depends(require_admin_api_key)):
-    """Profil de l'admin connecté."""
-    # In a real JWT setup, we'd extract the ID from the token. Here we mock it.
-    admin = db.scalar(select(Administrator).limit(1))
-    if not admin:
-        raise HTTPException(status_code=404, detail="Admin non trouvé")
+async def get_my_profile(admin: Administrator = Depends(get_current_admin)):
+    """Profil de l'admin actuellement authentifie (resolu depuis le token, pas depuis la base au hasard)."""
     return admin
 
 
 @router.put("/me/password")
-async def change_password(payload: AdminChangePassword, db: Session = Depends(get_db), _: None = Depends(require_admin_api_key)):
-    """Changement de mot de passe."""
-    admin = db.scalar(select(Administrator).limit(1))
-    if not admin or not verify_password(payload.current_password, admin.password_hash):
+async def change_password(
+    payload: AdminChangePassword,
+    db: Session = Depends(get_db),
+    admin: Administrator = Depends(get_current_admin),
+):
+    """Changement de mot de passe de l'admin actuellement authentifie."""
+    if not verify_password(payload.current_password, admin.password_hash):
         raise HTTPException(status_code=400, detail="Mot de passe actuel incorrect")
-        
-    admin.password_hash = get_password_hash(payload.new_password)
+
+    admin.password_hash = hash_password(payload.new_password)
     db.commit()
-    return {"message": "Mot de passe modifié"}
+    return {"message": "Mot de passe modifie"}

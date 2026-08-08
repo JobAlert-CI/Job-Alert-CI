@@ -23,6 +23,17 @@ router = APIRouter(
     dependencies=[Depends(require_roles("super_admin", "gestionnaire_utilisateurs"))],
 )
 
+# La query string et le PATCH /status partagent le meme vocabulaire cote API
+# ("bouncing") meme si la valeur stockee en base differe ("bounced").
+STATUS_ALIASES = {
+    "active": SubscriberStatus.ACTIVE,
+    "unsubscribed": SubscriberStatus.UNSUBSCRIBED,
+    "bouncing": SubscriberStatus.BOUNCED,
+    "paused": SubscriberStatus.PAUSED,
+    "pending": SubscriberStatus.PENDING,
+    "deleted": SubscriberStatus.DELETED,
+}
+
 
 def _require_subscriber(db: Session, subscriber_id: str) -> Subscriber:
     subscriber = db.scalar(select(Subscriber).where(Subscriber.id == subscriber_id))
@@ -46,7 +57,9 @@ async def list_subscribers(
     if q:
         stmt = stmt.where((Subscriber.email.ilike(f"%{q}%")) | (Subscriber.full_name.ilike(f"%{q}%")))
     if status:
-        stmt = stmt.where(Subscriber.status == status)
+        if status not in STATUS_ALIASES:
+            raise HTTPException(status_code=400, detail=f"Statut inconnu: {status}")
+        stmt = stmt.where(Subscriber.status == STATUS_ALIASES[status])
     if filiere_id:
         stmt = stmt.join(Subscriber.filiere_links).where(SubscriberFiliere.filiere_id == filiere_id)
 
@@ -94,13 +107,7 @@ async def update_subscriber_status(
 ):
     """Active / désinscrit / met en pause / bascule en bouncing."""
     subscriber = _require_subscriber(db, subscriber_id)
-    status_map = {
-        "active": SubscriberStatus.ACTIVE,
-        "unsubscribed": SubscriberStatus.UNSUBSCRIBED,
-        "bouncing": SubscriberStatus.BOUNCED,
-        "paused": SubscriberStatus.PAUSED,
-    }
-    subscriber.status = status_map[payload.status]
+    subscriber.status = STATUS_ALIASES[payload.status]
     if payload.status == "unsubscribed":
         subscriber.unsubscribed_at = datetime.now(timezone.utc)
         subscriber.unsubscribe_reason = payload.reason

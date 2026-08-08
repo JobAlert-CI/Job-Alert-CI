@@ -30,6 +30,18 @@ _LEVEL_BY_ACTION = {
     IngestionAction.INSERTED: "info",
 }
 
+# Vocabulaire API (utilise a la fois par le filtre GET et par le PATCH) mappe
+# vers les valeurs reellement stockees dans ContactMessageStatus.
+CONTACT_STATUS_ALIASES = {
+    "new": ContactMessageStatus.NEW,
+    "read": ContactMessageStatus.IN_PROGRESS,
+    "replied": ContactMessageStatus.REPLIED,
+    "archived": ContactMessageStatus.CLOSED,
+    "spam": ContactMessageStatus.SPAM,
+}
+
+_VALID_AUDIT_ACTIONS = {action.value for action in AdminAction}
+
 
 # ─── Journal d'audit admin ─────────────────────────────
 @router.get("/audit", response_model=list[AdminActionLogRead])
@@ -46,6 +58,8 @@ async def list_audit_logs(
     if admin_id:
         stmt = stmt.where(AdminActionLog.admin_id == admin_id)
     if action:
+        if action not in _VALID_AUDIT_ACTIONS:
+            raise HTTPException(status_code=400, detail=f"Action inconnue: {action}")
         stmt = stmt.where(AdminActionLog.action == action)
     if target_table:
         stmt = stmt.where(AdminActionLog.target_table == target_table)
@@ -110,7 +124,9 @@ async def list_contact_messages(
 ):
     stmt = select(ContactMessage).where(ContactMessage.deleted_at.is_(None))
     if status:
-        stmt = stmt.where(ContactMessage.status == status)
+        if status not in CONTACT_STATUS_ALIASES:
+            raise HTTPException(status_code=400, detail=f"Statut inconnu: {status}")
+        stmt = stmt.where(ContactMessage.status == CONTACT_STATUS_ALIASES[status])
     stmt = stmt.order_by(ContactMessage.created_at.desc()).limit(limit).offset(offset)
     return list(db.scalars(stmt))
 
@@ -126,13 +142,7 @@ async def update_contact_status(
     if not message:
         raise HTTPException(status_code=404, detail="Message introuvable")
 
-    status_map = {
-        "new": ContactMessageStatus.NEW,
-        "read": ContactMessageStatus.IN_PROGRESS,
-        "replied": ContactMessageStatus.REPLIED,
-        "archived": ContactMessageStatus.CLOSED,
-    }
-    message.status = status_map[payload.status]
+    message.status = CONTACT_STATUS_ALIASES[payload.status]
 
     log_admin_action(
         db, admin_id=admin.id, action=AdminAction.UPDATE, target_table="contact_messages", target_id=message.id,

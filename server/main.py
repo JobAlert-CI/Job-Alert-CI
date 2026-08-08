@@ -12,9 +12,18 @@ from db.session import init_db
 
 settings = get_settings()
 
+_INSECURE_DEFAULT_JWT_SECRET = "dev-insecure-secret-change-me"
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # En production, un secret JWT par defaut permettrait de forger des tokens
+    # admin: on refuse de demarrer plutot que de le faire silencieusement.
+    if settings.is_production and settings.admin_jwt_secret == _INSECURE_DEFAULT_JWT_SECRET:
+        raise RuntimeError(
+            "ADMIN_JWT_SECRET doit etre defini explicitement en production (APP_ENV=production)."
+        )
+
     # En production, Alembic doit piloter le schema. Ce flag reste pratique pour
     # un dev local ou une CI ephemere sans migration prealable.
     if settings.auto_create_tables:

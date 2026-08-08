@@ -6,7 +6,7 @@ from api.deps import get_current_admin, get_db
 from models import JobOffer, JobOfferStatus, Source, Subscriber, SubscriberStatus
 from models.content import ContactMessage
 from models.emails import EmailDigest
-from models.enums import ContactMessageStatus
+from models.enums import ContactMessageStatus, DigestStatus
 from models.scraping import ScrapeRun
 from schemas.admin import DashboardOverviewRead
 from schemas.scraping import ScrapeRunRead
@@ -50,7 +50,7 @@ async def get_dashboard_overview(db: Session = Depends(get_db)):
     
     pending_digests = db.scalar(
         select(func.count(EmailDigest.id))
-        .where(EmailDigest.status == "pending")
+        .where(EmailDigest.status == DigestStatus.QUEUED)
     ) or 0
     
     return DashboardOverviewRead(

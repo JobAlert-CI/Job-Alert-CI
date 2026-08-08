@@ -45,6 +45,8 @@ def create_subscriber(db: Session, payload: SubscriberCreate) -> Subscriber:
     now = datetime.now(timezone.utc)
     subscriber = db.scalar(select(Subscriber).where(Subscriber.email_normalized == email_normalized))
 
+    is_new_subscriber = subscriber is None
+
     if subscriber is None:
         subscriber = Subscriber(
             email=payload.email.strip(),
@@ -85,13 +87,23 @@ def create_subscriber(db: Session, payload: SubscriberCreate) -> Subscriber:
         if contract_type is not None:
             subscriber.contract_preferences.append(SubscriberContractPreference(contract_type_id=contract_type.id))
 
-    # Token de gestion cree seulement si l'abonne n'en a pas deja un actif.
-    if not subscriber.tokens:
-        raw_token = token_urlsafe(32)
+    # Un token est cree par usage (gestion des preferences / confirmation),
+    # seulement s'il n'en existe pas deja un actif pour ce couple abonne+purpose.
+    existing_purposes = {
+        token.purpose for token in subscriber.tokens if token.revoked_at is None
+    }
+    if TokenPurpose.MANAGE_ALERT not in existing_purposes:
         subscriber.tokens.append(
             SubscriberToken(
                 purpose=TokenPurpose.MANAGE_ALERT,
-                token_hash=token_hash(raw_token),
+                token_hash=token_hash(token_urlsafe(32)),
+            )
+        )
+    if is_new_subscriber and TokenPurpose.CONFIRM_EMAIL not in existing_purposes:
+        subscriber.tokens.append(
+            SubscriberToken(
+                purpose=TokenPurpose.CONFIRM_EMAIL,
+                token_hash=token_hash(token_urlsafe(32)),
             )
         )
 
