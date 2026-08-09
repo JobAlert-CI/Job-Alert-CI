@@ -1,4 +1,4 @@
-import api from "./axiosInstance";
+import api from "../axiosInstance";
 
 const API_URL = "/api/referentials";
 
@@ -9,6 +9,16 @@ const getSources = async() => {
 
 const getFilieres = async() => {
   const response = await api.get(`${API_URL}/filieres`)
+  return response.data
+}
+
+const getFilieresBySlug = async(slug) => {
+  const response = await api.get(`${API_URL}/filieres/${slug}`)
+  return response.data
+}
+
+const getSpecialitesFiliere = async(slug) => {
+  const response = await api.get(`${API_URL}/filieres/${slug}/specialites`)
   return response.data
 }
 
@@ -27,7 +37,7 @@ const getEducationLevels = async() => {
   return response.data
 }
 
-const getlocations = async() => {
+const getLocations = async() => {
   const response = await api.get(`${API_URL}/locations`)
   return response.data
 }
@@ -36,8 +46,10 @@ const getlocations = async() => {
 export {
   getSources,
   getFilieres,
+  getFilieresBySlug,
+  getSpecialitesFiliere,
   getContractTypes,
   getExperienceLevels,
   getEducationLevels,
-  getlocations
+  getLocations
 }
