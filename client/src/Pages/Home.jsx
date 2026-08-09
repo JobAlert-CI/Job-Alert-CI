@@ -30,6 +30,8 @@ import { useFetchData } from "@/hooks/use-fetch-data"
 import { Skeleton } from "@/components/ui/skeleton"
 import { HUES } from "@/lib/hues"
 import getFiliereTheme from "@/lib/filiere-theme"
+import chipFloat from "@/lib/chipFloat"
+import { REASSURANCES, QUESTIONS, TEMOIGNAGES, JOBS_APERCU } from "@/data/constanteMetier"
 
 /* ------------------------------------------------------------------ */
 /*  Constantes métier                                                 */
@@ -40,157 +42,6 @@ const EMAIL_DELIVERY_TIME = "8h00"
 const MAX_PREVIEW_OFFERS = 4
 const MAX_RECENT_OFFERS = 6
 const SOURCE_COUNT_FALLBACK = 4
-
-const REASSURANCES = [
-  "100 % gratuit, sans mot de passe",
-  "1 seul email par jour, pas plus",
-  "Désinscription en 1 clic",
-]
-
-const QUESTIONS = [
-  {
-    id: "q1",
-    question: "Est-ce vraiment gratuit ?",
-    reponse:
-      "Oui, à 100 % et pour toujours. Aucune carte bancaire, aucun frais caché : JobAlert CI ne vous demandera jamais de payer pour recevoir des offres.",
-  },
-  {
-    id: "q2",
-    question: "À quelle heure arrive le récapitulatif ?",
-    reponse:
-      "À 8h00 précises, chaque jour. Le scraping se termine à 6h15 et le filtrage à 7h00 — votre email est prêt avant votre premier café.",
-  },
-  {
-    id: "q3",
-    question: "D'où viennent les offres ?",
-    reponse:
-      "De 4 sources majeures scannées chaque matin : EmploiDakar CI, GoAfrica, Novojob et LinkedIn. Chaque offre affiche sa source d'origine et un lien direct vers l'annonce.",
-  },
-  {
-    id: "q4",
-    question: "Quels secteurs sont couverts ?",
-    reponse:
-      "13 filières métiers : Tech & Dev, Marketing & Com, Commercial & Vente, Comptabilité & Finance, RH, BTP & Génie Civil, Logistique & Transport, Santé & Médical, Administration, Éducation & Formation, Hôtellerie & Restauration, Agriculture & Agrobusiness, Sécurité & Gardiennage.",
-  },
-  {
-    id: "q5",
-    question: "Comment modifier mes filières ou me désinscrire ?",
-    reponse:
-      "Chaque email contient deux liens en bas de page : l'un pour gérer vos filières, l'autre pour vous désinscrire en un clic — sans mot de passe ni formulaire.",
-  },
-  {
-    id: "q6",
-    question: "Puis-je recevoir les alertes sur WhatsApp ?",
-    reponse:
-      "Pas encore. L'email est pour l'instant notre canal unique afin de garantir la fiabilité de la chaîne quotidienne. WhatsApp et SMS sont sur la feuille de route.",
-  },
-  {
-    id: "q7",
-    question: "Mes données sont-elles protégées ?",
-    reponse:
-      "Votre adresse email ne sert qu'à vous envoyer vos offres. Elle n'est jamais partagée, jamais revendue, et vous pouvez supprimer votre compte à tout moment.",
-  },
-]
-
-const TEMOIGNAGES = [
-  {
-    vedette: true,
-    initiales: "AD",
-    nom: "Awa D.",
-    ville: "Bouaké",
-    secteur: "Ressources Humaines",
-    avatar: "bg-violet-500",
-    texte:
-      "Je passais mes matinées à ouvrir dix sites un par un. Maintenant, tout arrive à 8h00 dans un seul email — et c'est dans mon tout premier récap que j'ai trouvé l'offre de Responsable RH que j'occupe aujourd'hui.",
-    resultat: "Embauchée 3 semaines après son inscription",
-  },
-  {
-    initiales: "JK",
-    nom: "Jean-Paul K.",
-    ville: "San Pédro",
-    secteur: "Tech & Dev",
-    avatar: "bg-sky-600",
-    texte:
-      "Alerte reçue à 8h00 pile, candidature envoyée à 8h20. Entretien la semaine suivante, CDI signé dans la foulée.",
-    resultat: "CDI signé en 12 jours",
-  },
-  {
-    initiales: "MK",
-    nom: "Moussa K.",
-    ville: "Abidjan",
-    secteur: "Comptabilité & Finance",
-    avatar: "bg-emerald-600",
-    texte:
-      "Dès la première semaine, une offre d'Expert-Comptable qui cochait toutes mes cases. Le filtrage par filière est d'une précision redoutable.",
-    resultat: "3 entretiens décrochés en 1 mois",
-  },
-  {
-    initiales: "SK",
-    nom: "Salimata K.",
-    ville: "Korhogo",
-    secteur: "Santé & Médical",
-    avatar: "bg-rose-600",
-    texte:
-      "Infirmière de nuit, je n'avais jamais le temps d'ouvrir les sites d'emploi. Le récap m'a apporté l'offre de la Clinique Farah sur un plateau — j'ai postulé entre deux gardes.",
-    resultat: "Nouveau poste en 3 semaines",
-  },
-  {
-    initiales: "YB",
-    nom: "Yao B.",
-    ville: "Yamoussoukro",
-    secteur: "BTP & Génie Civil",
-    avatar: "bg-amber-600",
-    texte:
-      "Une offre de conducteur de travaux arrivée un mardi, un chantier qui démarrait le lundi suivant. Sans l'alerte de 8h00, je passais complètement à côté.",
-    resultat: "CDD transformé en CDI",
-  },
-  {
-    initiales: "FC",
-    nom: "Fatou C.",
-    ville: "Abidjan",
-    secteur: "Marketing & Com",
-    avatar: "bg-fuchsia-600",
-    texte:
-      "J'ai fait le compte : en un mois, le récap m'a remonté plus d'offres pertinentes que trois mois de recherche manuelle, site par site.",
-    resultat: "12 candidatures ciblées en 1 mois",
-  },
-]
-
-/* ------------------------------------------------------------------ */
-/*  Fallbacks visuels                                                 */
-/* ------------------------------------------------------------------ */
-
-const JOBS_APERCU = [
-  {
-    id: "mock-1",
-    title: "Développeur Full-Stack",
-    company: { name: "Groupe SIFCA · Abidjan" },
-    source: { name: "Novojob", code: "novojob" },
-    primary_filiere: { hue: "sky" },
-  },
-  {
-    id: "mock-2",
-    title: "Responsable RH",
-    company: { name: "Orange Côte d'Ivoire · Abidjan" },
-    source: { name: "LinkedIn", code: "linkedin" },
-    primary_filiere: { hue: "violet" },
-    linkedin: true,
-  },
-  {
-    id: "mock-3",
-    title: "Conducteur de travaux",
-    company: { name: "Bouygues CI · Yamoussoukro" },
-    source: { name: "GoAfrica", code: "goafrica" },
-    primary_filiere: { hue: "amber" },
-  },
-  {
-    id: "mock-4",
-    title: "Infirmier(ère) diplômé(e)",
-    company: { name: "Clinique Farah · Abidjan" },
-    source: { name: "EmploiDakar CI", code: "emploidakar" },
-    primary_filiere: { hue: "rose" },
-  },
-]
 
 /* ------------------------------------------------------------------ */
 /*  Animations                                                        */
@@ -209,25 +60,6 @@ const fadeUp = {
     transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] },
   },
 }
-
-const chipFloat = (delay, duration = 4.5) => ({
-  initial: { opacity: 0, scale: 0.8 },
-  animate: {
-    opacity: 1,
-    scale: 1,
-    y: [0, -7, 0],
-    transition: {
-      opacity: { duration: 0.4, delay },
-      scale: { duration: 0.4, delay },
-      y: {
-        duration,
-        repeat: Infinity,
-        ease: "easeInOut",
-        delay: delay + 0.4,
-      },
-    },
-  },
-})
 
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                           */
@@ -1419,7 +1251,7 @@ const Testimonials = () => (
       />
 
       <div className="overflow-hidden">
-        <div className="flex w-max will-change-transform motion-safe:animate-marquee group-hover:[animation-play-state:paused]">
+        <div className="flex w-max will-change-transform motion-safe:animate-marquee group-hover:paused">
           {[0, 1].map((copie) => (
             <div
               key={copie}

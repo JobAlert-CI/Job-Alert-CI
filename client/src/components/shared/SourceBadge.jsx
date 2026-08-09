@@ -5,19 +5,15 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { SOURCES } from "@/lib/referentiels"
 import { getImgSource } from "@/utils/utilsSource"
 
-export const SourceLogo = ({ code, className = "size-4" }) => {
-  const s = SOURCES.find((x) => x.code === code)
-  if (!s) return null
+export const SourceLogo = ({ code, className = "size-6" }) => {
   return (
     <span className={cn("grid shrink-0 place-items-center overflow-hidden rounded", className)}>
-      {s.linkedin
-        ? <FaLinkedin className="size-full text-[#0A66C2]" />
-        : <img src={getImgSource(code)} alt={code} className="size-full object-contain" />}
+      <img src={getImgSource(code)} alt={code} className="size-full object-contain" />
     </span>
   )
 }
 
-export const ChipSource = ({ source, tooltip, className, logoClassName = "size-4" }) => (
+export const ChipSource = ({ source, tooltip, className, logoClassName = "size-6" }) => (
   <Tooltip>
     <TooltipTrigger asChild>
       <span className={cn(

@@ -62,7 +62,7 @@ def _database_url() -> str:
     metal. On laisse un fallback SQLite seulement pour tests ponctuels.
     """
 
-    explicit_url = getenv("DATABASE_URL")
+    explicit_url = getenv("DATABASE_URL_DEV") if getenv("APP_ENV") == "development"  else getenv("DATABASE_URL")
     if explicit_url:
         return explicit_url
 

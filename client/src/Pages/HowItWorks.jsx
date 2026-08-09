@@ -1,14 +1,23 @@
-import { useState, useEffect, useRef } from "react"
-import {
-  motion,
-  useScroll,
-  useSpring,
-  AnimatePresence
-} from "framer-motion"
+import { useState, useEffect, useRef, useCallback, useMemo } from "react"
+import { motion, useScroll, useSpring, AnimatePresence } from "framer-motion"
 import { Link } from "react-router-dom"
 import {
-  ArrowRight, BadgeCheck, Bell, Check, Clock, Filter, MailCheck, Database,
-  Fingerprint, Radar, RefreshCw, Send, ShieldAlert, SlidersHorizontal, LayoutGrid,
+  ArrowRight,
+  BadgeCheck,
+  Bell,
+  Check,
+  Clock,
+  Filter,
+  MailCheck,
+  Database,
+  Fingerprint,
+  Radar,
+  RefreshCw,
+  Send,
+  ShieldAlert,
+  SlidersHorizontal,
+  LayoutGrid,
+  AlertCircle,
 } from "lucide-react"
 import { FaLinkedin } from "react-icons/fa"
 import { cn } from "@/lib/utils"
@@ -16,73 +25,26 @@ import Seo from "@/components/seo/Seo"
 import { howItWorksSeo } from "@/lib/seo"
 import { getImgSource, getUrlSource } from "@/utils/utilsSource"
 import {
-  CountdownEnvoi, CtaLink, StatusChip, ReassuranceList,
-  FaqSection, SectionHeading, StepBlock, VisualFrame,
+  CountdownEnvoi,
+  CtaLink,
+  StatusChip,
+  ReassuranceList,
+  FaqSection,
+  SectionHeading,
+  StepBlock,
+  VisualFrame,
+  SourceLogo,
 } from "@/components/shared"
+import { getSources } from "@/api/public/sources"
+import { REASSURANCES } from "@/data/constanteMetier"
+import { useFetchData } from "@/hooks/use-fetch-data"
+import chipFloat from "@/lib/chipFloat"
+import { Skeleton } from "@/components/ui/skeleton"
+import { STEPS_HOW, EMAIL_JOBS, OFFRES_FILTREES, QUESTIONS_HOW } from "@/data/constanteMetier"
 
 /* ════════════════════════════════════════════════════════════════════
-  DONNÉES
+   ANIMATIONS
 ════════════════════════════════════════════════════════════════════ */
-
-const REASSURANCES_HERO = ["Gratuit pour toujours", "Sans mot de passe", "Désinscription en 1 clic"]
-
-const STEPS = [
-  { time: "06h00", icon: Radar, title: "Collecte", desc: "4 scrapers parcourent les sites sources en parallèle, la panne d'une source ne bloque jamais les autres.", hex: "#F5A623", metric: "+42 offres brutes collectées" },
-  { time: "06h45", icon: Fingerprint, title: "Dédoublonnage", desc: "Chaque annonce reçoit un hash unique calculé depuis son lien.", hex: "#0F2D4D", metric: "12 doublons écartés" },
-  { time: "07h15", icon: Filter, title: "Filtrage", desc: "Les offres sont matchées avec vos 1 à 3 filières métiers.", hex: "#2ECC71", metric: "3 offres matchées pour vous" },
-  { time: "08h00", icon: MailCheck, title: "Envoi", desc: "Votre récapitulatif personnalisé part par email, 3 tentatives en cas de panne SMTP.", hex: "#F5A623", metric: "Livré à 08h00:00" },
-];
-
-const EMAIL_JOBS = [
-  { t: "Développeur Full-Stack React / Node", e: "Digital Hub CI" },
-  { t: "Ingénieur DevOps Cloud", e: "Wave Mobile Money" },
-  { t: "Tech Lead Java", e: "SGI Africa" },
-];
-
-const SOURCES_RUN = [
-  { nom: "EmploiDakar CI", heure: "6h01" },
-  { nom: "GoAfrica", heure: "6h02" },
-  { nom: "Novojob", heure: "6h02" },
-  { nom: "LinkedIn", heure: "6h04", linkedin: true },
-]
-
-const OFFRES_FILTREES = [
-  { titre: "Responsable RH", entreprise: "Orange Côte d'Ivoire", ok: true },
-  { titre: "Comptable senior", entreprise: "Groupe SIFCA", ok: true },
-  { titre: "Développeur Full-Stack", entreprise: "Tech Solutions CI", ok: false },
-]
-
-const QUESTIONS = [
-  {
-    id: "q1", question: "Pourquoi un email plutôt qu'un tableau de bord ?",
-    reponse: "Parce que c'est plus rapide. Le mode « push » vous évite de penser à vérifier : l'information vient à vous chaque matin, au lieu d'ajouter un site de plus à consulter. C'est aussi le meilleur moyen de ne rien manquer."
-  },
-  {
-    id: "q2", question: "Comment une offre est-elle rattachée à une filière ?",
-    reponse: "Par analyse de mots-clés dans l'intitulé du poste : « développeur » ou « ingénieur logiciel » → Tech & Dev, « conducteur de travaux » → BTP & Génie Civil… Les listes de mots-clés sont maintenues et affinées en continu."
-  },
-  {
-    id: "q3", question: "Que se passe-t-il si une source est en panne ?",
-    reponse: "Rien de visible pour vous : chaque scraper est isolé, l'erreur est journalisée avec horodatage, et les trois autres sources continuent d'alimenter votre récapitulatif normalement."
-  },
-  {
-    id: "q4", question: "Et si aucune offre ne correspond à mes filières aujourd'hui ?",
-    reponse: "Vous ne recevez rien. Pas d'email vide, pas de remplissage : votre boîte mail reste propre, et la chaîne reprend le lendemain matin."
-  },
-  {
-    id: "q5", question: "Pourquoi 8h00 précisément ?",
-    reponse: "Pour que votre récapitulatif soit là au moment où vous commencez votre journée — avant que les meilleures offres ne reçoivent leurs premières candidatures."
-  },
-  {
-    id: "q6", question: "Puis-je changer de filières après mon inscription ?",
-    reponse: "Oui. Chaque email contient un lien pour gérer vos filières ou vous désinscrire en un clic — sans mot de passe ni formulaire."
-  },
-]
-
-/* ════════════════════════════════════════════════════════════════════
-  ANIMATIONS
-════════════════════════════════════════════════════════════════════ */
-
 const containerVariants = {
   hidden: {},
   visible: { transition: { staggerChildren: 0.1, delayChildren: 0.1 } },
@@ -94,22 +56,83 @@ const fadeUp = {
 }
 
 /* ════════════════════════════════════════════════════════════════════
-  HERO — le pipeline vivant
+   HELPERS
 ════════════════════════════════════════════════════════════════════ */
+const getSourceStatus = (source) => {
+  if (!source) return { status: "unknown", label: "Inconnu", color: "text-gray-500" }
+  
+  const isActive = source.status === "active"
+  const lastScrape = source.stats?.last_scrape_status
+  
+  if (!isActive) {
+    return { status: "inactive", label: "Inactif", color: "text-error" }
+  }
+  
+  if (lastScrape === "failed") {
+    return { status: "error", label: "Erreur", color: "text-error" }
+  }
+  
+  if (lastScrape === "success") {
+    return { status: "active", label: "Actif", color: "text-emerald-600" }
+  }
+  
+  return { status: "active", label: "Actif", color: "text-emerald-600" }
+}
 
-const PipelineCard = () => {
-  const dateFr = (() => {
-    const d = new Date().toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" })
-    return d.charAt(0).toUpperCase() + d.slice(1)
-  })()
+const getSourceStats = (source) => {
+  if (!source?.stats) return { active: 0, new: 0 }
+  return {
+    active: source.stats.active_offers ?? 0,
+    new: source.stats.new_offers ?? 0,
+  }
+}
 
-  const [tick, setTick] = useState(0);
+const formatDateFr = () => {
+  const d = new Date().toLocaleDateString("fr-FR", { 
+    weekday: "long", 
+    day: "numeric", 
+    month: "long" 
+  })
+  return d.charAt(0).toUpperCase() + d.slice(1)
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   HERO — le pipeline vivant
+════════════════════════════════════════════════════════════════════ */
+const PipelineCard = ({ sources, loading, error }) => {
+  const dateFr = useMemo(() => formatDateFr(), [])
+  const [tick, setTick] = useState(0)
+
   useEffect(() => {
-    const id = setInterval(() => setTick((t) => (t + 1) % 6), 1700);
-    return () => clearInterval(id);
-  }, []);
-  const delivered = tick >= 4;
-  const stateOf = (i) => (delivered || tick > i ? "done" : tick === i ? "active" : "pending");
+    const id = setInterval(() => setTick((t) => (t + 1) % 6), 1700)
+    return () => clearInterval(id)
+  }, [])
+
+  const delivered = tick >= 4
+  const stateOf = (i) => (delivered || tick > i ? "done" : tick === i ? "active" : "pending")
+
+  const PARAMS_CONFIG = [
+    { cls: "-left-3 top-8 md:-left-6", dur: 4.4, delay: 0 },
+    { cls: "-right-2 top-24 md:-right-5", dur: 5.2, delay: 0.8 },
+    { cls: "-left-2 bottom-28 md:-left-7", dur: 4.8, delay: 1.4 },
+    { cls: "-right-2 bottom-10 md:-right-4", dur: 5.6, delay: 0.4 },
+  ]
+
+  const chips = useMemo(() => {
+    if (!Array.isArray(sources)) return []
+    return sources.map((source, index) => {
+      const configParams = PARAMS_CONFIG[index % PARAMS_CONFIG.length]
+      return {
+        ...source,
+        ...configParams,
+      }
+    })
+  }, [sources])
+
+  const activeSourcesCount = useMemo(() => {
+    if (!Array.isArray(sources)) return 0
+    return sources.filter((s) => s.status === "active").length
+  }, [sources])
 
   return (
     <motion.div
@@ -118,30 +141,22 @@ const PipelineCard = () => {
       transition={{ duration: 0.7, delay: 0.25, ease: "easeOut" }}
       className="relative min-w-0"
     >
-      {/* Chips sources flottantes (position absolue → aucun impact layout) */}
-      {[
-        { label: "EmploiDakar CI", hex: "#F5A623", cls: "-left-3 top-8 md:-left-6", dur: 4.4, delay: 0 },
-        { label: "LinkedIn", hex: "#0A66C2", cls: "-right-2 top-24 md:-right-5", dur: 5.2, delay: 0.8, icon: true },
-        { label: "Novojob", hex: "#0F2D4D", cls: "-left-2 bottom-28 md:-left-7", dur: 4.8, delay: 1.4 },
-        { label: "GoAfrica", hex: "#2ECC71", cls: "-right-2 bottom-10 md:-right-4", dur: 5.6, delay: 0.4 },
-      ].map((chip) => (
-        <motion.div
-          key={chip.label}
-          className={cn(
-            "absolute z-20 hidden items-center gap-2 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold shadow-hover md:flex",
-            chip.cls
-          )}
-          animate={{ y: [0, -10, 0] }}
-          transition={{ duration: chip.dur, repeat: Infinity, ease: "easeInOut", delay: chip.delay }}
-        >
-          {chip.icon
-            ? <FaLinkedin className="size-3" style={{ color: chip.hex }} />
-            : <img src={getImgSource(chip.label)} alt={chip.label} className="size-5" />}
-          {chip.label}
-        </motion.div>
-      ))}
+      {!loading && !error &&
+        chips.map((chip) => (
+          <motion.span
+            key={chip.id || chip.code}
+            {...chipFloat(chip.delay, chip.dur)}
+            className={cn(
+              "absolute z-20 hidden items-center gap-2 -rotate-3 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold shadow-hover md:flex",
+              chip.cls
+            )}
+          >
+            <SourceLogo code={chip.code || chip.name} />
+            {chip.name}
+          </motion.span>
+        ))}
 
-      {/* Console « run quotidien » — hauteur constante du montage au démontage */}
+      {/* Console « run quotidien » */}
       <div className="overflow-hidden rounded-xl border border-border bg-card shadow-hover">
         {/* En-tête console */}
         <div className="flex items-center justify-between border-b border-border px-5 py-3.5">
@@ -157,13 +172,16 @@ const PipelineCard = () => {
 
         {/* Pipeline */}
         <div className="p-5 sm:p-6">
-          {STEPS.map((s, i) => {
-            const st = stateOf(i);
+          {STEPS_HOW.map((s, i) => {
+            const st = stateOf(i)
             return (
               <div key={s.title} className="relative flex gap-4 pb-7 last:pb-0">
                 {/* Connecteur vertical */}
-                {i < STEPS.length - 1 && (
-                  <span className="absolute left-5 top-11 h-[calc(100%-2.5rem)] w-0.5 -translate-x-1/2 rounded bg-border" aria-hidden>
+                {i < STEPS_HOW.length - 1 && (
+                  <span
+                    className="absolute left-5 top-11 h-[calc(100%-2.5rem)] w-0.5 -translate-x-1/2 rounded bg-border"
+                    aria-hidden
+                  >
                     <motion.span
                       className="block w-full origin-top rounded bg-brand-orange"
                       initial={false}
@@ -186,7 +204,10 @@ const PipelineCard = () => {
                 >
                   {st === "done" ? <Check className="h-4 w-4" /> : <s.icon className="h-4.5 w-4.5" />}
                   {st === "active" && (
-                    <span className="absolute inset-0 animate-ping rounded-full border-2 border-brand-orange opacity-50" aria-hidden />
+                    <span
+                      className="absolute inset-0 animate-ping rounded-full border-2 border-brand-orange opacity-50"
+                      aria-hidden
+                    />
                   )}
                 </div>
 
@@ -194,13 +215,19 @@ const PipelineCard = () => {
                 <div className="min-w-0 pt-0.5">
                   <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
                     <span className="font-mono text-xs font-bold text-muted-foreground">{s.time}</span>
-                    <span className="font-heading text-sm font-extrabold uppercase tracking-wide">{s.title}</span>
-                    {/* Statut : les deux libellés occupent le même emplacement, opacité croisée */}
+                    <span className="font-heading text-sm font-extrabold uppercase tracking-wide">
+                      {s.title}
+                    </span>
+
+                    {/* Statut */}
                     <span className="relative inline-flex h-4 items-center">
                       <motion.span
                         animate={{ opacity: st === "active" ? 1 : 0 }}
                         transition={{ duration: 0.25 }}
-                        className={cn("animate-pulse text-[10px] font-bold uppercase tracking-wider text-brand-orange", st !== "active" && "hidden")}
+                        className={cn(
+                          "animate-pulse text-[10px] font-bold uppercase tracking-wider text-brand-orange",
+                          st !== "active" && "hidden"
+                        )}
                         aria-hidden={st !== "active"}
                       >
                         en cours…
@@ -208,13 +235,17 @@ const PipelineCard = () => {
                       <motion.span
                         animate={{ opacity: st === "done" ? 1 : 0 }}
                         transition={{ duration: 0.25 }}
-                        className={cn("absolute inset-0 flex items-center text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400", st !== "done" && "hidden")}
+                        className={cn(
+                          "absolute inset-0 flex items-center text-[10px] font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400",
+                          st !== "done" && "hidden"
+                        )}
                         aria-hidden={st !== "done"}
                       >
                         terminé
                       </motion.span>
                     </span>
                   </div>
+
                   <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{s.desc}</p>
 
                   <motion.p
@@ -225,14 +256,17 @@ const PipelineCard = () => {
                     style={{ color: s.hex === "#0F2D4D" ? undefined : s.hex }}
                     aria-hidden={st !== "done"}
                   >
-                    <span className={s.hex === "#0F2D4D" ? "text-foreground" : ""}>▸ {s.metric}</span>
+                    <span className={s.hex === "#0F2D4D" ? "text-foreground" : ""}>
+                      ▸ {s.metric}
+                    </span>
                   </motion.p>
                 </div>
               </div>
-            );
+            )
           })}
         </div>
 
+        {/* Pied */}
         <div className="border-t border-border bg-muted/40 px-5 py-4 sm:px-6">
           {/* Ligne de statut */}
           <div className="flex min-w-0 items-center justify-between gap-3">
@@ -241,7 +275,9 @@ const PipelineCard = () => {
                 {delivered ? (
                   <motion.span
                     key="sent"
-                    initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
                     transition={{ duration: 0.3 }}
                     className="flex min-w-0 items-center gap-2 text-xs font-extrabold"
                   >
@@ -251,35 +287,49 @@ const PipelineCard = () => {
                 ) : (
                   <motion.span
                     key="waiting"
-                    initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }}
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
                     transition={{ duration: 0.3 }}
                     className="flex min-w-0 items-center gap-2 text-xs text-muted-foreground"
                   >
                     <Clock className="h-3.5 w-3.5 shrink-0" />
                     <span className="min-w-0 truncate">
-                      Envoi programmé à <span className="font-mono font-extrabold text-foreground">08h00</span>
+                      Envoi programmé à{" "}
+                      <span className="font-mono font-extrabold text-foreground">08h00</span>
                     </span>
                   </motion.span>
                 )}
               </AnimatePresence>
             </div>
 
-            {/* Pastille droite : dots → badge, dans un conteneur à hauteur fixe */}
+            {/* Pastille droite */}
             <div className="flex h-5 shrink-0 items-center">
               <AnimatePresence mode="wait" initial={false}>
                 {delivered ? (
                   <motion.span
                     key="badge"
-                    initial={{ opacity: 0, scale: 0.85 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.85 }}
+                    initial={{ opacity: 0, scale: 0.85 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.85 }}
                     transition={{ duration: 0.3 }}
                     className="rounded-full bg-brand-orange/15 px-2 py-0.5 text-[10px] font-bold text-[#8a5c00] dark:text-brand-orange"
                   >
-                    3 offres · Tech &amp; Dev
+                    {activeSourcesCount} sources actives
                   </motion.span>
                 ) : (
-                  <motion.span key="dots" exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="flex items-center gap-1">
+                  <motion.span
+                    key="dots"
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="flex items-center gap-1"
+                  >
                     {[0, 1, 2].map((i) => (
-                      <span key={i} className="h-1 w-1 animate-bounce rounded-full bg-brand-orange" style={{ animationDelay: `${i * 0.15}s` }} />
+                      <span
+                        key={i}
+                        className="h-1 w-1 animate-bounce rounded-full bg-brand-orange"
+                        style={{ animationDelay: `${i * 0.15}s` }}
+                      />
                     ))}
                   </motion.span>
                 )}
@@ -287,13 +337,14 @@ const PipelineCard = () => {
             </div>
           </div>
 
-          {/* 3 lignes — skeleton en attente, offres réelles une fois livré */}
+          {/* 3 lignes */}
           <div className="mt-2.5 space-y-1.5">
             {EMAIL_JOBS.map((j, i) =>
               delivered ? (
                 <motion.div
                   key={`job-${j.t}`}
-                  initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.1 + i * 0.12, duration: 0.3 }}
                   className="flex h-7.5 items-center gap-2 rounded-md border border-border bg-card px-2.5 text-[11px]"
                 >
@@ -308,7 +359,10 @@ const PipelineCard = () => {
                   style={{ animationDelay: `${i * 0.2}s` }}
                 >
                   <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-muted-foreground/20" />
-                  <span className="h-2 rounded-full bg-muted-foreground/15" style={{ width: `${68 - i * 14}%` }} />
+                  <span
+                    className="h-2 rounded-full bg-muted-foreground/15"
+                    style={{ width: `${68 - i * 14}%` }}
+                  />
                 </div>
               )
             )}
@@ -319,15 +373,23 @@ const PipelineCard = () => {
   )
 }
 
-const HeroHowItWorks = () => (
+const HeroHowItWorks = ({ sources, loading, error }) => (
   <section className="relative overflow-hidden hero-gradient">
     <div className="absolute inset-0 bg-pattern opacity-50" aria-hidden />
-    <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(245,166,35,0.10),transparent_50%)]" aria-hidden />
+    <div
+      className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(245,166,35,0.10),transparent_50%)]"
+      aria-hidden
+    />
     <div className="absolute -bottom-40 -left-40 size-120 rounded-full bg-brand-navy/4 blur-3xl" aria-hidden />
 
     <div className="relative z-10 mx-auto max-w-7xl px-6 pb-16 pt-13 md:px-12 md:pb-20 lg:pt-18">
       <div className="grid items-center gap-14 lg:grid-cols-2 lg:gap-16">
-        <motion.div variants={containerVariants} initial="hidden" animate="visible" className="flex flex-col items-start gap-5">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="flex flex-col items-start gap-5"
+        >
           <motion.div variants={fadeUp} className="hidden md:flex">
             <StatusChip tooltip="Scraping à 6h00, dédoublonnage à 6h15, filtrage à 7h00, envoi à 8h00 chaque jour, week-end compris.">
               Chaîne quotidienne active · dernier run à 6h02
@@ -364,64 +426,56 @@ const HeroHowItWorks = () => (
           </motion.h1>
 
           <motion.p variants={fadeUp} className="max-w-xl md:text-lg leading-relaxed text-on-surface-variant">
-            Chaque matin entre <strong className="font-semibold text-brand-navy">6h00 et 8h00</strong>, JobAlert CI
-            déroule seul toute la chaîne : collecte des 4 sources, dédoublonnage, filtrage par filière, puis envoi de
-            votre récapitulatif. Voici exactement ce qui se passe.
+            Chaque matin entre <strong className="font-semibold text-brand-navy">6h00 et 8h00</strong>,
+            JobAlert CI déroule seul toute la chaîne : collecte des différentes sources, dédoublonnage,
+            filtrage par filière, puis envoi de votre récapitulatif. Voici exactement ce qui se passe.
           </motion.p>
 
           <motion.div variants={fadeUp} className="mt-1 flex flex-col gap-3 sm:flex-row">
-            <motion.div variants={fadeUp} className="mt-1 flex flex-col gap-3 sm:flex-row">
-              <CtaLink to="/inscription" icon={Bell} animateIcon>Créer mon alerte gratuite</CtaLink>
-              <CtaLink to="/comment-ca-marche" variant="secondary" icon={LayoutGrid}>
-                Toutes les filieres
-              </CtaLink>
-            </motion.div>
+            <CtaLink to="/inscription" icon={Bell} animateIcon>
+              Créer mon alerte gratuite
+            </CtaLink>
+            <CtaLink to="/filieres" variant="secondary" icon={LayoutGrid}>
+              Toutes les filières
+            </CtaLink>
           </motion.div>
 
           <motion.div variants={fadeUp}>
-            <ReassuranceList items={REASSURANCES_HERO} />
+            <ReassuranceList items={REASSURANCES} />
           </motion.div>
+
           <CountdownEnvoi variant="horloge" className="mx-auto md:mt-4" />
         </motion.div>
 
-        <PipelineCard />
+        <PipelineCard sources={sources} loading={loading} error={error} />
       </div>
     </div>
   </section>
 )
 
 /* ════════════════════════════════════════════════════════════════════
-  LES 4 ÉTAPES EN DÉTAIL — visualisations du fonctionnement réel
+   LES 4 ÉTAPES EN DÉTAIL
 ════════════════════════════════════════════════════════════════════ */
-
-/* ═══ Trace serpentine — version ruban XL ════════════════════════════ */
 
 const TRACE_VB = { w: 1000, h: 2400 }
 
-/* Tracé difforme qui louvoie vers le visuel de chaque étape
-   (droite, gauche, droite, gauche) — déborde du cadre en haut/bas. */
 const TRACE_PATH =
-  "M 520 -120 " +
-  "C 700 60, 848 150, 836 320 " +
-  "C 824 490, 606 428, 452 528 " +
-  "C 268 645, 146 748, 184 932 " +
-  "C 218 1098, 432 1012, 622 1120 " +
-  "C 818 1230, 874 1338, 824 1508 " +
-  "C 772 1690, 542 1612, 390 1728 " +
-  "C 212 1862, 140 1970, 210 2110 " +
-  "C 292 2272, 512 2330, 498 2520"
+  "M 520 -120  " +
+  "C 700 60, 848 150, 836 320  " +
+  "C 824 490, 606 428, 452 528  " +
+  "C 268 645, 146 748, 184 932  " +
+  "C 218 1098, 432 1012, 622 1120  " +
+  "C 818 1230, 874 1338, 824 1508  " +
+  "C 772 1690, 542 1612, 390 1728  " +
+  "C 212 1862, 140 1970, 210 2110  " +
+  "C 292 2272, 512 2330, 498 2520 "
 
 const SerpentineTrace = ({ progress }) => {
   const pathRef = useRef(null)
 
   return (
     <div className="pointer-events-none absolute inset-0 z-0" aria-hidden>
-      <svg
-        className="h-full w-full"
-        viewBox={`0 0 ${TRACE_VB.w} ${TRACE_VB.h}`}
-        preserveAspectRatio="none"
-      >
-        {/* Fantôme du tracé complet — ruban navy large */}
+      <svg className="h-full w-full" viewBox={`0 0 ${TRACE_VB.w} ${TRACE_VB.h}`} preserveAspectRatio="none">
         <path
           ref={pathRef}
           d={TRACE_PATH}
@@ -432,7 +486,6 @@ const SerpentineTrace = ({ progress }) => {
           strokeLinecap="round"
           vectorEffect="non-scaling-stroke"
         />
-        {/* Halo extérieur — nappe orange très diffuse */}
         <motion.path
           d={TRACE_PATH}
           fill="none"
@@ -443,7 +496,6 @@ const SerpentineTrace = ({ progress }) => {
           vectorEffect="non-scaling-stroke"
           style={{ pathLength: progress }}
         />
-        {/* Halo intérieur — glow plus dense */}
         <motion.path
           d={TRACE_PATH}
           fill="none"
@@ -454,7 +506,6 @@ const SerpentineTrace = ({ progress }) => {
           vectorEffect="non-scaling-stroke"
           style={{ pathLength: progress }}
         />
-        {/* Ligne dessinée — trait épais */}
         <motion.path
           d={TRACE_PATH}
           fill="none"
@@ -471,40 +522,93 @@ const SerpentineTrace = ({ progress }) => {
 }
 
 /* ── Visuel 1 : statut des scrapers ─────────────────────────────────── */
-const VisualCollecte = () => (
+const VisualCollecte = ({ sources, loading }) => (
   <VisualFrame time="06h00">
     <div className="flex items-center justify-between gap-3">
-      <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Scrapers · statut du jour</p>
-      <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-700">4/4 actifs</span>
+      <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+        Scrapers · statut du jour
+      </p>
+      {!loading && sources && (
+        <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
+          {sources.filter((s) => s.status === "active").length}/{sources.length} actifs
+        </span>
+      )}
     </div>
 
     <ul className="mt-3.5 space-y-2">
-      {SOURCES_RUN.map((s, i) => (
-        <motion.li
-          key={s.nom}
-          initial={{ opacity: 0, x: -14 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.4, delay: 0.15 + i * 0.12, ease: "easeOut" }}
-          className="flex items-center gap-3 rounded-lg border border-outline-variant/40 bg-surface-container-lowest px-3.5 py-2.5"
-        >
-          <span className="relative flex size-2 shrink-0">
-            <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-            <span className="relative inline-flex size-2 rounded-full bg-emerald-500" />
-          </span>
-          <span className="flex-1 truncate text-[13px] font-semibold text-on-surface">{s.nom}</span>
-          {s.linkedin ? <FaLinkedin className="size-3.5 shrink-0 text-[#0A66C2]" /> : <img src={getImgSource(s.nom)} alt={s.nom} className="size-7" />}
-          <span className="text-[11px] font-medium text-muted-foreground">{s.heure}</span>
-          <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-700">OK</span>
-        </motion.li>
-      ))}
+      {loading
+        ? Array.from({ length: 4 }, (_, i) => (
+            <div
+              key={i}
+              className="flex items-center gap-3 rounded-lg border border-outline-variant/40 bg-surface-container-lowest px-3.5 py-2.5"
+            >
+              <Skeleton className="size-2 shrink-0 rounded-full" />
+              <Skeleton className="h-4 flex-1 max-w-35" />
+              <Skeleton className="size-5 shrink-0 rounded-full" />
+              <Skeleton className="h-3 w-10 shrink-0" />
+              <Skeleton className="h-5 w-12 shrink-0 rounded-full" />
+            </div>
+          ))
+        : sources?.map((s, i) => {
+            const status = getSourceStatus(s)
+            const stats = getSourceStats(s)
+
+            return (
+              <motion.li
+                key={s.id}
+                initial={{ opacity: 0, x: -14 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: 0.15 + i * 0.12, ease: "easeOut" }}
+                className="flex items-center gap-3 rounded-lg border border-outline-variant/40 bg-surface-container-lowest px-3.5 py-2.5"
+              >
+                <span className="relative flex size-2 shrink-0">
+                  <span
+                    className={cn(
+                      "absolute inline-flex size-full animate-ping rounded-full opacity-75",
+                      status.status === "active" ? "bg-emerald-400" : "bg-error"
+                    )}
+                  />
+                  <span
+                    className="relative inline-flex size-2 rounded-full"
+                    style={{ background: s.color_hex || "#10b981" }}
+                  />
+                </span>
+
+                <span className="flex-1 truncate text-[13px] font-semibold text-on-surface">
+                  {s.name}
+                </span>
+
+                <SourceLogo code={s.code || s.name} />
+
+                <span className="text-[11px] font-medium text-muted-foreground">
+                  {s.stats?.new_offers ?? 0} nouvelles
+                </span>
+
+                <span
+                  className={cn(
+                    "rounded-full px-2 py-0.5 text-[10px] font-bold",
+                    status.status === "active"
+                      ? "text-emerald-700 bg-emerald-500/10"
+                      : "text-error bg-error/10"
+                  )}
+                >
+                  {status.label}
+                </span>
+              </motion.li>
+            )
+          })}
     </ul>
 
     {/* Flux vers la base */}
     <div className="flex justify-center py-2.5" aria-hidden>
       <div className="flex flex-col items-center gap-1">
         {[0, 1, 2].map((i) => (
-          <span key={i} className="size-1 animate-pulse rounded-full bg-brand-orange" style={{ animationDelay: `${i * 200}ms` }} />
+          <span
+            key={i}
+            className="size-1 animate-pulse rounded-full bg-brand-orange"
+            style={{ animationDelay: `${i * 200}ms` }}
+          />
         ))}
       </div>
     </div>
@@ -513,16 +617,18 @@ const VisualCollecte = () => (
       <Database className="size-4 shrink-0 text-brand-orange" />
       <p className="text-[13px] font-semibold">Base offres</p>
       <p className="ml-auto text-[11px] text-white/60">
-        <strong className="font-heading text-brand-orange">+47</strong> aujourd'hui
+        <strong className="font-heading text-brand-orange">
+          +{sources?.reduce((acc, s) => acc + (s.stats?.new_offers ?? 0), 0) ?? 0}
+        </strong>{" "}
+        aujourd'hui
       </p>
     </div>
 
     <div className="flex flex-col md:flex-row gap-2 items-center justify-between pt-3">
       <p className="mt-3.5 flex items-center gap-1.5 text-[11px] text-muted-foreground">
         <ShieldAlert className="size-3.5 shrink-0 text-brand-orange" />
-        Scraper LinkedIn : délais renforcés — la source la plus protégée.
+        Chaque échec est journalisé avec horodatage
       </p>
-
       <Link
         to="/sources"
         className="inline-flex h-8 items-center gap-1 rounded-md px-2.5 text-xs font-bold bg-primary text-white shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:brightness-110 active:scale-[0.98]"
@@ -536,7 +642,9 @@ const VisualCollecte = () => (
 /* ── Visuel 2 : le tampon "doublon" ─────────────────────────────────── */
 const VisualDedup = () => (
   <VisualFrame time="06h15">
-    <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">6h15 — même annonce, deux sources</p>
+    <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+      6h15 — même annonce, deux sources
+    </p>
 
     <div className="mt-3.5 grid gap-3 sm:grid-cols-2">
       <motion.div
@@ -548,11 +656,15 @@ const VisualDedup = () => (
       >
         <div className="flex items-center justify-between gap-2">
           <Fingerprint className="size-4 text-emerald-600" />
-          <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-bold text-emerald-700">✓ Insérée</span>
+          <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
+            ✓ Insérée
+          </span>
         </div>
         <p className="mt-2.5 text-[13px] font-bold text-brand-navy">Comptable senior</p>
         <p className="text-[11px] text-muted-foreground">Groupe SIFCA · via Novojob</p>
-        <p className="mt-2 rounded bg-surface-container-low px-2 py-1 font-mono text-[10px] text-on-surface-variant">hash: a3f8…9c2</p>
+        <p className="mt-2 rounded bg-surface-container-low px-2 py-1 font-mono text-[10px] text-on-surface-variant">
+          hash: a3f8…9c2
+        </p>
       </motion.div>
 
       <motion.div
@@ -571,10 +683,15 @@ const VisualDedup = () => (
         >
           Doublon
         </motion.span>
+
         <Fingerprint className="size-4 text-muted-foreground" />
-        <p className="mt-2.5 text-[13px] font-bold text-on-surface-variant line-through decoration-red-400/70">Comptable senior</p>
+        <p className="mt-2.5 text-[13px] font-bold text-on-surface-variant line-through decoration-red-400/70">
+          Comptable senior
+        </p>
         <p className="text-[11px] text-muted-foreground">Groupe SIFCA · via GoAfrica</p>
-        <p className="mt-2 rounded bg-surface-container px-2 py-1 font-mono text-[10px] text-muted-foreground">hash: a3f8…9c2</p>
+        <p className="mt-2 rounded bg-surface-container px-2 py-1 font-mono text-[10px] text-muted-foreground">
+          hash: a3f8…9c2
+        </p>
         <p className="mt-1.5 text-[10px] font-semibold text-red-600/80">Écartée — déjà en base</p>
       </motion.div>
     </div>
@@ -590,14 +707,20 @@ const VisualDedup = () => (
 const VisualFiltrage = () => (
   <VisualFrame time="07h00">
     <div className="flex items-center gap-3">
-      <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-violet-500 text-[11px] font-black text-white">AD</span>
+      <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-violet-500 text-[11px] font-black text-white">
+        AD
+      </span>
       <div className="min-w-0">
         <p className="truncate text-[13px] font-bold text-brand-navy">
           Awa D. <span className="font-medium text-muted-foreground">· abonnée depuis le 12/07</span>
         </p>
         <div className="mt-1 flex gap-1.5">
-          <span className="rounded-full bg-violet-500/10 px-2 py-0.5 text-[10px] font-bold text-violet-700">RH</span>
-          <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-700">Comptabilité</span>
+          <span className="rounded-full bg-violet-500/10 px-2 py-0.5 text-[10px] font-bold text-violet-700">
+            RH
+          </span>
+          <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-700">
+            Comptabilité
+          </span>
         </div>
       </div>
     </div>
@@ -620,7 +743,9 @@ const VisualFiltrage = () => (
           transition={{ duration: 0.4, delay: 0.2 + i * 0.15, ease: "easeOut" }}
           className={cn(
             "flex items-center gap-3 rounded-lg border px-3.5 py-2.5",
-            o.ok ? "border-brand-orange/40 border-l-2 border-l-brand-orange bg-orange-50/60" : "border-outline-variant/40 opacity-55"
+            o.ok
+              ? "border-brand-orange/40 border-l-2 border-l-brand-orange bg-orange-50/60"
+              : "border-outline-variant/40 opacity-55"
           )}
         >
           <div className="min-w-0 flex-1">
@@ -644,12 +769,11 @@ const VisualFiltrage = () => (
         <SlidersHorizontal className="size-3.5 shrink-0 text-brand-orange" />
         Chaque abonné reçoit une liste différente — la sienne, et rien d'autre.
       </p>
-
       <Link
         to="/filieres"
         className="inline-flex h-8 items-center text-center gap-1 rounded-md px-2.5 text-xs font-bold bg-brand-orange text-white shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:brightness-110 active:scale-[0.98]"
       >
-        Voir tous les filieres
+        Voir toutes les filières
       </Link>
     </div>
   </VisualFrame>
@@ -665,7 +789,9 @@ const VisualEnvoi = () => (
 
     <div className="overflow-hidden rounded-lg border border-outline-variant/40">
       <div className="flex items-center gap-2.5 border-b border-outline-variant/40 bg-surface-container-low/60 px-4 py-3">
-        <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-brand-navy font-heading text-[9px] font-black text-white">JA</span>
+        <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-brand-navy font-heading text-[9px] font-black text-white">
+          JA
+        </span>
         <p className="flex-1 truncate text-[12px] font-bold text-brand-navy">
           JobAlert CI <span className="font-medium text-muted-foreground">· Votre récapitulatif</span>
         </p>
@@ -677,6 +803,7 @@ const VisualEnvoi = () => (
         <p className="mt-0.5 text-[12px] text-on-surface-variant">
           <strong className="font-semibold text-on-surface">2 offres</strong> correspondent à vos filières :
         </p>
+
         <ul className="mt-2.5 space-y-1.5">
           {OFFRES_FILTREES.filter((o) => o.ok).map((o, i) => (
             <motion.li
@@ -710,22 +837,31 @@ const VisualEnvoi = () => (
 )
 
 /* ── Section assemblée ──────────────────────────────────────────────── */
-const EtapesDetail = () => {
+const EtapesDetail = ({ sources, loading }) => {
   const stepsRef = useRef(null)
 
-  /* Progression de la trace : liée au scroll à travers les 4 étapes */
   const { scrollYProgress } = useScroll({
     target: stepsRef,
     offset: ["start 0.8", "end 0.55"],
   })
-  const traceProgress = useSpring(scrollYProgress, { stiffness: 90, damping: 26, restDelta: 0.001 })
+
+  const traceProgress = useSpring(scrollYProgress, {
+    stiffness: 90,
+    damping: 26,
+    restDelta: 0.001,
+  })
 
   return (
     <section id="chaine" className="scroll-mt-24 overflow-hidden bg-surface-container-lowest py-20 md:py-24">
       <div className="mx-auto max-w-7xl px-6 md:px-12">
         <SectionHeading
           eyebrow="Sous le capot"
-          title={<>Deux heures de mécanique, <span className="text-brand-orange">zéro intervention</span>.</>}
+          title={
+            <>
+              Deux heures de mécanique,{" "}
+              <span className="text-brand-orange">zéro intervention</span>.
+            </>
+          }
           sub="La chaîne s'exécute seule chaque matin, sans action humaine. Voici exactement ce que fait chaque maillon et ce qu'il ne fait pas."
         />
 
@@ -735,20 +871,26 @@ const EtapesDetail = () => {
 
           <div className="relative z-10 space-y-20 lg:space-y-24">
             <StepBlock
-              num="01" time="06h00" icon={Radar} title="Collecte & centralisation"
-              intro="À 6h00 tapantes, quatre scrapers se lancent en parallèle. Chacun parcourt la page « dernières offres » de sa source, extrait titre, entreprise, lien et date de publication, puis nettoie le tout : accents, casse, espaces superflus."
+              num="01"
+              time="06h00"
+              icon={Radar}
+              title="Collecte & centralisation"
+              intro="À 6h00 tapantes, plusieurs scrapers se lancent en parallèle. Chacun parcourt la page « dernières offres » de sa source, extrait titre, entreprise, lien et date de publication, puis nettoie le tout : accents, casse, espaces superflus."
               points={[
                 "Un scraper isolé par source : une panne ne bloque jamais les trois autres",
                 "Chaque offre reçoit un tag de filière par mots-clés (« ingénieur logiciel » → Tech & Dev)",
-                "Délais renforcés sur LinkedIn, la source la plus protégée",
                 "Chaque échec est journalisé avec horodatage",
               ]}
             >
-              <VisualCollecte />
+              <VisualCollecte sources={sources} loading={loading} />
             </StepBlock>
 
             <StepBlock
-              num="02" time="06h15" icon={Fingerprint} title="Dédoublonnage" reverse
+              num="02"
+              time="06h15"
+              icon={Fingerprint}
+              title="Dédoublonnage"
+              reverse
               intro="Avant d'entrer en base, chaque offre reçoit une empreinte unique calculée depuis son lien d'annonce ou à défaut du couple titre + entreprise. Si l'empreinte existe déjà, l'offre est ignorée. Définitivement."
               points={[
                 "Contrainte UNIQUE en base : une annonce ne peut physiquement pas être insérée deux fois",
@@ -760,7 +902,10 @@ const EtapesDetail = () => {
             </StepBlock>
 
             <StepBlock
-              num="03" time="07h00" icon={SlidersHorizontal} title="Filtrage par filière"
+              num="03"
+              time="07h00"
+              icon={SlidersHorizontal}
+              title="Filtrage par filière"
               intro="Une fois le scraping terminé, le système croise les nouvelles offres du jour avec les filières de chaque abonné actif. Chacun reçoit une liste différente, la sienne, construite à partir de ses 1 à 3 filières choisies à l'inscription."
               points={[
                 "Vos filières sont modifiables à tout moment via le lien en bas de chaque email",
@@ -772,7 +917,11 @@ const EtapesDetail = () => {
             </StepBlock>
 
             <StepBlock
-              num="04" time="08h00" icon={Send} title="Envoi du récapitulatif" reverse
+              num="04"
+              time="08h00"
+              icon={Send}
+              title="Envoi du récapitulatif"
+              reverse
               intro="À 8h00 précises, chaque abonné concerné reçoit son récapitulatif personnalisé : les offres filtrées, avec titre, entreprise, lien direct vers l'annonce d'origine et date de publication. Prêt à postuler avant tout le monde."
               points={[
                 "Jusqu'à 3 tentatives espacées en cas d'échec d'envoi",
@@ -790,29 +939,59 @@ const EtapesDetail = () => {
 }
 
 /* ════════════════════════════════════════════════════════════════════
-  BANDEAU SOURCES
+   BANDEAU SOURCES
 ════════════════════════════════════════════════════════════════════ */
-
-const SourcesBand = () => (
+const SourcesBand = ({ sources, loading, error }) => (
   <section className="relative overflow-hidden bg-brand-navy py-10">
     <div className="pointer-events-none absolute inset-0 bg-pattern opacity-20" aria-hidden />
+
     <div className="relative mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-6 px-6 md:px-12">
       <div>
-        <p className="font-heading text-lg font-bold text-white">Elles alimentent votre récapitulatif</p>
+        <p className="font-heading text-lg font-bold text-white">
+          Elles alimentent votre récapitulatif
+        </p>
         <p className="mt-0.5 text-sm text-white/60">Scannées chaque matin à 6h00, dans cet ordre.</p>
       </div>
+
       <div className="flex flex-wrap items-center gap-2.5">
-        {SOURCES_RUN.map((s) => (
-          <a
-            href={getUrlSource(s.nom)}
-            target="_blank"
-            key={s.nom}
-            className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3.5 py-1.5 text-[13px] font-semibold text-white"
-          >
-            {s.linkedin ? <FaLinkedin className="size-3.5 text-[#7BB8F0]" /> : <img src={getImgSource(s.nom)} alt={s.nom} className="size-5" />}
-            {s.nom}
-          </a>
-        ))}
+        {loading ? (
+          Array.from({ length: 4 }).map((_, i) => (
+            <div
+              key={i}
+              className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3.5 py-1.5"
+            >
+              <Skeleton className="size-5 shrink-0 rounded-full bg-white/20" />
+              <Skeleton className="h-4 w-16 bg-white/20" />
+            </div>
+          ))
+        ) : error ? (
+          <div className="inline-flex items-center gap-2 rounded-full border border-error/30 bg-error/10 px-3.5 py-1.5 text-[13px] font-semibold text-error">
+            <AlertCircle className="size-4" />
+            Erreur de chargement
+          </div>
+        ) : (
+          <>
+            {sources?.slice(0, 4)?.map((s) => (
+              <a
+                href={s.base_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                key={s.id || s.code}
+                className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3.5 py-1.5 text-[13px] font-semibold text-white transition-colors hover:bg-white/20"
+              >
+                <SourceLogo code={s.code || s.name} className="size-5" />
+                {s.name}
+              </a>
+            ))}
+
+            {sources?.length > 4 && (
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3.5 py-1.5 text-[13px] font-semibold text-white">
+                + {sources.length - 4}
+              </span>
+            )}
+          </>
+        )}
+
         <Link
           to="/sources"
           className="group inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[13px] font-bold text-brand-orange transition-colors hover:text-white"
@@ -826,32 +1005,55 @@ const SourcesBand = () => (
 )
 
 /* ════════════════════════════════════════════════════════════════════
-  PAGE
+   PAGE
 ════════════════════════════════════════════════════════════════════ */
+const HowItWorks = () => {
+  const fetchSources = useCallback(async () => {
+    return getSources()
+  }, [])
 
-const HowItWorks = () => (
-  <>
-    <Seo {...howItWorksSeo} />
-    <main>
-      <HeroHowItWorks />
-      <EtapesDetail />
-      <SourcesBand />
-      <FaqSection
-        background="bg-background"
-        eyebrow="Questions de mécanique"
-        title={<>Ce qu'on nous demande <span className="text-brand-orange">le plus souvent</span>.</>}
-        sub="Le fonctionnement de la chaîne, expliqué sans jargon."
-        questions={QUESTIONS}
-        aside={{
-          icon: Radar,
-          title: "Curieux de voir d'où viennent les offres ?",
-          text: "La page Sources détaille les 4 plateformes scannées et notre méthode de collecte, source par source.",
-          to: "/sources",
-          cta: "Explorer les sources",
-        }}
-      />
-    </main>
-  </>
-)
+  const SourcesQuery = useFetchData(fetchSources)
+
+  return (
+    <>
+      <Seo {...howItWorksSeo} />
+
+      <main>
+        <HeroHowItWorks
+          sources={SourcesQuery.data}
+          loading={SourcesQuery.isLoading}
+          error={SourcesQuery.error}
+        />
+
+        <EtapesDetail sources={SourcesQuery.data} loading={SourcesQuery.isLoading} />
+
+        <SourcesBand
+          sources={SourcesQuery.data}
+          loading={SourcesQuery.isLoading}
+          error={SourcesQuery.error}
+        />
+
+        <FaqSection
+          background="bg-background"
+          eyebrow="Questions de mécanique"
+          title={
+            <>
+              Ce qu'on nous demande <span className="text-brand-orange">le plus souvent</span>.
+            </>
+          }
+          sub="Le fonctionnement de la chaîne, expliqué sans jargon."
+          questions={QUESTIONS_HOW}
+          aside={{
+            icon: Radar,
+            title: "Curieux de voir d'où viennent les offres ?",
+            text: "La page Sources détaille les 4 plateformes scannées et notre méthode de collecte, source par source.",
+            to: "/sources",
+            cta: "Explorer les sources",
+          }}
+        />
+      </main>
+    </>
+  )
+}
 
 export default HowItWorks
