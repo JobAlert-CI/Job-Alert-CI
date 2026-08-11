@@ -199,8 +199,6 @@ const Home = () => {
     (filiere) => (filiere?.new_offers ?? 0) > 0
   )?.length
 
-  console.log(offersQuery.data)
-
   return (
     <>
       <Seo {...homeSeo} />

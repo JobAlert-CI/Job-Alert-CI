@@ -6,9 +6,10 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { cn } from "@/lib/utils"
 import { HUES } from "@/lib/hues"
 import BadgeNouveau from "./BadgeNouveau"
+import getFiliereTheme from "@/lib/filiere-theme"
 
 const FiliereLargeCard = ({ f, index, className }) => {
-  const hue = HUES[f.hue]
+  const hue = HUES[f.hue] || HUES["sky"]
   return (
     <motion.div
       layout
@@ -73,7 +74,7 @@ const FiliereLargeCard = ({ f, index, className }) => {
 }
 
 const FiliereCompactCard = ({ f, index, className }) => {
-  const hue = HUES[f.hue]
+  const hue = HUES[f.hue] || HUES["sky"]
   return (
     <motion.div
       layout

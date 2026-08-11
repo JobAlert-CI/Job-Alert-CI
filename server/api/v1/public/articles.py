@@ -17,36 +17,50 @@ from schemas.editorial import (
 
 router = APIRouter(prefix="/api/articles", tags=["articles"])
 
+
 def _build_article_item(article: Article) -> dict:
     return {
         "id": article.id,
         "content_page_id": article.content_page_id,
         "category_id": article.category_id,
+        "category": article.category,
         "reading_minutes": article.reading_minutes,
         "view_count": article.view_count,
         "is_featured": article.is_featured,
         "slug": article.content_page.slug if article.content_page else None,
         "title": article.content_page.title if article.content_page else None,
         "excerpt": article.content_page.excerpt if article.content_page else None,
-        "status": article.content_page.status.value if article.content_page and article.content_page.status else None,
-        "published_at": article.content_page.published_at if article.content_page else None,
+        "status": article.content_page.status.value
+        if article.content_page and article.content_page.status
+        else None,
+        "published_at": article.content_page.published_at
+        if article.content_page
+        else None,
     }
+
 
 def _build_article_read(article: Article) -> dict:
     base = _build_article_item(article)
-    base.update({
-        "category": article.category,
-        "featured_order": article.featured_order,
-        "quote_text": article.quote_text,
-        "quote_author": article.quote_author,
-        "tags": article.tags,
-        "sections": article.sections,
-        "takeaways": article.takeaways,
-        "key_figures": article.key_figures,
-        "seo_title": article.content_page.seo_title if article.content_page else None,
-        "seo_description": article.content_page.seo_description if article.content_page else None,
-    })
+    base.update(
+        {
+            "category": article.category,
+            "featured_order": article.featured_order,
+            "quote_text": article.quote_text,
+            "quote_author": article.quote_author,
+            "tags": article.tags,
+            "sections": article.sections,
+            "takeaways": article.takeaways,
+            "key_figures": article.key_figures,
+            "seo_title": article.content_page.seo_title
+            if article.content_page
+            else None,
+            "seo_description": article.content_page.seo_description
+            if article.content_page
+            else None,
+        }
+    )
     return base
+
 
 @router.get("", response_model=list[ArticleListItem])
 async def list_articles(
@@ -62,7 +76,7 @@ async def list_articles(
     stmt = (
         select(Article)
         .join(Article.content_page)
-        .options(joinedload(Article.content_page))
+        .options(joinedload(Article.content_page), joinedload(Article.category))
         .where(ContentPage.status == ContentStatus.PUBLISHED)
     )
     if category_id:
@@ -99,8 +113,10 @@ async def get_featured_articles(db: Session = Depends(get_db)):
     stmt = (
         select(Article)
         .join(Article.content_page)
-        .options(joinedload(Article.content_page))
-        .where(ContentPage.status == ContentStatus.PUBLISHED, Article.is_featured.is_(True))
+        .options(joinedload(Article.content_page), joinedload(Article.category))
+        .where(
+            ContentPage.status == ContentStatus.PUBLISHED, Article.is_featured.is_(True)
+        )
         .order_by(Article.featured_order.asc().nullslast())
         .limit(3)
     )
@@ -113,11 +129,13 @@ async def get_daily_tip(db: Session = Depends(get_db)):
     """Conseil du jour (rotation déterministe 7 jours)."""
     # Dummy rotation based on day of year
     import datetime
+
     day_of_year = datetime.datetime.now().timetuple().tm_yday
     rotation_order = day_of_year % 7
     tip = db.scalar(
-        select(DailyTip)
-        .where(DailyTip.is_active.is_(True), DailyTip.rotation_order == rotation_order)
+        select(DailyTip).where(
+            DailyTip.is_active.is_(True), DailyTip.rotation_order == rotation_order
+        )
     )
     if not tip:
         # Fallback to any tip
@@ -138,12 +156,14 @@ async def list_series(db: Session = Depends(get_db)):
 
 
 @router.get("/popular", response_model=list[ArticleListItem])
-async def get_popular_articles(limit: int = Query(5, ge=1, le=10), db: Session = Depends(get_db)):
+async def get_popular_articles(
+    limit: int = Query(5, ge=1, le=10), db: Session = Depends(get_db)
+):
     """Les plus lus (sidebar)."""
     stmt = (
         select(Article)
         .join(Article.content_page)
-        .options(joinedload(Article.content_page))
+        .options(joinedload(Article.content_page), joinedload(Article.category))
         .where(ContentPage.status == ContentStatus.PUBLISHED)
         .order_by(Article.view_count.desc())
         .limit(limit)
@@ -174,24 +194,24 @@ async def get_article(slug: str, db: Session = Depends(get_db)):
 
 
 @router.get("/{slug}/related", response_model=list[ArticleListItem])
-async def get_related_articles(slug: str, limit: int = Query(3, ge=1, le=6), db: Session = Depends(get_db)):
+async def get_related_articles(
+    slug: str, limit: int = Query(3, ge=1, le=6), db: Session = Depends(get_db)
+):
     """Articles sur le même thème (sidebar + 'Continuer la lecture')."""
     base_article = db.scalar(
-        select(Article)
-        .join(Article.content_page)
-        .where(ContentPage.slug == slug)
+        select(Article).join(Article.content_page).where(ContentPage.slug == slug)
     )
     if not base_article:
         raise HTTPException(status_code=404, detail="Article not found")
-        
+
     stmt = (
         select(Article)
         .join(Article.content_page)
-        .options(joinedload(Article.content_page))
+        .options(joinedload(Article.content_page), joinedload(Article.category))
         .where(
             ContentPage.status == ContentStatus.PUBLISHED,
             Article.id != base_article.id,
-            Article.category_id == base_article.category_id
+            Article.category_id == base_article.category_id,
         )
         .order_by(ContentPage.published_at.desc().nullslast())
         .limit(limit)
@@ -204,13 +224,11 @@ async def get_related_articles(slug: str, limit: int = Query(3, ge=1, le=6), db:
 async def register_article_view(slug: str, db: Session = Depends(get_db)):
     """Incrémente view_count + log analytics."""
     article = db.scalar(
-        select(Article)
-        .join(Article.content_page)
-        .where(ContentPage.slug == slug)
+        select(Article).join(Article.content_page).where(ContentPage.slug == slug)
     )
     if not article:
         raise HTTPException(status_code=404, detail="Article not found")
-    
+
     article.view_count += 1
     db.commit()
     return {"message": "View recorded", "view_count": article.view_count}

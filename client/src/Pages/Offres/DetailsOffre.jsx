@@ -1,11 +1,10 @@
-
-import { Fragment, useMemo, useState } from "react"
+import { Fragment, useEffect, useState } from "react"
 import { Link, useNavigate, useParams } from "react-router-dom"
 import { motion } from "framer-motion"
 import {
   ArrowRight, ArrowUpRight, Bell, Bookmark, BookmarkCheck, Briefcase, Building2,
   CalendarDays, Check, ChevronRight, Clock, Fingerprint, GraduationCap, Link2,
-  Mail, MapPin, Radar, SearchX, Send, ShieldCheck, Sparkles, Tag, Zap,
+  Mail, MapPin, Radar, SearchX, Send, ShieldCheck, Sparkles, Tag, Zap, Loader2
 } from "lucide-react"
 import { FaLinkedin } from "react-icons/fa6"
 import { cn } from "@/lib/utils"
@@ -17,9 +16,12 @@ import {
   ReassuranceList, SectionHeading, SourceLogo,
 } from "@/components/shared"
 import { HUES } from "@/lib/hues"
-import { FILIERES_META, SOURCES } from "@/lib/referentiels"
 import { addDays, publieLabel } from "@/lib/dates"
-import { ALL_OFFRES, getDetail } from "@/data/offres"
+import { getOfferById, getSimilarOffers, incrementeView, saveOffer } from "@/api/public/offers"
+import { getOfferSats, getOfferSatsBySource } from "@/api/public/stats"
+import { adaptOffer, adaptOffers } from "@/lib/offers-adapter"
+import { useFetchData } from "@/hooks/use-fetch-data"
+import getFiliereTheme from "@/lib/filiere-theme"
 
 /* ════════════════════════════════════════════════════════════════════
 OUTILS
@@ -32,9 +34,19 @@ const fadeUp = {
   hidden: { opacity: 0, y: 22 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } },
 }
-/* Empreinte fictive mais stable — v2.0 : offres.hash_unique */
-const fakeHash = (id) =>
-  (((Number(id) + 7) * 2654435761) % 0xfffffff).toString(16).padStart(7, "0")
+
+/* Empreinte stable supportant les UUIDs (chaînes de caractères) */
+const fakeHash = (id) => {
+  if (!id) return "0000000"
+  const str = String(id)
+  let hash = 0
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i)
+    hash = (hash << 5) - hash + char
+    hash |= 0
+  }
+  return Math.abs(hash).toString(16).padStart(7, "0").slice(0, 7)
+}
 
 const offreSeo = (o, meta, detail, relatedOffers = []) => buildOffreSeo({ offre: o, meta, detail, relatedOffers })
 
@@ -43,7 +55,7 @@ CHAÎNE DE PROVENANCE — l'ADN veille, dès l'ouverture
 ════════════════════════════════════════════════════════════════════ */
 const ProvenanceStrip = ({ offre, meta }) => {
   const steps = [
-    { icon: Radar, t: "06:02", l: `Collectée via ${offre.source}`, done: true },
+    { icon: Radar, t: "06:02", l: `Collectée via ${offre.sourceLabel || offre.source}`, done: true },
     { icon: Fingerprint, t: "06:04", l: "0 doublon · hash unique", done: true },
     { icon: Tag, t: "07:15", l: `Taggée ${meta.label}`, done: true },
     { icon: Send, t: "08:00", l: "Au récap du matin", done: false },
@@ -100,7 +112,6 @@ const CartePostuler = ({ offre, hue, hash, saved, onToggleSave, copied, onCopy }
     <div className="absolute inset-0 translate-x-4 translate-y-5 rotate-2 overflow-hidden rounded-2xl bg-brand-navy" aria-hidden>
       <div className="absolute inset-0 bg-pattern opacity-20" />
     </div>
-
     {/* Badges flottants */}
     <motion.span
       initial={{ opacity: 0, scale: 0.8 }}
@@ -120,7 +131,6 @@ const CartePostuler = ({ offre, hue, hash, saved, onToggleSave, copied, onCopy }
       <ShieldCheck className="size-3" />
       0 doublon
     </motion.span>
-
     {/* Carte */}
     <div className="relative overflow-hidden rounded-2xl border border-outline-variant/40 bg-white shadow-[0_24px_48px_-16px_rgba(15,45,77,0.22)]">
       <div className="flex items-center gap-3 border-b border-outline-variant/40 bg-surface-container-low/60 px-5 py-4">
@@ -131,19 +141,17 @@ const CartePostuler = ({ offre, hue, hash, saved, onToggleSave, copied, onCopy }
         </div>
         <ChipSource source={offre.source} />
       </div>
-
       <div className="px-5 py-5">
         <a
           href={offre.lien || "#offre"}
           onClick={(e) => offre.lien ? undefined : e.preventDefault()}
           className="group flex h-12 items-center justify-center gap-2.5 rounded-lg bg-brand-orange text-[15px] font-bold text-white shadow-[0_12px_28px_-8px_rgba(245,166,35,0.5)] transition-all duration-300 hover:-translate-y-0.5 hover:brightness-110 active:scale-[0.98]"
         >
-          Postuler sur {offre.source}
-          {offre.source === "LinkedIn"
+          Postuler sur {offre.sourceLabel || offre.source}
+          {offre.source === "linkedin"
             ? <FaLinkedin className="size-4.5 transition-transform duration-300 group-hover:scale-110" />
             : <ArrowUpRight className="size-5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />}
         </a>
-
         <div className="mt-2.5 grid grid-cols-2 gap-2.5">
           <motion.button
             whileTap={{ scale: 0.96 }}
@@ -172,7 +180,6 @@ const CartePostuler = ({ offre, hue, hash, saved, onToggleSave, copied, onCopy }
             {copied ? "Lien copié" : "Copier le lien"}
           </motion.button>
         </div>
-
         <dl className="mt-5 space-y-3 border-t border-outline-variant/40 pt-4">
           {[
             { I: CalendarDays, k: "Publication", v: addDays(new Date(), -offre.jours).toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" }) },
@@ -189,7 +196,6 @@ const CartePostuler = ({ offre, hue, hash, saved, onToggleSave, copied, onCopy }
             </div>
           ))}
         </dl>
-
         <div className="mt-4 flex items-center justify-between rounded-lg bg-surface-container-low px-3.5 py-2.5">
           <span className="text-[11px] font-medium text-muted-foreground">Empreinte de dédoublonnage</span>
           <Tooltip>
@@ -211,12 +217,11 @@ const CartePostuler = ({ offre, hue, hash, saved, onToggleSave, copied, onCopy }
 /* ════════════════════════════════════════════════════════════════════
 HERO — identité de l'offre + provenance + panneau postuler
 ════════════════════════════════════════════════════════════════════ */
-const HeroOffre = ({ offre, meta, hue, hash, totalEntreprise, saved, onToggleSave, copied, onCopy }) => (
+const HeroOffre = ({ offre, meta, title, hue, hash, totalEntreprise, saved, onToggleSave, copied, onCopy }) => (
   <section className="relative overflow-hidden hero-gradient">
     <div className="absolute inset-0 bg-pattern opacity-50" aria-hidden />
     <div className={cn("absolute -top-32 right-[-10%] size-140 rounded-full blur-3xl", hue.glow)} aria-hidden />
     <div className="absolute -bottom-40 -left-40 size-120 rounded-full bg-brand-navy/5 blur-3xl" aria-hidden />
-
     <div className="relative z-10 mx-auto max-w-7xl px-6 pb-14 pt-8 md:px-12 md:pb-16 md:pt-10">
       {/* Fil d'Ariane */}
       <motion.nav
@@ -232,7 +237,6 @@ const HeroOffre = ({ offre, meta, hue, hash, totalEntreprise, saved, onToggleSav
         <ChevronRight className="size-3" />
         <span className="max-w-55 truncate font-semibold text-brand-navy sm:max-w-none">{offre.titre}</span>
       </motion.nav>
-
       <div className="mt-8 grid items-start gap-14 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
         {/* Colonne gauche — l'offre */}
         <motion.div variants={containerVariants} initial="hidden" animate="visible" className="flex flex-col items-start gap-5">
@@ -242,22 +246,20 @@ const HeroOffre = ({ offre, meta, hue, hash, totalEntreprise, saved, onToggleSav
               className={cn("inline-flex items-center gap-2 rounded-full border border-transparent px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em] transition-all duration-200 hover:-translate-y-0.5", hue.tile)}
             >
               <meta.icon className="size-3.5" />
-              {meta.label}
+              {title}
             </Link>
-            {offre.jours === 0 && <BadgeNouveau />}
+            {offre.isNouveau && <BadgeNouveau />}
             <span className="inline-flex items-center gap-1.5 rounded-full border border-outline-variant/50 bg-white/80 px-3.5 py-1.5 text-[11px] font-bold text-on-surface-variant">
               <CalendarDays className="size-3 text-brand-orange" />
               {publieLabel(offre.jours)}
             </span>
           </motion.div>
-
           <motion.h1
             variants={fadeUp}
             className="font-heading text-4xl font-black leading-[1.06] tracking-tight text-brand-navy sm:text-5xl"
           >
             {offre.titre}
           </motion.h1>
-
           <motion.div variants={fadeUp} className="flex flex-wrap items-center gap-x-4 gap-y-2">
             <CompanyHover offre={offre} totalOffres={totalEntreprise} />
             <span className="inline-flex items-center gap-1 text-sm text-muted-foreground">
@@ -271,19 +273,17 @@ const HeroOffre = ({ offre, meta, hue, hash, totalEntreprise, saved, onToggleSav
               <Zap className="size-3" />{offre.experience}
             </span>
           </motion.div>
-
           <motion.div variants={fadeUp} className="w-full">
             <ProvenanceStrip offre={offre} meta={meta} />
           </motion.div>
-
           <motion.div variants={fadeUp} className="mt-1 flex flex-col gap-3 sm:flex-row">
             <a
               href={offre.lien || "#offre"}
               onClick={(e) => offre.lien ? undefined : e.preventDefault()}
               className="group inline-flex items-center justify-center gap-2.5 rounded-lg bg-brand-orange px-7 py-3.5 text-base font-bold text-white shadow-[0_12px_28px_-8px_rgba(245,166,35,0.5)] transition-all duration-300 hover:-translate-y-0.5 hover:brightness-110 active:scale-[0.98]"
             >
-              Postuler sur {offre.source}
-              {offre.source === "LinkedIn"
+              Postuler sur {offre.sourceLabel || offre.source}
+              {offre.source === "linkedin"
                 ? <FaLinkedin className="size-4.5 transition-transform duration-300 group-hover:scale-110" />
                 : <ArrowUpRight className="size-5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />}
             </a>
@@ -292,7 +292,6 @@ const HeroOffre = ({ offre, meta, hue, hash, totalEntreprise, saved, onToggleSav
             </CtaLink>
           </motion.div>
         </motion.div>
-
         {/* Colonne droite — le panneau d'action */}
         <CartePostuler
           offre={offre} hue={hue} hash={hash}
@@ -325,7 +324,7 @@ const SectionDescription = ({ meta, hue, detail }) => (
 
       <h3 className="mt-7 font-heading text-sm font-extrabold uppercase tracking-[0.14em] text-brand-navy">Vos missions</h3>
       <ul className="mt-3.5 space-y-2.5">
-        {detail.missions.map((m) => (
+        {(detail.missions || []).map((m) => (
           <li key={m} className="flex items-start gap-2.5 text-sm leading-relaxed text-on-surface-variant">
             <span className="mt-0.5 flex size-4.5 shrink-0 items-center justify-center rounded-full bg-brand-orange/10">
               <Check className="size-2.5 text-brand-orange" strokeWidth={3.5} />
@@ -337,7 +336,7 @@ const SectionDescription = ({ meta, hue, detail }) => (
 
       <h3 className="mt-7 font-heading text-sm font-extrabold uppercase tracking-[0.14em] text-brand-navy">Profil recherché</h3>
       <ul className="mt-3.5 space-y-2.5">
-        {detail.profil.map((p) => (
+        {(detail.profile_requirements || detail.profil || []).map((p) => (
           <li key={p} className="flex items-start gap-2.5 text-sm leading-relaxed text-on-surface-variant">
             <span className="mt-0.5 flex size-4.5 shrink-0 items-center justify-center rounded-full bg-brand-navy/8">
               <Check className="size-2.5 text-brand-navy" strokeWidth={3.5} />
@@ -347,11 +346,11 @@ const SectionDescription = ({ meta, hue, detail }) => (
         ))}
       </ul>
 
-      {detail.avantages && (
+      {(detail.benefits || detail.avantages) && (
         <>
           <h3 className="mt-7 font-heading text-sm font-extrabold uppercase tracking-[0.14em] text-brand-navy">Avantages</h3>
           <div className="mt-3 flex flex-wrap gap-2">
-            {detail.avantages.map((a) => (
+            {(detail.benefits || detail.avantages).map((a) => (
               <span key={a} className="rounded-full border border-outline-variant/60 bg-surface-container-low/60 px-3 py-1.5 text-xs font-semibold text-on-surface-variant">
                 {a}
               </span>
@@ -366,7 +365,7 @@ const SectionDescription = ({ meta, hue, detail }) => (
           Mots-clés de matching automatique
         </p>
         <div className="mt-2.5 flex flex-wrap gap-2">
-          {detail.tags.map((kw) => (
+          {(detail.tags || []).map((kw) => (
             <Tooltip key={kw}>
               <TooltipTrigger asChild>
                 <span className="cursor-help rounded-full border border-outline-variant/60 bg-white px-3 py-1 text-xs font-medium text-on-surface-variant transition-colors hover:border-brand-navy/40 hover:text-brand-navy">
@@ -383,7 +382,8 @@ const SectionDescription = ({ meta, hue, detail }) => (
 )
 
 const CarteEntreprise = ({ offre }) => {
-  const total = ALL_OFFRES.filter((x) => x.entreprise === offre.entreprise).length
+  // L'API ne renvoyant pas le total global d'offres par entreprise, on fallback sur 1
+  const total = 1
   return (
     <motion.div
       initial={{ opacity: 0, y: 24 }}
@@ -409,12 +409,12 @@ const CarteEntreprise = ({ offre }) => {
       </div>
       <div className="mt-5 grid grid-cols-2 gap-3">
         <div className="rounded-lg bg-surface-container-low/70 px-4 py-3">
-          <p className="font-heading text-2xl font-black text-brand-navy">{total}</p>
-          <p className="mt-0.5 text-[11px] font-semibold text-muted-foreground">offre(s) active(s) sur JobAlert CI</p>
+          <p className="font-heading text-2xl font-black text-brand-navy">{total} </p>
+          <p className="mt-0.5 text-[11px] font-semibold text-muted-foreground">offre(s) active(s) sur JobAlert CI </p>
         </div>
         <div className="rounded-lg bg-surface-container-low/70 px-4 py-3">
-          <p className="font-heading md:text-2xl font-black text-brand-navy">{offre.jours === 0 ? "Aujourd'hui" : `Il y a ${offre.jours} j`}</p>
-          <p className="mt-0.5 text-[11px] font-semibold text-muted-foreground">publication sur {offre.source}</p>
+          <p className="font-heading md:text-2xl font-black text-brand-navy">{offre.jours === 0 ? "Aujourd'hui" : `Il y a ${offre.jours} j`} </p>
+          <p className="mt-0.5 text-[11px] font-semibold text-muted-foreground">publication sur {offre.sourceLabel || offre.source} </p>
         </div>
       </div>
     </motion.div>
@@ -477,30 +477,35 @@ const CarteAlerte = ({ meta, hue }) => {
   )
 }
 
-const MiniCollecte = () => (
-  <motion.div
-    initial={{ opacity: 0, y: 24 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true, margin: "-60px" }}
-    transition={{ duration: 0.55, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-    className="rounded-xl border border-outline-variant/40 bg-white p-5 shadow-soft"
-  >
-    <div className="flex items-center justify-between">
-      <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Collecte du jour</p>
-      <span className="relative flex size-2">
-        <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-70" />
-        <span className="relative inline-flex size-2 rounded-full bg-emerald-500" />
-      </span>
-    </div>
-    <p className="mt-2 font-heading text-3xl font-black text-brand-navy">
-      47 <span className="text-sm font-bold text-muted-foreground">offres · 0 doublon</span>
-    </p>
-    <div className="mt-3 flex items-center gap-2 border-t border-outline-variant/40 pt-3">
-      {SOURCES.map((s) => <SourceLogo key={s.code} code={s.code} className="size-6 rounded" />)}
-      <span className="ml-auto text-[11px] font-semibold text-muted-foreground">scannées à 6h02</span>
-    </div>
-  </motion.div>
-)
+const MiniCollecte = () => {
+  const { data: stats } = useFetchData(getOfferSats)
+  const { data: sources } = useFetchData(getOfferSatsBySource)
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-60px" }}
+      transition={{ duration: 0.55, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+      className="rounded-xl border border-outline-variant/40 bg-white p-5 shadow-soft"
+    >
+      <div className="flex items-center justify-between">
+        <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Collecte du jour</p>
+        <span className="relative flex size-2">
+          <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-70" />
+          <span className="relative inline-flex size-2 rounded-full bg-emerald-500" />
+        </span>
+      </div>
+      <p className="mt-2 font-heading text-3xl font-black text-brand-navy">
+        {stats?.total_offers ?? 0} <span className="text-sm font-bold text-muted-foreground">offres · 0 doublon</span>
+      </p>
+      <div className="mt-3 flex items-center gap-2 border-t border-outline-variant/40 pt-3">
+        {sources?.map((s) => <SourceLogo key={s.id} code={s.label} className="size-6 rounded" />)}
+        <span className="ml-auto text-[11px] font-semibold text-muted-foreground">scannées à 6h02</span>
+      </div>
+    </motion.div>
+  )
+}
 
 const CorpsOffre = ({ offre, meta, hue, detail }) => (
   <section className="border-b border-outline-variant/30 bg-background py-14 md:py-18">
@@ -520,10 +525,8 @@ const CorpsOffre = ({ offre, meta, hue, detail }) => (
 /* ════════════════════════════════════════════════════════════════════
 OFFRES SIMILAIRES — même filière (OfferCard partagée)
 ════════════════════════════════════════════════════════════════════ */
-const OffresSimilaires = ({ offre, meta, hue }) => {
-  const similaires = ALL_OFFRES
-    .filter((o) => o.filiere === offre.filiere && o.uid !== offre.uid)
-    .slice(0, 3)
+const OffresSimilaires = ({ offre, meta, hue, similarOffers }) => {
+  const similaires = similarOffers || []
   return (
     <section className="bg-surface-container-lowest py-16 md:py-20">
       <div className="mx-auto max-w-7xl px-6 md:px-12">
@@ -531,17 +534,21 @@ const OffresSimilaires = ({ offre, meta, hue }) => {
           <SectionHeading
             eyebrow="Même filière"
             title={<>D'autres offres <span className="text-brand-orange">{meta.label}</span> vous attendent.</>}
-            sub={`${meta.actives} offres actives · ${meta.abonnes.toLocaleString("fr-FR")} abonnés à l'alerte ${meta.label}.`}
+            sub={`Découvrez d'autres opportunités dans la même filière.`}
           />
           <CtaLink to={`/filieres/${meta.code}`} variant="outline" size="md" iconRight={ArrowRight} className="hidden md:inline-flex">
             Toute la filière
           </CtaLink>
         </div>
-        <div className="mt-10 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {similaires.map((o, i) => (
-            <OfferCard key={o.uid} offre={o} index={i} view="grid" hue={hue} showFiliereChip={false} />
-          ))}
-        </div>
+        {similaires.length > 0 ? (
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {similaires.map((o, i) => (
+              <OfferCard key={o.uid} offre={o} index={i} view="grid" hue={hue} showFiliereChip={false} />
+            ))}
+          </div>
+        ) : (
+          <p className="mt-10 text-center text-sm text-muted-foreground">Aucune offre similaire trouvée pour le moment.</p>
+        )}
         <div className="mt-8 text-center md:hidden">
           <CtaLink to={`/filieres/${meta.code}`} variant="outline" size="md" iconRight={ArrowRight}>
             Toute la filière {meta.label}
@@ -615,26 +622,82 @@ PAGE
 ════════════════════════════════════════════════════════════════════ */
 const DetailsOffre = () => {
   const { id } = useParams()
-  const offre = useMemo(() => ALL_OFFRES.find((o) => String(o.id) === String(id)), [id])
-  const meta = offre ? FILIERES_META.find((f) => f.code === offre.filiere) : null
 
-  const [saved, setSaved] = useState(new Set())
+  const [offre, setOffre] = useState(null)
+  const [similarOffers, setSimilarOffers] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  const [saved, setSaved] = useState(false)
   const [copied, setCopied] = useState(false)
 
-  const toggleSave = (uid) =>
-    setSaved((prev) => {
-      const next = new Set(prev)
-      next.has(uid) ? next.delete(uid) : next.add(uid)
-      return next
-    })
+  useEffect(() => {
+    let isMounted = true
+    const fetchData = async () => {
+      setIsLoading(true)
+      setError(null)
+      try {
+        const rawOffre = await getOfferById(id)
+        if (!isMounted) return
+
+        const adaptedOffre = adaptOffer(rawOffre)
+        adaptedOffre.detail = rawOffre.detail
+
+        setOffre(adaptedOffre)
+
+        const rawSimilar = await getSimilarOffers(id)
+        if (!isMounted) return
+        setSimilarOffers(adaptOffers(rawSimilar))
+
+        // Incrémentation de la vue (fire and forget)
+        incrementeView(id).catch(() => { })
+      } catch (err) {
+        if (!isMounted) return
+        setError(err.message || "Erreur lors du chargement de l'offre.")
+      } finally {
+        if (isMounted) setIsLoading(false)
+      }
+    }
+
+    if (id) {
+      fetchData()
+    }
+
+    return () => { isMounted = false }
+  }, [id])
+
+  const meta = getFiliereTheme(offre?.filiere)
+  const hue = meta ? HUES[meta.hue] : HUES.sky
+  const hash = offre ? fakeHash(offre.id) : ""
+  const detail = offre?.detail || {}
+
+  const toggleSave = async () => {
+    if (!offre) return
+    try {
+      await saveOffer(offre.id)
+      setSaved(prev => !prev)
+    } catch (err) {
+      console.error("Erreur sauvegarde:", err)
+    }
+  }
 
   const copyLink = async () => {
-    try { await navigator.clipboard.writeText(window.location.href) } catch { /* contexte non sécurisé */ }
+    try {
+      await navigator.clipboard.writeText(window.location.href)
+    } catch { /* contexte non sécurisé */ }
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
 
-  if (!offre || !meta) {
+  if (isLoading) {
+    return (
+      <main className="flex min-h-[60vh] items-center justify-center bg-background">
+        <Loader2 className="size-8 animate-spin text-brand-orange" />
+      </main>
+    )
+  }
+
+  if (error || !offre || !meta) {
     return (
       <>
         <Seo
@@ -648,26 +711,23 @@ const DetailsOffre = () => {
     )
   }
 
-  const hue = HUES[meta.hue]
-  const detail = getDetail(offre, meta)
-  const hash = fakeHash(offre.id)
-  const totalEntreprise = ALL_OFFRES.filter((x) => x.entreprise === offre.entreprise).length
-  const relatedOffers = ALL_OFFRES.filter((x) => x.filiere === offre.filiere && x.id !== offre.id)
+  const totalEntreprise = 1
+  const relatedOffers = similarOffers
 
   return (
     <>
       <Seo {...offreSeo(offre, meta, detail, relatedOffers)} />
       <main>
         <HeroOffre
-          offre={offre} meta={meta} hue={hue} hash={hash}
+          offre={offre} meta={meta} title={offre?.filiereLabel} hue={hue} hash={hash}
           totalEntreprise={totalEntreprise}
-          saved={saved.has(offre.uid)}
-          onToggleSave={() => toggleSave(offre.uid)}
+          saved={saved}
+          onToggleSave={toggleSave}
           copied={copied}
           onCopy={copyLink}
         />
         <CorpsOffre offre={offre} meta={meta} hue={hue} detail={detail} />
-        <OffresSimilaires offre={offre} meta={meta} hue={hue} />
+        <OffresSimilaires offre={offre} meta={meta} hue={hue} similarOffers={similarOffers} />
         <BandeCloture />
       </main>
     </>
@@ -675,4 +735,3 @@ const DetailsOffre = () => {
 }
 
 export default DetailsOffre
-

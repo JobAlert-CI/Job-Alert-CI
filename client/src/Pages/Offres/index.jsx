@@ -1,36 +1,37 @@
-/* eslint-disable react-hooks/set-state-in-effect */
-import { Fragment, useEffect, useMemo, useRef, useState } from "react"
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Link } from "react-router-dom"
 import { AnimatePresence, motion } from "framer-motion"
 import {
-  ArrowRight, ArrowUp, ArrowUpDown, Bell,
+  AlertTriangle, ArrowRight, ArrowUp, ArrowUpDown, Bell,
   Briefcase, CalendarDays, Check, CheckCircle2, ChevronDown,
   ChevronRight, Clock, Fingerprint, GraduationCap, Layers, Loader2,
-  Mail, Radar, Search, SearchX, Send, ShieldCheck, SlidersHorizontal,
+  Mail, MapPin, Radar, RefreshCw, Search, SearchX, Send, ShieldCheck, SlidersHorizontal,
   Sparkles, X, Zap,
 } from "lucide-react"
 import {
   Tooltip, TooltipContent, TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 import { useIsMobile } from "@/hooks/use-mobile"
 import Seo from "@/components/seo/Seo"
 import {
   CountUp, CountdownEnvoi, Ticker, OfferCard, SourceLogo,
-  CheckRow, FilterPopover, MiniCalendar, ViewToggle, FiltersDrawer, OfferFilterGroups,
+  CheckRow, FilterPopover, MiniCalendar, ViewToggle, FiltersDrawer,
   CtaLink,
 } from "@/components/shared"
 import { HUES, BRAND_HUE } from "@/lib/hues"
-import { FILIERES_META, SOURCES, CONTRATS, EXPERIENCES, NIVEAUX, SORTS } from "@/lib/referentiels"
-import { startOfDay, addDays, sameDay, fmtDay, jourLabel, todayLong } from "@/lib/dates"
+import { SORTS } from "@/lib/referentiels"
+import { sameDay, fmtDay, jourLabel, todayLong } from "@/lib/dates"
 import { offresSeo } from "@/lib/seo"
 import useClickOutside from "@/hooks/use-click-outside"
 import { useUrlFilters } from "@/hooks/use-url-filters"
-import { ALL_OFFRES } from "@/data/offres"
-
-/* ════════════════════════════════════════════════════════════════════
-  DONNÉES — à brancher sur l'API (offres.visible_site + offre_filieres)
-════════════════════════════════════════════════════════════════════ */
+import { toIsoEnd, toIsoStart } from "@/lib/offers-adapter"
+import {
+  useOfferCounts, useOfferReferentials, useOffersFeed, useOffersOverview,
+} from "@/hooks/use-offers-data"
+import { OffersSkeletonList, StatSkeleton } from "../../components/ReuOffres/SkeletonsOffres"
+import OffresFilterGroups, { LocationPicker } from "../../components/ReuOffres/FiltresOffres"
 
 const ABONNES = 10550
 
@@ -40,11 +41,12 @@ const PIPELINE = [
   { icon: Send, t: "08:00", l: "Envoi", done: false },
 ]
 
+
 /* ════════════════════════════════════════════════════════════════════
   FLUX CARD améliorée — la chaîne du matin, en vivant
 ════════════════════════════════════════════════════════════════════ */
 
-const FluxCard = ({ parSource, nouveaux }) => (
+const FluxCard = ({ parSource = [], nouveaux = 0, isLoading = false }) => (
   <motion.div
     initial={{ opacity: 0, y: 32, rotate: 1.5 }}
     animate={{ opacity: 1, y: 0, rotate: 0 }}
@@ -95,7 +97,9 @@ const FluxCard = ({ parSource, nouveaux }) => (
           <span className="relative inline-flex size-2.5 rounded-full bg-emerald-500" />
         </span>
         <div className="min-w-0 flex-1">
-          <p className="font-heading text-sm font-bold text-brand-navy">4 sources → 1 flux</p>
+          <p className="font-heading text-sm font-bold text-brand-navy">
+            {parSource.length || 0} source{parSource.length > 1 ? "s" : ""} → 1 flux
+          </p>
           <p className="text-[11px] text-muted-foreground">Collecte terminée aujourd'hui · 06:02</p>
         </div>
         <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-brand-navy px-2.5 py-1 text-[10px] font-bold text-white">
@@ -105,35 +109,40 @@ const FluxCard = ({ parSource, nouveaux }) => (
       </div>
 
       <div className="px-5 pb-5 pt-4">
-        {/* Les 4 sources, avec statut de collecte */}
-        <div className="grid grid-cols-4 gap-2">
-          {parSource.map((s, i) => (
-            <motion.div
-              key={s.code}
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.55 + i * 0.1, duration: 0.4 }}
-            >
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <div className="relative flex cursor-default flex-col items-center gap-1.5 rounded-lg border border-outline-variant/50 bg-surface-container-low/50 px-1 py-2.5 transition-colors hover:border-brand-navy/30 hover:bg-surface-container-low">
-                    <span className="absolute right-1 top-1 grid size-3.5 place-items-center rounded-full bg-emerald-500 text-white">
-                      <Check className="size-2" strokeWidth={4} />
-                    </span>
-                    <SourceLogo code={s.code} className="size-7 rounded-md text-[9px]" />
-                    <span className="leading-none">
-                      <span className="block font-heading text-[12px] font-extrabold text-brand-navy">+{s.nouveaux}</span>
-                      <span className="mt-0.5 block text-[9px] font-semibold text-muted-foreground">{s.total} au total</span>
-                    </span>
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent side="bottom">
-                  {s.nouveaux} nouvelles offres via {s.code} · {s.total} actives
-                </TooltipContent>
-              </Tooltip>
-            </motion.div>
-          ))}
+        {/* Les sources collectées (données API) */}
+        <div className={cn("grid gap-2", parSource.length >= 4 || isLoading ? "grid-cols-4" : "grid-cols-3")}>
+          {isLoading && parSource.length === 0
+            ? [0, 1, 2, 3].map((i) => (
+              <Skeleton key={i} className="h-18 rounded-lg" />
+            ))
+            : parSource.map((s, i) => (
+              <motion.div
+                key={s.code}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.55 + i * 0.1, duration: 0.4 }}
+              >
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="relative flex cursor-default flex-col items-center gap-1.5 rounded-lg border border-outline-variant/50 bg-surface-container-low/50 px-1 py-2.5 transition-colors hover:border-brand-navy/30 hover:bg-surface-container-low">
+                      <span className="absolute right-1 top-1 grid size-3.5 place-items-center rounded-full bg-emerald-500 text-white">
+                        <Check className="size-2" strokeWidth={4} />
+                      </span>
+                      <SourceLogo code={s.code} className="size-7 rounded-md text-[9px]" />
+                      <span className="leading-none">
+                        <span className="block font-heading text-[12px] font-extrabold text-brand-navy">+{s.nouveaux}</span>
+                        <span className="mt-0.5 block text-[9px] font-semibold text-muted-foreground">{s.total} au total</span>
+                      </span>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">
+                    {s.nouveaux} nouvelle{s.nouveaux > 1 ? "s" : ""} offre{s.nouveaux > 1 ? "s" : ""} via {s.label ?? s.code} · {s.total} active{s.total > 1 ? "s" : ""}
+                  </TooltipContent>
+                </Tooltip>
+              </motion.div>
+            ))}
         </div>
+
 
         {/* Convergence animée vers le dé-doublonnage */}
         <svg viewBox="0 0 320 40" className="mt-1 w-full" fill="none" aria-hidden>
@@ -204,7 +213,7 @@ const FluxCard = ({ parSource, nouveaux }) => (
 /* ════════════════════════════════════════════════════════════════════
   HERO — ticker + breadcrumb + titre test1 + CTA & compteurs test2
 ════════════════════════════════════════════════════════════════════ */
-const HeroOffres = ({ total, nouveaux, parSource }) => (
+const HeroOffres = ({ total = 0, nouveaux = 0, parSource = [], isLoading = false }) => (
   <section className="relative overflow-hidden hero-gradient">
     <div className="absolute inset-0 bg-pattern opacity-50" aria-hidden />
     <div className="absolute -top-32 right-[-10%] size-140 rounded-full bg-brand-orange/8 blur-3xl" aria-hidden />
@@ -246,7 +255,7 @@ const HeroOffres = ({ total, nouveaux, parSource }) => (
             </span>
             <span className="inline-flex items-center gap-1.5 rounded-full border border-outline-variant/50 bg-white/80 px-3.5 py-1.5 text-[11px] font-bold text-on-surface-variant">
               <ShieldCheck className="size-3 text-brand-orange" />
-              4 sources scannées · 0 doublon en base
+              {parSource.length || 0} source{parSource.length > 1 ? "s" : ""} scannée{parSource.length > 1 ? "s" : ""} · 0 doublon en base
             </span>
           </motion.div>
 
@@ -285,8 +294,8 @@ const HeroOffres = ({ total, nouveaux, parSource }) => (
             variants={{ hidden: { opacity: 0, y: 22 }, visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } } }}
             className="max-w-xl md:text-lg leading-relaxed text-on-surface-variant"
           >
-            {nouveaux} opportunités collectées ce matin sur EmploiDakar CI, GoAfrica, Novojob
-            et LinkedIn, dé-dupliquées par hash puis taggées par filière. Demain, inutile de
+            {nouveaux > 0 ? `${nouveaux} nouvelle` : "Aucune"}{" "} opportunité{nouveaux > 1 ? "s" : ""} collectée{nouveaux > 1 ? "s" : ""} ce matin sur {parSource.length ? parSource.map((s) => s.label ?? s.code).join(", ") : "nos sources partenaires"}
+            , dé-dupliquées par hash puis taggées par filière. Demain, inutile de
             revenir : votre sélection arrive par email à{" "}
             <strong className="font-bold text-brand-navy">8h00 précises</strong>.
           </motion.p>
@@ -312,19 +321,25 @@ const HeroOffres = ({ total, nouveaux, parSource }) => (
             {[
               { valeur: total, label: "offres en ligne" },
               { valeur: nouveaux, label: "nouvelles ce matin" },
-              { valeur: 4, label: "sources scannées" },
+              { valeur: parSource.length, label: "sources scannées" },
             ].map((s) => (
               <div key={s.label}>
                 <dt className="sr-only">{s.label}</dt>
-                <dd className="font-heading text-3xl font-black text-brand-navy"><CountUp to={s.valeur} /></dd>
-                <dd className="text-xs font-medium text-muted-foreground">{s.label}</dd>
+                {isLoading ? (
+                  <StatSkeleton />
+                ) : (
+                  <>
+                    <dd className="font-heading text-3xl font-black text-brand-navy"><CountUp to={s.valeur} /></dd>
+                    <dd className="text-xs font-medium text-muted-foreground">{s.label}</dd>
+                  </>
+                )}
               </div>
             ))}
           </motion.dl>
         </motion.div>
 
         {/* Colonne droite */}
-        <FluxCard parSource={parSource} nouveaux={nouveaux} />
+        <FluxCard parSource={parSource} nouveaux={nouveaux} isLoading={isLoading} />
       </div>
     </div>
   </section>
@@ -335,7 +350,7 @@ const HeroOffres = ({ total, nouveaux, parSource }) => (
 ════════════════════════════════════════════════════════════════════ */
 const PAGE_SIZE = 12
 
-/* ═══ Filtres ↔ URL : /offres?fil=tech-dev&src=LinkedIn&ct=CDI&tri=az ═══ */
+/* ═══ Filtres ↔ URL : /offres?fil=tech-dev&src=linkedin&loc=<uuid>&tri=az ═══ */
 const CONFIG_FILTRES = {
   sets: [
     { key: "filieres", param: "fil" },
@@ -348,6 +363,7 @@ const CONFIG_FILTRES = {
     { key: "sort", param: "tri", defaut: "recent" },
     { key: "view", param: "vue", defaut: "list" },
     { key: "query", param: "q", defaut: "" },
+    { key: "location", param: "loc", defaut: "" },
   ],
   period: { debut: "du", fin: "au" },
 }
@@ -359,8 +375,10 @@ const Offres = () => {
   const { filters, valeurs, toggle, setScalar, setPeriod, reset } = useUrlFilters(CONFIG_FILTRES)
   const sort = SORTS.some((s) => s.k === valeurs.sort) ? valeurs.sort : "recent"
   const view = valeurs.view === "grid" ? "grid" : "list"
+  const locationId = valeurs.location || null
   const setSort = (k) => setScalar("sort", k)
   const setView = (v) => setScalar("view", v)
+  const setLocation = useCallback((id) => setScalar("location", id ?? ""), [setScalar])
 
   /* Recherche : champ local réactif → URL debouncée */
   const [queryLocale, setQueryLocale] = useState(valeurs.query)
@@ -374,58 +392,35 @@ const Offres = () => {
   const [saved, setSaved] = useState(new Set())
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [openPop, setOpenPop] = useState(null)
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE)
-  const [loadingMore, setLoadingMore] = useState(false)
   const [showTop, setShowTop] = useState(false)
   const sortRef = useRef(null)
   useClickOutside(sortRef, () => setOpenPop((p) => (p === "sort" ? null : p)))
 
-  /* Compteurs par option */
-  const stats = useMemo(() => {
-    const nouveaux = ALL_OFFRES.filter((o) => o.jours === 0).length
-    const parSource = SOURCES.map((s) => ({
-      ...s,
-      total: ALL_OFFRES.filter((o) => o.source === s.code).length,
-      nouveaux: ALL_OFFRES.filter((o) => o.source === s.code && o.jours === 0).length,
-    }))
-    const c = { filieres: {}, sources: {}, contrats: {}, experiences: {}, niveaux: {} }
-    ALL_OFFRES.forEach((o) => {
-      c.filieres[o.filiere] = (c.filieres[o.filiere] || 0) + 1
-      c.sources[o.source] = (c.sources[o.source] || 0) + 1
-      c.contrats[o.contrat] = (c.contrats[o.contrat] || 0) + 1
-      c.experiences[o.experience] = (c.experiences[o.experience] || 0) + 1
-      c.niveaux[o.niveau] = (c.niveaux[o.niveau] || 0) + 1
-    })
-    return { total: ALL_OFFRES.length, nouveaux, parSource, counts: c }
-  }, [])
+  /* ═══ Données backend ═══ */
+  const referentials = useOfferReferentials()
+  const { counts } = useOfferCounts()
+  const overview = useOffersOverview()
+  const refs = referentials.data
 
-  /* Filtrage + tri */
-  const filtered = useMemo(() => {
-    const q = queryLocale.trim().toLowerCase()
-    const today = startOfDay(new Date())
-    let list = ALL_OFFRES.filter((o) => {
-      if (q && !(o.titre.toLowerCase().includes(q) || o.entreprise.toLowerCase().includes(q))) return false
-      if (filters.filieres.size && !filters.filieres.has(o.filiere)) return false
-      if (filters.sources.size && !filters.sources.has(o.source)) return false
-      if (filters.contrats.size && !filters.contrats.has(o.contrat)) return false
-      if (filters.experiences.size && !filters.experiences.has(o.experience)) return false
-      if (filters.niveaux.size && !filters.niveaux.has(o.niveau)) return false
-      if (filters.period.start || filters.period.end) {
-        const d = addDays(today, -o.jours)
-        if (filters.period.start && d < filters.period.start) return false
-        if (filters.period.end && d > filters.period.end) return false
-      }
-      return true
-    })
-    if (sort === "recent") list = [...list].sort((a, b) => a.jours - b.jours)
-    if (sort === "old") list = [...list].sort((a, b) => b.jours - a.jours)
-    if (sort === "az") list = [...list].sort((a, b) => a.titre.localeCompare(b.titre, "fr"))
-    if (sort === "ent") list = [...list].sort((a, b) => a.entreprise.localeCompare(b.entreprise, "fr"))
-    return list
-  }, [filters, sort, queryLocale])
+  /* Paramètres API — sérialisables, mémoïsés : une seule requête par changement */
+  const apiParams = useMemo(() => {
+    const q = valeurs.query.trim()
+    return {
+      sort,
+      filieres: [...filters.filieres],
+      sources: [...filters.sources],
+      contrats: [...filters.contrats],
+      experiences: [...filters.experiences],
+      niveaux: [...filters.niveaux],
+      location_id: locationId || undefined,
+      q: q.length >= 2 ? q : undefined,
+      published_since: toIsoStart(filters.period.start),
+      published_until: toIsoEnd(filters.period.end),
+    }
+  }, [sort, filters, locationId, valeurs.query])
 
-  /* Reset de la pagination quand les filtres changent */
-  useEffect(() => { setVisibleCount(PAGE_SIZE) }, [filters, sort, queryLocale])
+  const feed = useOffersFeed({ params: apiParams, pageSize: PAGE_SIZE })
+  const { offers, isLoading, isLoadingMore, error, hasMore, loadMore, reload } = feed
 
   /* Bouton retour en haut */
   useEffect(() => {
@@ -434,32 +429,20 @@ const Offres = () => {
     return () => window.removeEventListener("scroll", onScroll)
   }, [])
 
-  /* « Charger plus » — par lots de 12 (ou le reste si < 12) */
-  const remaining = filtered.length - visibleCount
-  const loadMore = () => {
-    setLoadingMore(true)
-    setTimeout(() => {
-      setVisibleCount((c) => Math.min(c + PAGE_SIZE, filtered.length))
-      setLoadingMore(false)
-    }, 600)
-  }
-
   /* Feed groupé jour par jour (tri « récentes » uniquement) */
   const feedItems = useMemo(() => {
-    const visible = filtered.slice(0, visibleCount)
-    if (sort !== "recent") return visible.map((o) => ({ type: "offre", o }))
+    if (sort !== "recent") return offers.map((o) => ({ type: "offre", o }))
     const items = []
     let last = null
-    visible.forEach((o) => {
+    offers.forEach((o) => {
       if (o.jours !== last) {
-        const count = visible.filter((x) => x.jours === o.jours).length
-        items.push({ type: "header", jours: o.jours, count })
+        items.push({ type: "header", jours: o.jours, count: offers.filter((x) => x.jours === o.jours).length })
         last = o.jours
       }
       items.push({ type: "offre", o })
     })
     return items
-  }, [filtered, visibleCount, sort])
+  }, [offers, sort])
 
   const toggleSave = (uid) =>
     setSaved((prev) => {
@@ -468,16 +451,21 @@ const Offres = () => {
       return next
     })
 
+  const labelOf = useCallback((list, code) =>
+    list.find((x) => x.code === code)?.label || code, [])
+
   /* Chips de filtres actifs */
   const activeChips = useMemo(() => {
     const chips = []
-    filters.filieres.forEach((c) => chips.push({
-      key: `f-${c}`, label: FILIERES_META.find((f) => f.code === c)?.label || c, rm: () => toggle("filieres", c),
-    }))
-    filters.sources.forEach((s) => chips.push({ key: `s-${s}`, label: s, rm: () => toggle("sources", s) }))
-    filters.contrats.forEach((c) => chips.push({ key: `c-${c}`, label: c, rm: () => toggle("contrats", c) }))
-    filters.experiences.forEach((x) => chips.push({ key: `e-${x}`, label: x, rm: () => toggle("experiences", x) }))
-    filters.niveaux.forEach((n) => chips.push({ key: `n-${n}`, label: n, rm: () => toggle("niveaux", n) }))
+    filters.filieres.forEach((c) => chips.push({ key: `f-${c}`, label: labelOf(refs.filieres, c), rm: () => toggle("filieres", c) }))
+    filters.sources.forEach((s) => chips.push({ key: `s-${s}`, label: labelOf(refs.sources, s), rm: () => toggle("sources", s) }))
+    filters.contrats.forEach((c) => chips.push({ key: `c-${c}`, label: labelOf(refs.contrats, c), rm: () => toggle("contrats", c) }))
+    filters.experiences.forEach((x) => chips.push({ key: `e-${x}`, label: labelOf(refs.experiences, x), rm: () => toggle("experiences", x) }))
+    filters.niveaux.forEach((n) => chips.push({ key: `n-${n}`, label: labelOf(refs.niveaux, n), rm: () => toggle("niveaux", n) }))
+    if (locationId) {
+      const loc = refs.locations.find((l) => l.id === locationId)
+      chips.push({ key: "loc", label: loc?.label || loc?.city || "Localisation", rm: () => setLocation(null) })
+    }
     const { start, end } = filters.period
     if (start && end) {
       chips.push({
@@ -490,12 +478,15 @@ const Offres = () => {
     }
     return chips
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters])
+  }, [filters, locationId, refs, labelOf])
 
   const activeCount =
     filters.filieres.size + filters.sources.size + filters.contrats.size +
     filters.experiences.size + filters.niveaux.size +
+    (locationId ? 1 : 0) +
     (filters.period.start || filters.period.end ? 1 : 0)
+
+  const resetTout = useCallback(() => { reset(); setQueryLocale("") }, [reset])
 
   const pop = (k) => ({
     open: openPop === k,
@@ -512,23 +503,36 @@ const Offres = () => {
         ? `Depuis le ${fmtDay(filters.period.start)}`
         : "Période"
 
-  const isDone = !loadingMore && visibleCount >= filtered.length && filtered.length > 0
+  const locationLabel = locationId
+    ? (refs.locations.find((l) => l.id === locationId)?.label || "Localisation")
+    : "Localisation"
+
+  const isDone = !isLoading && !isLoadingMore && !hasMore && offers.length > 0
+  const refsLoading = referentials.isLoading
 
   return (
     <>
-      <Seo {...offresSeo({ total: stats.total, nouveaux: stats.nouveaux, parSource: stats.parSource, offers: ALL_OFFRES })} />
+      <Seo {...offresSeo({ total: overview.total, nouveaux: overview.nouveaux, parSource: overview.parSource, offers })} />
       <main>
-        <Ticker
-          variant="dark"
-          duration={250}
-          items={ALL_OFFRES.map((o) => ({
-            key: o.uid,
-            dot: HUES[FILIERES_META.find((f) => f.code === o.filiere).hue].dot,
-            titre: o.titre,
-            entreprise: o.entreprise,
-          }))}
+        {offers.length > 0 && (
+          <Ticker
+            variant="dark"
+            duration={250}
+            items={offers.slice(0, 24).map((o) => ({
+              key: o.uid,
+              dot: (HUES[refs.filieres.find((f) => f.code === o.filiere)?.hue] ?? BRAND_HUE).dot,
+              titre: o.titre,
+              entreprise: o.entreprise,
+            }))}
+          />
+        )}
+
+        <HeroOffres
+          total={overview.total}
+          nouveaux={overview.nouveaux}
+          parSource={overview.parSource}
+          isLoading={overview.isLoading}
         />
-        <HeroOffres total={stats.total} nouveaux={stats.nouveaux} parSource={stats.parSource} />
 
         {/* ═══════════ Barre de filtres sticky ═══════════ */}
         <div className="sticky top-1/10 z-40 border-b border-outline-variant/40 bg-background/85 backdrop-blur-md">
@@ -544,7 +548,7 @@ const Offres = () => {
                   aria-label="Rechercher"
                   className="h-9 w-full rounded-lg border border-outline-variant/60 bg-surface-container-lowest pl-9 pr-8 text-[13px] outline-none transition-all placeholder:text-muted-foreground/70 focus:border-brand-navy/50 focus:ring-2 focus:ring-brand-navy/10"
                 />
-                {filters.query && (
+                {queryLocale && (
                   <button
                     onClick={() => setQueryLocale("")}
                     aria-label="Effacer la recherche"
@@ -557,47 +561,82 @@ const Offres = () => {
 
               <FilterPopover label="Filière" icon={Sparkles} count={filters.filieres.size} {...pop("filiere")} panelClassName="w-64">
                 <div className="max-h-72 overflow-y-auto pr-1">
-                  {FILIERES_META.map((f) => (
-                    <CheckRow
-                      key={f.code}
-                      checked={filters.filieres.has(f.code)}
-                      onToggle={() => toggle("filieres", f.code)}
-                      label={f.label}
-                      count={stats.counts.filieres[f.code] || 0}
-                      lead={<span className={cn("size-2 shrink-0 rounded-full", HUES[f.hue].dot)} />}
-                    />
-                  ))}
+                  {refsLoading && refs.filieres.length === 0
+                    ? [0, 1, 2, 3, 4].map((i) => <Skeleton key={i} className="mb-1.5 h-8 w-full rounded-md" />)
+                    : refs.filieres.map((f) => (
+                      <CheckRow
+                        key={f.code}
+                        checked={filters.filieres.has(f.code)}
+                        onToggle={() => toggle("filieres", f.code)}
+                        label={f.label}
+                        count={counts.filieres[f.code] ?? 0}
+                        lead={<span className={cn("size-2 shrink-0 rounded-full", (HUES[f.hue] ?? BRAND_HUE).dot)} />}
+                      />
+                    ))}
                 </div>
               </FilterPopover>
 
+              <FilterPopover
+                label={locationLabel}
+                icon={MapPin}
+                count={locationId ? 1 : 0}
+                panelClassName="w-72 p-3"
+                {...pop("location")}
+              >
+                <LocationPicker
+                  locations={refs.locations}
+                  value={locationId}
+                  onChange={(id) => { setLocation(id); setOpenPop(null) }}
+                  isLoading={refsLoading && refs.locations.length === 0}
+                />
+              </FilterPopover>
+
               <FilterPopover label="Sources" icon={Layers} count={filters.sources.size} {...pop("source")}>
-                {SOURCES.map((s) => (
+                {refsLoading && refs.sources.length === 0
+                  ? [0, 1, 2].map((i) => <Skeleton key={i} className="mb-1.5 h-8 w-full rounded-md" />)
+                  : refs.sources.map((s) => (
+                    <CheckRow
+                      key={s.code}
+                      checked={filters.sources.has(s.code)}
+                      onToggle={() => toggle("sources", s.code)}
+                      label={s.label}
+                      count={counts.sources[s.code] ?? 0}
+                      lead={<SourceLogo code={s.code} className="size-5 rounded text-[8px]" />}
+                    />
+                  ))}
+              </FilterPopover>
+
+              <FilterPopover label="Contrat" icon={Briefcase} count={filters.contrats.size} {...pop("contrat")}>
+                {refs.contrats.map((c) => (
                   <CheckRow
-                    key={s.code}
-                    checked={filters.sources.has(s.code)}
-                    onToggle={() => toggle("sources", s.code)}
-                    label={s.code}
-                    count={stats.counts.sources[s.code] || 0}
-                    lead={<SourceLogo code={s.code} className="size-5 rounded text-[8px]" />}
+                    key={c.code}
+                    checked={filters.contrats.has(c.code)}
+                    onToggle={() => toggle("contrats", c.code)}
+                    label={c.label}
+                    count={counts.contrats[c.code] ?? 0}
                   />
                 ))}
               </FilterPopover>
 
-              <FilterPopover label="Contrat" icon={Briefcase} count={filters.contrats.size} {...pop("contrat")}>
-                {CONTRATS.map((c) => (
-                  <CheckRow key={c} checked={filters.contrats.has(c)} onToggle={() => toggle("contrats", c)} label={c} count={stats.counts.contrats[c] || 0} />
-                ))}
-              </FilterPopover>
-
               <FilterPopover label="Expérience" icon={Zap} count={filters.experiences.size} {...pop("exp")}>
-                {EXPERIENCES.map((x) => (
-                  <CheckRow key={x} checked={filters.experiences.has(x)} onToggle={() => toggle("experiences", x)} label={x} count={stats.counts.experiences[x] || 0} />
+                {refs.experiences.map((x) => (
+                  <CheckRow
+                    key={x.code}
+                    checked={filters.experiences.has(x.code)}
+                    onToggle={() => toggle("experiences", x.code)}
+                    label={x.label}
+                  />
                 ))}
               </FilterPopover>
 
               <FilterPopover label="Niveau" icon={GraduationCap} count={filters.niveaux.size} {...pop("niveau")}>
-                {NIVEAUX.map((n) => (
-                  <CheckRow key={n} checked={filters.niveaux.has(n)} onToggle={() => toggle("niveaux", n)} label={n} count={stats.counts.niveaux[n] || 0} />
+                {refs.niveaux.map((n) => (
+                  <CheckRow
+                    key={n.code}
+                    checked={filters.niveaux.has(n.code)}
+                    onToggle={() => toggle("niveaux", n.code)}
+                    label={n.label}
+                  />
                 ))}
               </FilterPopover>
 
@@ -614,7 +653,14 @@ const Offres = () => {
 
               <div className="ml-auto flex items-center gap-2.5">
                 <span className="hidden text-xs text-muted-foreground xl:inline">
-                  <strong className="font-heading text-sm font-bold text-brand-navy">{filtered.length}</strong> offre{filtered.length > 1 ? "s" : ""}
+                  {isLoading ? (
+                    <Skeleton className="inline-block h-4 w-20 align-middle" />
+                  ) : (
+                    <>
+                      <strong className="font-heading text-sm font-bold text-brand-navy">{offers.length}{hasMore ? "+" : ""}</strong>
+                      {" "}offre{offers.length > 1 ? "s" : ""}
+                    </>
+                  )}
                 </span>
                 {/* Tri */}
                 <div ref={sortRef} className="relative">
@@ -628,7 +674,7 @@ const Offres = () => {
                     )}
                   >
                     <ArrowUpDown className="size-3.5" />
-                    {SORTS.find((s) => s.k === sort).l}
+                    {SORTS.find((s) => s.k === sort)?.l ?? "Trier"}
                     <ChevronDown className={cn("size-3.5 transition-transform duration-200", openPop === "sort" && "rotate-180")} />
                   </button>
                   <AnimatePresence>
@@ -669,8 +715,7 @@ const Offres = () => {
                   aria-label="Rechercher"
                   className="h-10 w-full rounded-lg border border-outline-variant/60 bg-surface-container-lowest pl-9 pr-3 text-sm outline-none transition-all placeholder:text-muted-foreground/70 focus:border-brand-navy/50 focus:ring-2 focus:ring-brand-navy/10"
                 />
-
-                {filters.query && (
+                {queryLocale && (
                   <button
                     onClick={() => setQueryLocale("")}
                     aria-label="Effacer la recherche"
@@ -707,12 +752,22 @@ const Offres = () => {
         <FiltersDrawer
           open={drawerOpen}
           onOpenChange={setDrawerOpen}
-          resultCount={filtered.length}
+          resultCount={offers.length}
           sort={sort}
           onSort={setSort}
-          onReset={() => { reset() + setQueryLocale("") }}
+          onReset={resetTout}
         >
-          <OfferFilterGroups filters={filters} toggle={toggle} counts={stats.counts} onPeriod={setPeriod} />
+          <OffresFilterGroups
+            referentials={refs}
+            counts={counts}
+            filters={filters}
+            toggle={toggle}
+            period={filters.period}
+            onPeriod={setPeriod}
+            locationId={locationId}
+            onLocation={setLocation}
+            isLoading={refsLoading}
+          />
         </FiltersDrawer>
 
         {/* ═══════════ Le flux ═══════════ */}
@@ -733,12 +788,27 @@ const Offres = () => {
                   Les offres <span className="text-brand-orange">du moment</span>
                 </h2>
                 <p className="mt-2 text-sm text-muted-foreground">
-                  <strong className="font-heading font-bold text-brand-navy">{filtered.length}</strong> offre{filtered.length > 1 ? "s" : ""}
-                  {activeCount > 0 ? ` · ${activeCount} filtre${activeCount > 1 ? "s" : ""} actif${activeCount > 1 ? "s" : ""}` : ""}
-                  {" "} triées par « {SORTS.find((s) => s.k === sort).l.toLowerCase()} »
+                  {isLoading ? "Chargement du flux…" : (
+                    <>
+                      <strong className="font-heading font-bold text-brand-navy">{offers.length}{hasMore ? "+" : ""}</strong> offre{offers.length > 1 ? "s" : ""}
+                      {activeCount > 0 ? ` · ${activeCount} filtre${activeCount > 1 ? "s" : ""} actif${activeCount > 1 ? "s" : ""}` : ""}
+                      {" "} triées par « {(SORTS.find((s) => s.k === sort)?.l ?? "").toLowerCase()} »
+                    </>
+                  )}
                 </p>
               </motion.div>
             </div>
+
+            {/* Référentiels en repli : filtres réduits, on prévient sans bloquer */}
+            {referentials.isFallback && !referentials.isLoading && (
+              <div className="mt-6 flex flex-wrap items-center gap-3 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-xs font-semibold text-amber-800">
+                <AlertTriangle className="size-4" />
+                Les listes de filtres n'ont pas pu être chargées — options par défaut affichées.
+                <button onClick={referentials.reload} className="inline-flex items-center gap-1 font-bold underline">
+                  <RefreshCw className="size-3" /> Réessayer
+                </button>
+              </div>
+            )}
 
             {/* Chips de filtres actifs */}
             <AnimatePresence>
@@ -761,7 +831,7 @@ const Offres = () => {
                       </button>
                     ))}
                     <button
-                      onClick={() => { reset() + setQueryLocale("") }}
+                      onClick={resetTout}
                       className="text-xs font-bold text-brand-orange transition-colors hover:underline"
                     >
                       Tout effacer
@@ -771,8 +841,26 @@ const Offres = () => {
               )}
             </AnimatePresence>
 
-            {/* Feed */}
-            {filtered.length === 0 ? (
+            {/* ── États : chargement / erreur / vide / contenu ── */}
+            {isLoading ? (
+              <OffersSkeletonList view={view === "grid" || isMobile ? "grid" : "list"} count={PAGE_SIZE / 2} className="mt-8" />
+            ) : error && offers.length === 0 ? (
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-10 rounded-xl border border-destructive/30 bg-destructive/5 p-12 text-center"
+              >
+                <AlertTriangle className="mx-auto size-10 text-destructive/70" />
+                <h3 className="mt-4 font-heading text-lg font-bold text-brand-navy">Le flux n'a pas pu être chargé</h3>
+                <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">{error}</p>
+                <button
+                  onClick={reload}
+                  className="mt-5 inline-flex items-center gap-2 rounded-lg border border-brand-navy/20 px-5 py-2.5 text-sm font-bold text-brand-navy transition-all hover:border-brand-navy hover:bg-brand-navy hover:text-white"
+                >
+                  <RefreshCw className="size-4" /> Réessayer
+                </button>
+              </motion.div>
+            ) : offers.length === 0 ? (
               <motion.div
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -781,14 +869,18 @@ const Offres = () => {
                 <SearchX className="mx-auto size-10 text-muted-foreground/50" />
                 <h3 className="mt-4 font-heading text-lg font-bold text-brand-navy">Aucune offre trouvée</h3>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  Élargissez vos filtres — ou attendez la collecte de demain 6h02.
+                  {activeCount > 0 || valeurs.query
+                    ? "Élargissez vos filtres — ou attendez la collecte de demain 6h02."
+                    : "Le flux est vide pour le moment — la prochaine collecte est prévue à 6h02."}
                 </p>
-                <button
-                  onClick={() => { reset() + setQueryLocale("") }}
-                  className="mt-5 inline-flex items-center gap-2 rounded-lg border border-brand-navy/20 px-5 py-2.5 text-sm font-bold text-brand-navy transition-all hover:border-brand-navy hover:bg-brand-navy hover:text-white"
-                >
-                  Réinitialiser les filtres
-                </button>
+                {(activeCount > 0 || valeurs.query) && (
+                  <button
+                    onClick={resetTout}
+                    className="mt-5 inline-flex items-center gap-2 rounded-lg border border-brand-navy/20 px-5 py-2.5 text-sm font-bold text-brand-navy transition-all hover:border-brand-navy hover:bg-brand-navy hover:text-white"
+                  >
+                    Réinitialiser les filtres
+                  </button>
+                )}
               </motion.div>
             ) : (view === "list" && !isMobile) ? (
               <div className="mt-8 flex flex-col gap-3">
@@ -825,10 +917,10 @@ const Offres = () => {
                         key={item.o.uid}
                         offre={item.o}
                         index={i}
-                        view="list" /* ou "grid" */
+                        view="list"
                         saved={saved.has(item.o.uid)}
                         onToggleSave={toggleSave}
-                        entrepriseTotal={ALL_OFFRES.filter((x) => x.entreprise === item.o.entreprise).length}
+                        entrepriseTotal={offers.filter((x) => x.entreprise === item.o.entreprise).length}
                       />
                     )
                   )}
@@ -842,43 +934,38 @@ const Offres = () => {
                       key={item.o.uid}
                       offre={item.o}
                       index={i}
-                      view="list" /* ou "grid" */
+                      view="grid"
                       saved={saved.has(item.o.uid)}
                       onToggleSave={toggleSave}
-                      entrepriseTotal={ALL_OFFRES.filter((x) => x.entreprise === item.o.entreprise).length}
+                      entrepriseTotal={offers.filter((x) => x.entreprise === item.o.entreprise).length}
                     />
                   ))}
                 </AnimatePresence>
               </div>
             )}
 
-            {/* Squelettes pendant le chargement */}
-            <AnimatePresence>
-              {loadingMore && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  className={cn("mt-3", view === "grid" ? "grid gap-4 sm:grid-cols-2 xl:grid-cols-3" : "flex flex-col gap-3")}
-                >
-                  {[0, 1, 2].map((i) => (
-                    <div key={i} className="rounded-xl border border-outline-variant/40 bg-white p-5 shadow-soft">
-                      <div className="flex gap-4">
-                        <div className="hidden size-14 animate-pulse rounded-lg bg-surface-container-high sm:block" />
-                        <div className="flex-1 space-y-2.5">
-                          <div className="h-4 w-2/3 animate-pulse rounded bg-surface-container-high" />
-                          <div className="h-3 w-1/3 animate-pulse rounded bg-surface-container" />
-                          <div className="h-3 w-1/2 animate-pulse rounded bg-surface-container" />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
+            {/* Squelettes pendant « charger plus » */}
+            {isLoadingMore && (
+              <OffersSkeletonList
+                view={view === "grid" || isMobile ? "grid" : "list"}
+                count={3}
+                className="mt-3"
+              />
+            )}
+
+            {/* Erreur non bloquante sur une page suivante */}
+            {error && offers.length > 0 && (
+              <div className="mt-6 flex flex-wrap items-center justify-center gap-3 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-xs font-semibold text-destructive">
+                <AlertTriangle className="size-4" />
+                {error}
+                <button onClick={loadMore} className="inline-flex items-center gap-1 font-bold underline">
+                  <RefreshCw className="size-3" /> Réessayer
+                </button>
+              </div>
+            )}
 
             {/* Charger plus — par lots de 12 */}
-            {remaining > 0 && (
+            {hasMore && !isLoading && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
@@ -888,23 +975,23 @@ const Offres = () => {
               >
                 <div className="w-full max-w-xs">
                   <div className="flex items-center justify-between text-[11px] font-semibold text-muted-foreground">
-                    <span>{visibleCount} affichée{visibleCount > 1 ? "s" : ""}</span>
-                    <span>{filtered.length} au total</span>
+                    <span>{offers.length} affichée{offers.length > 1 ? "s" : ""}</span>
+                    {overview.total > 0 && <span>{overview.total} au total</span>}
                   </div>
                   <div className="mt-1.5 h-1 overflow-hidden rounded-full bg-surface-container-high">
                     <motion.div
                       className="h-full rounded-full bg-brand-navy"
-                      animate={{ width: `${(visibleCount / filtered.length) * 100}%` }}
+                      animate={{ width: `${Math.min(100, overview.total ? (offers.length / overview.total) * 100 : 0)}%` }}
                       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                     />
                   </div>
                 </div>
                 <button
                   onClick={loadMore}
-                  disabled={loadingMore}
+                  disabled={isLoadingMore}
                   className="group inline-flex h-12 items-center gap-2.5 rounded-lg border border-brand-navy/25 bg-white px-7 text-sm font-bold text-brand-navy shadow-soft transition-all duration-300 hover:-translate-y-0.5 hover:border-brand-navy hover:bg-brand-navy hover:text-white hover:shadow-hover active:scale-[0.98] disabled:pointer-events-none disabled:opacity-60"
                 >
-                  {loadingMore ? (
+                  {isLoadingMore ? (
                     <>
                       <Loader2 className="size-4 animate-spin" />
                       Chargement des offres…
@@ -912,14 +999,12 @@ const Offres = () => {
                   ) : (
                     <>
                       <ChevronDown className="size-4 transition-transform duration-300 group-hover:translate-y-0.5" />
-                      {remaining >= PAGE_SIZE
-                        ? `Charger ${PAGE_SIZE} offres de plus ?`
-                        : `Charger les ${remaining} offre${remaining > 1 ? "s" : ""} restante${remaining > 1 ? "s" : ""} ?`}
+                      Charger {PAGE_SIZE} offres de plus ?
                     </>
                   )}
                 </button>
                 <p className="text-[11px] text-muted-foreground">
-                  Par lots de 12 · groupées jour par jour
+                  Par lots de {PAGE_SIZE} · groupées jour par jour
                 </p>
               </motion.div>
             )}
@@ -991,3 +1076,4 @@ const Offres = () => {
 }
 
 export default Offres
+

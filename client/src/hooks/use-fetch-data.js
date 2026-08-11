@@ -1,13 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 
-/**
- * Hook personnalisé pour gérer les requêtes Axios.
- * 
- * @param {Function} apiFunction - Une fonction qui retourne une promesse Axios (ex: () => axios.get('/api/users'))
- * @param {boolean} immediate - Si true, lance la requête dès le montage du composant
- */
-
 export const useFetchData = (apiFunction, immediate = true) => {
   const [data, setData] = useState(null);
   const [isLoading, setIsLoading] = useState(immediate);
@@ -16,11 +9,10 @@ export const useFetchData = (apiFunction, immediate = true) => {
   const execute = useCallback(async (...args) => {
     setIsLoading(true);
     setError(null);
-
     try {
-      const response = await apiFunction(...args);
-      setData(response);
-      return response;
+      const result = await apiFunction(...args);
+      setData(result);
+      return result;
     } catch (err) {
       let formattedError = {
         message: "Une erreur inattendue est survenue.",
@@ -28,13 +20,11 @@ export const useFetchData = (apiFunction, immediate = true) => {
         details: null,
         validationErrors: null
       };
-
       if (axios.isAxiosError(err)) {
         if (err.response) {
           const responseData = err.response.data;
           formattedError.status = err.response.status;
           formattedError.details = responseData;
-
           if (responseData?.detail) {
             if (Array.isArray(responseData.detail)) {
               formattedError.message = "Certaines données envoyées sont invalides.";
@@ -57,7 +47,6 @@ export const useFetchData = (apiFunction, immediate = true) => {
       } else if (err instanceof Error) {
         formattedError.message = err.message;
       }
-
       setError(formattedError);
     } finally {
       setIsLoading(false);
@@ -70,10 +59,5 @@ export const useFetchData = (apiFunction, immediate = true) => {
     }
   }, [execute, immediate]);
 
-  return {
-    data,
-    isLoading,
-    error,
-    reload: execute
-  };
-};
+  return { data, isLoading, error, reload: execute };
+};  

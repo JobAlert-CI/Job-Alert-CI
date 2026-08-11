@@ -5,13 +5,13 @@ import { ArrowUpRight, Clock, Eye } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { HUES } from "@/lib/hues"
 import { dateLabel } from "@/lib/dates"
-import { catOf, fmtVus } from "@/data/conseils"
+import { fmtVus } from "@/data/conseils"
 import BadgeNouveau from "./BadgeNouveau"
+import { joursDepuis } from "@/lib/conseils-adapter"
 
 const CarteArticle = ({ a, index = 0, large = false }) => {
-  const cat = catOf(a.cat)
-  const hue = HUES[cat.hue]
-  const Icon = cat.icon
+  const hue = HUES[a.category?.hue] || HUES["sky"]
+  // const Icon = a.icon
   return (
     <motion.div
       layout
@@ -33,9 +33,9 @@ const CarteArticle = ({ a, index = 0, large = false }) => {
         <div className={cn("pointer-events-none absolute -right-14 -top-14 size-40 rounded-full blur-3xl opacity-0 transition-opacity duration-500 group-hover:opacity-100", hue.glow)} aria-hidden />
         {large && (
           <div className={cn("relative mb-5 flex shrink-0 flex-col justify-between rounded-lg p-4 sm:mb-0 sm:w-44", hue.tile)}>
-            <Icon className="size-7" strokeWidth={1.8} />
+            {/* <Icon className="size-7" strokeWidth={1.8} /> */}
             <div>
-              <p className="font-heading text-3xl font-black leading-none">{a.lecture}′</p>
+              <p className="font-heading text-3xl font-black leading-none">{a.reading_minutes}′</p>
               <p className="mt-1 text-[10px] font-bold uppercase tracking-wider opacity-80">lecture</p>
             </div>
           </div>
@@ -43,24 +43,24 @@ const CarteArticle = ({ a, index = 0, large = false }) => {
         <div className="relative flex min-w-0 flex-1 flex-col">
           <div className="flex items-center gap-2">
             <span className={cn("inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide", hue.tile)}>
-              <Icon className="size-3" />
-              {cat.label}
+              {/* <Icon className="size-3" /> */}
+              {a.category?.label}
             </span>
-            {a.jours === 0 && <BadgeNouveau />}
+            {joursDepuis(a.published_at) === 0 && <BadgeNouveau />}
           </div>
           <h3 className={cn(
             "mt-3 font-heading font-extrabold leading-snug text-brand-navy transition-colors duration-300 group-hover:text-brand-orange",
             large ? "text-xl sm:text-2xl" : "text-[15px]"
           )}>
-            {a.titre}
+            {a.title}
           </h3>
           <p className={cn("mb-4 mt-2 text-[13px] leading-relaxed text-on-surface-variant", large ? "line-clamp-3" : "line-clamp-2")}>
-            {a.extrait}
+            {a.excerpt}
           </p>
           <div className="mt-auto flex items-center gap-3 border-t border-outline-variant/40 pt-3.5 text-[11px] font-semibold text-muted-foreground">
-            <span>{dateLabel(a.jours)}</span>
-            <span className="inline-flex items-center gap-1"><Clock className="size-3" />{a.lecture} min</span>
-            <span className="inline-flex items-center gap-1"><Eye className="size-3" />{fmtVus(a.vus)}</span>
+            <span>{dateLabel(joursDepuis(a.published_at))}</span>
+            <span className="inline-flex items-center gap-1"><Clock className="size-3" />{a.reading_minutes} min</span>
+            <span className="inline-flex items-center gap-1"><Eye className="size-3" />{fmtVus(a.view_count)}</span>
             <ArrowUpRight className="ml-auto size-4 text-outline-variant transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-brand-orange" />
           </div>
         </div>

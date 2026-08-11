@@ -1,136 +1,146 @@
-
-import { Fragment, useEffect, useMemo, useRef, useState } from "react"
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Link, useNavigate, useParams } from "react-router-dom"
 import { AnimatePresence, motion } from "framer-motion"
 import {
-  ArrowRight, ArrowUpRight, ArrowUpDown, Bell,
+  AlertTriangle, ArrowRight, ArrowUp, ArrowUpDown, Bell,
   Briefcase, CalendarDays, Check, ChevronDown,
   ChevronRight, Clock, Filter as FilterIcon,
-  GraduationCap, LayoutGrid, Layers, Mail,
-  Radar, Search, SearchX, Send, ShieldCheck, SlidersHorizontal,
-  Sparkles, X, Zap,
+  GraduationCap, LayoutGrid, Layers, Loader2, Mail,
+  MapPin, Radar, RefreshCw, Search, SearchX, Send, ShieldCheck, SlidersHorizontal,
+  Sparkles, X, Zap, ArrowUpRight, CheckCircle2
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import {
   Tooltip, TooltipContent, TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { Skeleton } from "@/components/ui/skeleton"
 import Seo from "@/components/seo/Seo"
 import { filiereSeo } from "@/lib/seo"
 import {
   CountUp, OfferCard, ChipSource, SourceLogo,
-  CheckRow, FilterPopover, MiniCalendar, ViewToggle, FiltersDrawer, OfferFilterGroups,
+  CheckRow, FilterPopover, MiniCalendar, ViewToggle, FiltersDrawer,
   CtaLink,
 } from "@/components/shared"
-import { HUES } from "@/lib/hues"
-import { FILIERES_META, SOURCES, CONTRATS, EXPERIENCES, NIVEAUX, SORTS } from "@/lib/referentiels"
-import { startOfDay, addDays, sameDay, fmtDay } from "@/lib/dates"
+import { HUES, BRAND_HUE } from "@/lib/hues"
+import { SORTS } from "@/lib/referentiels"
+import { startOfDay, addDays, sameDay, fmtDay, jourLabel } from "@/lib/dates"
 import useClickOutside from "@/hooks/use-click-outside"
 import { useUrlFilters } from "@/hooks/use-url-filters"
-
+import { useIsMobile } from "@/hooks/use-mobile"
+import { useFetchData } from "@/hooks/use-fetch-data"
+import { useOfferReferentials } from "@/hooks/use-offers-data"
+import { adaptOffers, mergeOffers, toIsoStart, toIsoEnd } from "@/lib/offers-adapter"
+import { isCanceledError, formatApiError } from "@/api/errors"
+import { getFilieresBySlug, getFiliereOffers, getFilieres } from "@/api/public/filieres"
+import getFiliereTheme from "@/lib/filiere-theme"
 
 /* ════════════════════════════════════════════════════════════════════
-  DONNÉES
+ADAPTATEUR API → UI (Filière)
 ════════════════════════════════════════════════════════════════════ */
+const adaptFiliere = (raw) => {
+  if (!raw || typeof raw !== "object") return null
+  const theme = getFiliereTheme(raw.code)
+  const stats = raw.stats || {}
+  const activeSpecialties = (raw.specialties || []).filter(s => s.is_active !== false)
 
-let oid = 0
-const O = (titre, entreprise, ville, contrat, source, jours, niveau, experience, specialite) =>
-  ({ id: ++oid, titre, entreprise, ville, contrat, source, jours, niveau, experience, specialite })
-
-const OFFRES = {
-  "tech-dev": [
-    O("Développeur Full-Stack React / Node", "Orange Côte d'Ivoire", "Abidjan · Plateau", "CDI", "LinkedIn", 0, "Bac+5", "3-5 ans", "Développement web"),
-    O("Ingénieur Logiciel Java / Spring", "Société Générale CI", "Abidjan · Cocody", "CDI", "Novojob", 0, "Bac+5", "1-3 ans", "Développement web"),
-    O("Data Analyst", "Wave", "Abidjan · Cocody", "CDI", "LinkedIn", 1, "Bac+5", "1-3 ans", "Data & IA"),
-    O("Développeur Mobile Flutter", "Djamo", "Abidjan · Marcory", "CDI", "GoAfrica", 1, "Bac+3", "1-3 ans", "Mobile"),
-    O("Administrateur Systèmes & Réseaux", "MTN Côte d'Ivoire", "Abidjan · Cocody", "CDD", "EmploiDakar CI", 2, "Bac+3", "3-5 ans", "Cloud & Infra"),
-    O("Ingénieur DevOps Cloud", "Inova Tech", "Abidjan · Riviera", "CDI", "GoAfrica", 4, "Bac+5", "5 ans+", "Cloud & Infra"),
-  ],
-  "marketing-com": [
-    O("Chargé de Communication Digitale", "CFAO Retail CI", "Abidjan · Treichville", "CDI", "LinkedIn", 0, "Bac+3", "1-3 ans", "Communication"),
-    O("Community Manager", "Yango Côte d'Ivoire", "Abidjan · Cocody", "CDD", "Novojob", 0, "Bac+2", "Débutant", "Marketing digital"),
-    O("Chef de Marque", "Nestlé Côte d'Ivoire", "Abidjan · Plateau", "CDI", "LinkedIn", 1, "Bac+5", "3-5 ans", "Marketing digital"),
-    O("Graphiste / DA Junior", "Agence Voodoo", "Abidjan · Marcory", "Stage", "GoAfrica", 2, "Bac+3", "Débutant", "Création & Design"),
-    O("Attaché de Presse", "Fraternité Matin", "Abidjan · Adjamé", "CDI", "EmploiDakar CI", 3, "Bac+3", "1-3 ans", "Médias"),
-  ],
-  "commercial-vente": [
-    O("Commercial B2B", "Jumia Côte d'Ivoire", "Abidjan · Cocody", "CDI", "Novojob", 0, "Bac+3", "1-3 ans", "B2B & Grands comptes"),
-    O("Responsable Grands Comptes", "Ecobank CI", "Abidjan · Plateau", "CDI", "LinkedIn", 0, "Bac+5", "5 ans+", "B2B & Grands comptes"),
-    O("Business Developer", "SAMA Money", "Abidjan · Yopougon", "CDI", "GoAfrica", 1, "Bac+3", "3-5 ans", "Vente terrain"),
-    O("Téléconseiller (H/F)", "CI Telecom", "Abidjan · Plateau", "CDD", "EmploiDakar CI", 2, "Bac+2", "Débutant", "Téléconseil"),
-    O("Commercial Terrain", "Agro Distribution", "San Pédro", "Mission", "GoAfrica", 3, "Bac", "1-3 ans", "Vente terrain"),
-  ],
-  "comptabilite-finance": [
-    O("Comptable Senior", "NSIA Banque", "Abidjan · Plateau", "CDI", "Novojob", 0, "Bac+3", "5 ans+", "Comptabilité"),
-    O("Contrôleur de Gestion", "AGL Côte d'Ivoire", "Abidjan · Treichville", "CDI", "LinkedIn", 1, "Bac+5", "3-5 ans", "Contrôle de gestion"),
-    O("Auditeur Interne", "Deloitte Côte d'Ivoire", "Abidjan · Cocody", "CDI", "LinkedIn", 1, "Bac+5", "1-3 ans", "Audit"),
-    O("Aide-Comptable", "Prosuma", "Abidjan · Koumassi", "CDD", "EmploiDakar CI", 2, "Bac+2", "Débutant", "Comptabilité"),
-    O("Trésorier", "BNI", "Abidjan · Plateau", "CDI", "EmploiDakar CI", 4, "Bac+5", "3-5 ans", "Banque"),
-  ],
-  "ressources-humaines": [
-    O("Chargé de Recrutement", "KPMG Côte d'Ivoire", "Abidjan · Cocody", "CDI", "LinkedIn", 0, "Bac+5", "1-3 ans", "Recrutement"),
-    O("Gestionnaire Paie & ADP", "SODECI", "Abidjan · Treichville", "CDI", "Novojob", 1, "Bac+3", "3-5 ans", "Paie & ADP"),
-    O("Responsable Formation", "INPHB", "Yamoussoukro", "CDI", "GoAfrica", 2, "Bac+5", "5 ans+", "Formation"),
-    O("Assistant RH", "Uniwax", "Abidjan · Yopougon", "CDD", "EmploiDakar CI", 2, "Bac+2", "Débutant", "Gestion RH"),
-    O("Responsable RH", "Orange Côte d'Ivoire", "Abidjan · Cocody", "CDI", "LinkedIn", 3, "Bac+5", "5 ans+", "Gestion RH"),
-  ],
-  "btp-genie-civil": [
-    O("Conducteur de Travaux", "SARI", "Abidjan · Cocody", "CDI", "GoAfrica", 0, "Bac+5", "3-5 ans", "Conduite de travaux"),
-    O("Ingénieur Génie Civil", "BNETD", "Abidjan · Plateau", "CDI", "Novojob", 0, "Bac+5", "1-3 ans", "Études & ingénierie"),
-    O("Chef de Chantier", "PFO Africa", "Abidjan · Abobo", "CDI", "EmploiDakar CI", 1, "Bac+2", "5 ans+", "Chantier"),
-    O("Métreur-Vérificateur", "Bâtir Afrique", "Abidjan · Koumassi", "CDD", "LinkedIn", 2, "Bac+3", "1-3 ans", "Études & ingénierie"),
-    O("Topographe", "AGEROUTE", "Bouaké", "CDI", "EmploiDakar CI", 4, "Bac+2", "3-5 ans", "Topographie"),
-  ],
-  "logistique-transport": [
-    O("Agent de Transit", "AGL Côte d'Ivoire", "Abidjan · Treichville", "CDI", "Novojob", 0, "Bac+2", "1-3 ans", "Transit & Douane"),
-    O("Déclarant en Douane", "Cargill Côte d'Ivoire", "San Pedro", "CDI", "LinkedIn", 0, "Bac+2", "3-5 ans", "Transit & Douane"),
-    O("Responsable Logistique", "Air Côte d'Ivoire", "Abidjan · Port-Bouët", "CDI", "LinkedIn", 1, "Bac+5", "5 ans+", "Supply chain"),
-    O("Magasinier", "Bernabé CI", "Abidjan · Yopougon", "CDD", "EmploiDakar CI", 2, "Bac", "Débutant", "Magasinage"),
-    O("Supply Chain Analyst", "Olam Côte d'Ivoire", "Abidjan · Plateau", "CDI", "GoAfrica", 3, "Bac+5", "1-3 ans", "Supply chain"),
-  ],
-  "sante-medical": [
-    O("Infirmier(ère) Diplômé(e) d'État", "CHU de Cocody", "Abidjan · Cocody", "CDI", "EmploiDakar CI", 0, "Bac+3", "Débutant", "Soins infirmiers"),
-    O("Médecin Généraliste", "Polyclinique des Deux Plateaux", "Abidjan · Cocody", "CDI", "Novojob", 0, "Bac+8", "3-5 ans", "Médecine"),
-    O("Pharmacien Adjoint", "Pharmacie de la Riviera", "Abidjan · Cocody", "CDI", "GoAfrica", 1, "Bac+8", "1-3 ans", "Pharmacie"),
-    O("Technicien de Laboratoire", "Institut Pasteur de CI", "Abidjan · Cocody", "CDD", "LinkedIn", 2, "Bac+2", "1-3 ans", "Laboratoire"),
-    O("Sage-femme", "CHR de Bouaké", "Bouaké", "CDI", "EmploiDakar CI", 3, "Bac+3", "3-5 ans", "Soins infirmiers"),
-  ],
-  "administration": [
-    O("Assistant(e) de Direction", "Groupe SIFCA", "Abidjan · Treichville", "CDI", "Novojob", 0, "Bac+3", "3-5 ans", "Assistanat de direction"),
-    O("Office Manager", "Deloitte CI", "Abidjan · Cocody", "CDI", "LinkedIn", 1, "Bac+5", "5 ans+", "Office management"),
-    O("Agent Administratif", "Mairie de Cocody", "Abidjan · Cocody", "CDD", "GoAfrica", 2, "Bac+2", "Débutant", "Services généraux"),
-    O("Secrétaire Comptable", "Cabinet Fiduciaire Ivoire", "Abidjan · Plateau", "CDI", "EmploiDakar CI", 3, "Bac+2", "1-3 ans", "Secrétariat"),
-    O("Assistant(e) Services Généraux", "Bolloré CI", "Abidjan · Treichville", "Alternance", "GoAfrica", 4, "Bac+2", "Débutant", "Services généraux"),
-  ],
-  "education-formation": [
-    O("Enseignant de Mathématiques", "Groupe Scolaire Excellence", "Abidjan · Cocody", "CDI", "EmploiDakar CI", 0, "Bac+5", "1-3 ans", "Enseignement"),
-    O("Formateur Professionnel", "INJS", "Abidjan · Marcory", "CDD", "GoAfrica", 1, "Bac+3", "3-5 ans", "Formation professionnelle"),
-    O("Conseiller Pédagogique", "UNICEF CI", "Abidjan · Cocody", "Mission", "LinkedIn", 2, "Bac+5", "5 ans+", "Pédagogie"),
-    O("Professeur d'Anglais", "Institut Ivoire Langues", "Abidjan · Plateau", "CDD", "Novojob", 3, "Bac+3", "1-3 ans", "Enseignement"),
-    O("Éducateur Spécialisé", "ONG Espoir Enfance", "Abidjan · Yopougon", "CDI", "EmploiDakar CI", 4, "Bac+3", "3-5 ans", "Éducation spécialisée"),
-  ],
-  "hotellerie-restauration": [
-    O("Chef de Partie", "Hôtel Ivoire", "Abidjan · Cocody", "CDI", "Novojob", 0, "Bac+2", "3-5 ans", "Cuisine"),
-    O("Serveur(se)", "Restaurant La Case", "Abidjan · Plateau", "CDD", "GoAfrica", 1, "Bac", "Débutant", "Salle & Bar"),
-    O("Gouvernante", "Radisson Blu", "Abidjan · Port-Bouët", "CDI", "LinkedIn", 2, "Bac+2", "5 ans+", "Hébergement"),
-    O("Barman", "Hôtel Tiama", "Abidjan · Plateau", "Mission", "EmploiDakar CI", 3, "Bac", "1-3 ans", "Salle & Bar"),
-    O("Chef Pâtissier", "Traiteur Prestige", "Abidjan · Marcory", "CDI", "GoAfrica", 4, "Bac+2", "3-5 ans", "Cuisine"),
-  ],
-  "agriculture-agrobusiness": [
-    O("Ingénieur Agronome", "ANADER", "Bouaké", "CDI", "EmploiDakar CI", 0, "Bac+5", "1-3 ans", "Agronomie"),
-    O("Technicien Agricole", "SUCRIVOIRE", "Korhogo", "CDD", "GoAfrica", 1, "Bac+2", "Débutant", "Production"),
-    O("Responsable Plantation", "Groupe SIFCA", "Dabou", "CDI", "LinkedIn", 2, "Bac+5", "5 ans+", "Plantation"),
-    O("Agent de Production", "Cargill CI", "San Pédro", "Mission", "Novojob", 3, "Bac", "Débutant", "Transformation"),
-    O("Technicien Qualité Agro", "Ivoire Cacao", "Abidjan · Treichville", "CDI", "EmploiDakar CI", 4, "Bac+3", "1-3 ans", "Transformation"),
-  ],
-  "securite-gardiennage": [
-    O("Agent de Sécurité", "G4S CI", "Abidjan · Cocody", "CDI", "GoAfrica", 0, "Bac", "Débutant", "Gardiennage"),
-    O("Superviseur Sécurité", "Aéroport FHB", "Abidjan · Port-Bouët", "CDI", "Novojob", 1, "Bac+2", "5 ans+", "Sûreté aéroportuaire"),
-    O("Gardien de Nuit", "Société Bancaire", "Abidjan · Plateau", "CDD", "EmploiDakar CI", 2, "Bac", "1-3 ans", "Gardiennage"),
-    O("Agent Cynophile", "Sécuritas CI", "Abidjan · Yopougon", "CDI", "LinkedIn", 3, "Bac", "3-5 ans", "Cynophile"),
-    O("Agent de Sûreté", "Port Autonome d'Abidjan", "Abidjan · Treichville", "CDI", "GoAfrica", 4, "Bac+2", "1-3 ans", "Supervision"),
-  ],
+  return {
+    id: raw.id,
+    code: raw.code,
+    slug: raw.slug || raw.code,
+    label: raw.label || raw.code,
+    tagline: raw.tagline || "",
+    desc: raw.description || "",
+    icon: theme.icon,
+    hue: raw.hue || theme.hue,
+    actives: Number(stats.active_offers ?? 0),
+    nouvelles: Number(stats.new_offers ?? 0),
+    abonnes: Number(stats.subscribers ?? 0),
+    keywords: activeSpecialties.map(s => (s.label || "").toLowerCase()).filter(Boolean),
+    specialites: activeSpecialties.map(s => ({ id: s.id, code: s.code, label: s.label })),
+  }
 }
 
+/* ════════════════════════════════════════════════════════════════════
+HOOK — Feed paginé d'offres pour une filière
+════════════════════════════════════════════════════════════════════ */
+const useFiliereOffersFeed = ({ slug, params, pageSize = 12 }) => {
+  const paramsKey = useMemo(() => JSON.stringify({ slug, ...params }), [slug, params])
+  const requestId = useRef(0)
+  const controllers = useRef(new Set())
+  const [state, setState] = useState({
+    offers: [],
+    isLoading: true,
+    isLoadingMore: false,
+    error: null,
+    hasMore: false,
+    loadedPages: 0,
+  })
+
+  const fetchPage = useCallback(async ({ page, append }) => {
+    const id = ++requestId.current
+    const controller = new AbortController()
+    controllers.current.add(controller)
+    setState(s => ({
+      ...s,
+      error: null,
+      isLoading: append ? s.isLoading : true,
+      isLoadingMore: append,
+    }))
+    try {
+      const parsed = JSON.parse(paramsKey)
+      const data = await getFiliereOffers(
+        parsed.slug,
+        { ...parsed, limit: pageSize, offset: page * pageSize },
+      )
+      if (id !== requestId.current) return
+      const batch = adaptOffers(Array.isArray(data) ? data : [])
+      setState(s => ({
+        offers: append ? mergeOffers(s.offers, batch) : batch,
+        isLoading: false,
+        isLoadingMore: false,
+        error: null,
+        hasMore: batch.length === pageSize,
+        loadedPages: page + 1,
+      }))
+    } catch (err) {
+      if (isCanceledError(err) || id !== requestId.current) return
+      setState(s => ({
+        ...s,
+        offers: append ? s.offers : [],
+        isLoading: false,
+        isLoadingMore: false,
+        error: formatApiError(err),
+      }))
+    } finally {
+      controllers.current.delete(controller)
+    }
+  }, [paramsKey, pageSize])
+
+  useEffect(() => {
+    if (!slug) return
+    fetchPage({ page: 0, append: false })
+    return () => {
+      controllers.current.forEach(c => c.abort())
+      controllers.current.clear()
+    }
+  }, [fetchPage, slug])
+
+  const loadMore = useCallback(() => {
+    setState(s => {
+      if (s.isLoading || s.isLoadingMore || !s.hasMore) return s
+      fetchPage({ page: s.loadedPages, append: true })
+      return s
+    })
+  }, [fetchPage])
+
+  const reload = useCallback(() => fetchPage({ page: 0, append: false }), [fetchPage])
+
+  return { ...state, loadMore, reload, pageSize }
+}
+
+/* ════════════════════════════════════════════════════════════════════
+HERO — identité de la filière + récap du jour
+════════════════════════════════════════════════════════════════════ */
 const AVATARS = [
   { init: "AK", cls: "bg-sky-600" },
   { init: "MC", cls: "bg-emerald-600" },
@@ -138,21 +148,15 @@ const AVATARS = [
   { init: "YK", cls: "bg-amber-600" },
 ]
 
-/* ════════════════════════════════════════════════════════════════════
-  HERO — identité de la filière + récap du jour
-════════════════════════════════════════════════════════════════════ */
-
-const RecapCard = ({ meta, hue, offres }) => {
+const RecapCard = ({ meta, hue, offres, isLoading }) => {
   const preview = [...offres].sort((a, b) => a.jours - b.jours).slice(0, 3)
-  const nouveaux = offres.filter((o) => o.jours === 0).length
+  const nouveaux = offres.filter(o => o.jours === 0).length
   const restants = Math.max(meta.actives - preview.length, 0)
-
   const pipeline = [
     { icon: Radar, t: "06h02", l: "Collecte" },
     { icon: FilterIcon, t: "07h15", l: "Filtrage" },
     { icon: Send, t: "08h00", l: "Envoi" },
   ]
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 36, rotate: 1.5 }}
@@ -161,25 +165,18 @@ const RecapCard = ({ meta, hue, offres }) => {
       className="relative mx-auto w-full max-w-md min-w-0 md:max-w-none"
     >
       <div className={cn("absolute -inset-8 rounded-full blur-3xl", hue.glow)} aria-hidden />
-
       <div className="absolute inset-0 translate-x-4 translate-y-5 rotate-2 overflow-hidden rounded-2xl bg-brand-navy" aria-hidden>
         <div className="absolute inset-0 bg-pattern opacity-20" />
       </div>
-
-      {/* Badges flottants */}
       <motion.span
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1, y: [0, -7, 0] }}
         transition={{ delay: 0.9, opacity: { duration: 0.4 }, scale: { duration: 0.4 }, y: { duration: 4.6, repeat: Infinity, ease: "easeInOut" } }}
-        className={cn(
-          "absolute -top-4 left-5 z-20 inline-flex -rotate-3 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[11px] font-bold text-white shadow-lg sm:-left-4",
-          hue.solid
-        )}
+        className={cn("absolute -top-4 left-5 z-20 inline-flex -rotate-3 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[11px] font-bold text-white shadow-lg sm:-left-4", hue.solid)}
       >
         <Zap className="size-3" />
-        +{nouveaux} offres ce matin
+        +{meta.nouvelles} offres cette semaine
       </motion.span>
-
       <motion.span
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -189,7 +186,6 @@ const RecapCard = ({ meta, hue, offres }) => {
         <ShieldCheck className="size-3" />
         0 doublon
       </motion.span>
-
       <motion.span
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1, y: [0, -6, 0] }}
@@ -199,8 +195,6 @@ const RecapCard = ({ meta, hue, offres }) => {
         <Mail className="size-3 text-brand-orange" />
         Envoyé à {meta.abonnes.toLocaleString("fr-FR")} abonnés
       </motion.span>
-
-      {/* Carte principale */}
       <div className="relative overflow-hidden rounded-2xl border border-outline-variant/40 bg-white shadow-[0_24px_48px_-16px_rgba(15,45,77,0.22)]">
         <div className="flex items-center gap-3 border-b border-outline-variant/40 bg-surface-container-low/60 px-5 py-4">
           <span className={cn("flex size-9 shrink-0 items-center justify-center rounded-lg", hue.tile)}>
@@ -215,8 +209,6 @@ const RecapCard = ({ meta, hue, offres }) => {
             08:00
           </span>
         </div>
-
-        {/* Pipeline du matin */}
         <div className="border-b border-outline-variant/40 bg-surface-container-low/40 px-5 py-3">
           <div className="flex items-center">
             {pipeline.map((s, i) => (
@@ -246,31 +238,39 @@ const RecapCard = ({ meta, hue, offres }) => {
             ))}
           </div>
         </div>
-
         <ul className="divide-y divide-outline-variant/30 px-3">
-          {preview.map((o, i) => (
-            <motion.li
-              key={o.id}
-              initial={{ opacity: 0, x: -14 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.4, delay: 0.7 + i * 0.14, ease: "easeOut" }}
-              className="group flex items-center gap-3 rounded-lg px-2 py-3.5 transition-colors hover:bg-surface-container-low/60"
-            >
-              <span className={cn("size-2 shrink-0 rounded-full transition-transform duration-200 group-hover:scale-150", hue.dot)} />
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-[13px] font-semibold text-on-surface">{o.titre}</p>
-                <p className="truncate text-[11px] text-muted-foreground">{o.entreprise} · {o.ville}</p>
-              </div>
-              {o.jours === 0 && (
-                <span className="hidden shrink-0 rounded-full bg-brand-orange/15 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-[#B45309] sm:inline">
-                  Nouveau
-                </span>
-              )}
-              <ChipSource source={o.source} />
-            </motion.li>
-          ))}
+          {isLoading && preview.length === 0
+            ? [0, 1, 2].map(i => (
+                <li key={i} className="flex items-center gap-3 px-2 py-3.5">
+                  <Skeleton className="size-2 rounded-full" />
+                  <div className="flex-1 space-y-1.5">
+                    <Skeleton className="h-3 w-2/3" />
+                    <Skeleton className="h-2.5 w-1/2" />
+                  </div>
+                </li>
+              ))
+            : preview.map((o, i) => (
+                <motion.li
+                  key={o.uid}
+                  initial={{ opacity: 0, x: -14 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.4, delay: 0.7 + i * 0.14, ease: "easeOut" }}
+                  className="group flex items-center gap-3 rounded-lg px-2 py-3.5 transition-colors hover:bg-surface-container-low/60"
+                >
+                  <span className={cn("size-2 shrink-0 rounded-full transition-transform duration-200 group-hover:scale-150", hue.dot)} />
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-[13px] font-semibold text-on-surface">{o.titre}</p>
+                    <p className="truncate text-[11px] text-muted-foreground">{o.entreprise} · {o.ville}</p>
+                  </div>
+                  {o.jours === 0 && (
+                    <span className="hidden shrink-0 rounded-full bg-brand-orange/15 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-[#B45309] sm:inline">
+                      Nouveau
+                    </span>
+                  )}
+                  <ChipSource source={o.source} />
+                </motion.li>
+              ))}
         </ul>
-
         <div className="flex items-center justify-between gap-3 border-t border-outline-variant/40 bg-surface-container-low/40 px-5 py-3.5">
           <span className="text-[11px] font-medium text-muted-foreground">
             + {restants} autres offres dans l'email
@@ -279,10 +279,9 @@ const RecapCard = ({ meta, hue, offres }) => {
             Ouvrir le récap'
           </span>
         </div>
-
         <div className="flex items-center gap-3 border-t border-outline-variant/40 px-5 py-3">
           <div className="flex -space-x-2">
-            {AVATARS.map((a) => (
+            {AVATARS.map(a => (
               <span key={a.init} className={cn("grid size-6 place-items-center rounded-full border-2 border-white text-[9px] font-bold text-white", a.cls)}>
                 {a.init}
               </span>
@@ -297,16 +296,14 @@ const RecapCard = ({ meta, hue, offres }) => {
   )
 }
 
-const HeroFiliere = ({ meta, hue, offres }) => {
-  const nouvelles = offres.filter((o) => o.jours === 0).length
+const HeroFiliere = ({ meta, hue, offres, isLoading }) => {
+  const nouvelles = offres.filter(o => o.jours === 0).length
   return (
     <section className="relative overflow-hidden hero-gradient">
       <div className="absolute inset-0 bg-pattern opacity-50" aria-hidden />
       <div className={cn("absolute -top-32 right-[-10%] size-140 rounded-full blur-3xl", hue.glow)} aria-hidden />
       <div className="absolute -bottom-40 -left-40 size-120 rounded-full bg-brand-navy/4 blur-3xl" aria-hidden />
-
       <div className="relative z-10 mx-auto max-w-7xl px-4 pb-16 pt-8 md:px-12 md:pb-20 lg:pt-10">
-        {/* Fil d'Ariane */}
         <motion.nav
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -320,9 +317,7 @@ const HeroFiliere = ({ meta, hue, offres }) => {
           <ChevronRight className="size-3" />
           <span className="font-semibold text-brand-navy">{meta.label}</span>
         </motion.nav>
-
         <div className="mt-8 grid items-center gap-14 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16">
-          {/* Colonne gauche */}
           <motion.div
             initial="hidden"
             animate="visible"
@@ -341,7 +336,6 @@ const HeroFiliere = ({ meta, hue, offres }) => {
                 Filière métier
               </span>
             </motion.div>
-
             <motion.h1
               variants={{ hidden: { opacity: 0, y: 22 }, visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } } }}
               className="font-heading text-4xl font-black leading-[1.05] tracking-tight text-brand-navy sm:text-5xl xl:text-6xl"
@@ -351,18 +345,14 @@ const HeroFiliere = ({ meta, hue, offres }) => {
                 en Côte d'Ivoire.
               </span>
             </motion.h1>
-
-            {/* Tagline + description (test2) */}
             <motion.div
               variants={{ hidden: { opacity: 0, y: 22 }, visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } } }}
             >
               <p className={cn("font-heading text-base font-bold sm:text-lg", hue.accent)}>{meta.tagline}</p>
               <p className="mt-2 max-w-xl md:text-lg leading-relaxed text-on-surface-variant">
-                {meta.desc} Recevez les nouveautés de la filière chaque matin à 8h00 directement dans votre boîte mail des abonnés, sans recherche, sans doublon.
+                {meta.desc} Recevez les nouveautés de la filière chaque matin à 8h00 directement dans votre boîte mail, sans recherche, sans doublon.
               </p>
             </motion.div>
-
-            {/* Mots-clés de matching automatique (test2) */}
             <motion.div
               variants={{ hidden: { opacity: 0, y: 22 }, visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } } }}
             >
@@ -371,7 +361,7 @@ const HeroFiliere = ({ meta, hue, offres }) => {
                 Mots-clés de matching automatique
               </p>
               <div className="mt-2.5 flex flex-wrap gap-2">
-                {meta.keywords.map((kw) => (
+                {meta.keywords.map(kw => (
                   <Tooltip key={kw}>
                     <TooltipTrigger asChild>
                       <span className="cursor-help rounded-full border border-outline-variant/60 bg-white/80 px-3 py-1 text-xs font-medium text-on-surface-variant backdrop-blur-sm transition-colors hover:border-brand-navy/40 hover:text-brand-navy">
@@ -385,8 +375,6 @@ const HeroFiliere = ({ meta, hue, offres }) => {
                 ))}
               </div>
             </motion.div>
-
-            {/* CTA (test1) */}
             <motion.div
               variants={{ hidden: { opacity: 0, y: 22 }, visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } } }}
               className="mt-1 flex flex-col gap-3 sm:flex-row"
@@ -401,22 +389,19 @@ const HeroFiliere = ({ meta, hue, offres }) => {
                 <Bell className="size-5 transition-transform duration-300 group-hover:rotate-12" />
                 Créer une alerte {meta.label}
               </Link>
-
               <CtaLink to="/filieres" variant="secondary" icon={LayoutGrid}>
-                Toutes les filieres
+                Toutes les filières
               </CtaLink>
             </motion.div>
-
-            {/* Stats vivantes (test1) */}
             <motion.dl
               variants={{ hidden: { opacity: 0, y: 22 }, visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } } }}
               className="mt-3 flex flex-wrap items-center gap-x-8 gap-y-4"
             >
               {[
                 { valeur: meta.actives, label: "offres actives" },
-                { valeur: nouvelles, label: "nouvelles ce matin" },
+                { valeur: nouvelles, label: "nouvelles cette semaine" },
                 { valeur: meta.abonnes, label: "abonnés à l'alerte" },
-              ].map((s) => (
+              ].map(s => (
                 <div key={s.label}>
                   <dt className="sr-only">{s.label}</dt>
                   <dd className="font-heading text-3xl font-black text-brand-navy">
@@ -427,9 +412,7 @@ const HeroFiliere = ({ meta, hue, offres }) => {
               ))}
             </motion.dl>
           </motion.div>
-
-          {/* Colonne droite */}
-          <RecapCard meta={meta} hue={hue} offres={offres} />
+          <RecapCard meta={meta} hue={hue} offres={offres} isLoading={isLoading} />
         </div>
       </div>
     </section>
@@ -437,42 +420,12 @@ const HeroFiliere = ({ meta, hue, offres }) => {
 }
 
 /* ════════════════════════════════════════════════════════════════════
-  PAGE
+BANDEAU ALERTE + AUTRES FILIÈRES
 ════════════════════════════════════════════════════════════════════ */
-
-const FiliereIntrouvable = ({ code }) => (
-  <section className="hero-gradient flex min-h-[60vh] items-center justify-center px-6 py-20">
-    <motion.div
-      initial={{ opacity: 0, y: 24 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-      className="max-w-md text-center"
-    >
-      <span className="mx-auto flex size-16 items-center justify-center rounded-xl bg-brand-orange/10 text-brand-orange">
-        <SearchX className="size-8" strokeWidth={1.8} />
-      </span>
-      <h1 className="mt-5 font-heading text-3xl font-black tracking-tight text-brand-navy">
-        Filière « {code} » introuvable
-      </h1>
-      <p className="mt-3 text-on-surface-variant">
-        Cette filière n'existe pas ou a été renommée. Découvrez les 13 filières couvertes par JobAlert CI.
-      </p>
-      <Link
-        to="/filieres"
-        className="mt-6 inline-flex items-center gap-2 rounded-lg bg-brand-orange px-6 py-3 text-sm font-bold text-white transition-all duration-300 hover:-translate-y-0.5 hover:brightness-110"
-      >
-        <LayoutGrid className="size-4" />
-        Voir les 13 filières
-      </Link>
-    </motion.div>
-  </section>
-)
-
-/* Bandeau d'alerte */
 const BandeauAlerte = ({ meta, hue }) => {
   const [email, setEmail] = useState("")
   const navigate = useNavigate()
-  const handleSubmit = (e) => {
+  const handleSubmit = e => {
     e.preventDefault()
     if (!email.trim()) return
     navigate(`/inscription?filieres=${meta.code}&email=${encodeURIComponent(email.trim())}`)
@@ -489,11 +442,7 @@ const BandeauAlerte = ({ meta, hue }) => {
         >
           <div className="pointer-events-none absolute inset-0 bg-pattern opacity-20" aria-hidden />
           <div className={cn("pointer-events-none absolute -right-24 -top-24 size-105 rounded-full blur-3xl", hue.glow)} aria-hidden />
-          <meta.icon
-            className="pointer-events-none absolute -bottom-10 -right-6 size-56 rotate-12 text-white/5"
-            strokeWidth={1}
-            aria-hidden
-          />
+          <meta.icon className="pointer-events-none absolute -bottom-10 -right-6 size-56 rotate-12 text-white/5" strokeWidth={1} aria-hidden />
           <div className="relative grid items-center gap-10 px-6 py-12 sm:px-10 lg:grid-cols-[1.1fr_0.9fr] lg:px-14 lg:py-14">
             <div>
               <span className={cn("inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-white", hue.solid)}>
@@ -516,7 +465,7 @@ const BandeauAlerte = ({ meta, hue }) => {
                     type="email"
                     required
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={e => setEmail(e.target.value)}
                     placeholder="votre@email.com"
                     aria-label="Votre adresse email"
                     className="h-12 w-full rounded-md border border-white/15 bg-white/10 pl-10 pr-4 text-sm text-white outline-none transition-all duration-300 placeholder:text-white/40 focus:border-brand-orange focus:bg-white/[0.14] focus:ring-2 focus:ring-brand-orange/30"
@@ -534,7 +483,7 @@ const BandeauAlerte = ({ meta, hue }) => {
                 </button>
               </form>
               <p className="mt-3.5 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-white/50">
-                {["Gratuit pour toujours", "1 email par jour à 8h00", "Désinscription en 1 clic"].map((t) => (
+                {["Gratuit pour toujours", "1 email par jour à 8h00", "Désinscription en 1 clic"].map(t => (
                   <span key={t} className="inline-flex items-center gap-1.5">
                     <Check className="size-3.5 text-emerald-400" />
                     {t}
@@ -549,66 +498,320 @@ const BandeauAlerte = ({ meta, hue }) => {
   )
 }
 
-/* Autres filières — mélange test1 (header + chips) / test2 (cartes) */
-const AutresFilieres = ({ codeActuel }) => (
-  <section className="bg-surface-container-lowest pb-20">
-    <div className="mx-auto max-w-7xl px-6 md:px-12">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        className="flex items-center justify-between gap-4 border-t border-outline-variant/40 pt-10"
-      >
-        <h2 className="font-heading text-lg font-bold text-brand-navy sm:text-xl">Explorer les autres filières</h2>
+const AutresFilieres = ({ codeActuel }) => {
+  const { data: rawFilieres } = useFetchData(getFilieres)
+  const autres = useMemo(
+    () => (Array.isArray(rawFilieres) ? rawFilieres : [])
+      .map(adaptFiliere)
+      .filter(f => f && f.code !== codeActuel && f.is_active !== false),
+    [rawFilieres, codeActuel]
+  )
+  return (
+    <section className="bg-surface-container-lowest pb-20">
+      <div className="mx-auto max-w-7xl px-6 md:px-12">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          className="flex items-center justify-between gap-4 border-t border-outline-variant/40 pt-10"
+        >
+          <h2 className="font-heading text-lg font-bold text-brand-navy sm:text-xl">Explorer les autres filières</h2>
+          <Link to="/filieres" className="group inline-flex items-center gap-1 text-sm font-bold text-brand-navy transition-colors hover:text-brand-orange">
+            Tout voir
+            <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
+          </Link>
+        </motion.div>
+        <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {autres.slice(0, 8).map((f, i) => {
+            const h = HUES[f.hue] || BRAND_HUE
+            return (
+              <motion.div
+                key={f.code}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-40px" }}
+                transition={{ duration: 0.4, delay: (i % 8) * 0.05, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <Link
+                  to={`/filieres/${f.code}`}
+                  className="group flex items-center gap-3.5 rounded-xl border border-outline-variant/50 bg-white p-4 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-brand-navy/25 hover:shadow-hover"
+                >
+                  <span className={cn("flex size-11 shrink-0 items-center justify-center rounded-lg transition-transform duration-300 group-hover:scale-105", h.tile)}>
+                    <f.icon className="size-5" strokeWidth={2} />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-heading text-sm font-bold text-brand-navy">{f.label}</p>
+                    <p className="mt-0.5 text-xs text-muted-foreground">
+                      {f.actives} offres actives · {f.abonnes.toLocaleString("fr-FR")} abonnés
+                    </p>
+                  </div>
+                  <ArrowUpRight className="size-4 shrink-0 text-outline-variant transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-brand-orange" />
+                </Link>
+              </motion.div>
+            )
+          })}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/* ════════════════════════════════════════════════════════════════════
+FILIÈRE INTROUVABLE
+════════════════════════════════════════════════════════════════════ */
+const FiliereIntrouvable = ({ code, error, onReload }) => (
+  <section className="hero-gradient flex min-h-[60vh] items-center justify-center px-6 py-20">
+    <motion.div
+      initial={{ opacity: 0, y: 24 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      className="max-w-md text-center"
+    >
+      <span className="mx-auto flex size-16 items-center justify-center rounded-xl bg-brand-orange/10 text-brand-orange">
+        {error ? <AlertTriangle className="size-8" strokeWidth={1.8} /> : <SearchX className="size-8" strokeWidth={1.8} />}
+      </span>
+      <h1 className="mt-5 font-heading text-3xl font-black tracking-tight text-brand-navy">
+        {error ? "Impossible de charger la filière" : `Filière « ${code} » introuvable`}
+      </h1>
+      <p className="mt-3 text-on-surface-variant">
+        {error?.message || "Cette filière n'existe pas ou a été renommée. Découvrez les filières couvertes par JobAlert CI."}
+      </p>
+      <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+        {error && onReload && (
+          <button
+            onClick={onReload}
+            className="inline-flex items-center gap-2 rounded-lg border border-brand-navy/20 px-5 py-2.5 text-sm font-bold text-brand-navy transition-all hover:border-brand-navy hover:bg-brand-navy hover:text-white"
+          >
+            <RefreshCw className="size-4" /> Réessayer
+          </button>
+        )}
         <Link
           to="/filieres"
-          className="group inline-flex items-center gap-1 text-sm font-bold text-brand-navy transition-colors hover:text-brand-orange"
+          className="inline-flex items-center gap-2 rounded-lg bg-brand-orange px-6 py-3 text-sm font-bold text-white transition-all duration-300 hover:-translate-y-0.5 hover:brightness-110"
         >
-          Tout voir
-          <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
+          <LayoutGrid className="size-4" />
+          Voir toutes les filières
         </Link>
-      </motion.div>
-
-      <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {FILIERES_META.filter((f) => f.code !== codeActuel).map((f, i) => {
-          const h = HUES[f.hue]
-          return (
-            <motion.div
-              key={f.code}
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-40px" }}
-              transition={{ duration: 0.4, delay: (i % 8) * 0.05, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <Link
-                to={`/filieres/${f.code}`}
-                className="group flex items-center gap-3.5 rounded-xl border border-outline-variant/50 bg-white p-4 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-brand-navy/25 hover:shadow-hover"
-              >
-                <span className={cn("flex size-11 shrink-0 items-center justify-center rounded-lg transition-transform duration-300 group-hover:scale-105", h.tile)}>
-                  <f.icon className="size-5" strokeWidth={2} />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="flex items-center gap-2 truncate font-heading text-sm font-bold text-brand-navy">
-                    {f.label}
-                  </p>
-                  <p className="mt-0.5 text-xs text-muted-foreground">
-                    {f.actives} offres actives · {f.abonnes.toLocaleString("fr-FR")} abonnés
-                  </p>
-                </div>
-                <ArrowUpRight className="size-4 shrink-0 text-outline-variant transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-brand-orange" />
-              </Link>
-            </motion.div>
-          )
-        })}
       </div>
-    </div>
+    </motion.div>
   </section>
 )
 
-/* ──────────────────────────────────────────────────────────────────── */
+/* ════════════════════════════════════════════════════════════════════
+SÉLECTEUR DE LOCALISATION (identique à FiltresOffres.jsx)
+════════════════════════════════════════════════════════════════════ */
+const LocationPicker = ({
+  locations = [],
+  value = null,
+  onChange,
+  isLoading = false,
+  className,
+}) => {
+  const [q, setQ] = useState("")
+  const results = useMemo(() => {
+    const needle = q.trim().toLowerCase()
+    const list = needle
+      ? locations.filter(l => `${l.label} ${l.city}`.toLowerCase().includes(needle))
+      : locations
+    return list.slice(0, 60)
+  }, [locations, q])
 
-/* ═══ Filtres ↔ URL : /filieres/tech-dev?spec=Data+%26+IA&tri=az ═══ */
+  return (
+    <div className={cn("flex flex-col gap-2", className)}>
+      <div className="relative">
+        <Search className="pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2 text-muted-foreground" />
+        <input
+          value={q}
+          onChange={e => setQ(e.target.value)}
+          placeholder="Ville, région, télétravail…"
+          aria-label="Rechercher une localisation"
+          className="h-9 w-full rounded-lg border border-outline-variant/60 bg-surface-container-lowest pl-8 pr-7 text-[13px] outline-none transition-all placeholder:text-muted-foreground/70 focus:border-brand-navy/50 focus:ring-2 focus:ring-brand-navy/10"
+        />
+        {q && (
+          <button
+            onClick={() => setQ("")}
+            aria-label="Effacer"
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-brand-navy"
+          >
+            <X className="size-3.5" />
+          </button>
+        )}
+      </div>
+      {value && (
+        <button
+          onClick={() => onChange?.(null)}
+          className="self-start text-[11px] font-bold text-brand-orange transition-colors hover:underline"
+        >
+          Effacer la localisation
+        </button>
+      )}
+      <div className="max-h-64 overflow-y-auto pr-1">
+        {isLoading ? (
+          <div className="space-y-1.5 py-1">
+            {[0, 1, 2, 3, 4].map(i => <Skeleton key={i} className="h-8 w-full rounded-md" />)}
+          </div>
+        ) : results.length === 0 ? (
+          <p className="px-1 py-6 text-center text-xs text-muted-foreground">
+            {locations.length === 0
+              ? "Localisations indisponibles pour le moment."
+              : "Aucune localisation ne correspond."}
+          </p>
+        ) : (
+          results.map(l => (
+            <CheckRow
+              key={l.id}
+              checked={value === l.id}
+              onToggle={() => onChange?.(value === l.id ? null : l.id)}
+              label={l.label || l.city || "—"}
+              lead={<MapPin className={cn("size-3.5 shrink-0", value === l.id ? "text-brand-orange" : "text-muted-foreground")} />}
+            />
+          ))
+        )}
+      </div>
+    </div>
+  )
+}
+
+/* ════════════════════════════════════════════════════════════════════
+GROUPES DE FILTRES — drawer mobile (Spécialité remplace Filière)
+════════════════════════════════════════════════════════════════════ */
+const FilterGroup = ({ icon: Icon, title, children }) => (
+  <div className="border-b border-outline-variant/40 py-4 first:pt-0 last:border-0">
+    <p className="mb-2 flex items-center gap-2 font-heading text-[13px] font-extrabold text-brand-navy">
+      <Icon className="size-3.5 text-brand-orange" />
+      {title}
+    </p>
+    {children}
+  </div>
+)
+
+const OptionsSkeleton = ({ rows = 4 }) => (
+  <div className="space-y-1.5">
+    {Array.from({ length: rows }, (_, i) => <Skeleton key={i} className="h-8 w-full rounded-md" />)}
+  </div>
+)
+
+const FiliereFilterGroups = ({
+  meta,
+  referentials,
+  counts = {},
+  filters,
+  toggle,
+  period,
+  onPeriod,
+  locationId = null,
+  onLocation,
+  isLoading = false,
+  hue,
+}) => {
+  const {
+    sources = [], contrats = [],
+    experiences = [], niveaux = [], locations = [],
+  } = referentials ?? {}
+
+  return (
+    <div className="flex flex-col">
+      {/* Localisation */}
+      <FilterGroup icon={MapPin} title="Localisation">
+        <LocationPicker
+          locations={locations}
+          value={locationId}
+          onChange={onLocation}
+          isLoading={isLoading && locations.length === 0}
+        />
+      </FilterGroup>
+
+      {/* Sources */}
+      <FilterGroup icon={Layers} title="Sources">
+        {isLoading && sources.length === 0 ? <OptionsSkeleton /> : sources.map(s => (
+          <CheckRow
+            key={s.code}
+            checked={filters.sources.has(s.code)}
+            onToggle={() => toggle("sources", s.code)}
+            label={s.label}
+            count={counts.sources?.[s.code] ?? 0}
+            lead={<SourceLogo code={s.code} className="size-5 rounded text-[8px]" />}
+          />
+        ))}
+      </FilterGroup>
+
+      {/* Contrat */}
+      <FilterGroup icon={Briefcase} title="Contrat">
+        {isLoading && contrats.length === 0 ? <OptionsSkeleton /> : contrats.map(c => (
+          <CheckRow
+            key={c.code}
+            checked={filters.contrats.has(c.code)}
+            onToggle={() => toggle("contrats", c.code)}
+            label={c.label}
+            count={counts.contrats?.[c.code] ?? 0}
+          />
+        ))}
+      </FilterGroup>
+
+      {/* Expérience */}
+      <FilterGroup icon={Zap} title="Expérience">
+        {isLoading && experiences.length === 0 ? <OptionsSkeleton rows={3} /> : experiences.map(x => (
+          <CheckRow
+            key={x.code}
+            checked={filters.experiences.has(x.code)}
+            onToggle={() => toggle("experiences", x.code)}
+            label={x.label}
+          />
+        ))}
+      </FilterGroup>
+
+      {/* Niveau */}
+      <FilterGroup icon={GraduationCap} title="Niveau d'études">
+        {isLoading && niveaux.length === 0 ? <OptionsSkeleton rows={3} /> : niveaux.map(n => (
+          <CheckRow
+            key={n.code}
+            checked={filters.niveaux.has(n.code)}
+            onToggle={() => toggle("niveaux", n.code)}
+            label={n.label}
+          />
+        ))}
+      </FilterGroup>
+
+      {/* Période */}
+      <FilterGroup icon={CalendarDays} title="Période de publication">
+        <MiniCalendar range={period ?? filters.period} onChange={onPeriod} hue={BRAND_HUE} />
+      </FilterGroup>
+    </div>
+  )
+}
+
+/* ════════════════════════════════════════════════════════════════════
+SKELETONS
+════════════════════════════════════════════════════════════════════ */
+const OfferSkeleton = ({ view }) => (
+  <div className={cn(
+    "rounded-xl border border-outline-variant/40 bg-white p-5 shadow-soft",
+    view === "grid" ? "h-64" : "h-24"
+  )}>
+    <div className="space-y-3">
+      <Skeleton className="h-3 w-1/3" />
+      <Skeleton className="h-5 w-2/3" />
+      <Skeleton className="h-3 w-1/2" />
+      {view === "grid" && <Skeleton className="mt-6 h-8 w-24" />}
+    </div>
+  </div>
+)
+
+const OffersSkeletonList = ({ view, count = 6, className }) => (
+  <div className={cn(
+    view === "grid" ? "grid gap-4 sm:grid-cols-2 xl:grid-cols-3" : "flex flex-col gap-3",
+    className
+  )}>
+    {Array.from({ length: count }, (_, i) => <OfferSkeleton key={i} view={view} />)}
+  </div>
+)
+
+/* ════════════════════════════════════════════════════════════════════
+CONFIGURATION DES FILTRES URL
+(identique à Offres, avec specialites à la place de filieres)
+════════════════════════════════════════════════════════════════════ */
+const PAGE_SIZE = 12
 const CONFIG_FILTRES = {
   sets: [
     { key: "sources", param: "src" },
@@ -621,122 +824,192 @@ const CONFIG_FILTRES = {
     { key: "sort", param: "tri", defaut: "recent" },
     { key: "view", param: "vue", defaut: "list" },
     { key: "query", param: "q", defaut: "" },
+    { key: "location", param: "loc", defaut: "" },
   ],
   period: { debut: "du", fin: "au" },
 }
 
+/* ════════════════════════════════════════════════════════════════════
+PAGE
+════════════════════════════════════════════════════════════════════ */
 const DetailsFiliere = () => {
-  const { filiere } = useParams()
-  const meta = FILIERES_META.find((f) => f.code === filiere)
+  const { filiere: slug } = useParams()
+  const isMobile = useIsMobile()
 
-  const offres = useMemo(() => (meta ? OFFRES[meta.code] || [] : []), [meta])
-  const seo = filiereSeo({ meta, filiere, offres })
+  /* ═══ Chargement de la filière ═══ */
+  const fetchFiliere = useCallback(() => getFilieresBySlug(slug), [slug])
+  const {
+    data: rawFiliere,
+    isLoading: loadingFiliere,
+    error: errorFiliere,
+    reload: reloadFiliere,
+  } = useFetchData(fetchFiliere, !!slug)
 
+  const meta = useMemo(() => adaptFiliere(rawFiliere), [rawFiliere])
+  const hue = meta ? (HUES[meta.hue] || BRAND_HUE) : BRAND_HUE
+
+  /* ═══ Référentiels API (sources, contrats, expériences, niveaux, locations) ═══ */
+  const referentials = useOfferReferentials()
+  const refs = referentials.data
+  const refsLoading = referentials.isLoading
+
+  /* ═══ Filtres URL ═══ */
   const { filters, valeurs, toggle, setScalar, setPeriod, reset } = useUrlFilters(CONFIG_FILTRES)
-  const sort = SORTS.some((s) => s.k === valeurs.sort) ? valeurs.sort : "recent"
+  const sort = SORTS.some(s => s.k === valeurs.sort) ? valeurs.sort : "recent"
   const view = valeurs.view === "grid" ? "grid" : "list"
-  const setSort = (k) => setScalar("sort", k)
-  const setView = (v) => setScalar("view", v)
+  const locationId = valeurs.location || null
+  const setSort = k => setScalar("sort", k)
+  const setView = v => setScalar("view", v)
+  const setLocation = useCallback(id => setScalar("location", id ?? ""), [setScalar])
 
+  /* ═══ Recherche debounce ═══ */
   const [queryLocale, setQueryLocale] = useState(valeurs.query)
-  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { setQueryLocale(valeurs.query) }, [valeurs.query])
   useEffect(() => {
     if (queryLocale === valeurs.query) return
     const t = setTimeout(() => setScalar("query", queryLocale), 350)
     return () => clearTimeout(t)
   }, [queryLocale, valeurs.query, setScalar])
-  
+
+  /* ═══ Paramètres API ═══
+     Le backend FiliereOffers accepte des IDs uniques.
+     On passe le premier sélectionné de chaque set, le filtrage fin côté client. */
+  const apiParams = useMemo(() => {
+    if (!meta) return {}
+    const q = valeurs.query.trim()
+    const firstOf = set => (set.size > 0 ? [...set][0] : undefined)
+
+    const specialiteId = meta.specialites.find(s => filters.specialites.has(s.code))?.id
+      || firstOf(filters.specialites)
+
+    const sourceId = refs.sources?.find(s => filters.sources.has(s.code))?.id
+    const contractId = refs.contrats?.find(c => filters.contrats.has(c.code))?.id
+    const experienceId = refs.experiences?.find(x => filters.experiences.has(x.code))?.id
+    const educationId = refs.niveaux?.find(n => filters.niveaux.has(n.code))?.id
+
+    return {
+      sort,
+      specialite_id: specialiteId,
+      source_id: sourceId,
+      contract_type_id: contractId,
+      experience_level_id: experienceId,
+      education_level_id: educationId,
+      location_id: locationId || undefined,
+      q: q.length >= 2 ? q : undefined,
+      published_since: toIsoStart(filters.period.start),
+      published_until: toIsoEnd(filters.period.end),
+    }
+  }, [meta, sort, filters, locationId, valeurs.query, refs])
+
+  /* ═══ Feed paginé ═══ */
+  const feed = useFiliereOffersFeed({ slug, params: apiParams, pageSize: PAGE_SIZE })
+  const { offers, isLoading, isLoadingMore, error: feedError, hasMore, loadMore, reload } = feed
+
+  /* ═══ Filtrage fin côté client (multi-sélection) ═══ */
+  const filtered = useMemo(() => {
+    if (!offers.length) return []
+    const q = queryLocale.trim().toLowerCase()
+    return offers.filter(o => {
+      if (q && !(o.titre.toLowerCase().includes(q) || o.entreprise.toLowerCase().includes(q))) return false
+      if (filters.sources.size && !filters.sources.has(o.source)) return false
+      if (filters.contrats.size && !filters.contrats.has(o.contratCode)) return false
+      if (filters.experiences.size && !filters.experiences.has(o.experienceCode)) return false
+      if (filters.niveaux.size && !filters.niveaux.has(o.niveauCode)) return false
+      if (filters.specialites.size && !filters.specialites.has(o.specialite)) return false
+      if (locationId && o.locationId !== locationId) return false
+      return true
+    })
+  }, [offers, queryLocale, filters, locationId])
+
+  /* ═══ Compteurs locaux (dans la filière) ═══ */
+  const counts = useMemo(() => {
+    const c = { sources: {}, contrats: {}, experiences: {}, niveaux: {}, specialites: {} }
+    offers.forEach(o => {
+      if (o.source) c.sources[o.source] = (c.sources[o.source] || 0) + 1
+      if (o.contratCode) c.contrats[o.contratCode] = (c.contrats[o.contratCode] || 0) + 1
+      if (o.experienceCode) c.experiences[o.experienceCode] = (c.experiences[o.experienceCode] || 0) + 1
+      if (o.niveauCode) c.niveaux[o.niveauCode] = (c.niveaux[o.niveauCode] || 0) + 1
+      if (o.specialite) c.specialites[o.specialite] = (c.specialites[o.specialite] || 0) + 1
+    })
+    return c
+  }, [offers])
+
+  /* ═══ Feed groupé jour par jour ═══ */
+  const feedItems = useMemo(() => {
+    if (sort !== "recent") return filtered.map(o => ({ type: "offre", o }))
+    const items = []
+    let last = null
+    filtered.forEach(o => {
+      if (o.jours !== last) {
+        items.push({ type: "header", jours: o.jours, count: filtered.filter(x => x.jours === o.jours).length })
+        last = o.jours
+      }
+      items.push({ type: "offre", o })
+    })
+    return items
+  }, [filtered, sort])
+
+  /* ═══ États UI ═══ */
   const [saved, setSaved] = useState(new Set())
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [openPop, setOpenPop] = useState(null)
+  const [showTop, setShowTop] = useState(false)
   const sortRef = useRef(null)
+  useClickOutside(sortRef, () => setOpenPop(p => (p === "sort" ? null : p)))
 
-  useClickOutside(sortRef, () => setOpenPop((p) => (p === "sort" ? null : p)))
+  useEffect(() => {
+    const onScroll = () => setShowTop(window.scrollY > 700)
+    window.addEventListener("scroll", onScroll, { passive: true })
+    return () => window.removeEventListener("scroll", onScroll)
+  }, [])
 
-
-  /* Compteurs par option (dans la filière) */
-  const counts = useMemo(() => {
-    const c = { sources: {}, contrats: {}, experiences: {}, niveaux: {}, specialites: {} }
-    offres.forEach((o) => {
-      c.sources[o.source] = (c.sources[o.source] || 0) + 1
-      c.contrats[o.contrat] = (c.contrats[o.contrat] || 0) + 1
-      c.experiences[o.experience] = (c.experiences[o.experience] || 0) + 1
-      c.niveaux[o.niveau] = (c.niveaux[o.niveau] || 0) + 1
-      c.specialites[o.specialite] = (c.specialites[o.specialite] || 0) + 1
+  const toggleSave = uid =>
+    setSaved(prev => {
+      const next = new Set(prev)
+      next.has(uid) ? next.delete(uid) : next.add(uid)
+      return next
     })
-    return c
-  }, [offres])
 
-  /* Filtrage + tri */
-  const filtered = useMemo(() => {
-    const q = queryLocale.trim().toLowerCase()
-    const today = startOfDay(new Date())
-    let list = offres.filter((o) => {
-      if (q && !(o.titre.toLowerCase().includes(q) || o.entreprise.toLowerCase().includes(q))) return false
-      if (filters.sources.size && !filters.sources.has(o.source)) return false
-      if (filters.contrats.size && !filters.contrats.has(o.contrat)) return false
-      if (filters.experiences.size && !filters.experiences.has(o.experience)) return false
-      if (filters.niveaux.size && !filters.niveaux.has(o.niveau)) return false
-      if (filters.specialites.size && !filters.specialites.has(o.specialite)) return false
-      if (filters.period.start || filters.period.end) {
-        const d = addDays(today, -o.jours)
-        if (filters.period.start && d < filters.period.start) return false
-        if (filters.period.end && d > filters.period.end) return false
-      }
-      return true
-    })
-    if (sort === "recent") list = [...list].sort((a, b) => a.jours - b.jours)
-    if (sort === "old") list = [...list].sort((a, b) => b.jours - a.jours)
-    if (sort === "az") list = [...list].sort((a, b) => a.titre.localeCompare(b.titre, "fr"))
-    if (sort === "ent") list = [...list].sort((a, b) => a.entreprise.localeCompare(b.entreprise, "fr"))
-    return list
-  }, [offres, filters, sort, queryLocale])
+  const labelOf = useCallback((list, code) =>
+    list.find(x => x.code === code)?.label || code, [])
 
-  /* Filtres actifs (chips) */
+  /* ═══ Chips actifs ═══ */
   const activeChips = useMemo(() => {
     const chips = []
-    filters.sources.forEach((v) => chips.push({ key: `s-${v}`, label: v, rm: () => toggle("sources", v) }))
-    filters.specialites.forEach((v) => chips.push({ key: `sp-${v}`, label: v, rm: () => toggle("specialites", v) }))
-    filters.contrats.forEach((v) => chips.push({ key: `c-${v}`, label: v, rm: () => toggle("contrats", v) }))
-    filters.experiences.forEach((v) => chips.push({ key: `e-${v}`, label: v, rm: () => toggle("experiences", v) }))
-    filters.niveaux.forEach((v) => chips.push({ key: `n-${v}`, label: v, rm: () => toggle("niveaux", v) }))
+    filters.sources.forEach(s => chips.push({ key: `s-${s}`, label: labelOf(refs.sources, s), rm: () => toggle("sources", s) }))
+    filters.specialites.forEach(sp => {
+      const spMeta = meta.specialites.find(s => s.code === sp)
+      chips.push({ key: `sp-${sp}`, label: spMeta?.label || sp, rm: () => toggle("specialites", sp) })
+    })
+    filters.contrats.forEach(c => chips.push({ key: `c-${c}`, label: labelOf(refs.contrats, c), rm: () => toggle("contrats", c) }))
+    filters.experiences.forEach(x => chips.push({ key: `e-${x}`, label: labelOf(refs.experiences, x), rm: () => toggle("experiences", x) }))
+    filters.niveaux.forEach(n => chips.push({ key: `n-${n}`, label: labelOf(refs.niveaux, n), rm: () => toggle("niveaux", n) }))
+    if (locationId) {
+      const loc = refs.locations.find(l => l.id === locationId)
+      chips.push({ key: "loc", label: loc?.label || loc?.city || "Localisation", rm: () => setLocation(null) })
+    }
     const { start, end } = filters.period
     if (start && end) {
-      chips.push({
-        key: "p",
-        label: sameDay(start, end) ? fmtDay(start) : `${fmtDay(start)} → ${fmtDay(end)}`,
-        rm: () => setPeriod({ start: null, end: null }),
-      })
+      chips.push({ key: "p", label: sameDay(start, end) ? fmtDay(start) : `${fmtDay(start)} → ${fmtDay(end)}`, rm: () => setPeriod({ start: null, end: null }) })
     } else if (start) {
       chips.push({ key: "p", label: `Depuis le ${fmtDay(start)}`, rm: () => setPeriod({ start: null, end: null }) })
     }
     return chips
-  }, [filters.contrats, filters.experiences, filters.niveaux, filters.period, filters.sources, filters.specialites, setPeriod, toggle])
+  }, [filters, locationId, refs, meta, labelOf, toggle, setPeriod, setLocation])
 
   const activeCount =
     filters.sources.size + filters.contrats.size + filters.experiences.size +
     filters.niveaux.size + filters.specialites.size +
+    (locationId ? 1 : 0) +
     (filters.period.start || filters.period.end ? 1 : 0)
 
-  const toggleSave = (id) =>
-    setSaved((prev) => {
-      const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
-      return next
-    })
+  const resetTout = useCallback(() => { reset(); setQueryLocale("") }, [reset])
+  const pop = k => ({
+    open: openPop === k,
+    onToggle: () => setOpenPop(p => (p === k ? null : k)),
+    onClose: () => setOpenPop(p => (p === k ? null : p)),
+  })
 
-  if (!meta) {
-    return (
-      <>
-        <Seo {...seo} />
-        <FiliereIntrouvable code={filiere} />
-      </>
-    )
-  }
-
-  const hue = HUES[meta.hue]
-  const pop = (k) => ({ open: openPop === k, onToggle: () => setOpenPop((p) => (p === k ? null : k)), onClose: () => setOpenPop((p) => (p === k ? null : p)) })
   const periodLabel =
     filters.period.start && filters.period.end
       ? sameDay(filters.period.start, filters.period.end)
@@ -746,13 +1019,44 @@ const DetailsFiliere = () => {
         ? `Depuis le ${fmtDay(filters.period.start)}`
         : "Période"
 
+  const locationLabel = locationId
+    ? (refs.locations.find(l => l.id === locationId)?.label || "Localisation")
+    : "Localisation"
+
+  const isDone = !isLoading && !isLoadingMore && !hasMore && filtered.length > 0
+
+  /* ═══ Rendu ═══ */
+  if (!slug) {
+    return <FiliereIntrouvable code="?" />
+  }
+
+  if (loadingFiliere) {
+    return (
+      <>
+        <Seo title="Chargement… | JobAlert CI" description="" />
+        <main className="flex min-h-[60vh] items-center justify-center bg-background">
+          <Loader2 className="size-8 animate-spin text-brand-orange" />
+        </main>
+      </>
+    )
+  }
+
+  if (errorFiliere || !meta) {
+    return (
+      <>
+        <Seo title={`Filière introuvable | JobAlert CI`} description="" noindex />
+        <FiliereIntrouvable code={slug} error={errorFiliere} onReload={reloadFiliere} />
+      </>
+    )
+  }
+
   return (
     <>
-      <Seo {...seo} />
+      <Seo {...filiereSeo({ meta, filiere: slug, offres: filtered })} />
       <main>
-        <HeroFiliere meta={meta} hue={hue} offres={offres} />
+        <HeroFiliere meta={meta} hue={hue} offres={offers} isLoading={isLoading} />
 
-        {/* ═══════════ Barre de filtres sticky ═══════════ */}
+        {/* ═══════════ Barre de filtres sticky (même structure que Offres) ═══════════ */}
         <div className="sticky top-1/10 z-40 border-b border-outline-variant/40 bg-background/85 backdrop-blur-md">
           <div className="mx-auto max-w-7xl px-6 py-3 md:px-12">
             {/* Desktop */}
@@ -761,12 +1065,12 @@ const DetailsFiliere = () => {
                 <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                 <input
                   value={queryLocale}
-                  onChange={(e) => setQueryLocale(e.target.value)}
+                  onChange={e => setQueryLocale(e.target.value)}
                   placeholder="Rechercher un poste, une entreprise…"
                   aria-label="Rechercher"
                   className="h-9 w-full rounded-lg border border-outline-variant/60 bg-surface-container-lowest pl-9 pr-8 text-[13px] outline-none transition-all placeholder:text-muted-foreground/70 focus:border-brand-navy/50 focus:ring-2 focus:ring-brand-navy/10"
                 />
-                {filters.query && (
+                {queryLocale && (
                   <button
                     onClick={() => setQueryLocale("")}
                     aria-label="Effacer la recherche"
@@ -777,50 +1081,76 @@ const DetailsFiliere = () => {
                 )}
               </div>
 
+              {/* Localisation (ajout depuis Offres) */}
+              <FilterPopover
+                label={locationLabel}
+                icon={MapPin}
+                count={locationId ? 1 : 0}
+                panelClassName="w-72 p-3"
+                {...pop("location")}
+              >
+                <LocationPicker
+                  locations={refs.locations}
+                  value={locationId}
+                  onChange={(id) => { setLocation(id); setOpenPop(null) }}
+                  isLoading={refsLoading && refs.locations.length === 0}
+                />
+              </FilterPopover>
+
+              {/* Sources */}
               <FilterPopover label="Sources" icon={Layers} count={filters.sources.size} {...pop("sources")}>
-                {SOURCES.map((s) => (
-                  <CheckRow
-                    key={s.code}
-                    checked={filters.sources.has(s.code)}
-                    onToggle={() => toggle("sources", s.code)}
-                    label={s.code}
-                    count={counts.sources[s.code] || 0}
-                    lead={<SourceLogo code={s.code} className="size-5 rounded text-[8px]" />}
-                  />
-                ))}
+                {refsLoading && refs.sources.length === 0
+                  ? [0, 1, 2].map(i => <Skeleton key={i} className="mb-1.5 h-8 w-full rounded-md" />)
+                  : refs.sources.map(s => (
+                      <CheckRow
+                        key={s.code}
+                        checked={filters.sources.has(s.code)}
+                        onToggle={() => toggle("sources", s.code)}
+                        label={s.label}
+                        count={counts.sources[s.code] ?? 0}
+                        lead={<SourceLogo code={s.code} className="size-5 rounded text-[8px]" />}
+                      />
+                    ))}
               </FilterPopover>
 
-              <FilterPopover label="Spécialité" icon={Sparkles} count={filters.specialites.size} {...pop("spec")}>
-                {meta.specialites.map((sp) => (
-                  <CheckRow
-                    key={sp}
-                    checked={filters.specialites.has(sp)}
-                    onToggle={() => toggle("specialites", sp)}
-                    label={sp}
-                    count={counts.specialites[sp] || 0}
-                    lead={<span className={cn("size-2 shrink-0 rounded-full", hue.dot)} />}
-                  />
-                ))}
-              </FilterPopover>
-
+              {/* Contrat */}
               <FilterPopover label="Contrat" icon={Briefcase} count={filters.contrats.size} {...pop("contrat")}>
-                {CONTRATS.map((c) => (
-                  <CheckRow key={c} checked={filters.contrats.has(c)} onToggle={() => toggle("contrats", c)} label={c} count={counts.contrats[c] || 0} />
+                {refs.contrats.map(c => (
+                  <CheckRow
+                    key={c.code}
+                    checked={filters.contrats.has(c.code)}
+                    onToggle={() => toggle("contrats", c.code)}
+                    label={c.label}
+                    count={counts.contrats[c.code] ?? 0}
+                  />
                 ))}
               </FilterPopover>
 
+              {/* Expérience */}
               <FilterPopover label="Expérience" icon={Zap} count={filters.experiences.size} {...pop("exp")}>
-                {EXPERIENCES.map((x) => (
-                  <CheckRow key={x} checked={filters.experiences.has(x)} onToggle={() => toggle("experiences", x)} label={x} count={counts.experiences[x] || 0} />
+                {refs.experiences.map(x => (
+                  <CheckRow
+                    key={x.code}
+                    checked={filters.experiences.has(x.code)}
+                    onToggle={() => toggle("experiences", x.code)}
+                    label={x.label}
+                  />
                 ))}
               </FilterPopover>
 
+              {/* Niveau */}
               <FilterPopover label="Niveau" icon={GraduationCap} count={filters.niveaux.size} {...pop("niveau")}>
-                {NIVEAUX.map((n) => (
-                  <CheckRow key={n} checked={filters.niveaux.has(n)} onToggle={() => toggle("niveaux", n)} label={n} count={counts.niveaux[n] || 0} />
+                {refs.niveaux.map(n => (
+                  <CheckRow
+                    key={n.code}
+                    checked={filters.niveaux.has(n.code)}
+                    onToggle={() => toggle("niveaux", n.code)}
+                    label={n.label}
+                  />
                 ))}
               </FilterPopover>
 
+              {/* Période */}
               <FilterPopover
                 label={periodLabel}
                 icon={CalendarDays}
@@ -829,18 +1159,24 @@ const DetailsFiliere = () => {
                 panelClassName="w-[19.5rem] p-3"
                 {...pop("period")}
               >
-                <MiniCalendar range={filters.period} onChange={setPeriod} hue={hue} />
+                <MiniCalendar range={filters.period} onChange={setPeriod} hue={BRAND_HUE} />
               </FilterPopover>
 
               <div className="ml-auto flex items-center gap-2.5">
                 <span className="hidden text-xs text-muted-foreground xl:inline">
-                  <strong className="font-heading text-sm font-bold text-brand-navy">{filtered.length}</strong> offre{filtered.length > 1 ? "s" : ""}
+                  {isLoading ? (
+                    <Skeleton className="inline-block h-4 w-20 align-middle" />
+                  ) : (
+                    <>
+                      <strong className="font-heading text-sm font-bold text-brand-navy">{filtered.length}{hasMore ? "+" : ""}</strong>
+                      {" "}offre{filtered.length > 1 ? "s" : ""}
+                    </>
+                  )}
                 </span>
-
                 {/* Tri */}
                 <div ref={sortRef} className="relative">
                   <button
-                    onClick={() => setOpenPop((p) => (p === "sort" ? null : "sort"))}
+                    onClick={() => setOpenPop(p => (p === "sort" ? null : "sort"))}
                     className={cn(
                       "inline-flex h-9 items-center gap-1.5 rounded-lg border px-3 text-xs font-bold transition-all duration-200",
                       openPop === "sort"
@@ -849,7 +1185,7 @@ const DetailsFiliere = () => {
                     )}
                   >
                     <ArrowUpDown className="size-3.5" />
-                    {SORTS.find((s) => s.k === sort).l}
+                    {SORTS.find(s => s.k === sort)?.l ?? "Trier"}
                     <ChevronDown className={cn("size-3.5 transition-transform duration-200", openPop === "sort" && "rotate-180")} />
                   </button>
                   <AnimatePresence>
@@ -861,7 +1197,7 @@ const DetailsFiliere = () => {
                         transition={{ duration: 0.18 }}
                         className="absolute right-0 top-full z-50 mt-2 w-48 rounded-xl border border-outline-variant/50 bg-surface-container-lowest p-1.5 shadow-hover"
                       >
-                        {SORTS.map((s) => (
+                        {SORTS.map(s => (
                           <button
                             key={s.k}
                             onClick={() => { setSort(s.k); setOpenPop(null) }}
@@ -875,7 +1211,6 @@ const DetailsFiliere = () => {
                     )}
                   </AnimatePresence>
                 </div>
-
                 <ViewToggle view={view} onChange={setView} />
               </div>
             </div>
@@ -886,11 +1221,20 @@ const DetailsFiliere = () => {
                 <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
                 <input
                   value={queryLocale}
-                  onChange={(e) => setQueryLocale(e.target.value)}
+                  onChange={e => setQueryLocale(e.target.value)}
                   placeholder="Rechercher…"
                   aria-label="Rechercher"
                   className="h-10 w-full rounded-lg border border-outline-variant/60 bg-surface-container-lowest pl-9 pr-3 text-sm outline-none transition-all placeholder:text-muted-foreground/70 focus:border-brand-navy/50 focus:ring-2 focus:ring-brand-navy/10"
                 />
+                {queryLocale && (
+                  <button
+                    onClick={() => setQueryLocale("")}
+                    aria-label="Effacer la recherche"
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-brand-navy"
+                  >
+                    <X className="size-3.5" />
+                  </button>
+                )}
               </div>
               <button
                 onClick={() => setDrawerOpen(true)}
@@ -914,7 +1258,7 @@ const DetailsFiliere = () => {
           </div>
         </div>
 
-        {/* ═══════════ Drawer mobile ═══════════ */}
+        {/* ═══════════ Drawer mobile (mêmes groupes que Offres, avec Spécialité) ═══════════ */}
         <FiltersDrawer
           open={drawerOpen}
           onOpenChange={setDrawerOpen}
@@ -922,45 +1266,64 @@ const DetailsFiliere = () => {
           resultCount={filtered.length}
           sort={sort}
           onSort={setSort}
-          onReset={() => reset() + setQueryLocale("")}
+          onReset={resetTout}
           ctaClassName={hue.solid}
         >
-          <OfferFilterGroups
-            groups={["sources", "specialites", "contrats", "experiences", "niveaux", "period"]}
+          <FiliereFilterGroups
             meta={meta}
-            hue={hue}
+            referentials={refs}
+            counts={counts}
             filters={filters}
             toggle={toggle}
-            counts={counts}
+            period={filters.period}
             onPeriod={setPeriod}
+            locationId={locationId}
+            onLocation={setLocation}
+            isLoading={refsLoading}
+            hue={hue}
           />
         </FiltersDrawer>
 
-        {/* ═══════════ Liste des offres ═══════════ */}
+        {/* ═══════════ Le flux ═══════════ */}
         <section className="border-b border-outline-variant/30 bg-background py-12 md:py-16">
           <div className="mx-auto max-w-7xl px-6 md:px-12">
-            <div className="flex flex-wrap items-end justify-between gap-6">
-              <motion.div
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-80px" }}
-                transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-              >
-                <p className="flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[0.18em] text-brand-orange">
-                  <span className="h-px w-6 bg-brand-orange" aria-hidden />
-                  Collecte du jour
-                </p>
-                <h2 className="mt-3 font-heading text-3xl font-extrabold tracking-tight text-brand-navy sm:text-4xl">
-                  Les offres <span className="text-brand-orange">{meta.label}</span> du moment
-                </h2>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  <strong className="font-heading font-bold text-brand-navy">{filtered.length}</strong> offre{filtered.length > 1 ? "s" : ""}
-                  {activeCount > 0 ? ` · ${activeCount} filtre${activeCount > 1 ? "s" : ""} actif${activeCount > 1 ? "s" : ""}` : ""} — triées par « {SORTS.find((s) => s.k === sort).l.toLowerCase()} »
-                </p>
-              </motion.div>
-            </div>
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <p className="flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[0.18em] text-brand-orange">
+                <span className="h-px w-6 bg-brand-orange" aria-hidden />
+                Collecte du jour
+              </p>
+              <h2 className="mt-3 font-heading text-3xl font-extrabold tracking-tight text-brand-navy sm:text-4xl">
+                Les offres <span className="text-brand-orange">{meta.label}</span> du moment
+              </h2>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {isLoading ? "Chargement des offres…" : (
+                  <>
+                    <strong className="font-heading font-bold text-brand-navy">{filtered.length}{hasMore ? "+" : ""}</strong>
+                    {" "}offre{filtered.length > 1 ? "s" : ""}
+                    {activeCount > 0 ? ` · ${activeCount} filtre${activeCount > 1 ? "s" : ""} actif${activeCount > 1 ? "s" : ""}` : ""}
+                    {" "}triées par « {(SORTS.find(s => s.k === sort)?.l ?? "").toLowerCase()} »
+                  </>
+                )}
+              </p>
+            </motion.div>
 
-            {/* Chips de filtres actifs */}
+            {/* Référentiels en repli */}
+            {referentials.isFallback && !referentials.isLoading && (
+              <div className="mt-6 flex flex-wrap items-center gap-3 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-xs font-semibold text-amber-800">
+                <AlertTriangle className="size-4" />
+                Les listes de filtres n'ont pas pu être chargées — options par défaut affichées.
+                <button onClick={referentials.reload} className="inline-flex items-center gap-1 font-bold underline">
+                  <RefreshCw className="size-3" /> Réessayer
+                </button>
+              </div>
+            )}
+
+            {/* Chips actifs */}
             <AnimatePresence>
               {activeChips.length > 0 && (
                 <motion.div
@@ -970,7 +1333,7 @@ const DetailsFiliere = () => {
                   className="overflow-hidden"
                 >
                   <div className="mt-5 flex flex-wrap items-center gap-2">
-                    {activeChips.map((c) => (
+                    {activeChips.map(c => (
                       <button
                         key={c.key}
                         onClick={c.rm}
@@ -980,10 +1343,7 @@ const DetailsFiliere = () => {
                         <X className="size-3 text-muted-foreground transition-colors group-hover:text-brand-orange" />
                       </button>
                     ))}
-                    <button
-                      onClick={() => reset() + setQueryLocale("")}
-                      className="text-xs font-bold text-brand-orange transition-colors hover:underline"
-                    >
+                    <button onClick={resetTout} className="text-xs font-bold text-brand-orange transition-colors hover:underline">
                       Tout effacer
                     </button>
                   </div>
@@ -991,61 +1351,217 @@ const DetailsFiliere = () => {
               )}
             </AnimatePresence>
 
-            {/* Feed */}
-            <AnimatePresence mode="popLayout">
-              {filtered.length === 0 ? (
-                <motion.div
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="mt-10 rounded-xl border border-dashed border-outline-variant/60 bg-white p-12 text-center"
+            {/* ── États ── */}
+            {isLoading ? (
+              <OffersSkeletonList view={view === "grid" || isMobile ? "grid" : "list"} count={PAGE_SIZE / 2} className="mt-8" />
+            ) : feedError && filtered.length === 0 ? (
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-10 rounded-xl border border-destructive/30 bg-destructive/5 p-12 text-center"
+              >
+                <AlertTriangle className="mx-auto size-10 text-destructive/70" />
+                <h3 className="mt-4 font-heading text-lg font-bold text-brand-navy">Le flux n'a pas pu être chargé</h3>
+                <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">{feedError?.message || feedError}</p>
+                <button
+                  onClick={reload}
+                  className="mt-5 inline-flex items-center gap-2 rounded-lg border border-brand-navy/20 px-5 py-2.5 text-sm font-bold text-brand-navy transition-all hover:border-brand-navy hover:bg-brand-navy hover:text-white"
                 >
-                  <SearchX className="mx-auto size-10 text-muted-foreground/50" />
-                  <h3 className="mt-4 font-heading text-lg font-bold text-brand-navy">Aucune offre trouvée</h3>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    Essayez d'élargir vos filtres ou de modifier votre recherche.
-                  </p>
+                  <RefreshCw className="size-4" /> Réessayer
+                </button>
+              </motion.div>
+            ) : filtered.length === 0 ? (
+              <motion.div
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mt-10 rounded-xl border border-dashed border-outline-variant/60 bg-white p-12 text-center"
+              >
+                <SearchX className="mx-auto size-10 text-muted-foreground/50" />
+                <h3 className="mt-4 font-heading text-lg font-bold text-brand-navy">Aucune offre trouvée</h3>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {activeCount > 0 || valeurs.query
+                    ? "Élargissez vos filtres — ou attendez la collecte de demain 6h02."
+                    : "Le flux est vide pour le moment — la prochaine collecte est prévue à 6h02."}
+                </p>
+                {(activeCount > 0 || valeurs.query) && (
                   <button
-                    onClick={() => reset() + setQueryLocale("")}
+                    onClick={resetTout}
                     className="mt-5 inline-flex items-center gap-2 rounded-lg border border-brand-navy/20 px-5 py-2.5 text-sm font-bold text-brand-navy transition-all hover:border-brand-navy hover:bg-brand-navy hover:text-white"
                   >
                     Réinitialiser les filtres
                   </button>
-                </motion.div>
-              ) : view === "list" ? (
-                <motion.ul layout className="mt-8 flex flex-col gap-3">
-                  {filtered.map((o, i) => (
+                )}
+              </motion.div>
+            ) : (view === "list" && !isMobile) ? (
+              <div className="mt-8 flex flex-col gap-3">
+                <AnimatePresence mode="popLayout">
+                  {feedItems.map((item, i) =>
+                    item.type === "header" ? (
+                      <motion.div
+                        key={`h-${item.jours}`}
+                        layout
+                        initial={{ opacity: 0, x: -14 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        className="flex items-center gap-3 pt-5 first:pt-0"
+                      >
+                        <span className="relative flex size-2">
+                          {jourLabel(item.jours).ping && (
+                            <span className="absolute inline-flex size-full animate-ping rounded-full bg-brand-orange opacity-70" />
+                          )}
+                          <span className={cn(
+                            "relative inline-flex size-2 rounded-full",
+                            jourLabel(item.jours).ping ? "bg-brand-orange" : "bg-outline-variant"
+                          )} />
+                        </span>
+                        <h3 className="font-heading text-sm font-extrabold uppercase tracking-[0.14em] text-brand-navy">
+                          {jourLabel(item.jours).label}
+                        </h3>
+                        <span className="text-[11px] font-semibold text-muted-foreground">
+                          {item.count} offre{item.count > 1 ? "s" : ""}
+                          {jourLabel(item.jours).sub && ` · ${jourLabel(item.jours).sub}`}
+                        </span>
+                        <span className="h-px flex-1 bg-outline-variant/50" aria-hidden />
+                      </motion.div>
+                    ) : (
+                      <OfferCard
+                        key={item.o.uid}
+                        offre={item.o}
+                        index={i}
+                        view="list"
+                        hue={hue}
+                        showFiliereChip={false}
+                        showSpecialite
+                        saved={saved.has(item.o.uid)}
+                        onToggleSave={toggleSave}
+                        getDetailLink={of => `/offres/${of.id}`}
+                        entrepriseTotal={offers.filter(x => x.entreprise === item.o.entreprise).length}
+                      />
+                    )
+                  )}
+                </AnimatePresence>
+              </div>
+            ) : (
+              <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                <AnimatePresence mode="popLayout">
+                  {feedItems.filter(x => x.type === "offre").map((item, i) => (
                     <OfferCard
-                      key={o.id}
-                      offre={o}
+                      key={item.o.uid}
+                      offre={item.o}
                       index={i}
-                      view="list"
+                      view="grid"
                       hue={hue}
                       showFiliereChip={false}
                       showSpecialite
-                      saved={saved.has(o.id)}
+                      saved={saved.has(item.o.uid)}
                       onToggleSave={toggleSave}
-                      getDetailLink={(of) => `/offres/${of.id}`}
-                      entrepriseTotal={Object.values(OFFRES).flat().filter((x) => x.entreprise === o.entreprise).length}
+                      getDetailLink={of => `/offres/${of.id}`}
+                      entrepriseTotal={offers.filter(x => x.entreprise === item.o.entreprise).length}
                     />
                   ))}
-                </motion.ul>
-              ) : (
-                <motion.div layout className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                  {filtered.map((o, i) => (
-                    <OfferCard
-                      key={o.id}
-                      offre={o}
-                      index={i}
-                      view="list"
-                      hue={hue}
-                      showFiliereChip={false}
-                      showSpecialite
-                      saved={saved.has(o.id)}
-                      onToggleSave={toggleSave}
-                      getDetailLink={(of) => `/offres/${of.id}`}
-                      entrepriseTotal={Object.values(OFFRES).flat().filter((x) => x.entreprise === o.entreprise).length}
+                </AnimatePresence>
+              </div>
+            )}
+
+            {/* Skeletons "charger plus" */}
+            {isLoadingMore && (
+              <OffersSkeletonList
+                view={view === "grid" || isMobile ? "grid" : "list"}
+                count={3}
+                className="mt-3"
+              />
+            )}
+
+            {/* Erreur non bloquante */}
+            {feedError && filtered.length > 0 && (
+              <div className="mt-6 flex flex-wrap items-center justify-center gap-3 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-xs font-semibold text-destructive">
+                <AlertTriangle className="size-4" />
+                {feedError?.message || feedError}
+                <button onClick={loadMore} className="inline-flex items-center gap-1 font-bold underline">
+                  <RefreshCw className="size-3" /> Réessayer
+                </button>
+              </div>
+            )}
+
+            {/* Charger plus */}
+            {hasMore && !isLoading && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.45 }}
+                className="mt-10 flex flex-col items-center gap-3.5"
+              >
+                <div className="w-full max-w-xs">
+                  <div className="flex items-center justify-between text-[11px] font-semibold text-muted-foreground">
+                    <span>{filtered.length} affichée{filtered.length > 1 ? "s" : ""}</span>
+                    {meta.actives > 0 && <span>{meta.actives} au total</span>}
+                  </div>
+                  <div className="mt-1.5 h-1 overflow-hidden rounded-full bg-surface-container-high">
+                    <motion.div
+                      className="h-full rounded-full bg-brand-navy"
+                      animate={{ width: `${Math.min(100, meta.actives ? (filtered.length / meta.actives) * 100 : 0)}%` }}
+                      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
                     />
-                  ))}
+                  </div>
+                </div>
+                <button
+                  onClick={loadMore}
+                  disabled={isLoadingMore}
+                  className="group inline-flex h-12 items-center gap-2.5 rounded-lg border border-brand-navy/25 bg-white px-7 text-sm font-bold text-brand-navy shadow-soft transition-all duration-300 hover:-translate-y-0.5 hover:border-brand-navy hover:bg-brand-navy hover:text-white hover:shadow-hover active:scale-[0.98] disabled:pointer-events-none disabled:opacity-60"
+                >
+                  {isLoadingMore ? (
+                    <>
+                      <Loader2 className="size-4 animate-spin" />
+                      Chargement des offres…
+                    </>
+                  ) : (
+                    <>
+                      <ChevronDown className="size-4 transition-transform duration-300 group-hover:translate-y-0.5" />
+                      Charger {PAGE_SIZE} offres de plus ?
+                    </>
+                  )}
+                </button>
+                <p className="text-[11px] text-muted-foreground">
+                  Par lots de {PAGE_SIZE} · groupées jour par jour
+                </p>
+              </motion.div>
+            )}
+
+            {/* Fin du flux */}
+            <AnimatePresence>
+              {isDone && (
+                <motion.div
+                  initial={{ opacity: 0, y: 24 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                  className="mt-10 overflow-hidden rounded-xl border border-outline-variant/40 bg-white text-center shadow-soft"
+                >
+                  <div className="mx-auto h-1 w-24 rounded-b-full bg-emerald-500" aria-hidden />
+                  <div className="px-6 py-10">
+                    <span className="mx-auto grid size-14 place-items-center rounded-full bg-emerald-500/10">
+                      <CheckCircle2 className="size-7 text-emerald-600" />
+                    </span>
+                    <h3 className="mt-4 font-heading text-xl font-extrabold text-brand-navy">Vous êtes à jour.</h3>
+                    <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
+                      C'est tout pour aujourd'hui — demain à 6h02, on remet ça. Ou mieux :
+                      recevez le flux directement à 8h00, sans avoir à revenir.
+                    </p>
+                    <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
+                      <Link
+                        to={`/inscription?filieres=${meta.code}`}
+                        className="group inline-flex items-center gap-2 rounded-lg bg-brand-orange px-6 py-3 text-sm font-bold text-white shadow-soft transition-all duration-300 hover:-translate-y-0.5 hover:brightness-110"
+                      >
+                        <Bell className="size-4 transition-transform duration-300 group-hover:rotate-12" />
+                        Créer mon alerte 8h00
+                      </Link>
+                      <button
+                        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                        className="inline-flex items-center gap-2 rounded-lg border border-outline-variant/60 px-6 py-3 text-sm font-bold text-on-surface-variant transition-all hover:border-brand-navy/40 hover:text-brand-navy"
+                      >
+                        Retour en haut
+                      </button>
+                    </div>
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -1058,7 +1574,23 @@ const DetailsFiliere = () => {
         </section>
 
         <BandeauAlerte meta={meta} hue={hue} />
-        <AutresFilieres codeActuel={filiere} />
+        <AutresFilieres codeActuel={meta.code} />
+
+        {/* Bouton retour en haut */}
+        <AnimatePresence>
+          {showTop && (
+            <motion.button
+              initial={{ opacity: 0, scale: 0.8, y: 12 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.8, y: 12 }}
+              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+              aria-label="Retour en haut"
+              className="fixed bottom-6 right-6 z-40 grid size-11 place-items-center rounded-full bg-brand-navy text-white shadow-hover transition-colors duration-300 hover:bg-brand-orange"
+            >
+              <ArrowUp className="size-5" />
+            </motion.button>
+          )}
+        </AnimatePresence>
       </main>
     </>
   )

@@ -187,6 +187,7 @@ class ArticleListItem(BaseModel):
     reading_minutes: int = 5
     published_at: datetime | None = None
     category_id: str | None = None
+    category: ArticleCategoryRead | None = None
 
 
 class ArticleCreate(BaseModel):

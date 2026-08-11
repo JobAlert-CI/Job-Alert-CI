@@ -6,6 +6,7 @@ const getImgSource = (name, transp = false) => {
     case "linkedin":
       return transp ? "/LogoSource/linkedinT.png" : "/LogoSource/linkedin.png"
     case "goafrica":
+    case "go africa online":
       return transp ? "/LogoSource/goafricaT.png" : "/LogoSource/goafrica.svg"
     case "emploidakar ci":
     case "emploidakar":

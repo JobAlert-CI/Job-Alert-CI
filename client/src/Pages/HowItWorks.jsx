@@ -19,11 +19,9 @@ import {
   LayoutGrid,
   AlertCircle,
 } from "lucide-react"
-import { FaLinkedin } from "react-icons/fa"
 import { cn } from "@/lib/utils"
 import Seo from "@/components/seo/Seo"
 import { howItWorksSeo } from "@/lib/seo"
-import { getImgSource, getUrlSource } from "@/utils/utilsSource"
 import {
   CountdownEnvoi,
   CtaLink,
@@ -36,11 +34,10 @@ import {
   SourceLogo,
 } from "@/components/shared"
 import { getSources } from "@/api/public/sources"
-import { REASSURANCES } from "@/data/constanteMetier"
 import { useFetchData } from "@/hooks/use-fetch-data"
 import chipFloat from "@/lib/chipFloat"
 import { Skeleton } from "@/components/ui/skeleton"
-import { STEPS_HOW, EMAIL_JOBS, OFFRES_FILTREES, QUESTIONS_HOW } from "@/data/constanteMetier"
+import { STEPS_HOW, EMAIL_JOBS, OFFRES_FILTREES, QUESTIONS_HOW, REASSURANCES } from "@/data/constanteMetier"
 
 /* ════════════════════════════════════════════════════════════════════
    ANIMATIONS

@@ -1,0 +1,2082 @@
+{
+  "articles": {
+    "getArticles": {
+      "request": {
+        "method": "GET",
+        "url": "/api/articles"
+      },
+      "status_code": 200,
+      "data": [
+        {
+          "id": "3b273360-3af3-4a11-8dd8-e76c072854f9",
+          "slug": "rediger-un-cv-percutant-en-cote-divoire",
+          "title": "Rédiger un CV percutant en Côte d'Ivoire",
+          "excerpt": "Sur le marché de l'emploi en Côte d'Ivoire, les recruteurs reçoivent souvent un grand nombre de candidatures pour une seule offre. Votre CV doit donc être clair, orienté résultats et adapté au poste visé dès les premières secondes de lecture.",
+          "status": "published",
+          "is_featured": true,
+          "view_count": 240,
+          "reading_minutes": 6,
+          "published_at": "2026-08-09T02:46:36",
+          "category_id": "b2046120-bdce-4c92-b0d5-1ae4ca0147d5"
+        }
+      ]
+    },
+    "getArticleBySlug": {
+      "request": {
+        "method": "GET",
+        "url": "/api/articles/rediger-un-cv-percutant-en-cote-divoire"
+      },
+      "status_code": 200,
+      "data": {
+        "created_at": null,
+        "updated_at": null,
+        "id": "3b273360-3af3-4a11-8dd8-e76c072854f9",
+        "content_page_id": "ef9f2098-15c0-4650-aa33-d9de961678d3",
+        "category_id": "b2046120-bdce-4c92-b0d5-1ae4ca0147d5",
+        "category": {
+          "created_at": "2026-08-10T11:46:36",
+          "updated_at": "2026-08-10T11:46:36",
+          "id": "b2046120-bdce-4c92-b0d5-1ae4ca0147d5",
+          "code": "cv-lettres",
+          "label": "CV & Lettres",
+          "slug": "cv-lettres",
+          "hue": "sky",
+          "icon_name": "file-text",
+          "sort_order": 1,
+          "is_active": true
+        },
+        "reading_minutes": 6,
+        "view_count": 240,
+        "is_featured": true,
+        "featured_order": 1,
+        "quote_text": "Un bon CV ne liste pas des tâches : il prouve une valeur.",
+        "quote_author": "Équipe JobAlert CI",
+        "tags": [
+          "CV",
+          "candidature",
+          "recrutement",
+          "Côte d'Ivoire"
+        ],
+        "sections": [
+          {
+            "created_at": "2026-08-10T11:46:36",
+            "updated_at": "2026-08-10T11:46:36",
+            "id": "d76e495b-93d4-4a26-80ed-c3f46184c457",
+            "position": 1,
+            "anchor": "structure-claire",
+            "title": "Une structure claire dès la première lecture",
+            "blocks": [
+              {
+                "created_at": "2026-08-10T11:46:36",
+                "updated_at": "2026-08-10T11:46:36",
+                "id": "15b7836a-d4f9-4404-8aa2-a11febec4084",
+                "position": 1,
+                "block_type": "paragraph",
+                "content": "Un CV efficace doit permettre au recruteur de comprendre votre profil en moins de dix secondes. Mettez en avant votre titre professionnel, vos expériences clés et vos compétences principales en haut de page.",
+                "attribution": null,
+                "metadata_json": null
+              },
+              {
+                "created_at": "2026-08-10T11:46:36",
+                "updated_at": "2026-08-10T11:46:36",
+                "id": "67a5b1cd-b630-4be8-8943-f0cba5baab7d",
+                "position": 2,
+                "block_type": "list",
+                "content": "- Titre professionnel précis\n- Résumé de 3 à 5 lignes\n- Expériences avec résultats chiffrés\n- Compétences techniques et comportementales\n- Formation et certifications",
+                "attribution": null,
+                "metadata_json": null
+              }
+            ]
+          },
+          {
+            "created_at": "2026-08-10T11:46:36",
+            "updated_at": "2026-08-10T11:46:36",
+            "id": "8a9b41ca-5eca-4e1d-9ea9-d3c48b33a196",
+            "position": 2,
+            "anchor": "mots-cles",
+            "title": "Des mots-clés alignés sur l'offre",
+            "blocks": [
+              {
+                "created_at": "2026-08-10T11:46:36",
+                "updated_at": "2026-08-10T11:46:36",
+                "id": "77e0dedc-d295-4434-b137-95661f17341d",
+                "position": 1,
+                "block_type": "paragraph",
+                "content": "Beaucoup d'offres utilisent des mots-clés spécifiques : gestion de projet, développement commercial, logistique, comptabilité, Python, gestion de stock, etc. Reprenez ces termes dans votre CV si vous possédez réellement les compétences demandées.",
+                "attribution": null,
+                "metadata_json": null
+              },
+              {
+                "created_at": "2026-08-10T11:46:36",
+                "updated_at": "2026-08-10T11:46:36",
+                "id": "99515e39-235b-412e-8116-9d598a574dd9",
+                "position": 2,
+                "block_type": "callout",
+                "content": "Astuce : comparez votre CV à l'offre et vérifiez que les compétences principales de l'annonce apparaissent clairement dans votre profil.",
+                "attribution": null,
+                "metadata_json": null
+              }
+            ]
+          },
+          {
+            "created_at": "2026-08-10T11:46:36",
+            "updated_at": "2026-08-10T11:46:36",
+            "id": "db111fd4-fb96-4ecb-a6ec-b19c9edee305",
+            "position": 3,
+            "anchor": "erreurs-a-eviter",
+            "title": "Les erreurs qui écartent un CV",
+            "blocks": [
+              {
+                "created_at": "2026-08-10T11:46:36",
+                "updated_at": "2026-08-10T11:46:36",
+                "id": "82b433e9-83e8-4608-be2c-276106af97cc",
+                "position": 1,
+                "block_type": "list",
+                "content": "- Fautes d'orthographe ou de grammaire\n- CV trop long ou trop dense\n- Description vague des expériences\n- Adresse email peu professionnelle\n- Mensonges sur les compétences ou les diplômes",
+                "attribution": null,
+                "metadata_json": null
+              }
+            ]
+          }
+        ],
+        "takeaways": [
+          {
+            "created_at": "2026-08-10T11:46:36",
+            "updated_at": "2026-08-10T11:46:36",
+            "id": "c20d65aa-45a4-48f7-b005-c423862a5a42",
+            "position": 1,
+            "text": "Adaptez votre CV à chaque offre."
+          },
+          {
+            "created_at": "2026-08-10T11:46:36",
+            "updated_at": "2026-08-10T11:46:36",
+            "id": "21682161-1c58-4025-a837-7b08729f0c25",
+            "position": 2,
+            "text": "Ajoutez des résultats mesurables."
+          },
+          {
+            "created_at": "2026-08-10T11:46:36",
+            "updated_at": "2026-08-10T11:46:36",
+            "id": "df12b563-d721-4172-a333-ab040d38235e",
+            "position": 3,
+            "text": "Facilitez la lecture pour le recruteur."
+          }
+        ],
+        "key_figures": [
+          {
+            "created_at": "2026-08-10T11:46:36",
+            "updated_at": "2026-08-10T11:46:36",
+            "id": "14bb42fb-d3dc-4fde-bdaa-f1e8cbdc1170",
+            "position": 1,
+            "value": 6.0,
+            "label": "temps moyen passé par recruteur sur un CV",
+            "prefix": null,
+            "suffix": "s"
+          },
+          {
+            "created_at": "2026-08-10T11:46:36",
+            "updated_at": "2026-08-10T11:46:36",
+            "id": "adc0823a-f246-468a-9bb6-9314554126e3",
+            "position": 2,
+            "value": 2.0,
+            "label": "longueur maximale recommandée pour un CV",
+            "prefix": null,
+            "suffix": "pages"
+          },
+          {
+            "created_at": "2026-08-10T11:46:36",
+            "updated_at": "2026-08-10T11:46:36",
+            "id": "9d52362a-f803-4b9b-8c62-825ff90783a7",
+            "position": 3,
+            "value": 30.0,
+            "label": "des candidatures écartées par manque de clarté",
+            "prefix": null,
+            "suffix": "%"
+          }
+        ],
+        "slug": "rediger-un-cv-percutant-en-cote-divoire",
+        "title": "Rédiger un CV percutant en Côte d'Ivoire",
+        "excerpt": "Sur le marché de l'emploi en Côte d'Ivoire, les recruteurs reçoivent souvent un grand nombre de candidatures pour une seule offre. Votre CV doit donc être clair, orienté résultats et adapté au poste visé dès les premières secondes de lecture.",
+        "status": "published",
+        "published_at": "2026-08-09T02:46:36",
+        "seo_title": null,
+        "seo_description": "Structure, mots-clés, résultats chiffrés et erreurs à éviter pour créer un CV adapté au marché ivoirien."
+      }
+    },
+    "getArticlesSimilar": {
+      "request": {
+        "method": "GET",
+        "url": "/api/articles/rediger-un-cv-percutant-en-cote-divoire/related"
+      },
+      "status_code": 200,
+      "data": []
+    },
+    "getArticleCategories": {
+      "request": {
+        "method": "GET",
+        "url": "/api/articles/categories"
+      },
+      "status_code": 200,
+      "data": [
+        {
+          "created_at": "2026-08-10T11:46:36",
+          "updated_at": "2026-08-10T11:46:36",
+          "id": "b2046120-bdce-4c92-b0d5-1ae4ca0147d5",
+          "code": "cv-lettres",
+          "label": "CV & Lettres",
+          "slug": "cv-lettres",
+          "hue": "sky",
+          "icon_name": "file-text",
+          "sort_order": 1,
+          "is_active": true
+        }
+      ]
+    },
+    "getArticleFeatured": {
+      "request": {
+        "method": "GET",
+        "url": "/api/articles/featured"
+      },
+      "status_code": 200,
+      "data": [
+        {
+          "id": "3b273360-3af3-4a11-8dd8-e76c072854f9",
+          "slug": "rediger-un-cv-percutant-en-cote-divoire",
+          "title": "Rédiger un CV percutant en Côte d'Ivoire",
+          "excerpt": "Sur le marché de l'emploi en Côte d'Ivoire, les recruteurs reçoivent souvent un grand nombre de candidatures pour une seule offre. Votre CV doit donc être clair, orienté résultats et adapté au poste visé dès les premières secondes de lecture.",
+          "status": "published",
+          "is_featured": true,
+          "view_count": 240,
+          "reading_minutes": 6,
+          "published_at": "2026-08-09T02:46:36",
+          "category_id": "b2046120-bdce-4c92-b0d5-1ae4ca0147d5"
+        }
+      ]
+    },
+    "getArticlesDaily": {
+      "request": {
+        "method": "GET",
+        "url": "/api/articles/daily-tip"
+      },
+      "status_code": 200,
+      "data": {
+        "created_at": "2026-08-10T11:46:36",
+        "updated_at": "2026-08-10T11:46:36",
+        "id": "753a5c57-f3ce-4d18-b16e-796de5d66956",
+        "text": "Mettez à jour votre profil LinkedIn avec un titre clair, un résumé professionnel et des compétences liées aux offres visées.",
+        "rotation_order": 5,
+        "is_active": true,
+        "category_id": "c748aaca-0e72-4466-8f74-6f8cda22a285"
+      }
+    },
+    "getArticleSeries": {
+      "request": {
+        "method": "GET",
+        "url": "/api/articles/series"
+      },
+      "status_code": 200,
+      "data": [
+        {
+          "created_at": "2026-08-10T11:46:36",
+          "updated_at": "2026-08-10T11:46:36",
+          "id": "b363ec97-d4e7-46e5-889b-24515141c7c0",
+          "title": "Guides emploi JobAlert CI",
+          "slug": "guides-emploi-jobalert-ci",
+          "hue": "sky",
+          "description": "Une série de guides pratiques pour améliorer votre CV, réussir vos entretiens et mieux comprendre le marché de l'emploi en Côte d'Ivoire.",
+          "sort_order": 1,
+          "is_active": true
+        }
+      ]
+    },
+    "getArticlesPopular": {
+      "request": {
+        "method": "GET",
+        "url": "/api/articles/popular"
+      },
+      "status_code": 200,
+      "data": [
+        {
+          "id": "3b273360-3af3-4a11-8dd8-e76c072854f9",
+          "slug": "rediger-un-cv-percutant-en-cote-divoire",
+          "title": "Rédiger un CV percutant en Côte d'Ivoire",
+          "excerpt": "Sur le marché de l'emploi en Côte d'Ivoire, les recruteurs reçoivent souvent un grand nombre de candidatures pour une seule offre. Votre CV doit donc être clair, orienté résultats et adapté au poste visé dès les premières secondes de lecture.",
+          "status": "published",
+          "is_featured": true,
+          "view_count": 240,
+          "reading_minutes": 6,
+          "published_at": "2026-08-09T02:46:36",
+          "category_id": "b2046120-bdce-4c92-b0d5-1ae4ca0147d5"
+        }
+      ]
+    },
+    "incrementeView": {
+      "request": {
+        "method": "POST",
+        "url": "/api/articles/rediger-un-cv-percutant-en-cote-divoire/view"
+      },
+      "status_code": 200,
+      "data": {
+        "message": "View recorded",
+        "view_count": 241
+      }
+    }
+  },
+  "contact": {
+    "createContact": {
+      "request": {
+        "method": "POST",
+        "url": "/api/contact",
+        "json": {
+          "full_name": "Utilisateur Démo",
+          "email": "demo.jsonclaude@example.com",
+          "subject_code": "question_generale",
+          "message": "Ceci est un message de test envoyé pour générer un exemple de réponse API."
+        }
+      },
+      "status_code": 500,
+      "data": "Internal Server Error"
+    }
+  },
+  "filieres": {
+    "getFilieres": {
+      "request": {
+        "method": "GET",
+        "url": "/api/filieres"
+      },
+      "status_code": 200,
+      "data": [
+        {
+          "created_at": "2026-08-10T11:46:35",
+          "updated_at": "2026-08-10T11:46:35",
+          "id": "90c54ca6-af5e-44b2-a959-504bde79325f",
+          "code": "tech-dev",
+          "label": "Tech & Dev",
+          "slug": "tech-dev",
+          "hue": "sky",
+          "icon_name": "code",
+          "tagline": "Opportunités quotidiennes dans le domaine Tech & Dev.",
+          "description": "Offres d'emploi, missions et opportunités dans le secteur Tech & Dev en Côte d'Ivoire.",
+          "sort_order": 1,
+          "is_active": true,
+          "specialties": [
+            {
+              "created_at": "2026-08-10T11:46:35",
+              "updated_at": "2026-08-10T11:46:35",
+              "id": "7546e829-9c1b-4a33-ac19-20a1d0c64229",
+              "code": "tech-dev-pilotage",
+              "label": "Pilotage",
+              "sort_order": 1,
+              "is_active": true
+            },
+            {
+              "created_at": "2026-08-10T11:46:35",
+              "updated_at": "2026-08-10T11:46:35",
+              "id": "c6629b13-810d-4c92-9173-cb1caea5be24",
+              "code": "tech-dev-analyse",
+              "label": "Analyse",
+              "sort_order": 2,
+              "is_active": true
+            },
+            {
+              "created_at": "2026-08-10T11:46:35",
+              "updated_at": "2026-08-10T11:46:35",
+              "id": "f087ef88-3fc6-4083-99a6-e17b1f17f1e4",
+              "code": "tech-dev-deploiement",
+              "label": "Déploiement",
+              "sort_order": 3,
+              "is_active": true
+            }
+          ],
+          "stats": {
+            "active_offers": 7,
+            "new_offers": 0,
+            "subscribers": 1
+          }
+        }
+      ]
+    },
+    "getFilieresBySlug": {
+      "request": {
+        "method": "GET",
+        "url": "/api/filieres/tech-dev"
+      },
+      "status_code": 200,
+      "data": {
+        "created_at": "2026-08-10T11:46:35",
+        "updated_at": "2026-08-10T11:46:35",
+        "id": "90c54ca6-af5e-44b2-a959-504bde79325f",
+        "code": "tech-dev",
+        "label": "Tech & Dev",
+        "slug": "tech-dev",
+        "hue": "sky",
+        "icon_name": "code",
+        "tagline": "Opportunités quotidiennes dans le domaine Tech & Dev.",
+        "description": "Offres d'emploi, missions et opportunités dans le secteur Tech & Dev en Côte d'Ivoire.",
+        "sort_order": 1,
+        "is_active": true,
+        "specialties": [
+          {
+            "created_at": "2026-08-10T11:46:35",
+            "updated_at": "2026-08-10T11:46:35",
+            "id": "7546e829-9c1b-4a33-ac19-20a1d0c64229",
+            "code": "tech-dev-pilotage",
+            "label": "Pilotage",
+            "sort_order": 1,
+            "is_active": true
+          },
+          {
+            "created_at": "2026-08-10T11:46:35",
+            "updated_at": "2026-08-10T11:46:35",
+            "id": "c6629b13-810d-4c92-9173-cb1caea5be24",
+            "code": "tech-dev-analyse",
+            "label": "Analyse",
+            "sort_order": 2,
+            "is_active": true
+          },
+          {
+            "created_at": "2026-08-10T11:46:35",
+            "updated_at": "2026-08-10T11:46:35",
+            "id": "f087ef88-3fc6-4083-99a6-e17b1f17f1e4",
+            "code": "tech-dev-deploiement",
+            "label": "Déploiement",
+            "sort_order": 3,
+            "is_active": true
+          }
+        ],
+        "stats": {
+          "active_offers": 7,
+          "new_offers": 0,
+          "subscribers": 1
+        }
+      }
+    },
+    "getFiliereOffers": {
+      "request": {
+        "method": "GET",
+        "url": "/api/filieres/tech-dev/offers"
+      },
+      "status_code": 200,
+      "data": [
+        {
+          "created_at": "2026-08-10T11:46:35",
+          "updated_at": "2026-08-10T11:46:35",
+          "id": "a0236743-1bbe-4787-8a7d-9cdc28f1796c",
+          "public_id": 10007,
+          "title": "QA Automation Engineer",
+          "normalized_title": "qa automation engineer",
+          "slug": "qa-automation-engineer-abidjan-digital-labs-in-00007",
+          "status": "active",
+          "origin": "scraping",
+          "visible_site": true,
+          "source_reference": "IN-00007",
+          "source_url": "https://www.linkedin.com/offres/qa-automation-engineer-abidjan-digital-labs-in-00007",
+          "canonical_url": "https://www.linkedin.com/offres/in-00007",
+          "location_raw": "Yamoussoukro - Centre",
+          "salary_raw": "Salaire selon profil",
+          "published_at": "2026-07-21T01:35:35",
+          "collected_at": "2026-07-21T02:47:35",
+          "first_seen_at": "2026-07-21T02:47:35",
+          "last_seen_at": "2026-07-23T05:47:35",
+          "expires_at": "2026-09-04T11:46:35",
+          "application_deadline_at": "2026-08-24T11:46:35",
+          "view_count": 186,
+          "save_count": 16,
+          "company": {
+            "created_at": "2026-08-10T11:46:35",
+            "updated_at": "2026-08-10T11:46:35",
+            "id": "a5293130-728f-4082-915e-32194457a379",
+            "name": "Abidjan Digital Labs",
+            "normalized_name": "abidjan digital labs",
+            "slug": "abidjan-digital-labs",
+            "website_url": "https://www.abidjandigitallabs.ci",
+            "logo_url": "https://cdn.jobalert.ci/companies/abidjan-digital-labs.png",
+            "description": "Abidjan Digital Labs recrute régulièrement dans le secteur Tech & Dev en Côte d'Ivoire."
+          },
+          "source": {
+            "created_at": "2026-08-10T11:46:35",
+            "updated_at": "2026-08-10T11:46:35",
+            "id": "70f7947c-fc0b-4daa-b91a-a5bc45fd8312",
+            "code": "linkedin",
+            "name": "LinkedIn",
+            "slug": "linkedin",
+            "base_url": "https://www.linkedin.com",
+            "jobs_url": "https://www.linkedin.com/jobs",
+            "logo_path": "/static/sources/linkedin.png",
+            "color_hex": "#0A66C2",
+            "short_code": "IN",
+            "status": "active",
+            "priority": 40,
+            "supports_scraping": true,
+            "anti_scraping_level": 4,
+            "default_scan_time": "06:30",
+            "description": "Réseau professionnel international.",
+            "notes": "Protections anti-scraping fortes : délais et plan de repli requis.",
+            "is_primary": false
+          },
+          "location": {
+            "created_at": "2026-08-10T11:46:35",
+            "updated_at": "2026-08-10T11:46:35",
+            "id": "8fca54d5-ac3b-4b69-a9bb-67f3c0f96dde",
+            "country_code": "CI",
+            "city": "Yamoussoukro",
+            "district": "Centre",
+            "label": "Yamoussoukro - Centre",
+            "normalized_label": "yamoussoukro centre",
+            "is_remote": false,
+            "is_active": true
+          },
+          "primary_filiere": {
+            "created_at": "2026-08-10T11:46:35",
+            "updated_at": "2026-08-10T11:46:35",
+            "id": "90c54ca6-af5e-44b2-a959-504bde79325f",
+            "code": "tech-dev",
+            "label": "Tech & Dev",
+            "slug": "tech-dev",
+            "hue": "sky",
+            "icon_name": "code",
+            "tagline": "Opportunités quotidiennes dans le domaine Tech & Dev.",
+            "description": "Offres d'emploi, missions et opportunités dans le secteur Tech & Dev en Côte d'Ivoire.",
+            "sort_order": 1,
+            "is_active": true,
+            "specialties": [
+              {
+                "created_at": "2026-08-10T11:46:35",
+                "updated_at": "2026-08-10T11:46:35",
+                "id": "7546e829-9c1b-4a33-ac19-20a1d0c64229",
+                "code": "tech-dev-pilotage",
+                "label": "Pilotage",
+                "sort_order": 1,
+                "is_active": true
+              },
+              {
+                "created_at": "2026-08-10T11:46:35",
+                "updated_at": "2026-08-10T11:46:35",
+                "id": "c6629b13-810d-4c92-9173-cb1caea5be24",
+                "code": "tech-dev-analyse",
+                "label": "Analyse",
+                "sort_order": 2,
+                "is_active": true
+              },
+              {
+                "created_at": "2026-08-10T11:46:35",
+                "updated_at": "2026-08-10T11:46:35",
+                "id": "f087ef88-3fc6-4083-99a6-e17b1f17f1e4",
+                "code": "tech-dev-deploiement",
+                "label": "Déploiement",
+                "sort_order": 3,
+                "is_active": true
+              }
+            ]
+          },
+          "specialty": {
+            "created_at": "2026-08-10T11:46:35",
+            "updated_at": "2026-08-10T11:46:35",
+            "id": "7546e829-9c1b-4a33-ac19-20a1d0c64229",
+            "code": "tech-dev-pilotage",
+            "label": "Pilotage",
+            "sort_order": 1,
+            "is_active": true
+          },
+          "contract_type": {
+            "created_at": "2026-08-10T11:46:35",
+            "updated_at": "2026-08-10T11:46:35",
+            "id": "46d92eec-b361-4efb-990e-0b45709e7fbc",
+            "code": "mission",
+            "label": "Mission",
+            "sort_order": 4,
+            "is_active": true
+          },
+          "experience_level": {
+            "created_at": "2026-08-10T11:46:35",
+            "updated_at": "2026-08-10T11:46:35",
+            "id": "23a50a82-809f-46e4-bc17-3611b6236c19",
+            "code": "5-plus",
+            "label": "5 ans et plus",
+            "min_years": 5,
+            "max_years": null,
+            "sort_order": 4,
+            "is_active": true
+          },
+          "education_level": {
+            "created_at": "2026-08-10T11:46:35",
+            "updated_at": "2026-08-10T11:46:35",
+            "id": "9791f30c-ec6c-475e-9174-8647a85e0caf",
+            "code": "bac-5",
+            "label": "Bac+5",
+            "rank": 5,
+            "sort_order": 4,
+            "is_active": true
+          },
+          "detail": {
+            "created_at": "2026-08-10T11:46:35",
+            "updated_at": "2026-08-10T11:46:35",
+            "id": "23a3f88d-325f-45b5-8175-3656a25b8689",
+            "intro": "Abidjan Digital Labs recrute un(e) QA Automation Engineer pour renforcer son équipe Tech & Dev à Yamoussoukro - Centre. Le poste est proposé en Mission et s'adresse à un profil 5 ans et plus.",
+            "missions": [
+              "Participer activement aux projets Tech & Dev de Abidjan Digital Labs.",
+              "Assurer le suivi opérationnel des activités liées au poste QA Automation Engineer.",
+              "Collaborer avec les équipes internes pour améliorer les processus.",
+              "Contribuer à la qualité de service et à la satisfaction des parties prenantes."
+            ],
+            "profile_requirements": [
+              "Expérience ou formation en lien avec le domaine Tech & Dev.",
+              "Bonne capacité d'adaptation à un environnement Mission.",
+              "Esprit d'analyse, rigueur et autonomie.",
+              "Excellente communication orale et écrite."
+            ],
+            "benefits": [
+              "Package salarial attractif selon profil",
+              "Formation continue et perspectives d'évolution",
+              "Environnement de travail dynamique"
+            ],
+            "tags": [
+              "Tech & Dev",
+              "Mission",
+              "5 ans et plus",
+              "Bac+5",
+              "Yamoussoukro",
+              "Côte d'Ivoire"
+            ],
+            "source_text": "Titre : QA Automation Engineer\nEntreprise : Abidjan Digital Labs\nLocalisation : Yamoussoukro - Centre\nContrat : Mission\nExpérience : 5 ans et plus\nFormation : Bac+5\nSalaire : Salaire selon profil\n\nAbidjan Digital Labs recrute un(e) QA Automation Engineer pour renforcer son équipe Tech & Dev à Yamoussoukro - Centre. Le poste est proposé en Mission et s'adresse à un profil 5 ans et plus.\n\nMissions :\n- Participer activement aux projets Tech & Dev de Abidjan Digital Labs.\n- Assurer le suivi opérationnel des activités liées au poste QA Automation Engineer.\n- Collaborer avec les équipes internes pour améliorer les processus.\n- Contribuer à la qualité de service et à la satisfaction des parties prenantes.\n\nProfil recherché :\n- Expérience ou formation en lien avec le domaine Tech & Dev.\n- Bonne capacité d'adaptation à un environnement Mission.\n- Esprit d'analyse, rigueur et autonomie.\n- Excellente communication orale et écrite.\n\nAvantages :\n- Package salarial attractif selon profil\n- Formation continue et perspectives d'évolution\n- Environnement de travail dynamique",
+            "is_manual": false
+          }
+        }
+      ]
+    },
+    "getFilieresStats": {
+      "request": {
+        "method": "GET",
+        "url": "/api/filieres/tech-dev/stats"
+      },
+      "status_code": 200,
+      "data": {
+        "active_offers": 7,
+        "new_offers": 0,
+        "subscribers": 1
+      }
+    }
+  },
+  "offers": {
+    "getOffers": {
+      "request": {
+        "method": "GET",
+        "url": "/api/offers"
+      },
+      "status_code": 200,
+      "data": [
+        {
+          "created_at": "2026-08-10T11:46:36",
+          "updated_at": "2026-08-10T11:46:36",
+          "id": "3bf36ef4-1929-43b9-b95b-502f2572a140",
+          "public_id": 10047,
+          "title": "Responsable Supply Chain",
+          "normalized_title": "responsable supply chain",
+          "slug": "responsable-supply-chain-transcargo-ci-in-00047",
+          "status": "active",
+          "origin": "scraping",
+          "visible_site": true,
+          "source_reference": "IN-00047",
+          "source_url": "https://www.linkedin.com/offres/responsable-supply-chain-transcargo-ci-in-00047",
+          "canonical_url": "https://www.linkedin.com/offres/in-00047",
+          "location_raw": "Abidjan - Plateau",
+          "salary_raw": "650 000 - 900 000 FCFA / mois",
+          "published_at": "2026-08-06T01:40:35",
+          "collected_at": "2026-08-06T02:52:35",
+          "first_seen_at": "2026-08-06T02:52:35",
+          "last_seen_at": "2026-08-08T05:52:35",
+          "expires_at": "2026-09-02T11:46:35",
+          "application_deadline_at": "2026-08-22T11:46:35",
+          "view_count": 774,
+          "save_count": 65,
+          "company": {
+            "created_at": "2026-08-10T11:46:35",
+            "updated_at": "2026-08-10T11:46:35",
+            "id": "08f1d8cd-7fd6-4cee-b162-fa242dd7bdac",
+            "name": "TransCargo CI",
+            "normalized_name": "transcargo ci",
+            "slug": "transcargo-ci",
+            "website_url": "https://www.transcargoci.ci",
+            "logo_url": "https://cdn.jobalert.ci/companies/transcargo-ci.png",
+            "description": "TransCargo CI recrute régulièrement dans le secteur Logistique & Transport en Côte d'Ivoire."
+          },
+          "source": {
+            "created_at": "2026-08-10T11:46:35",
+            "updated_at": "2026-08-10T11:46:35",
+            "id": "70f7947c-fc0b-4daa-b91a-a5bc45fd8312",
+            "code": "linkedin",
+            "name": "LinkedIn",
+            "slug": "linkedin",
+            "base_url": "https://www.linkedin.com",
+            "jobs_url": "https://www.linkedin.com/jobs",
+            "logo_path": "/static/sources/linkedin.png",
+            "color_hex": "#0A66C2",
+            "short_code": "IN",
+            "status": "active",
+            "priority": 40,
+            "supports_scraping": true,
+            "anti_scraping_level": 4,
+            "default_scan_time": "06:30",
+            "description": "Réseau professionnel international.",
+            "notes": "Protections anti-scraping fortes : délais et plan de repli requis.",
+            "is_primary": false
+          },
+          "location": {
+            "created_at": "2026-08-10T11:46:35",
+            "updated_at": "2026-08-10T11:46:35",
+            "id": "dbf6e9ea-a622-4352-ab64-8852126334bb",
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": "Plateau",
+            "label": "Abidjan - Plateau",
+            "normalized_label": "abidjan plateau",
+            "is_remote": false,
+            "is_active": true
+          },
+          "primary_filiere": {
+            "created_at": "2026-08-10T11:46:35",
+            "updated_at": "2026-08-10T11:46:35",
+            "id": "80695c08-c20e-444c-ae5c-fc30ef1c03a9",
+            "code": "logistique-transport",
+            "label": "Logistique & Transport",
+            "slug": "logistique-transport",
+            "hue": "cyan",
+            "icon_name": "truck",
+            "tagline": "Opportunités quotidiennes dans le domaine Logistique & Transport.",
+            "description": "Offres d'emploi, missions et opportunités dans le secteur Logistique & Transport en Côte d'Ivoire.",
+            "sort_order": 7,
+            "is_active": true,
+            "specialties": [
+              {
+                "created_at": "2026-08-10T11:46:35",
+                "updated_at": "2026-08-10T11:46:35",
+                "id": "ca1b2f56-21ac-4bcf-a386-82bc691b3791",
+                "code": "logistique-transport-pilotage",
+                "label": "Pilotage",
+                "sort_order": 1,
+                "is_active": true
+              },
+              {
+                "created_at": "2026-08-10T11:46:35",
+                "updated_at": "2026-08-10T11:46:35",
+                "id": "410da454-7643-40db-b4db-ec266a72d6ed",
+                "code": "logistique-transport-analyse",
+                "label": "Analyse",
+                "sort_order": 2,
+                "is_active": true
+              },
+              {
+                "created_at": "2026-08-10T11:46:35",
+                "updated_at": "2026-08-10T11:46:35",
+                "id": "a7afe8bf-0c1f-44d5-9eed-85e294b46f15",
+                "code": "logistique-transport-deploiement",
+                "label": "Déploiement",
+                "sort_order": 3,
+                "is_active": true
+              }
+            ]
+          },
+          "specialty": {
+            "created_at": "2026-08-10T11:46:35",
+            "updated_at": "2026-08-10T11:46:35",
+            "id": "410da454-7643-40db-b4db-ec266a72d6ed",
+            "code": "logistique-transport-analyse",
+            "label": "Analyse",
+            "sort_order": 2,
+            "is_active": true
+          },
+          "contract_type": {
+            "created_at": "2026-08-10T11:46:35",
+            "updated_at": "2026-08-10T11:46:35",
+            "id": "d14a8ec6-fc3f-49af-a0f3-39cd46476882",
+            "code": "cdd",
+            "label": "CDD",
+            "sort_order": 2,
+            "is_active": true
+          },
+          "experience_level": {
+            "created_at": "2026-08-10T11:46:35",
+            "updated_at": "2026-08-10T11:46:35",
+            "id": "9950b913-5f8d-4afe-97c2-63c29330a269",
+            "code": "1-3",
+            "label": "1-3 ans",
+            "min_years": 1,
+            "max_years": 3,
+            "sort_order": 2,
+            "is_active": true
+          },
+          "education_level": {
+            "created_at": "2026-08-10T11:46:35",
+            "updated_at": "2026-08-10T11:46:35",
+            "id": "36852835-d64a-4ff2-9c7a-5c9a764ba9e1",
+            "code": "bac-3",
+            "label": "Bac+3",
+            "rank": 3,
+            "sort_order": 3,
+            "is_active": true
+          },
+          "detail": {
+            "created_at": "2026-08-10T11:46:36",
+            "updated_at": "2026-08-10T11:46:36",
+            "id": "834cedf7-8458-4113-9ec8-416dc7615a0d",
+            "intro": "TransCargo CI recrute un(e) Responsable Supply Chain pour renforcer son équipe Logistique & Transport à Abidjan - Plateau. Le poste est proposé en CDD et s'adresse à un profil 1-3 ans.",
+            "missions": [
+              "Participer activement aux projets Logistique & Transport de TransCargo CI.",
+              "Assurer le suivi opérationnel des activités liées au poste Responsable Supply Chain.",
+              "Collaborer avec les équipes internes pour améliorer les processus.",
+              "Contribuer à la qualité de service et à la satisfaction des parties prenantes."
+            ],
+            "profile_requirements": [
+              "Expérience ou formation en lien avec le domaine Logistique & Transport.",
+              "Bonne capacité d'adaptation à un environnement CDD.",
+              "Esprit d'analyse, rigueur et autonomie.",
+              "Excellente communication orale et écrite."
+            ],
+            "benefits": [
+              "Package salarial attractif selon profil",
+              "Formation continue et perspectives d'évolution",
+              "Environnement de travail dynamique"
+            ],
+            "tags": [
+              "Logistique & Transport",
+              "CDD",
+              "1-3 ans",
+              "Bac+3",
+              "Abidjan",
+              "Côte d'Ivoire"
+            ],
+            "source_text": "Titre : Responsable Supply Chain\nEntreprise : TransCargo CI\nLocalisation : Abidjan - Plateau\nContrat : CDD\nExpérience : 1-3 ans\nFormation : Bac+3\nSalaire : 650 000 - 900 000 FCFA / mois\n\nTransCargo CI recrute un(e) Responsable Supply Chain pour renforcer son équipe Logistique & Transport à Abidjan - Plateau. Le poste est proposé en CDD et s'adresse à un profil 1-3 ans.\n\nMissions :\n- Participer activement aux projets Logistique & Transport de TransCargo CI.\n- Assurer le suivi opérationnel des activités liées au poste Responsable Supply Chain.\n- Collaborer avec les équipes internes pour améliorer les processus.\n- Contribuer à la qualité de service et à la satisfaction des parties prenantes.\n\nProfil recherché :\n- Expérience ou formation en lien avec le domaine Logistique & Transport.\n- Bonne capacité d'adaptation à un environnement CDD.\n- Esprit d'analyse, rigueur et autonomie.\n- Excellente communication orale et écrite.\n\nAvantages :\n- Package salarial attractif selon profil\n- Formation continue et perspectives d'évolution\n- Environnement de travail dynamique",
+            "is_manual": false
+          }
+        }
+      ]
+    },
+    "getOfferById": {
+      "request": {
+        "method": "GET",
+        "url": "/api/offers/3547ed76-47c0-4315-847e-1b32d56331e5"
+      },
+      "status_code": 200,
+      "data": {
+        "created_at": "2026-08-10T11:46:35",
+        "updated_at": "2026-08-10T11:46:35",
+        "id": "3547ed76-47c0-4315-847e-1b32d56331e5",
+        "public_id": 10001,
+        "title": "Développeur Full Stack Python / React",
+        "normalized_title": "developpeur full stack python react",
+        "slug": "developpeur-full-stack-python-react-abidjan-digital-labs-ga-00001",
+        "status": "active",
+        "origin": "scraping",
+        "visible_site": true,
+        "source_reference": "GA-00001",
+        "source_url": "https://www.goafricaonline.com/offres/developpeur-full-stack-python-react-abidjan-digital-labs-ga-00001",
+        "canonical_url": "https://www.goafricaonline.com/offres/ga-00001",
+        "location_raw": "Abidjan - Koumassi",
+        "salary_raw": "250 000 - 400 000 FCFA / mois",
+        "published_at": "2026-07-14T18:53:35",
+        "collected_at": "2026-07-14T20:05:35",
+        "first_seen_at": "2026-07-14T20:05:35",
+        "last_seen_at": "2026-07-16T23:05:35",
+        "expires_at": "2026-08-29T11:46:35",
+        "application_deadline_at": "2026-08-18T11:46:35",
+        "view_count": 729,
+        "save_count": 100,
+        "company": {
+          "created_at": "2026-08-10T11:46:35",
+          "updated_at": "2026-08-10T11:46:35",
+          "id": "a5293130-728f-4082-915e-32194457a379",
+          "name": "Abidjan Digital Labs",
+          "normalized_name": "abidjan digital labs",
+          "slug": "abidjan-digital-labs",
+          "website_url": "https://www.abidjandigitallabs.ci",
+          "logo_url": "https://cdn.jobalert.ci/companies/abidjan-digital-labs.png",
+          "description": "Abidjan Digital Labs recrute régulièrement dans le secteur Tech & Dev en Côte d'Ivoire."
+        },
+        "source": {
+          "created_at": "2026-08-10T11:46:35",
+          "updated_at": "2026-08-10T11:46:35",
+          "id": "24a7b746-e0d7-458c-91d6-31bffaaad4e7",
+          "code": "goafrica",
+          "name": "Go Africa Online",
+          "slug": "goafrica",
+          "base_url": "https://www.goafricaonline.com",
+          "jobs_url": "https://www.goafricaonline.com/offres",
+          "logo_path": "/static/sources/goafrica.png",
+          "color_hex": "#1D4ED8",
+          "short_code": "GA",
+          "status": "active",
+          "priority": 20,
+          "supports_scraping": true,
+          "anti_scraping_level": 1,
+          "default_scan_time": "06:10",
+          "description": "Site emploi à couverture régionale africaine.",
+          "notes": "Contrôler la pagination et les libellés de filière.",
+          "is_primary": true
+        },
+        "location": {
+          "created_at": "2026-08-10T11:46:35",
+          "updated_at": "2026-08-10T11:46:35",
+          "id": "e948d946-3064-4b6a-8525-962cfde800b9",
+          "country_code": "CI",
+          "city": "Abidjan",
+          "district": "Koumassi",
+          "label": "Abidjan - Koumassi",
+          "normalized_label": "abidjan koumassi",
+          "is_remote": false,
+          "is_active": true
+        },
+        "primary_filiere": {
+          "created_at": "2026-08-10T11:46:35",
+          "updated_at": "2026-08-10T11:46:35",
+          "id": "90c54ca6-af5e-44b2-a959-504bde79325f",
+          "code": "tech-dev",
+          "label": "Tech & Dev",
+          "slug": "tech-dev",
+          "hue": "sky",
+          "icon_name": "code",
+          "tagline": "Opportunités quotidiennes dans le domaine Tech & Dev.",
+          "description": "Offres d'emploi, missions et opportunités dans le secteur Tech & Dev en Côte d'Ivoire.",
+          "sort_order": 1,
+          "is_active": true,
+          "specialties": [
+            {
+              "created_at": "2026-08-10T11:46:35",
+              "updated_at": "2026-08-10T11:46:35",
+              "id": "7546e829-9c1b-4a33-ac19-20a1d0c64229",
+              "code": "tech-dev-pilotage",
+              "label": "Pilotage",
+              "sort_order": 1,
+              "is_active": true
+            },
+            {
+              "created_at": "2026-08-10T11:46:35",
+              "updated_at": "2026-08-10T11:46:35",
+              "id": "c6629b13-810d-4c92-9173-cb1caea5be24",
+              "code": "tech-dev-analyse",
+              "label": "Analyse",
+              "sort_order": 2,
+              "is_active": true
+            },
+            {
+              "created_at": "2026-08-10T11:46:35",
+              "updated_at": "2026-08-10T11:46:35",
+              "id": "f087ef88-3fc6-4083-99a6-e17b1f17f1e4",
+              "code": "tech-dev-deploiement",
+              "label": "Déploiement",
+              "sort_order": 3,
+              "is_active": true
+            }
+          ]
+        },
+        "specialty": {
+          "created_at": "2026-08-10T11:46:35",
+          "updated_at": "2026-08-10T11:46:35",
+          "id": "7546e829-9c1b-4a33-ac19-20a1d0c64229",
+          "code": "tech-dev-pilotage",
+          "label": "Pilotage",
+          "sort_order": 1,
+          "is_active": true
+        },
+        "contract_type": {
+          "created_at": "2026-08-10T11:46:35",
+          "updated_at": "2026-08-10T11:46:35",
+          "id": "d14a8ec6-fc3f-49af-a0f3-39cd46476882",
+          "code": "cdd",
+          "label": "CDD",
+          "sort_order": 2,
+          "is_active": true
+        },
+        "experience_level": {
+          "created_at": "2026-08-10T11:46:35",
+          "updated_at": "2026-08-10T11:46:35",
+          "id": "9950b913-5f8d-4afe-97c2-63c29330a269",
+          "code": "1-3",
+          "label": "1-3 ans",
+          "min_years": 1,
+          "max_years": 3,
+          "sort_order": 2,
+          "is_active": true
+        },
+        "education_level": {
+          "created_at": "2026-08-10T11:46:35",
+          "updated_at": "2026-08-10T11:46:35",
+          "id": "732f3859-84d4-4931-82e7-7c6158676382",
+          "code": "bac-2",
+          "label": "Bac+2",
+          "rank": 2,
+          "sort_order": 2,
+          "is_active": true
+        },
+        "detail": {
+          "created_at": "2026-08-10T11:46:35",
+          "updated_at": "2026-08-10T11:46:35",
+          "id": "cd64aa2b-4519-48c4-a61c-a42e12a96f57",
+          "intro": "Abidjan Digital Labs recrute un(e) Développeur Full Stack Python / React pour renforcer son équipe Tech & Dev à Abidjan - Koumassi. Le poste est proposé en CDD et s'adresse à un profil 1-3 ans.",
+          "missions": [
+            "Participer activement aux projets Tech & Dev de Abidjan Digital Labs.",
+            "Assurer le suivi opérationnel des activités liées au poste Développeur Full Stack Python / React.",
+            "Collaborer avec les équipes internes pour améliorer les processus.",
+            "Contribuer à la qualité de service et à la satisfaction des parties prenantes."
+          ],
+          "profile_requirements": [
+            "Expérience ou formation en lien avec le domaine Tech & Dev.",
+            "Bonne capacité d'adaptation à un environnement CDD.",
+            "Esprit d'analyse, rigueur et autonomie.",
+            "Excellente communication orale et écrite."
+          ],
+          "benefits": [
+            "Package salarial attractif selon profil",
+            "Formation continue et perspectives d'évolution",
+            "Environnement de travail dynamique"
+          ],
+          "tags": [
+            "Tech & Dev",
+            "CDD",
+            "1-3 ans",
+            "Bac+2",
+            "Abidjan",
+            "Côte d'Ivoire"
+          ],
+          "source_text": "Titre : Développeur Full Stack Python / React\nEntreprise : Abidjan Digital Labs\nLocalisation : Abidjan - Koumassi\nContrat : CDD\nExpérience : 1-3 ans\nFormation : Bac+2\nSalaire : 250 000 - 400 000 FCFA / mois\n\nAbidjan Digital Labs recrute un(e) Développeur Full Stack Python / React pour renforcer son équipe Tech & Dev à Abidjan - Koumassi. Le poste est proposé en CDD et s'adresse à un profil 1-3 ans.\n\nMissions :\n- Participer activement aux projets Tech & Dev de Abidjan Digital Labs.\n- Assurer le suivi opérationnel des activités liées au poste Développeur Full Stack Python / React.\n- Collaborer avec les équipes internes pour améliorer les processus.\n- Contribuer à la qualité de service et à la satisfaction des parties prenantes.\n\nProfil recherché :\n- Expérience ou formation en lien avec le domaine Tech & Dev.\n- Bonne capacité d'adaptation à un environnement CDD.\n- Esprit d'analyse, rigueur et autonomie.\n- Excellente communication orale et écrite.\n\nAvantages :\n- Package salarial attractif selon profil\n- Formation continue et perspectives d'évolution\n- Environnement de travail dynamique",
+          "is_manual": false
+        }
+      }
+    },
+    "getSimilarOffers": {
+      "request": {
+        "method": "GET",
+        "url": "/api/offers/3547ed76-47c0-4315-847e-1b32d56331e5/similar"
+      },
+      "status_code": 200,
+      "data": [
+        {
+          "created_at": "2026-08-10T11:46:35",
+          "updated_at": "2026-08-10T11:46:35",
+          "id": "a0236743-1bbe-4787-8a7d-9cdc28f1796c",
+          "public_id": 10007,
+          "title": "QA Automation Engineer",
+          "normalized_title": "qa automation engineer",
+          "slug": "qa-automation-engineer-abidjan-digital-labs-in-00007",
+          "status": "active",
+          "origin": "scraping",
+          "visible_site": true,
+          "source_reference": "IN-00007",
+          "source_url": "https://www.linkedin.com/offres/qa-automation-engineer-abidjan-digital-labs-in-00007",
+          "canonical_url": "https://www.linkedin.com/offres/in-00007",
+          "location_raw": "Yamoussoukro - Centre",
+          "salary_raw": "Salaire selon profil",
+          "published_at": "2026-07-21T01:35:35",
+          "collected_at": "2026-07-21T02:47:35",
+          "first_seen_at": "2026-07-21T02:47:35",
+          "last_seen_at": "2026-07-23T05:47:35",
+          "expires_at": "2026-09-04T11:46:35",
+          "application_deadline_at": "2026-08-24T11:46:35",
+          "view_count": 186,
+          "save_count": 16,
+          "company": {
+            "created_at": "2026-08-10T11:46:35",
+            "updated_at": "2026-08-10T11:46:35",
+            "id": "a5293130-728f-4082-915e-32194457a379",
+            "name": "Abidjan Digital Labs",
+            "normalized_name": "abidjan digital labs",
+            "slug": "abidjan-digital-labs",
+            "website_url": "https://www.abidjandigitallabs.ci",
+            "logo_url": "https://cdn.jobalert.ci/companies/abidjan-digital-labs.png",
+            "description": "Abidjan Digital Labs recrute régulièrement dans le secteur Tech & Dev en Côte d'Ivoire."
+          },
+          "source": {
+            "created_at": "2026-08-10T11:46:35",
+            "updated_at": "2026-08-10T11:46:35",
+            "id": "70f7947c-fc0b-4daa-b91a-a5bc45fd8312",
+            "code": "linkedin",
+            "name": "LinkedIn",
+            "slug": "linkedin",
+            "base_url": "https://www.linkedin.com",
+            "jobs_url": "https://www.linkedin.com/jobs",
+            "logo_path": "/static/sources/linkedin.png",
+            "color_hex": "#0A66C2",
+            "short_code": "IN",
+            "status": "active",
+            "priority": 40,
+            "supports_scraping": true,
+            "anti_scraping_level": 4,
+            "default_scan_time": "06:30",
+            "description": "Réseau professionnel international.",
+            "notes": "Protections anti-scraping fortes : délais et plan de repli requis.",
+            "is_primary": false
+          },
+          "location": {
+            "created_at": "2026-08-10T11:46:35",
+            "updated_at": "2026-08-10T11:46:35",
+            "id": "8fca54d5-ac3b-4b69-a9bb-67f3c0f96dde",
+            "country_code": "CI",
+            "city": "Yamoussoukro",
+            "district": "Centre",
+            "label": "Yamoussoukro - Centre",
+            "normalized_label": "yamoussoukro centre",
+            "is_remote": false,
+            "is_active": true
+          },
+          "primary_filiere": {
+            "created_at": "2026-08-10T11:46:35",
+            "updated_at": "2026-08-10T11:46:35",
+            "id": "90c54ca6-af5e-44b2-a959-504bde79325f",
+            "code": "tech-dev",
+            "label": "Tech & Dev",
+            "slug": "tech-dev",
+            "hue": "sky",
+            "icon_name": "code",
+            "tagline": "Opportunités quotidiennes dans le domaine Tech & Dev.",
+            "description": "Offres d'emploi, missions et opportunités dans le secteur Tech & Dev en Côte d'Ivoire.",
+            "sort_order": 1,
+            "is_active": true,
+            "specialties": [
+              {
+                "created_at": "2026-08-10T11:46:35",
+                "updated_at": "2026-08-10T11:46:35",
+                "id": "7546e829-9c1b-4a33-ac19-20a1d0c64229",
+                "code": "tech-dev-pilotage",
+                "label": "Pilotage",
+                "sort_order": 1,
+                "is_active": true
+              },
+              {
+                "created_at": "2026-08-10T11:46:35",
+                "updated_at": "2026-08-10T11:46:35",
+                "id": "c6629b13-810d-4c92-9173-cb1caea5be24",
+                "code": "tech-dev-analyse",
+                "label": "Analyse",
+                "sort_order": 2,
+                "is_active": true
+              },
+              {
+                "created_at": "2026-08-10T11:46:35",
+                "updated_at": "2026-08-10T11:46:35",
+                "id": "f087ef88-3fc6-4083-99a6-e17b1f17f1e4",
+                "code": "tech-dev-deploiement",
+                "label": "Déploiement",
+                "sort_order": 3,
+                "is_active": true
+              }
+            ]
+          },
+          "specialty": {
+            "created_at": "2026-08-10T11:46:35",
+            "updated_at": "2026-08-10T11:46:35",
+            "id": "7546e829-9c1b-4a33-ac19-20a1d0c64229",
+            "code": "tech-dev-pilotage",
+            "label": "Pilotage",
+            "sort_order": 1,
+            "is_active": true
+          },
+          "contract_type": {
+            "created_at": "2026-08-10T11:46:35",
+            "updated_at": "2026-08-10T11:46:35",
+            "id": "46d92eec-b361-4efb-990e-0b45709e7fbc",
+            "code": "mission",
+            "label": "Mission",
+            "sort_order": 4,
+            "is_active": true
+          },
+          "experience_level": {
+            "created_at": "2026-08-10T11:46:35",
+            "updated_at": "2026-08-10T11:46:35",
+            "id": "23a50a82-809f-46e4-bc17-3611b6236c19",
+            "code": "5-plus",
+            "label": "5 ans et plus",
+            "min_years": 5,
+            "max_years": null,
+            "sort_order": 4,
+            "is_active": true
+          },
+          "education_level": {
+            "created_at": "2026-08-10T11:46:35",
+            "updated_at": "2026-08-10T11:46:35",
+            "id": "9791f30c-ec6c-475e-9174-8647a85e0caf",
+            "code": "bac-5",
+            "label": "Bac+5",
+            "rank": 5,
+            "sort_order": 4,
+            "is_active": true
+          },
+          "detail": {
+            "created_at": "2026-08-10T11:46:35",
+            "updated_at": "2026-08-10T11:46:35",
+            "id": "23a3f88d-325f-45b5-8175-3656a25b8689",
+            "intro": "Abidjan Digital Labs recrute un(e) QA Automation Engineer pour renforcer son équipe Tech & Dev à Yamoussoukro - Centre. Le poste est proposé en Mission et s'adresse à un profil 5 ans et plus.",
+            "missions": [
+              "Participer activement aux projets Tech & Dev de Abidjan Digital Labs.",
+              "Assurer le suivi opérationnel des activités liées au poste QA Automation Engineer.",
+              "Collaborer avec les équipes internes pour améliorer les processus.",
+              "Contribuer à la qualité de service et à la satisfaction des parties prenantes."
+            ],
+            "profile_requirements": [
+              "Expérience ou formation en lien avec le domaine Tech & Dev.",
+              "Bonne capacité d'adaptation à un environnement Mission.",
+              "Esprit d'analyse, rigueur et autonomie.",
+              "Excellente communication orale et écrite."
+            ],
+            "benefits": [
+              "Package salarial attractif selon profil",
+              "Formation continue et perspectives d'évolution",
+              "Environnement de travail dynamique"
+            ],
+            "tags": [
+              "Tech & Dev",
+              "Mission",
+              "5 ans et plus",
+              "Bac+5",
+              "Yamoussoukro",
+              "Côte d'Ivoire"
+            ],
+            "source_text": "Titre : QA Automation Engineer\nEntreprise : Abidjan Digital Labs\nLocalisation : Yamoussoukro - Centre\nContrat : Mission\nExpérience : 5 ans et plus\nFormation : Bac+5\nSalaire : Salaire selon profil\n\nAbidjan Digital Labs recrute un(e) QA Automation Engineer pour renforcer son équipe Tech & Dev à Yamoussoukro - Centre. Le poste est proposé en Mission et s'adresse à un profil 5 ans et plus.\n\nMissions :\n- Participer activement aux projets Tech & Dev de Abidjan Digital Labs.\n- Assurer le suivi opérationnel des activités liées au poste QA Automation Engineer.\n- Collaborer avec les équipes internes pour améliorer les processus.\n- Contribuer à la qualité de service et à la satisfaction des parties prenantes.\n\nProfil recherché :\n- Expérience ou formation en lien avec le domaine Tech & Dev.\n- Bonne capacité d'adaptation à un environnement Mission.\n- Esprit d'analyse, rigueur et autonomie.\n- Excellente communication orale et écrite.\n\nAvantages :\n- Package salarial attractif selon profil\n- Formation continue et perspectives d'évolution\n- Environnement de travail dynamique",
+            "is_manual": false
+          }
+        }
+      ]
+    },
+    "incrementeView": {
+      "request": {
+        "method": "POST",
+        "url": "/api/offers/3547ed76-47c0-4315-847e-1b32d56331e5/view"
+      },
+      "status_code": 200,
+      "data": {
+        "view_count": 730
+      }
+    },
+    "saveOffer": {
+      "request": {
+        "method": "POST",
+        "url": "/api/offers/3547ed76-47c0-4315-847e-1b32d56331e5/save"
+      },
+      "status_code": 200,
+      "data": {
+        "save_count": 101
+      }
+    }
+  },
+  "referentials": {
+    "getSources": {
+      "request": {
+        "method": "GET",
+        "url": "/api/referentials/sources"
+      },
+      "status_code": 200,
+      "data": [
+        {
+          "created_at": "2026-08-10T11:46:35",
+          "updated_at": "2026-08-10T11:46:35",
+          "id": "6198382f-6dcd-4fa0-bbe1-7f5fef9ae360",
+          "code": "emploi-dakar",
+          "name": "EmploiDakar CI",
+          "slug": "emploi-dakar",
+          "base_url": "https://www.emploidakar.com",
+          "jobs_url": "https://www.emploidakar.com/offres",
+          "logo_path": "/static/sources/emploidakar-ci.png",
+          "color_hex": "#0F2D4D",
+          "short_code": "ED",
+          "status": "active",
+          "priority": 10,
+          "supports_scraping": true,
+          "anti_scraping_level": 1,
+          "default_scan_time": "06:00",
+          "description": "Portail généraliste d'offres d'emploi pour la Côte d'Ivoire.",
+          "notes": "Source principale : structure HTML à surveiller.",
+          "is_primary": true
+        }
+      ]
+    },
+    "getFilieres": {
+      "request": {
+        "method": "GET",
+        "url": "/api/referentials/filieres"
+      },
+      "status_code": 200,
+      "data": [
+        {
+          "created_at": "2026-08-10T11:46:35",
+          "updated_at": "2026-08-10T11:46:35",
+          "id": "90c54ca6-af5e-44b2-a959-504bde79325f",
+          "code": "tech-dev",
+          "label": "Tech & Dev",
+          "slug": "tech-dev",
+          "hue": "sky",
+          "icon_name": "code",
+          "tagline": "Opportunités quotidiennes dans le domaine Tech & Dev.",
+          "description": "Offres d'emploi, missions et opportunités dans le secteur Tech & Dev en Côte d'Ivoire.",
+          "sort_order": 1,
+          "is_active": true,
+          "specialties": [
+            {
+              "created_at": "2026-08-10T11:46:35",
+              "updated_at": "2026-08-10T11:46:35",
+              "id": "7546e829-9c1b-4a33-ac19-20a1d0c64229",
+              "code": "tech-dev-pilotage",
+              "label": "Pilotage",
+              "sort_order": 1,
+              "is_active": true
+            },
+            {
+              "created_at": "2026-08-10T11:46:35",
+              "updated_at": "2026-08-10T11:46:35",
+              "id": "c6629b13-810d-4c92-9173-cb1caea5be24",
+              "code": "tech-dev-analyse",
+              "label": "Analyse",
+              "sort_order": 2,
+              "is_active": true
+            },
+            {
+              "created_at": "2026-08-10T11:46:35",
+              "updated_at": "2026-08-10T11:46:35",
+              "id": "f087ef88-3fc6-4083-99a6-e17b1f17f1e4",
+              "code": "tech-dev-deploiement",
+              "label": "Déploiement",
+              "sort_order": 3,
+              "is_active": true
+            }
+          ]
+        }
+      ]
+    },
+    "getFilieresBySlug": {
+      "request": {
+        "method": "GET",
+        "url": "/api/referentials/filieres/tech-dev"
+      },
+      "status_code": 200,
+      "data": {
+        "created_at": "2026-08-10T11:46:35",
+        "updated_at": "2026-08-10T11:46:35",
+        "id": "90c54ca6-af5e-44b2-a959-504bde79325f",
+        "code": "tech-dev",
+        "label": "Tech & Dev",
+        "slug": "tech-dev",
+        "hue": "sky",
+        "icon_name": "code",
+        "tagline": "Opportunités quotidiennes dans le domaine Tech & Dev.",
+        "description": "Offres d'emploi, missions et opportunités dans le secteur Tech & Dev en Côte d'Ivoire.",
+        "sort_order": 1,
+        "is_active": true,
+        "specialties": [
+          {
+            "created_at": "2026-08-10T11:46:35",
+            "updated_at": "2026-08-10T11:46:35",
+            "id": "7546e829-9c1b-4a33-ac19-20a1d0c64229",
+            "code": "tech-dev-pilotage",
+            "label": "Pilotage",
+            "sort_order": 1,
+            "is_active": true
+          },
+          {
+            "created_at": "2026-08-10T11:46:35",
+            "updated_at": "2026-08-10T11:46:35",
+            "id": "c6629b13-810d-4c92-9173-cb1caea5be24",
+            "code": "tech-dev-analyse",
+            "label": "Analyse",
+            "sort_order": 2,
+            "is_active": true
+          },
+          {
+            "created_at": "2026-08-10T11:46:35",
+            "updated_at": "2026-08-10T11:46:35",
+            "id": "f087ef88-3fc6-4083-99a6-e17b1f17f1e4",
+            "code": "tech-dev-deploiement",
+            "label": "Déploiement",
+            "sort_order": 3,
+            "is_active": true
+          }
+        ]
+      }
+    },
+    "getSpecialitesFiliere": {
+      "request": {
+        "method": "GET",
+        "url": "/api/referentials/filieres/tech-dev/specialites"
+      },
+      "status_code": 200,
+      "data": [
+        {
+          "created_at": "2026-08-10T11:46:35",
+          "updated_at": "2026-08-10T11:46:35",
+          "id": "7546e829-9c1b-4a33-ac19-20a1d0c64229",
+          "code": "tech-dev-pilotage",
+          "label": "Pilotage",
+          "sort_order": 1,
+          "is_active": true
+        }
+      ]
+    },
+    "getContractTypes": {
+      "request": {
+        "method": "GET",
+        "url": "/api/referentials/contract-types"
+      },
+      "status_code": 200,
+      "data": [
+        {
+          "created_at": "2026-08-10T11:46:35",
+          "updated_at": "2026-08-10T11:46:35",
+          "id": "40167844-49b1-4dfe-9321-291e426e7527",
+          "code": "cdi",
+          "label": "CDI",
+          "sort_order": 1,
+          "is_active": true
+        }
+      ]
+    },
+    "getExperienceLevels": {
+      "request": {
+        "method": "GET",
+        "url": "/api/referentials/experience-levels"
+      },
+      "status_code": 200,
+      "data": [
+        {
+          "created_at": "2026-08-10T11:46:35",
+          "updated_at": "2026-08-10T11:46:35",
+          "id": "d43cac20-e6a4-46c5-8afb-3fe60e0b3a30",
+          "code": "debutant",
+          "label": "Débutant",
+          "min_years": 0,
+          "max_years": 1,
+          "sort_order": 1,
+          "is_active": true
+        }
+      ]
+    },
+    "getEducationLevels": {
+      "request": {
+        "method": "GET",
+        "url": "/api/referentials/education-levels"
+      },
+      "status_code": 200,
+      "data": [
+        {
+          "created_at": "2026-08-10T11:46:35",
+          "updated_at": "2026-08-10T11:46:35",
+          "id": "0be40391-342c-403a-add2-32c82a0ec061",
+          "code": "bac",
+          "label": "Bac",
+          "rank": 1,
+          "sort_order": 1,
+          "is_active": true
+        }
+      ]
+    },
+    "getLocations": {
+      "request": {
+        "method": "GET",
+        "url": "/api/referentials/locations"
+      },
+      "status_code": 200,
+      "data": [
+        {
+          "created_at": "2026-08-10T11:46:35",
+          "updated_at": "2026-08-10T11:46:35",
+          "id": "f1cd830e-af79-4dfd-9e0e-73c1b9535972",
+          "country_code": "CI",
+          "city": "Abidjan",
+          "district": "Abobo",
+          "label": "Abidjan - Abobo",
+          "normalized_label": "abidjan abobo",
+          "is_remote": false,
+          "is_active": true
+        }
+      ]
+    }
+  },
+  "sources": {
+    "getSources": {
+      "request": {
+        "method": "GET",
+        "url": "/api/sources"
+      },
+      "status_code": 200,
+      "data": [
+        {
+          "created_at": "2026-08-10T11:46:35",
+          "updated_at": "2026-08-10T11:46:35",
+          "id": "6198382f-6dcd-4fa0-bbe1-7f5fef9ae360",
+          "code": "emploi-dakar",
+          "name": "EmploiDakar CI",
+          "slug": "emploi-dakar",
+          "base_url": "https://www.emploidakar.com",
+          "jobs_url": "https://www.emploidakar.com/offres",
+          "logo_path": "/static/sources/emploidakar-ci.png",
+          "color_hex": "#0F2D4D",
+          "short_code": "ED",
+          "status": "active",
+          "priority": 10,
+          "supports_scraping": true,
+          "anti_scraping_level": 1,
+          "default_scan_time": "06:00",
+          "description": "Portail généraliste d'offres d'emploi pour la Côte d'Ivoire.",
+          "notes": "Source principale : structure HTML à surveiller.",
+          "is_primary": true,
+          "stats": {
+            "active_offers": 22,
+            "new_offers": 0,
+            "last_scrape_status": null,
+            "last_scrape_duration": null
+          }
+        }
+      ]
+    },
+    "getSourcesBySlug": {
+      "request": {
+        "method": "GET",
+        "url": "/api/sources/emploi-dakar"
+      },
+      "status_code": 200,
+      "data": {
+        "created_at": "2026-08-10T11:46:35",
+        "updated_at": "2026-08-10T11:46:35",
+        "id": "6198382f-6dcd-4fa0-bbe1-7f5fef9ae360",
+        "code": "emploi-dakar",
+        "name": "EmploiDakar CI",
+        "slug": "emploi-dakar",
+        "base_url": "https://www.emploidakar.com",
+        "jobs_url": "https://www.emploidakar.com/offres",
+        "logo_path": "/static/sources/emploidakar-ci.png",
+        "color_hex": "#0F2D4D",
+        "short_code": "ED",
+        "status": "active",
+        "priority": 10,
+        "supports_scraping": true,
+        "anti_scraping_level": 1,
+        "default_scan_time": "06:00",
+        "description": "Portail généraliste d'offres d'emploi pour la Côte d'Ivoire.",
+        "notes": "Source principale : structure HTML à surveiller.",
+        "is_primary": true,
+        "stats": {
+          "active_offers": 22,
+          "new_offers": 0,
+          "last_scrape_status": null,
+          "last_scrape_duration": null
+        }
+      }
+    },
+    "getSourceOffers": {
+      "request": {
+        "method": "GET",
+        "url": "/api/sources/emploi-dakar/offers"
+      },
+      "status_code": 200,
+      "data": [
+        {
+          "created_at": "2026-08-10T11:46:36",
+          "updated_at": "2026-08-10T11:46:36",
+          "id": "eef2f244-0788-45ff-81e1-d802c2bd4ab5",
+          "public_id": 10068,
+          "title": "Assistant d'Éducation",
+          "normalized_title": "assistant d education",
+          "slug": "assistant-d-education-ecole-avenir-ed-00068",
+          "status": "active",
+          "origin": "scraping",
+          "visible_site": true,
+          "source_reference": "ED-00068",
+          "source_url": "https://www.emploidakar.com/offres/assistant-d-education-ecole-avenir-ed-00068",
+          "canonical_url": "https://www.emploidakar.com/offres/ed-00068",
+          "location_raw": "San-Pédro - Port",
+          "salary_raw": "150 000 - 250 000 FCFA / mois",
+          "published_at": "2026-08-02T22:22:35",
+          "collected_at": "2026-08-02T23:34:35",
+          "first_seen_at": "2026-08-02T23:34:35",
+          "last_seen_at": "2026-08-05T02:34:35",
+          "expires_at": "2026-09-02T11:46:35",
+          "application_deadline_at": "2026-08-29T11:46:35",
+          "view_count": 461,
+          "save_count": 55,
+          "company": {
+            "created_at": "2026-08-10T11:46:35",
+            "updated_at": "2026-08-10T11:46:35",
+            "id": "01d819df-a02b-42ec-81bf-4ccc53804f77",
+            "name": "École Avenir",
+            "normalized_name": "ecole avenir",
+            "slug": "ecole-avenir",
+            "website_url": "https://www.ecoleavenir.ci",
+            "logo_url": "https://cdn.jobalert.ci/companies/ecole-avenir.png",
+            "description": "École Avenir recrute régulièrement dans le secteur Éducation & Formation en Côte d'Ivoire."
+          },
+          "source": {
+            "created_at": "2026-08-10T11:46:35",
+            "updated_at": "2026-08-10T11:46:35",
+            "id": "6198382f-6dcd-4fa0-bbe1-7f5fef9ae360",
+            "code": "emploi-dakar",
+            "name": "EmploiDakar CI",
+            "slug": "emploi-dakar",
+            "base_url": "https://www.emploidakar.com",
+            "jobs_url": "https://www.emploidakar.com/offres",
+            "logo_path": "/static/sources/emploidakar-ci.png",
+            "color_hex": "#0F2D4D",
+            "short_code": "ED",
+            "status": "active",
+            "priority": 10,
+            "supports_scraping": true,
+            "anti_scraping_level": 1,
+            "default_scan_time": "06:00",
+            "description": "Portail généraliste d'offres d'emploi pour la Côte d'Ivoire.",
+            "notes": "Source principale : structure HTML à surveiller.",
+            "is_primary": true
+          },
+          "location": {
+            "created_at": "2026-08-10T11:46:35",
+            "updated_at": "2026-08-10T11:46:35",
+            "id": "2098b613-0ab6-4981-8e2a-158b229e65c6",
+            "country_code": "CI",
+            "city": "San-Pédro",
+            "district": "Port",
+            "label": "San-Pédro - Port",
+            "normalized_label": "san pedro port",
+            "is_remote": false,
+            "is_active": true
+          },
+          "primary_filiere": {
+            "created_at": "2026-08-10T11:46:35",
+            "updated_at": "2026-08-10T11:46:35",
+            "id": "0071500d-2e11-4976-a213-00a7935ed4a3",
+            "code": "education-formation",
+            "label": "Éducation & Formation",
+            "slug": "education-formation",
+            "hue": "lime",
+            "icon_name": "graduation-cap",
+            "tagline": "Opportunités quotidiennes dans le domaine Éducation & Formation.",
+            "description": "Offres d'emploi, missions et opportunités dans le secteur Éducation & Formation en Côte d'Ivoire.",
+            "sort_order": 10,
+            "is_active": true,
+            "specialties": [
+              {
+                "created_at": "2026-08-10T11:46:35",
+                "updated_at": "2026-08-10T11:46:35",
+                "id": "e055336d-e0c5-48c3-a94f-6979dfe6d68a",
+                "code": "education-formation-pilotage",
+                "label": "Pilotage",
+                "sort_order": 1,
+                "is_active": true
+              },
+              {
+                "created_at": "2026-08-10T11:46:35",
+                "updated_at": "2026-08-10T11:46:35",
+                "id": "5fe7896a-87b6-407c-ad0b-f2638fb5af19",
+                "code": "education-formation-analyse",
+                "label": "Analyse",
+                "sort_order": 2,
+                "is_active": true
+              },
+              {
+                "created_at": "2026-08-10T11:46:35",
+                "updated_at": "2026-08-10T11:46:35",
+                "id": "41ee2836-efca-4159-bdb6-a82d6fab6962",
+                "code": "education-formation-deploiement",
+                "label": "Déploiement",
+                "sort_order": 3,
+                "is_active": true
+              }
+            ]
+          },
+          "specialty": {
+            "created_at": "2026-08-10T11:46:35",
+            "updated_at": "2026-08-10T11:46:35",
+            "id": "5fe7896a-87b6-407c-ad0b-f2638fb5af19",
+            "code": "education-formation-analyse",
+            "label": "Analyse",
+            "sort_order": 2,
+            "is_active": true
+          },
+          "contract_type": {
+            "created_at": "2026-08-10T11:46:35",
+            "updated_at": "2026-08-10T11:46:35",
+            "id": "1262ce7d-3ca2-4e70-b4b7-3bcfd57f2705",
+            "code": "stage",
+            "label": "Stage",
+            "sort_order": 3,
+            "is_active": true
+          },
+          "experience_level": {
+            "created_at": "2026-08-10T11:46:35",
+            "updated_at": "2026-08-10T11:46:35",
+            "id": "9950b913-5f8d-4afe-97c2-63c29330a269",
+            "code": "1-3",
+            "label": "1-3 ans",
+            "min_years": 1,
+            "max_years": 3,
+            "sort_order": 2,
+            "is_active": true
+          },
+          "education_level": {
+            "created_at": "2026-08-10T11:46:35",
+            "updated_at": "2026-08-10T11:46:35",
+            "id": "732f3859-84d4-4931-82e7-7c6158676382",
+            "code": "bac-2",
+            "label": "Bac+2",
+            "rank": 2,
+            "sort_order": 2,
+            "is_active": true
+          },
+          "detail": {
+            "created_at": "2026-08-10T11:46:36",
+            "updated_at": "2026-08-10T11:46:36",
+            "id": "9ca1abe7-ed5f-4e3c-a36e-0c73c598ab6d",
+            "intro": "École Avenir recrute un(e) Assistant d'Éducation pour renforcer son équipe Éducation & Formation à San-Pédro - Port. Le poste est proposé en Stage et s'adresse à un profil 1-3 ans.",
+            "missions": [
+              "Participer activement aux projets Éducation & Formation de École Avenir.",
+              "Assurer le suivi opérationnel des activités liées au poste Assistant d'Éducation.",
+              "Collaborer avec les équipes internes pour améliorer les processus.",
+              "Contribuer à la qualité de service et à la satisfaction des parties prenantes."
+            ],
+            "profile_requirements": [
+              "Expérience ou formation en lien avec le domaine Éducation & Formation.",
+              "Bonne capacité d'adaptation à un environnement Stage.",
+              "Esprit d'analyse, rigueur et autonomie.",
+              "Excellente communication orale et écrite."
+            ],
+            "benefits": [
+              "Package salarial attractif selon profil",
+              "Formation continue et perspectives d'évolution",
+              "Environnement de travail dynamique"
+            ],
+            "tags": [
+              "Éducation & Formation",
+              "Stage",
+              "1-3 ans",
+              "Bac+2",
+              "San-Pédro",
+              "Côte d'Ivoire"
+            ],
+            "source_text": "Titre : Assistant d'Éducation\nEntreprise : École Avenir\nLocalisation : San-Pédro - Port\nContrat : Stage\nExpérience : 1-3 ans\nFormation : Bac+2\nSalaire : 150 000 - 250 000 FCFA / mois\n\nÉcole Avenir recrute un(e) Assistant d'Éducation pour renforcer son équipe Éducation & Formation à San-Pédro - Port. Le poste est proposé en Stage et s'adresse à un profil 1-3 ans.\n\nMissions :\n- Participer activement aux projets Éducation & Formation de École Avenir.\n- Assurer le suivi opérationnel des activités liées au poste Assistant d'Éducation.\n- Collaborer avec les équipes internes pour améliorer les processus.\n- Contribuer à la qualité de service et à la satisfaction des parties prenantes.\n\nProfil recherché :\n- Expérience ou formation en lien avec le domaine Éducation & Formation.\n- Bonne capacité d'adaptation à un environnement Stage.\n- Esprit d'analyse, rigueur et autonomie.\n- Excellente communication orale et écrite.\n\nAvantages :\n- Package salarial attractif selon profil\n- Formation continue et perspectives d'évolution\n- Environnement de travail dynamique",
+            "is_manual": false
+          }
+        }
+      ]
+    }
+  },
+  "stats": {
+    "getGlobalSats": {
+      "request": {
+        "method": "GET",
+        "url": "/api/stats/global"
+      },
+      "status_code": 200,
+      "data": {
+        "active_offers": 91,
+        "new_today": 0,
+        "subscribers": 1,
+        "sources": 4
+      }
+    },
+    "getPipelineStatus": {
+      "request": {
+        "method": "GET",
+        "url": "/api/stats/pipeline"
+      },
+      "status_code": 200,
+      "data": {
+        "status": "No runs yet",
+        "last_run_date": null
+      }
+    },
+    "getOfferSats": {
+      "request": {
+        "method": "GET",
+        "url": "/api/stats/offers"
+      },
+      "status_code": 200,
+      "data": {
+        "total_offers": 91,
+        "new_offers": 9
+      }
+    },
+    "getOfferSatsByFiliere": {
+      "request": {
+        "method": "GET",
+        "url": "/api/stats/offers/by-filiere"
+      },
+      "status_code": 200,
+      "data": [
+        {
+          "id": "90c54ca6-af5e-44b2-a959-504bde79325f",
+          "code": "tech-dev",
+          "label": "Tech & Dev",
+          "total_offers": 7,
+          "new_offers": 0
+        },
+        {
+          "id": "0ab7e1ab-2e7e-49d4-918a-8af4601e306a",
+          "code": "marketing-com",
+          "label": "Marketing & Communication",
+          "total_offers": 7,
+          "new_offers": 0
+        },
+        {
+          "id": "da67a611-0223-4948-b847-05492a612702",
+          "code": "commercial-vente",
+          "label": "Commercial & Vente",
+          "total_offers": 7,
+          "new_offers": 1
+        },
+        {
+          "id": "58108ae9-642b-4904-ab63-4c751f02c472",
+          "code": "comptabilite-finance",
+          "label": "Comptabilité & Finance",
+          "total_offers": 7,
+          "new_offers": 2
+        },
+        {
+          "id": "2f0167d9-aa22-47ed-854d-38540251794a",
+          "code": "ressources-humaines",
+          "label": "Ressources Humaines",
+          "total_offers": 7,
+          "new_offers": 0
+        },
+        {
+          "id": "988d983f-7cd9-447f-b785-7868446f39f7",
+          "code": "btp-genie-civil",
+          "label": "BTP & Génie Civil",
+          "total_offers": 7,
+          "new_offers": 0
+        },
+        {
+          "id": "80695c08-c20e-444c-ae5c-fc30ef1c03a9",
+          "code": "logistique-transport",
+          "label": "Logistique & Transport",
+          "total_offers": 7,
+          "new_offers": 3
+        },
+        {
+          "id": "b7889fa3-ea1f-4590-8ced-bb3bd5003d0b",
+          "code": "sante-medical",
+          "label": "Santé & Médical",
+          "total_offers": 7,
+          "new_offers": 0
+        },
+        {
+          "id": "21c8ddf5-d88a-4881-8a40-638bbc1b7867",
+          "code": "administration",
+          "label": "Administration",
+          "total_offers": 7,
+          "new_offers": 0
+        },
+        {
+          "id": "0071500d-2e11-4976-a213-00a7935ed4a3",
+          "code": "education-formation",
+          "label": "Éducation & Formation",
+          "total_offers": 7,
+          "new_offers": 2
+        },
+        {
+          "id": "358f4d87-9126-4b17-a9f9-ccc9f1259102",
+          "code": "hotellerie-restauration",
+          "label": "Hôtellerie & Restauration",
+          "total_offers": 7,
+          "new_offers": 1
+        },
+        {
+          "id": "2592ba01-1b37-4ca5-9e28-5d64027af6d9",
+          "code": "agriculture-agrobusiness",
+          "label": "Agriculture & Agrobusiness",
+          "total_offers": 7,
+          "new_offers": 0
+        },
+        {
+          "id": "d77b7dd7-1c6b-4cec-85e8-89371c9f52b1",
+          "code": "securite-gardiennage",
+          "label": "Sécurité & Gardiennage",
+          "total_offers": 7,
+          "new_offers": 0
+        }
+      ]
+    },
+    "getOfferSatsBySource": {
+      "request": {
+        "method": "GET",
+        "url": "/api/stats/offers/by-source"
+      },
+      "status_code": 200,
+      "data": [
+        {
+          "id": "24a7b746-e0d7-458c-91d6-31bffaaad4e7",
+          "code": "goafrica",
+          "label": "Go Africa Online",
+          "total_offers": 23,
+          "new_offers": 3
+        },
+        {
+          "id": "6126a609-c8b5-43e7-8fcb-ad5aa414eadd",
+          "code": "novojob",
+          "label": "Novojob",
+          "total_offers": 23,
+          "new_offers": 3
+        },
+        {
+          "id": "70f7947c-fc0b-4daa-b91a-a5bc45fd8312",
+          "code": "linkedin",
+          "label": "LinkedIn",
+          "total_offers": 23,
+          "new_offers": 3
+        },
+        {
+          "id": "6198382f-6dcd-4fa0-bbe1-7f5fef9ae360",
+          "code": "emploi-dakar",
+          "label": "EmploiDakar CI",
+          "total_offers": 22,
+          "new_offers": 0
+        }
+      ]
+    },
+    "getOfferSatsByContract": {
+      "request": {
+        "method": "GET",
+        "url": "/api/stats/offers/by-contract"
+      },
+      "status_code": 200,
+      "data": [
+        {
+          "id": "40167844-49b1-4dfe-9321-291e426e7527",
+          "code": "cdi",
+          "label": "CDI",
+          "total_offers": 19,
+          "new_offers": 0
+        },
+        {
+          "id": "46d92eec-b361-4efb-990e-0b45709e7fbc",
+          "code": "mission",
+          "label": "Mission",
+          "total_offers": 19,
+          "new_offers": 0
+        },
+        {
+          "id": "1262ce7d-3ca2-4e70-b4b7-3bcfd57f2705",
+          "code": "stage",
+          "label": "Stage",
+          "total_offers": 18,
+          "new_offers": 0
+        },
+        {
+          "id": "d14a8ec6-fc3f-49af-a0f3-39cd46476882",
+          "code": "cdd",
+          "label": "CDD",
+          "total_offers": 18,
+          "new_offers": 0
+        },
+        {
+          "id": "02db9be1-93c1-465b-9661-0c296a85c653",
+          "code": "alternance",
+          "label": "Alternance",
+          "total_offers": 17,
+          "new_offers": 0
+        }
+      ]
+    }
+  },
+  "subscriptions": {
+    "subscribe": {
+      "request": {
+        "method": "POST",
+        "url": "/api/subscriptions",
+        "json": {
+          "email": "demo.jsonclaude@example.com",
+          "full_name": "Utilisateur Démo",
+          "city": "Abidjan",
+          "filieres": [
+            "tech-dev"
+          ],
+          "experience": null,
+          "contract_types": [],
+          "wants_career_tips": true,
+          "source": "site"
+        }
+      },
+      "status_code": 201,
+      "data": {
+        "created_at": "2026-08-10T11:46:38",
+        "updated_at": "2026-08-10T11:46:38",
+        "id": "303fa2e1-5cae-46bf-8c1a-4f2f83de8887",
+        "email": "demo.jsonclaude@example.com",
+        "full_name": "Utilisateur Démo",
+        "city": "Abidjan",
+        "status": "active",
+        "timezone": "Africa/Abidjan",
+        "wants_career_tips": true,
+        "source": "site",
+        "subscribed_at": "2026-08-10T11:46:38.000317",
+        "filiere_links": [
+          {
+            "created_at": "2026-08-10T11:46:38",
+            "updated_at": "2026-08-10T11:46:38",
+            "id": "42464aa6-d994-4c94-9673-656645654228",
+            "filiere_id": "90c54ca6-af5e-44b2-a959-504bde79325f",
+            "priority": 1
+          }
+        ],
+        "contract_preferences": []
+      }
+    },
+    "ConfirmSubscribe": {
+      "request": {
+        "method": "GET",
+        "url": "/api/subscriptions/confirm/demo-token-jobalertci-confirm-0000"
+      },
+      "status_code": 200,
+      "data": {
+        "message": "Inscription confirmée",
+        "email": "demo.jsonclaude@example.com"
+      }
+    },
+    "getPreferences": {
+      "request": {
+        "method": "GET",
+        "url": "/api/subscriptions/preferences/demo-token-jobalertci-000000000000"
+      },
+      "status_code": 200,
+      "data": {
+        "created_at": "2026-08-10T11:46:38",
+        "updated_at": "2026-08-10T11:46:38",
+        "id": "303fa2e1-5cae-46bf-8c1a-4f2f83de8887",
+        "email": "demo.jsonclaude@example.com",
+        "full_name": "Utilisateur Démo",
+        "city": "Abidjan",
+        "status": "active",
+        "timezone": "Africa/Abidjan",
+        "wants_career_tips": true,
+        "source": "site",
+        "subscribed_at": "2026-08-10T11:46:38.000317",
+        "filiere_links": [
+          {
+            "created_at": "2026-08-10T11:46:38",
+            "updated_at": "2026-08-10T11:46:38",
+            "id": "42464aa6-d994-4c94-9673-656645654228",
+            "filiere_id": "90c54ca6-af5e-44b2-a959-504bde79325f",
+            "priority": 1
+          }
+        ],
+        "contract_preferences": []
+      }
+    },
+    "updatePreferences": {
+      "request": {
+        "method": "PUT",
+        "url": "/api/subscriptions/preferences/demo-token-jobalertci-000000000000",
+        "json": {
+          "filieres": [
+            "tech-dev"
+          ],
+          "contract_types": [],
+          "wants_career_tips": false
+        }
+      },
+      "status_code": 500,
+      "data": "Internal Server Error"
+    },
+    "unsubscribe": {
+      "request": {
+        "method": "POST",
+        "url": "/api/subscriptions/unsubscribe/demo-token-jobalertci-000000000000"
+      },
+      "status_code": 200,
+      "data": {
+        "message": "Désinscription enregistrée"
+      }
+    }
+  }
+}

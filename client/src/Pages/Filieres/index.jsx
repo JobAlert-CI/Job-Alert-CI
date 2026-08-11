@@ -1,52 +1,101 @@
-import { useEffect, useMemo, useState, Fragment } from "react"
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react"
 import { Link } from "react-router-dom"
 import { AnimatePresence, motion } from "framer-motion"
 import {
-  ArrowDownAZ, ArrowDownWideNarrow, ArrowRight, Bell,
-  CheckCircle2, ChevronRight, Clock,
-  LayoutGrid, Mail, MousePointerClick, Radar, Search, SearchX,
+  AlertTriangle, ArrowDownAZ, ArrowDownWideNarrow, ArrowRight, Bell,
+  CheckCircle2, ChevronRight, Clock, LayoutGrid, Mail,
+  MousePointerClick, Radar, RefreshCw, Search, SearchX,
   ShieldCheck, X,
 } from "lucide-react"
 import { FaLinkedin } from "react-icons/fa6"
 import {
   HoverCard, HoverCardContent, HoverCardTrigger,
 } from "@/components/ui/hover-card"
+import { Skeleton } from "@/components/ui/skeleton"
 import Seo from "@/components/seo/Seo"
 import { cn } from "@/lib/utils"
 import { getImgSource } from "@/utils/utilsSource"
 import { filieresSeo } from "@/lib/seo"
-import { CountUp, CountdownEnvoi, Ticker, FiliereCard, CtaLink } from "@/components/shared"
-import { FILIERES_META as FILIERES } from "@/lib/referentiels"
+import { CountUp, CountdownEnvoi, Ticker, FiliereCard, CtaLink, SourceLogo } from "@/components/shared"
+import { HUES } from "@/lib/hues"
+import getFiliereTheme from "@/lib/filiere-theme"
 import { useUrlFilters } from "@/hooks/use-url-filters"
+import { useFetchData } from "@/hooks/use-fetch-data"
+import { getFilieres } from "@/api/public/filieres"
+import { getGlobalSats, getOfferSatsBySource } from "@/api/public/stats"
+import { getOffers } from "@/api/public/offers"
+import { adaptOffers } from "@/lib/offers-adapter"
 
 /* ════════════════════════════════════════════════════════════════════
-  DONNÉES — à brancher sur l'API (tables filieres + offres, v2.0)
+ADAPTATEUR API → UI (FILIÈRES)
+Le backend retourne FiliereWithStats. On produit l'objet attendu
+par FiliereCard (f.icon, f.hue, f.bar, f.tile, f.hover,
+f.actives, f.nouvelles, f.abonnes, f.keywords).
+Tout est défensif : une relation manquante ne casse jamais le rendu.
 ════════════════════════════════════════════════════════════════════ */
-const TOP3 = ["tech-dev", "marketing-com", "commercial-vente"]
+export const adaptFiliere = (raw) => {
+  if (!raw || typeof raw !== "object") return null
 
-const SOURCES_STATUS = [
-  { nom: "EmploiDakar CI", short: "ED", bg: "#0F2D4D", offres: 9, fin: "06:02", duree: "38 s" },
-  { nom: "GoAfrica", short: "GA", bg: "#0F766E", offres: 7, fin: "06:03", duree: "24 s" },
-  { nom: "Novojob", short: "NJ", bg: "#B45309", offres: 8, fin: "06:04", duree: "31 s" },
-  { nom: "LinkedIn", short: "in", bg: "#0A66C2", offres: 5, fin: "06:06", duree: "1 min 42", linkedin: true },
-]
+  // Thème complet (icône + palette) basé sur le code.
+  // On écrase par les valeurs de l'API si fournies (ex: hue "sky").
+  const theme = getFiliereTheme(raw.code)
+  const stats = raw.stats || {}
 
-const TICKER = [
-  { titre: "Développeur Full-Stack React/Node", entreprise: "Orange CI", source: "LinkedIn", dot: "bg-sky-500" },
-  { titre: "Chargé de Communication Digitale", entreprise: "CFAO Retail", source: "LinkedIn", dot: "bg-fuchsia-500" },
-  { titre: "Comptable Senior", entreprise: "NSIA Banque", source: "Novojob", dot: "bg-emerald-500" },
-  { titre: "Agent de Transit", entreprise: "AGL CI", source: "Novojob", dot: "bg-cyan-500" },
-  { titre: "Infirmier(ère) Diplômé(e) d'État", entreprise: "CHU de Cocody", source: "EmploiDakar CI", dot: "bg-rose-500" },
-  { titre: "Conducteur de Travaux", entreprise: "SARI", source: "GoAfrica", dot: "bg-amber-500" },
-  { titre: "Business Developer", entreprise: "SAMA Money", source: "GoAfrica", dot: "bg-orange-500" },
-  { titre: "Chargé de Recrutement", entreprise: "KPMG CI", source: "LinkedIn", dot: "bg-violet-500" },
-]
+
+  return {
+    id: raw.id,
+    code: raw.code,
+    slug: raw.slug || raw.code,
+    label: raw.label || raw.code,
+    tagline: raw.tagline || "",
+    description: raw.description || "",
+    icon: theme.icon,
+    hue: raw.hue,
+    bar: theme.bar,
+    tile: theme.tile,
+    tileHover: theme.tileHover,
+    hover: theme.hover,
+    actives: Number(stats.active_offers ?? 0),
+    nouvelles: Number(stats.new_offers ?? 0),
+    abonnes: Number(stats.subscribers ?? 0),
+    keywords: Array.isArray(raw.specialties)
+      ? raw.specialties
+        .filter((s) => s && s.is_active !== false)
+        .map((s) => (s.label || s.code || "").toLowerCase())
+        .filter(Boolean)
+      : [],
+    sort_order: Number(raw.sort_order ?? 99),
+    is_active: raw.is_active !== false,
+  }
+}
+
+export const adaptFilieres = (list) =>
+  (Array.isArray(list) ? list : [])
+    .map(adaptFiliere)
+    .filter(Boolean)
+    .filter((f) => f.is_active)
 
 /* ════════════════════════════════════════════════════════════════════
-  HERO — ouverture sur la collecte du jour (le cœur du produit)
+ADAPTATEUR API → UI (SOURCES pour CollectePanel)
 ════════════════════════════════════════════════════════════════════ */
-const CollectePanel = () => {
-  const total = SOURCES_STATUS.reduce((s, x) => s + x.offres, 0)
+export const adaptSourceStat = (s) => {
+  if (!s) return null
+  return {
+    code: s.code,
+    label: s.label || s.name || s.code,
+    total: Number(s.total_offers ?? 0),
+    nouveaux: Number(s.new_offers ?? 0),
+    color_hex: s.color_hex,
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════════
+COLLECTE PANEL — alimenté par getOfferSatsBySource
+════════════════════════════════════════════════════════════════════ */
+const CollectePanel = ({ parSource = [], isLoading = false }) => {
+  // const total = parSource.reduce((s, x) => s + (x.nouveaux ?? 0), 0)
+  const totalActives = parSource.reduce((s, x) => s + (x.total ?? 0), 0)
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 32, rotate: 1.5 }}
@@ -77,50 +126,64 @@ const CollectePanel = () => {
           </span>
           <div className="min-w-0 flex-1">
             <p className="font-heading text-sm font-bold text-brand-navy">Collecte terminée</p>
-            <p className="text-[11px] text-muted-foreground">Aujourd'hui · 06:02 · 4 sources scannées</p>
+            <p className="text-[11px] text-muted-foreground">
+              Aujourd'hui · 06:02 · {parSource.length} source{parSource.length > 1 ? "s" : ""} scannée{parSource.length > 1 ? "s" : ""}
+            </p>
           </div>
           <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-brand-navy px-2.5 py-1 text-[10px] font-bold text-white">
             <Clock className="size-3" />
-            {total} offres
+            <CountUp to={totalActives ?? 0} /> offre{totalActives > 1 ? "s" : ""}
           </span>
         </div>
 
         <ul className="divide-y divide-outline-variant/30 px-3">
-          {SOURCES_STATUS.map((s, i) => (
-            <HoverCard key={s.nom} openDelay={150}>
-              <HoverCardTrigger asChild>
-                <motion.li
-                  initial={{ opacity: 0, x: -14 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.4, delay: 0.55 + i * 0.12, ease: "easeOut" }}
-                  className="flex cursor-default items-center gap-3 rounded-lg px-2 py-3 transition-colors hover:bg-surface-container-low/60"
-                >
-                  <span className="grid size-8 shrink-0 place-items-center rounded-md font-heading text-[10px] font-extrabold text-white">
-                    {s.linkedin
-                      ? <FaLinkedin className="size-3.5" style={{ background: s.bg }} />
-                      : <img src={getImgSource(s.nom)} alt={s.nom} className="h-full size-8 object-contain" />
-                    }
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-[13px] font-semibold text-on-surface">{s.nom}</p>
-                    <p className="text-[11px] text-muted-foreground">Passage à {s.fin} · {s.duree}</p>
-                  </div>
-                  <span className="shrink-0 font-heading text-sm font-extrabold text-brand-navy">+{s.offres}</span>
-                  <CheckCircle2 className="size-4 shrink-0 text-emerald-500" />
-                </motion.li>
-              </HoverCardTrigger>
-              <HoverCardContent align="start" className="w-60">
-                <p className="font-heading text-sm font-semibold">{s.nom}</p>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  {s.offres} offres extraites ce matin en {s.duree}. Structure HTML surveillée chaque jour.
-                </p>
-                <p className="mt-1.5 flex items-center gap-1.5 text-xs font-semibold text-emerald-600">
-                  <CheckCircle2 className="size-3.5" />
-                  Source opérationnelle
-                </p>
-              </HoverCardContent>
-            </HoverCard>
-          ))}
+          {isLoading && parSource.length === 0
+            ? [0, 1, 2, 3].map((i) => (
+              <li key={i} className="flex items-center gap-3 px-2 py-3">
+                <Skeleton className="size-8 rounded-md" />
+                <div className="flex-1 space-y-1.5">
+                  <Skeleton className="h-3 w-2/3" />
+                  <Skeleton className="h-2.5 w-1/2" />
+                </div>
+                <Skeleton className="h-4 w-6" />
+              </li>
+            ))
+            : parSource.map((s, i) => (
+              <HoverCard key={s.code} openDelay={150}>
+                <HoverCardTrigger asChild>
+                  <motion.li
+                    initial={{ opacity: 0, x: -14 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.4, delay: 0.55 + i * 0.12, ease: "easeOut" }}
+                    className="flex cursor-default items-center gap-3 rounded-lg px-2 py-3 transition-colors hover:bg-surface-container-low/60"
+                  >
+                    <span className="grid size-8 shrink-0 place-items-center rounded-md font-heading text-[10px] font-extrabold text-white">
+                      <SourceLogo code={s.label} />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-[13px] font-semibold text-on-surface">{s.label}</p>
+                      <p className="text-[11px] text-muted-foreground">
+                        +{s.nouveaux} nouvelle{s.nouveaux > 1 ? "s" : ""} offre{s.nouveaux > 1 ? "s" : ""} · {s.total} au total
+                      </p>
+                    </div>
+                    <span className="shrink-0 font-heading text-sm font-extrabold text-brand-navy">
+                      {s.total}
+                    </span>
+                    <CheckCircle2 className="size-4 shrink-0 text-emerald-500" />
+                  </motion.li>
+                </HoverCardTrigger>
+                <HoverCardContent align="start" className="w-60">
+                  <p className="font-heading text-sm font-semibold">{s.label}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    {s.total} offre{s.total > 1 ? "s" : ""} active{s.total > 1 ? "s" : ""} dont {s.nouveaux} nouvelle{s.nouveaux > 1 ? "s" : ""} ce matin.
+                  </p>
+                  <p className="mt-1.5 flex items-center gap-1.5 text-xs font-semibold text-emerald-600">
+                    <CheckCircle2 className="size-3.5" />
+                    Source opérationnelle
+                  </p>
+                </HoverCardContent>
+              </HoverCard>
+            ))}
         </ul>
 
         <CountdownEnvoi className="border-t border-outline-variant/40 bg-surface-container-low/40 px-5 py-4" />
@@ -129,7 +192,10 @@ const CollectePanel = () => {
   )
 }
 
-const HeroFilieres = () => (
+/* ════════════════════════════════════════════════════════════════════
+HERO
+════════════════════════════════════════════════════════════════════ */
+const HeroFilieres = ({ filieres, globalStats, isLoading, parSource }) => (
   <section className="relative overflow-hidden hero-gradient">
     <div className="absolute inset-0 bg-pattern opacity-50" aria-hidden />
     <div className="absolute -top-32 right-[-10%] size-140 rounded-full bg-brand-orange/8 blur-3xl" aria-hidden />
@@ -155,28 +221,30 @@ const HeroFilieres = () => (
           variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.1, delayChildren: 0.1 } } }}
           className="flex flex-col items-start gap-5"
         >
-          <motion.div
-            variants={{ hidden: { opacity: 0, y: 22 }, visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } } }}
-            className="flex flex-wrap items-center gap-2.5"
-          >
-            <span className="inline-flex items-center gap-2 rounded-full border border-outline-variant/50 bg-white/80 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-on-surface-variant backdrop-blur-sm">
-              <LayoutGrid className="size-3 text-brand-orange" />
-              13 filières couvertes
-            </span>
-            <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-3.5 py-1.5 text-[11px] font-bold text-emerald-700">
-              <span className="relative flex size-1.5">
-                <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-500 opacity-70" />
-                <span className="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
+          {!isLoading && (
+            <motion.div
+              variants={{ hidden: { opacity: 0, y: 22 }, visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } } }}
+              className="flex flex-wrap items-center gap-2.5"
+            >
+              <span className="inline-flex items-center gap-2 rounded-full border border-outline-variant/50 bg-white/80 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-on-surface-variant backdrop-blur-sm">
+                <LayoutGrid className="size-3 text-brand-orange" />
+                {filieres.length} filière{filieres.length > 1 ? "s" : ""} couverte{filieres.length > 1 ? "s" : ""}
               </span>
-              Collecte 06:02 terminée
-            </span>
-          </motion.div>
+              <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-3.5 py-1.5 text-[11px] font-bold text-emerald-700">
+                <span className="relative flex size-1.5">
+                  <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-500 opacity-70" />
+                  <span className="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
+                </span>
+                Collecte 06:02 terminée
+              </span>
+            </motion.div>
+          )}
 
           <motion.h1
             variants={{ hidden: { opacity: 0, y: 22 }, visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } } }}
             className="font-heading text-4xl font-black leading-[1.04] tracking-tight text-brand-navy sm:text-5xl xl:text-6xl"
           >
-            13 filières. Un récap.
+            {isLoading ? "Nos filieres" : `${filieres.length} filières`}. Un récap.
             <span className="mt-2 block text-brand-orange">Chaque matin à 8h00.</span>
           </motion.h1>
 
@@ -184,7 +252,7 @@ const HeroFilieres = () => (
             variants={{ hidden: { opacity: 0, y: 22 }, visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } } }}
             className="max-w-xl md:text-lg leading-relaxed text-on-surface-variant"
           >
-            JobAlert CI scanne chaque jour les 4 grandes plateformes d'emploi ivoiriennes et vous
+            JobAlert CI scanne chaque jour les plus grandes plateformes d'emploi ivoiriennes et vous
             envoie le meilleur de vos filières sans recherche, sans doublon, sans connexion.
           </motion.p>
 
@@ -205,31 +273,34 @@ const HeroFilieres = () => (
             className="mt-3 flex flex-wrap items-center gap-x-8 gap-y-4"
           >
             {[
-              { valeur: 47, label: "nouvelles ce matin" },
-              { valeur: 181, label: "offres actives" },
-              { valeur: 10550, label: "abonnés servis" },
+              { valeur: globalStats?.new_today ?? 0, label: "nouvelles ce matin" },
+              { valeur: globalStats?.active_offers ?? 0, label: "offres actives" },
+              { valeur: globalStats?.subscribers ?? 0, label: "abonnés servis" },
             ].map((s) => (
               <div key={s.label}>
                 <dt className="sr-only">{s.label}</dt>
-                <dd className="font-heading text-3xl font-black text-brand-navy">
-                  <CountUp to={s.valeur} />
-                </dd>
+                {isLoading ? (
+                  <Skeleton className="h-8 w-16" />
+                ) : (
+                  <dd className="font-heading text-3xl font-black text-brand-navy">
+                    <CountUp to={s.valeur} />
+                  </dd>
+                )}
                 <dd className="text-xs font-medium text-muted-foreground">{s.label}</dd>
               </div>
             ))}
           </motion.dl>
         </motion.div>
 
-        <CollectePanel />
+        <CollectePanel parSource={parSource} isLoading={isLoading} />
       </div>
     </div>
   </section>
 )
 
 /* ════════════════════════════════════════════════════════════════════
-  LA MÉCANIQUE — flux en 3 étapes (lien vers HowItWorks)
+MÉCANIQUE
 ════════════════════════════════════════════════════════════════════ */
-
 const ETAPES = [
   { icon: MousePointerClick, titre: "Je choisis 1 à 3 filières", texte: "À l'inscription, en 2 minutes. Aucun mot de passe requis." },
   { icon: Radar, titre: "On scanne 4 sources chaque nuit", texte: "EmploiDakar CI, GoAfrica, Novojob et LinkedIn, dédoublonnées par hash." },
@@ -282,7 +353,6 @@ const BandeMechanique = () => (
           </Fragment>
         ))}
       </ol>
-
       <Link
         to="/comment-ca-marche"
         className="group inline-flex shrink-0 items-center gap-2 rounded-lg border border-brand-navy/20 bg-white px-5 py-2.5 text-sm font-bold text-brand-navy shadow-soft transition-all duration-300 hover:border-brand-navy hover:bg-brand-navy hover:text-white lg:self-auto"
@@ -295,9 +365,14 @@ const BandeMechanique = () => (
 )
 
 /* ════════════════════════════════════════════════════════════════════
-  PAGE
+TOP 3 — calculé dynamiquement depuis les données API
 ════════════════════════════════════════════════════════════════════ */
+const computeTop3 = (list) =>
+  [...list].sort((a, b) => b.actives - a.actives).slice(0, 3).map((f) => f.code)
 
+/* ════════════════════════════════════════════════════════════════════
+PAGE
+════════════════════════════════════════════════════════════════════ */
 const CONFIG_FILTRES = {
   scalars: [
     { key: "sort", param: "tri", defaut: "volume" },
@@ -310,9 +385,37 @@ const Filieres = () => {
   const sort = ["volume", "az"].includes(valeurs.sort) ? valeurs.sort : "volume"
   const setSort = (k) => setScalar("sort", k)
 
-  /* Recherche : champ local réactif → URL debouncée */
+  const {
+    data: rawFilieres,
+    isLoading: loadingFilieres,
+    error: errorFilieres,
+    reload: reloadFilieres,
+  } = useFetchData(getFilieres)
+
+  const { data: globalStats, isLoading: loadingGlobal } = useFetchData(getGlobalSats)
+
+  const { data: rawSources, isLoading: loadingSources } = useFetchData(getOfferSatsBySource)
+
+  const fetchTicker = useCallback(() => getOffers({ limit: 24, sort: "recent" }), [])
+  const { data: rawTicker, isLoading: loadingTicker } = useFetchData(fetchTicker)
+
+  console.log(rawSources)
+
+  /* ═══ Adaptation ═══ */
+  const filieres = useMemo(() => adaptFilieres(rawFilieres), [rawFilieres])
+
+  const tickerOffres = useMemo(
+    () => (Array.isArray(rawTicker) ? adaptOffers(rawTicker) : []),
+    [rawTicker]
+  )
+  const TOP3 = useMemo(() => computeTop3(filieres), [filieres])
+
+  /* ═══ États agrégés ═══ */
+  const isLoading = loadingFilieres || loadingGlobal || loadingSources || loadingTicker
+  const primaryError = errorFilieres // On priorise l'erreur filières (données principales)
+
+  /* ═══ Recherche locale + tri ═══ */
   const [queryLocale, setQueryLocale] = useState(valeurs.query)
-  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { setQueryLocale(valeurs.query) }, [valeurs.query])
   useEffect(() => {
     if (queryLocale === valeurs.query) return
@@ -322,7 +425,7 @@ const Filieres = () => {
 
   const filtered = useMemo(() => {
     const q = queryLocale.trim().toLowerCase()
-    let list = FILIERES.filter(
+    let list = filieres.filter(
       (f) =>
         !q ||
         f.label.toLowerCase().includes(q) ||
@@ -332,22 +435,37 @@ const Filieres = () => {
     if (sort === "volume") list = [...list].sort((a, b) => b.actives - a.actives)
     else list = [...list].sort((a, b) => a.label.localeCompare(b.label, "fr"))
     return list
-  }, [queryLocale, sort])
+  }, [filieres, queryLocale, sort])
 
   const q = queryLocale.trim()
   const large = filtered.filter((f) => TOP3.includes(f.code) && !q)
   const compact = filtered.filter((f) => !large.includes(f))
 
+  const resetQuery = useCallback(() => setQueryLocale(""), [])
+
   return (
     <>
-      <Seo {...filieresSeo(FILIERES)} />
+      <Seo {...filieresSeo(filieres)} />
       <main>
-        <HeroFilieres />
-        <Ticker
-          variant="light"
-          duration={48}
-          items={TICKER.map((t, i) => ({ key: `t-${i}`, ...t }))}
+        <HeroFilieres
+          filieres={filieres}
+          globalStats={globalStats}
+          isLoading={isLoading}
+          parSource={rawSources || []}
         />
+
+        {tickerOffres.length > 0 && (
+          <Ticker
+            variant="light"
+            duration={48}
+            items={tickerOffres.map((t, i) => ({
+              key: `t-${t.uid || i}`,
+              titre: t.titre,
+              entreprise: t.entreprise,
+              dot: (HUES[t.filiereHue] ?? HUES.sky).dot,
+            }))}
+          />
+        )}
 
         {/* ═══════════ Le référentiel ═══════════ */}
         <section className="bg-background py-14 md:py-18">
@@ -392,7 +510,7 @@ const Filieres = () => {
                 />
                 {queryLocale && (
                   <button
-                    onClick={() => setQueryLocale("")}
+                    onClick={resetQuery}
                     aria-label="Effacer la recherche"
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-brand-navy"
                   >
@@ -425,34 +543,63 @@ const Filieres = () => {
               </div>
             </motion.div>
 
-            {/* Grille bento */}
-            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
-              <AnimatePresence mode="popLayout">
-                {large.map((f, i) => <FiliereCard key={f.code} f={f} index={i} variant="large" />)}
-                {compact.map((f, i) => <FiliereCard key={f.code} f={f} index={i} variant="compact" />)}
-              </AnimatePresence>
-            </div>
-
-            {filtered.length === 0 && (
+            {/* ═══ États : loading / erreur / vide / contenu ═══ */}
+            {isLoading && filieres.length === 0 ? (
+              <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
+                {Array.from({ length: 12 }).map((_, i) => (
+                  <Skeleton key={i} className="h-40 rounded-xl" />
+                ))}
+              </div>
+            ) : primaryError ? (
               <motion.div
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mt-8 rounded-xl border border-dashed border-outline-variant/60 bg-white p-12 text-center"
+                className="mt-8 rounded-xl border border-destructive/30 bg-destructive/5 p-12 text-center"
               >
-                <SearchX className="mx-auto size-10 text-muted-foreground/50" />
-                <h3 className="mt-4 font-heading text-lg font-bold text-brand-navy">Aucune filière trouvée</h3>
-                <p className="mt-1 text-sm text-muted-foreground">Essayez « tech », « santé », « transit »…</p>
+                <AlertTriangle className="mx-auto size-10 text-destructive/70" />
+                <h3 className="mt-4 font-heading text-lg font-bold text-brand-navy">
+                  Impossible de charger les filières
+                </h3>
+                <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">
+                  {primaryError.message || "Une erreur est survenue."}
+                </p>
                 <button
-                  onClick={() => setQueryLocale("")}
+                  onClick={reloadFilieres}
                   className="mt-5 inline-flex items-center gap-2 rounded-lg border border-brand-navy/20 px-5 py-2.5 text-sm font-bold text-brand-navy transition-all hover:border-brand-navy hover:bg-brand-navy hover:text-white"
                 >
-                  Effacer la recherche
+                  <RefreshCw className="size-4" /> Réessayer
                 </button>
               </motion.div>
+            ) : (
+              <>
+                <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
+                  <AnimatePresence mode="popLayout">
+                    {large.map((f, i) => <FiliereCard key={f.code} f={f} index={i} variant="large" />)}
+                    {compact.map((f, i) => <FiliereCard key={f.code} f={f} index={i} variant="compact" />)}
+                  </AnimatePresence>
+                </div>
+
+                {filtered.length === 0 && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mt-8 rounded-xl border border-dashed border-outline-variant/60 bg-white p-12 text-center"
+                  >
+                    <SearchX className="mx-auto size-10 text-muted-foreground/50" />
+                    <h3 className="mt-4 font-heading text-lg font-bold text-brand-navy">Aucune filière trouvée</h3>
+                    <p className="mt-1 text-sm text-muted-foreground">Essayez « tech », « santé », « transit »…</p>
+                    <button
+                      onClick={resetQuery}
+                      className="mt-5 inline-flex items-center gap-2 rounded-lg border border-brand-navy/20 px-5 py-2.5 text-sm font-bold text-brand-navy transition-all hover:border-brand-navy hover:bg-brand-navy hover:text-white"
+                    >
+                      Effacer la recherche
+                    </button>
+                  </motion.div>
+                )}
+              </>
             )}
           </div>
         </section>
-
         <BandeMechanique />
       </main>
     </>
