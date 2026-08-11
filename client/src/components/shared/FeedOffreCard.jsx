@@ -3,7 +3,6 @@ import { Link } from "react-router-dom"
 import { motion } from "framer-motion"
 import { ArrowUpRight, MapPin } from "lucide-react"
 import { cn } from "@/lib/utils"
-import BadgeNouveau from "./BadgeNouveau"
 import { ChipSource } from "./SourceBadge"
 import getFiliereTheme from "@/lib/filiere-theme"
 

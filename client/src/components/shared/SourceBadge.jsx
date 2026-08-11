@@ -1,8 +1,5 @@
-
-import { FaLinkedin } from "react-icons/fa6"
 import { cn } from "@/lib/utils"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
-import { SOURCES } from "@/lib/referentiels"
 import { getImgSource } from "@/utils/utilsSource"
 
 export const SourceLogo = ({ code, className = "size-6" }) => {

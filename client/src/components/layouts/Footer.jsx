@@ -1,21 +1,17 @@
-
 import { useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { motion } from "framer-motion"
 import {
-  BadgeCheck, Bell, Check, ChevronRight,
-  Clock, Mail, Radar,
+  BadgeCheck, Bell, Check, ChevronRight, Clock, Mail, Radar,
 } from "lucide-react"
 import { SiFacebook, SiInstagram, SiX } from "@icons-pack/react-simple-icons"
-import { cn } from "@/lib/utils"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
-import { getImgSource } from "@/utils/utilsSource"
 import { FaLinkedin } from "react-icons/fa6"
-import { Badge } from "../ui/badge"
+import { cn } from "@/lib/utils"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
+import { Badge } from "@/components/ui/badge"
+import { useNavigationData } from "@/lib/navigation-data"
+import { HUES } from "@/lib/hues"
+import { SourceLogo } from "../shared"
 
 /* ------------------------------------------------------------------ */
 /*  Données                                                            */
@@ -31,15 +27,6 @@ const NAV_FOOTER = [
   { label: "Actualités", to: "/actualites" },
 ]
 
-const FILIERES_FOOTER = [
-  { label: "Tech & Dev", to: "/filieres/tech-dev", dot: "bg-sky-400" },
-  { label: "Commercial & Vente", to: "/filieres/commercial-vente", dot: "bg-orange-400" },
-  { label: "Comptabilité & Finance", to: "/filieres/comptabilite-finance", dot: "bg-emerald-400" },
-  { label: "Ressources Humaines", to: "/filieres/ressources-humaines", dot: "bg-violet-400" },
-  { label: "BTP & Génie Civil", to: "/filieres/btp-genie-civil", dot: "bg-amber-400" },
-  { label: "Santé & Médical", to: "/filieres/sante-medical", dot: "bg-rose-400" },
-]
-
 const SUPPORT_FOOTER = [
   { label: "FAQ", to: "/faq" },
   { label: "Contact", to: "/contact" },
@@ -52,20 +39,6 @@ const socialsLinks = [
   { label: "Instagram", icon: SiInstagram, color: "hover:bg-pink-600/20 hover:text-pink-500 hover:border-pink-500/50", link: "https://instagram.com" },
   { label: "X", icon: SiX, color: "hover:bg-slate-900 hover:text-white hover:border-white/30", link: "https://x.com" },
 ];
-
-const SOURCES = [
-  { src: "EmploiDakar CI", link: "https://www.emploidakar.com/" },
-  { src: "GoAfrica", link: "https://www.goafricaonline.com/fr" },
-  { src: "Novojob", link: "https://www.novojob.com/cote-d-ivoire/" },
-  { src: "LinkedIn", linkedin: true, link: "https://linkedin.com", ic: true },
-]
-
-const APERCU_OFFRES = [
-  { titre: "Développeur Full-Stack", entreprise: "Groupe SIFCA", source: "Novojob" },
-  { titre: "Responsable RH", entreprise: "Orange Côte d'Ivoire", source: "LinkedIn", linkedin: true },
-  { titre: "Conducteur de travaux", entreprise: "Bouygues CI", source: "GoAfrica" },
-  { titre: "Infirmier(ère) diplômé(e)", entreprise: "Clinique Farah", source: "EmploiDakar CI" },
-]
 
 /* ------------------------------------------------------------------ */
 /*  Sous-composants                                                    */
@@ -114,8 +87,18 @@ const Footer = () => {
   const [email, setEmail] = useState("")
   const navigate = useNavigate()
 
+  /* ═══ Données réelles depuis le backend ═══ */
+  const {
+    filieres,
+    filieresPopulaires,
+    nouveauxCeMatin,
+    sourcesList
+  } = useNavigationData()
+
   const dateFr = (() => {
-    const d = new Date().toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" })
+    const d = new Date().toLocaleDateString("fr-FR", {
+      weekday: "long", day: "numeric", month: "long",
+    })
     return d.charAt(0).toUpperCase() + d.slice(1)
   })()
 
@@ -217,17 +200,14 @@ const Footer = () => {
           >
             <div className="absolute -inset-8 rounded-full bg-brand-orange/10 blur-3xl" aria-hidden />
             <div className="absolute inset-0 translate-x-4 translate-y-4 rotate-2 rounded-xl border border-white/10 bg-white/4" aria-hidden />
-
             <span className="absolute -left-4 -top-3 z-10 inline-flex -rotate-3 items-center gap-1.5 rounded-full bg-brand-orange px-3 py-1.5 text-[11px] font-bold text-white shadow-lg">
               <Clock className="size-3" />
               Envoyé à 8h00
             </span>
-
             <motion.div
-              initial={{ y: 0 }} // Toujours définir un point de départ explicite pour éviter les sauts
+              initial={{ y: 0 }}
               animate={{ y: [0, -8, 0] }}
               transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-              // Ajout de "will-change-transform" pour l'accélération matérielle
               className="relative rounded-xl border border-white/10 bg-[#123252]/90 p-5 shadow-[0_24px_48px_-16px_rgba(0,0,0,0.4)] backdrop-blur-sm will-change-transform"
             >
               <div className="flex items-center justify-between gap-3 border-b border-white/10 pb-4">
@@ -241,38 +221,41 @@ const Footer = () => {
                   </div>
                 </div>
                 <span className="rounded-full bg-emerald-400/15 px-2.5 py-1 text-[10px] font-bold text-emerald-300">
-                  47 offres
+                  {nouveauxCeMatin} offre{nouveauxCeMatin > 1 ? "s" : ""}
                 </span>
               </div>
-
               <ul className="divide-y divide-white/[0.07]">
-                {APERCU_OFFRES.map((o, i) => (
-                  <motion.li
-                    key={o.titre}
-                    initial={{ opacity: 0, x: -14 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.4, delay: 0.35 + i * 0.12, ease: "easeOut" }}
-                    className="-mx-2 flex items-center gap-3 rounded-md px-2 py-3 transition-colors duration-200 hover:bg-white/5"
-                  >
-                    <span className="size-1.5 shrink-0 rounded-full bg-brand-orange" />
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-[13px] font-semibold text-white">{o.titre}</p>
-                      <p className="truncate text-[11px] text-white/50">{o.entreprise}</p>
-                    </div>
-                    <Badge
-                      variant="outline"
-                      className="shrink-0 rounded border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-semibold text-white/60"
+                {filieresPopulaires.length > 0 ? (
+                  filieresPopulaires.slice(0, 4).map((f, i) => (
+                    <motion.li
+                      key={f.code}
+                      initial={{ opacity: 0, x: -14 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.4, delay: 0.35 + i * 0.12, ease: "easeOut" }}
+                      className="-mx-2 flex items-center gap-3 rounded-md px-2 py-3 transition-colors duration-200 hover:bg-white/5"
                     >
-                      {o.linkedin ?
-                        <FaLinkedin className="size-2.5 text-[#0A66C2]" />
-                        : <img src={getImgSource(o.source)} alt={o.source} className="h-full size-6.5 object-contain" />}
-                      {o.source}
-                    </Badge>
-                  </motion.li>
-                ))}
+                      <span className="size-1.5 shrink-0 rounded-full bg-brand-orange" />
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-[13px] font-semibold text-white">{f.label}</p>
+                        <p className="truncate text-[11px] text-white/50">
+                          {f.count} offre{f.count > 1 ? "s" : ""} active{f.count > 1 ? "s" : ""}
+                        </p>
+                      </div>
+                      <Badge
+                        variant="outline"
+                        className="shrink-0 rounded border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-semibold text-white/60"
+                      >
+                        {f.nouveaux > 0 ? `+${f.nouveaux}` : "—"}
+                      </Badge>
+                    </motion.li>
+                  ))
+                ) : (
+                  <li className="px-2 py-3 text-[11px] text-white/50">
+                    Chargement des filières…
+                  </li>
+                )}
               </ul>
-
               <p className="mt-1 flex items-center gap-1.5 text-[11px] text-white/45">
                 <BadgeCheck className="size-3.5 text-emerald-400" />
                 Dédoublonné automatiquement — 0 doublon envoyé
@@ -360,28 +343,34 @@ const Footer = () => {
           >
             <FooterHeading>Filières populaires</FooterHeading>
             <ul className="flex flex-col gap-2">
-              {FILIERES_FOOTER.map((f) => (
-                <li key={f.to}>
-                  <Link
-                    to={f.to}
-                    className="group inline-flex items-center gap-2.5 text-sm font-medium text-white/65 transition-colors duration-200 hover:text-brand-orange"
-                  >
-                    <span
-                      className={cn(
-                        "size-1.5 shrink-0 rounded-full transition-transform duration-200 group-hover:scale-[1.7]",
-                        f.dot
-                      )}
-                    />
-                    {f.label}
-                  </Link>
-                </li>
-              ))}
+              {filieresPopulaires.map((f) => {
+                const hue = HUES[f.hue] ?? HUES.sky
+                return (
+                  <li key={f.code}>
+                    <Link
+                      to={f.to}
+                      className="group inline-flex items-center gap-2.5 text-sm font-medium text-white/65 transition-colors duration-200 hover:text-brand-orange"
+                    >
+                      <span
+                        className={cn(
+                          "size-1.5 shrink-0 rounded-full transition-transform duration-200 group-hover:scale-[1.7]",
+                          hue.dot
+                        )}
+                      />
+                      {f.label}
+                      <span className="ml-auto text-[10px] font-semibold text-white/40">
+                        {f.count}
+                      </span>
+                    </Link>
+                  </li>
+                )
+              })}
             </ul>
             <Link
               to="/filieres"
               className="group mt-1 inline-flex w-fit items-center gap-1 text-sm font-semibold text-white/85 transition-colors duration-200 hover:text-brand-orange"
             >
-              Voir les 13 filières
+              Voir les {filieres.length} filières
               <ChevronRight className="size-3.5 transition-transform duration-200 group-hover:translate-x-0.5" />
             </Link>
           </motion.div>
@@ -425,21 +414,27 @@ const Footer = () => {
           </p>
 
 
+          {/* APRÈS — liste des sources actives depuis l'API */}
           <p className="hidden items-center gap-2 lg:flex">
             <Radar className="size-3.5 text-brand-orange/70" />
             Offres collectées sur
-            {SOURCES.map((s, i) => (
-              <a
-                href={s.link} key={i} target="_blank" rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 font-semibold text-white/60 hover:text-brand-orange"
-              >
-                {s.ic ?
-                  <FaLinkedin className="size-2.5 text-[#0A66C2]" />
-                  : <img src={getImgSource(s.src)} alt={s.src} className="h-full size-6.5 object-contain" />}
-                {s.src}
-                {i < SOURCES.length - 1 && <span className="text-white/20">·</span>}
-              </a>
-            ))}
+            {sourcesList.length > 0 ? (
+              sourcesList.map((s, i) => (
+                <a
+                  href={s.base_url}
+                  key={s.code}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 font-semibold text-white/60 hover:text-brand-orange"
+                >
+                  <SourceLogo code={s.code} className="size-4 rounded-sm" />
+                  {s.name}
+                  {i < sourcesList.length - 1 && <span className="text-white/20">·</span>}
+                </a>
+              ))
+            ) : (
+              <span className="font-semibold text-white/60">nos sources partenaires</span>
+            )}
           </p>
 
           <div className="flex items-center gap-4">

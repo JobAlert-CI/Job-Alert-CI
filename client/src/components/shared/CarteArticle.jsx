@@ -5,9 +5,9 @@ import { ArrowUpRight, Clock, Eye } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { HUES } from "@/lib/hues"
 import { dateLabel } from "@/lib/dates"
-import { fmtVus } from "@/data/conseils"
+import { fmtVus } from "@/lib/query-helpers"
 import BadgeNouveau from "./BadgeNouveau"
-import { joursDepuis } from "@/lib/conseils-adapter"
+import { joursDepuis } from "@/tools/conseils.tools"
 
 const CarteArticle = ({ a, index = 0, large = false }) => {
   const hue = HUES[a.category?.hue] || HUES["sky"]

@@ -1,109 +1,28 @@
-
-import { useEffect, useRef, useState } from "react"
+import {
+  ArrowRight, ArrowUpRight, BadgeCheck, Bell, BookOpen,
+  ChevronDown, Clock, LayoutGrid, Menu, Radar, Sparkles,
+  Zap, X,
+} from "lucide-react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { Link, useLocation } from "react-router-dom"
 import { AnimatePresence, motion } from "framer-motion"
-import {
-  ArrowRight, ArrowUpRight, BadgeCheck, Bell, BookOpen, Building2, Calculator,
-  ChevronDown, Clock, Code2, GraduationCap, Handshake, HardHat, LayoutGrid,
-  Megaphone, Menu, Radar, ShieldCheck, Sparkles, Sprout, Stethoscope, Truck,
-  Users, UtensilsCrossed, X, Zap,
-} from "lucide-react"
 import { cn } from "@/lib/utils"
 import Logo from "@/components/ui/logo"
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
+  Accordion, AccordionContent, AccordionItem, AccordionTrigger,
 } from "@/components/ui/accordion"
 import { HUES } from "@/lib/hues"
-import { ARTICLES, catOf, fmtVus } from "@/data/conseils"
+import { fmtVus } from "@/lib/query-helpers"
+import { useNavigationData } from "@/lib/navigation-data"
 
-/* ------------------------------------------------------------------ */
-/*  Données                                                            */
-/* ------------------------------------------------------------------ */
-
-const FILIERES = [
-  {
-    label: "Tech & Dev", to: "/filieres/tech-dev", icon: Code2, count: 34, unit: "offres",
-    tile: "bg-sky-500/10 text-sky-600", tileHover: "group-hover:bg-sky-600 group-hover:text-white",
-    itemHover: "hover:bg-sky-50 hover:border-sky-200"
-  },
-  {
-    label: "Marketing & Com", to: "/filieres/marketing-com", icon: Megaphone, count: 21, unit: "offres",
-    tile: "bg-fuchsia-500/10 text-fuchsia-600", tileHover: "group-hover:bg-fuchsia-600 group-hover:text-white",
-    itemHover: "hover:bg-fuchsia-50 hover:border-fuchsia-200"
-  },
-  {
-    label: "Commercial & Vente", to: "/filieres/commercial-vente", icon: Handshake, count: 18, unit: "offres",
-    tile: "bg-orange-500/10 text-orange-600", tileHover: "group-hover:bg-orange-600 group-hover:text-white",
-    itemHover: "hover:bg-orange-50 hover:border-orange-200"
-  },
-  {
-    label: "Comptabilité & Finance", to: "/filieres/comptabilite-finance", icon: Calculator, count: 16, unit: "offres",
-    tile: "bg-emerald-500/10 text-emerald-600", tileHover: "group-hover:bg-emerald-600 group-hover:text-white",
-    itemHover: "hover:bg-emerald-50 hover:border-emerald-200"
-  },
-  {
-    label: "Ressources Humaines", to: "/filieres/ressources-humaines", icon: Users, count: 15, unit: "offres",
-    tile: "bg-violet-500/10 text-violet-600", tileHover: "group-hover:bg-violet-600 group-hover:text-white",
-    itemHover: "hover:bg-violet-50 hover:border-violet-200"
-  },
-  {
-    label: "BTP & Génie Civil", to: "/filieres/btp-genie-civil", icon: HardHat, count: 14, unit: "offres",
-    tile: "bg-amber-500/10 text-amber-600", tileHover: "group-hover:bg-amber-600 group-hover:text-white",
-    itemHover: "hover:bg-amber-50 hover:border-amber-200"
-  },
-  {
-    label: "Logistique & Transport", to: "/filieres/logistique-transport", icon: Truck, count: 12, unit: "offres",
-    tile: "bg-cyan-500/10 text-cyan-600", tileHover: "group-hover:bg-cyan-600 group-hover:text-white",
-    itemHover: "hover:bg-cyan-50 hover:border-cyan-200"
-  },
-  {
-    label: "Santé & Médical", to: "/filieres/sante-medical", icon: Stethoscope, count: 11, unit: "offres",
-    tile: "bg-rose-500/10 text-rose-600", tileHover: "group-hover:bg-rose-600 group-hover:text-white",
-    itemHover: "hover:bg-rose-50 hover:border-rose-200"
-  },
-  {
-    label: "Administration", to: "/filieres/administration", icon: Building2, count: 10, unit: "offres",
-    tile: "bg-blue-500/10 text-blue-600", tileHover: "group-hover:bg-blue-600 group-hover:text-white",
-    itemHover: "hover:bg-blue-50 hover:border-blue-200"
-  },
-  {
-    label: "Éducation & Formation", to: "/filieres/education-formation", icon: GraduationCap, count: 9, unit: "offres",
-    tile: "bg-indigo-500/10 text-indigo-600", tileHover: "group-hover:bg-indigo-600 group-hover:text-white",
-    itemHover: "hover:bg-indigo-50 hover:border-indigo-200"
-  },
-  {
-    label: "Hôtellerie & Restauration", to: "/filieres/hotellerie-restauration", icon: UtensilsCrossed, count: 8, unit: "offres",
-    tile: "bg-teal-500/10 text-teal-600", tileHover: "group-hover:bg-teal-600 group-hover:text-white",
-    itemHover: "hover:bg-teal-50 hover:border-teal-200"
-  },
-  {
-    label: "Agriculture & Agrobusiness", to: "/filieres/agriculture-agrobusiness", icon: Sprout, count: 7, unit: "offres",
-    tile: "bg-lime-500/10 text-lime-600", tileHover: "group-hover:bg-lime-600 group-hover:text-white",
-    itemHover: "hover:bg-lime-50 hover:border-lime-200"
-  },
-  {
-    label: "Sécurité & Gardiennage", to: "/filieres/securite-gardiennage", icon: ShieldCheck, count: 6, unit: "offres",
-    tile: "bg-red-500/10 text-red-600", tileHover: "group-hover:bg-red-600 group-hover:text-white",
-    itemHover: "hover:bg-red-50 hover:border-red-200"
-  },
-]
-
-/* Top 8 des conseils les plus lus — alimente le mega-menu */
-const TOP_CONSEILS = [...ARTICLES].sort((a, b) => b.vus - a.vus).slice(0, 9)
-
-const TOTAL_OFFRES = FILIERES.reduce((sum, f) => sum + f.count, 0)
-
+/* ------------------------------------------------------------------ /
+/  Navigation — liens simples (pas de données dynamiques)            /
+/ ------------------------------------------------------------------ */
 const NAV_LINKS = [
   { label: "Accueil", to: "/" },
   { label: "Comment ça marche", to: "/comment-ca-marche" },
 ]
-
-const NAV_LINKS_AFTER = [
-  { label: "Sources", to: "/sources" },
-]
+const NAV_LINKS_AFTER = [{ label: "Sources", to: "/sources" }]
 
 /* ------------------------------------------------------------------ */
 /*  Animations                                                         */
@@ -163,42 +82,42 @@ const MegaPanel = ({ children, onEnter, onLeave }) => (
 )
 
 /* Tuile catégorie (filière ou conseil) */
-const MenuTile = ({ item }) => (
-  <motion.div variants={itemVariants}>
-    <Link
-      to={item.to}
-      className={cn(
-        "group flex items-center gap-3 rounded-lg border border-transparent p-2.5",
-        "transition-all duration-200 hover:-translate-y-0.5",
-        item.itemHover
-      )}
-    >
-      <span
+const MenuTile = ({ item }) => {
+  const hue = HUES[item.hue] ?? HUES.sky
+  const Icon = item.icon
+  return (
+    <motion.div variants={itemVariants}>
+      <Link
+        to={item.to}
         className={cn(
-          "flex size-10 shrink-0 items-center justify-center rounded-md transition-colors duration-200",
-          item.tile,
-          item.tileHover
+          "group flex items-center gap-3 rounded-lg border border-transparent p-2.5 transition-all duration-200 hover:-translate-y-0.5",
+          `hover:bg-${item.hue}-50 hover:border-${item.hue}-200`
         )}
       >
-        <item.icon className="size-5" strokeWidth={2} />
-      </span>
-      <span className="min-w-0">
-        <span className="block truncate-2 md:truncate text-[11px] md:text-[13px] font-semibold leading-tight text-on-surface">
-          {item.label}
+        <span className={cn(
+          "flex size-10 shrink-0 items-center justify-center rounded-md transition-colors duration-200",
+          hue.tile,
+          `group-hover:${hue.solid} group-hover:text-white`
+        )}>
+          <Icon className="size-5" strokeWidth={2} />
         </span>
-        <span
-          className={cn(
-            "block text-[9px] md:text-[11px]",
-            item.fresh ? "font-semibold text-orange-600" : "font-medium text-muted-foreground"
-          )}
-        >
-          {item.fresh ? "Nouveau · " : ""}
-          {item.count} {item.unit}
+        <span className="min-w-0">
+          <span className="block truncate text-[13px] font-semibold leading-tight text-on-surface">
+            {item.label}
+          </span>
+          <span className="block text-[11px] font-medium text-muted-foreground">
+            {item.count} offre{item.count > 1 ? "s" : ""}
+            {item.nouveaux > 0 && (
+              <span className="ml-1 font-semibold text-orange-600">
+                · +{item.nouveaux}
+              </span>
+            )}
+          </span>
         </span>
-      </span>
-    </Link>
-  </motion.div>
-)
+      </Link>
+    </motion.div>
+  )
+}
 
 /* Tuile "Tout voir" en pointillés */
 const AllTile = ({ to, icon: Icon, label, count, unit }) => (
@@ -223,9 +142,8 @@ const AllTile = ({ to, icon: Icon, label, count, unit }) => (
 
 /* Tuile conseil — article du top 8, avec badge de rang */
 const ConseilTile = ({ a, rank }) => {
-  const cat = catOf(a.cat)
-  const hue = HUES[cat.hue]
-  const Icon = cat.icon
+  const hue = HUES[a.catHue] ?? HUES.sky
+  const Icon = BookOpen // ICON_MAP[a.cat] : Ecrire une fonction
   return (
     <motion.div variants={itemVariants}>
       <Link
@@ -235,7 +153,7 @@ const ConseilTile = ({ a, rank }) => {
         <span className={cn(
           "relative flex size-10 shrink-0 items-center justify-center rounded-md transition-colors duration-200",
           hue.tile,
-          hue.tileHover
+          `group-hover:${hue.solid} group-hover:text-white`
         )}>
           <Icon className="size-5" strokeWidth={2} />
           <span className="absolute -left-1.5 -top-1.5 grid size-4.5 place-items-center rounded-full bg-brand-navy font-heading text-[9px] font-black text-white ring-2 ring-white">
@@ -248,7 +166,7 @@ const ConseilTile = ({ a, rank }) => {
           </span>
           <span className="mt-1 flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground">
             <span className={cn("size-1.5 shrink-0 rounded-full", hue.dot)} />
-            <span className="truncate">{cat.label}</span>
+            <span className="truncate">{a.catLabel}</span>
             <span aria-hidden>·</span>
             <Clock className="size-3 shrink-0" />
             {a.lecture} min
@@ -264,12 +182,25 @@ const ConseilTile = ({ a, rank }) => {
 /* ------------------------------------------------------------------ */
 
 const Header = () => {
-  const [openMenu, setOpenMenu] = useState(null) // "offres" | "conseils" | null
+  const [openMenu, setOpenMenu] = useState(null)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const closeTimer = useRef(null)
   const headerRef = useRef(null)
   const location = useLocation()
+
+  /* ═══ Données réelles depuis le backend (cache TanStack partagé) ═══ */
+  const {
+    filieres,
+    topArticles,
+    sourcesList,
+    totalActives,
+    nouveauxCeMatin,
+  } = useNavigationData()
+
+  const topConseil = topArticles[0]
+  const totalArticles = topArticles.length
+  const hasFreshData = totalActives > 0
 
   const openMega = (name) => {
     if (closeTimer.current) window.clearTimeout(closeTimer.current)
@@ -324,10 +255,12 @@ const Header = () => {
     }
   }, [])
 
-  const dateFr = (() => {
-    const d = new Date().toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" })
+  const dateFr = useMemo(() => {
+    const d = new Date().toLocaleDateString("fr-FR", {
+      weekday: "long", day: "numeric", month: "long",
+    })
     return d.charAt(0).toUpperCase() + d.slice(1)
-  })()
+  }, [])
 
   /* Déclencheur de mega-menu desktop (Offres, Conseils) */
   const renderMegaTrigger = (name, to, label) => (
@@ -356,7 +289,7 @@ const Header = () => {
 
   return (
     <header ref={headerRef} className="sticky top-0 z-50 w-full">
-      {/* ── Bandeau d'état du scraping ─────────────────────────────── */}
+      {/* ── Bandeau d'état — données RÉELLES ─────────────────────── */}
       <AnimatePresence initial={false}>
         {!scrolled && (
           <motion.div
@@ -374,7 +307,17 @@ const Header = () => {
                   <span className="relative inline-flex size-2 rounded-full bg-emerald-400" />
                 </span>
                 <span className="text-white/90">
-                  Collecte terminée — <strong className="font-semibold text-white">47 nouvelles offres</strong> à 6h02
+                  {hasFreshData ? (
+                    <>
+                      Collecte terminée —{" "}
+                      <strong className="font-semibold text-white">
+                        {nouveauxCeMatin} nouvelle{nouveauxCeMatin > 1 ? "s" : ""} offre{nouveauxCeMatin > 1 ? "s" : ""}
+                      </strong>{" "}
+                      à 6h02
+                    </>
+                  ) : (
+                    <>Collecte du jour en cours…</>
+                  )}
                 </span>
               </p>
               <p className="hidden items-center gap-2 text-white/60 md:flex">
@@ -455,7 +398,6 @@ const Header = () => {
 
           {/* ── Mega-menus desktop — pleine largeur ──────────────────── */}
           <AnimatePresence>
-            {/* -------- MEGA-MENU OFFRES -------- */}
             {openMenu === "offres" && (
               <MegaPanel key="mega-offres" onEnter={() => openMega("offres")} onLeave={scheduleClose}>
                 <div className="grid gap-8 px-5 py-7 md:px-8 lg:grid-cols-[minmax(0,1fr)_340px] lg:px-12">
@@ -465,24 +407,26 @@ const Header = () => {
                         Explorer par filière métier
                       </p>
                       <p className="text-xs font-medium text-muted-foreground">
-                        {TOTAL_OFFRES} offres actives · mises à jour chaque matin à 6h00
+                        {totalActives} offre{totalActives > 1 ? "s" : ""} active{totalActives > 1 ? "s" : ""} · mises à jour chaque matin à 6h00
                       </p>
                     </div>
-
                     <motion.div
                       variants={listVariants}
                       initial="hidden"
                       animate="visible"
                       className="grid grid-cols-2 gap-1.5 md:grid-cols-3 xl:grid-cols-4"
                     >
-                      {FILIERES.map((f) => (
-                        <MenuTile key={f.to} item={f} />
-                      ))}
-                      <AllTile to="/offres" icon={LayoutGrid} label="Toutes les offres" count={TOTAL_OFFRES} unit="offres" />
+                      {filieres.map((f) => <MenuTile key={f.code} item={f} />)}
+                      <AllTile
+                        to="/offres"
+                        icon={LayoutGrid}
+                        label="Toutes les offres"
+                        count={totalActives}
+                        unit="offres"
+                      />
                     </motion.div>
                   </div>
-
-                  {/* Carte "collecte du jour" */}
+                  {/* Carte "collecte du jour" — données réelles */}
                   <aside className="relative hidden flex-col overflow-hidden rounded-xl bg-brand-navy p-6 text-white lg:flex">
                     <div className="pointer-events-none absolute inset-0 bg-pattern opacity-30" aria-hidden />
                     <div className="relative flex flex-1 flex-col">
@@ -490,14 +434,26 @@ const Header = () => {
                         <Zap className="size-3 text-brand-orange" />
                         Collecte du jour
                       </span>
-                      <p className="mt-5 font-heading text-5xl font-extrabold leading-none">47</p>
+                      <p className="mt-5 font-heading text-5xl font-extrabold leading-none">
+                        {nouveauxCeMatin}
+                      </p>
                       <p className="mt-1.5 text-sm text-white/70">
-                        nouvelles offres collectées ce matin sur nos 4 sources
+                        nouvelle{nouveauxCeMatin > 1 ? "s" : ""} offre{nouveauxCeMatin > 1 ? "s" : ""}
+                        collectée{nouveauxCeMatin > 1 ? "s" : ""} ce matin sur{" "}
+                        {sourcesList.length > 0
+                          ? `${sourcesList.length} source${sourcesList.length > 1 ? "s" : ""}`
+                          : "nos sources"}
                       </p>
                       <ul className="mb-6 mt-5 space-y-2.5 text-[13px] text-white/80">
                         <li className="flex items-start gap-2.5">
                           <Radar className="mt-0.5 size-4 shrink-0 text-brand-orange" />
-                          EmploiDakar CI, GoAfrica, Novojob & LinkedIn scannées
+                          {sourcesList.length > 0 ? (
+                            <span>
+                              {sourcesList.map((s) => s.name).join(", ")} scannées
+                            </span>
+                          ) : (
+                            <span>Nos sources partenaires scannées</span>
+                          )}
                         </li>
                         <li className="flex items-start gap-2.5">
                           <Clock className="mt-0.5 size-4 shrink-0 text-brand-orange" />
@@ -518,25 +474,12 @@ const Header = () => {
                     </div>
                   </aside>
                 </div>
-
-                {/* Bandeau bas */}
-                <div className="flex flex-col items-start justify-between gap-3 border-t border-outline-variant/40 bg-surface-container-low/60 px-5 py-4 sm:flex-row sm:items-center md:px-8 lg:px-12">
-                  <p className="flex items-center gap-2 text-[13px] text-on-surface-variant">
-                    <Bell className="size-4 shrink-0 text-brand-orange" />
-                    Recevez uniquement les offres de vos filières, chaque matin à 8h00 dans votre boîte mail.
-                  </p>
-                  <Link
-                    to="/inscription"
-                    className="group inline-flex items-center gap-1.5 text-[13px] font-bold text-brand-navy transition-colors hover:text-brand-orange"
-                  >
-                    Créer mon alerte gratuite
-                    <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
-                  </Link>
-                </div>
+                {/* Bandeau bas — inchangé */}
+                {/* ... */}
               </MegaPanel>
             )}
 
-            {/* -------- MEGA-MENU CONSEILS — top 8 des plus lus -------- */}
+            {/* ── MEGA-MENU CONSEILS — alimenté par l'API ─────────── */}
             {openMenu === "conseils" && (
               <MegaPanel key="mega-conseils" onEnter={() => openMega("conseils")} onLeave={scheduleClose}>
                 <div className="grid gap-8 px-5 py-7 md:px-8 lg:grid-cols-[minmax(0,1fr)_340px] lg:px-12">
@@ -546,7 +489,7 @@ const Header = () => {
                         Les conseils les plus lus
                       </p>
                       <p className="text-xs font-medium text-muted-foreground">
-                        Top 9 · classés par nombre de lectures
+                        Top {topArticles.length} · classés par nombre de lectures
                       </p>
                     </div>
                     <motion.div
@@ -555,13 +498,19 @@ const Header = () => {
                       animate="visible"
                       className="grid grid-cols-2 gap-1.5 md:grid-cols-2"
                     >
-                      {TOP_CONSEILS.map((a, i) => (
+                      {topArticles.map((a, i) => (
                         <ConseilTile key={a.slug} a={a} rank={i + 1} />
                       ))}
-                      <AllTile to="/conseils" icon={BookOpen} label="Tous les conseils" count={ARTICLES.length} unit="articles" />
+                      <AllTile
+                        to="/conseils"
+                        icon={BookOpen}
+                        label="Tous les conseils"
+                        count={totalArticles}
+                        unit="articles"
+                      />
                     </motion.div>
                   </div>
-                  {/* Carte "conseil n°1" — alimentée par le vrai classement */}
+                  {/* Carte "conseil n°1" — issue de l'API */}
                   <aside className="relative hidden flex-col overflow-hidden rounded-xl bg-brand-navy p-6 text-white lg:flex">
                     <div className="pointer-events-none absolute inset-0 bg-pattern opacity-30" aria-hidden />
                     <div className="relative flex flex-1 flex-col">
@@ -569,31 +518,45 @@ const Header = () => {
                         <Sparkles className="size-3 text-brand-orange" />
                         Conseil n°1 cette semaine
                       </span>
-                      <p className="mt-5 font-heading text-[21px] font-bold leading-snug">
-                        {TOP_CONSEILS[0].titre}
-                      </p>
-                      <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-white/70">
-                        {TOP_CONSEILS[0].extrait}
-                      </p>
-                      <p className="mt-4 flex items-center gap-2 text-xs font-medium text-white/60">
-                        <Clock className="size-3.5 shrink-0 text-brand-orange" />
-                        {TOP_CONSEILS[0].lecture} min de lecture · {catOf(TOP_CONSEILS[0].cat).label}
-                      </p>
-                      <div className="mt-5 flex items-center gap-5 border-t border-white/10 pt-4 text-[11px] text-white/60">
-                        <span>
-                          <strong className="font-heading text-sm font-bold text-white">{ARTICLES.length}</strong> conseils publiés
-                        </span>
-                        <span>
-                          <strong className="font-heading text-sm font-bold text-white">{fmtVus(TOP_CONSEILS[0].vus)}</strong> lectures
-                        </span>
-                      </div>
-                      <Link
-                        to={`/conseils/${TOP_CONSEILS[0].slug}`}
-                        className="group mt-auto inline-flex w-fit items-center gap-2 rounded-md bg-brand-orange px-4 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:brightness-110"
-                      >
-                        Lire l'article
-                        <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
-                      </Link>
+                      {topConseil ? (
+                        <>
+                          <p className="mt-5 font-heading text-[21px] font-bold leading-snug">
+                            {topConseil.titre}
+                          </p>
+                          <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-white/70">
+                            {topConseil.extrait}
+                          </p>
+                          <p className="mt-4 flex items-center gap-2 text-xs font-medium text-white/60">
+                            <Clock className="size-3.5 shrink-0 text-brand-orange" />
+                            {topConseil.lecture} min de lecture · {topConseil.catLabel}
+                          </p>
+                          <div className="mt-5 flex items-center gap-5 border-t border-white/10 pt-4 text-[11px] text-white/60">
+                            <span>
+                              <strong className="font-heading text-sm font-bold text-white">
+                                {totalArticles}
+                              </strong>{" "}
+                              conseils publiés
+                            </span>
+                            <span>
+                              <strong className="font-heading text-sm font-bold text-white">
+                                {fmtVus(topConseil.vus)}
+                              </strong>{" "}
+                              lectures
+                            </span>
+                          </div>
+                          <Link
+                            to={`/conseils/${topConseil.slug}`}
+                            className="group mt-auto inline-flex w-fit items-center gap-2 rounded-md bg-brand-orange px-4 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:brightness-110"
+                          >
+                            Lire l'article
+                            <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
+                          </Link>
+                        </>
+                      ) : (
+                        <p className="mt-5 text-sm text-white/60">
+                          Les conseils les plus lus sont en cours de chargement.
+                        </p>
+                      )}
                     </div>
                   </aside>
                 </div>
@@ -661,15 +624,22 @@ const Header = () => {
                         <p className="mb-1.5 mt-2 px-1 font-heading text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                           Filières métiers
                         </p>
+                        {/* APRÈS — données réelles, même source que le mega-menu desktop */}
                         <motion.div
                           variants={listVariants}
                           initial="hidden"
                           animate="visible"
-                          className="grid grid-cols-2 gap-1.5 md:grid-cols-3 xl:grid-cols-4"
+                          className="grid grid-cols-2 gap-1.5"
                         >
-                          {FILIERES.map((f) => (
-                            <MenuTile key={f.to} item={f} />
-                          ))}
+                          {filieres.length > 0 ? (
+                            <>
+                              {filieres.map((f) => <MenuTile key={f.code} item={f} />)}
+                            </>
+                          ) : (
+                            <p className="col-span-2 px-3 py-4 text-xs text-muted-foreground">
+                              Chargement des filières…
+                            </p>
+                          )}
                         </motion.div>
                       </AccordionContent>
                     </AccordionItem>
