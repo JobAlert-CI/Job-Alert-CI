@@ -68,7 +68,7 @@ SOURCES = [
         "default_scan_time": "06:10",
         "description": "Site emploi à couverture régionale africaine.",
         "notes": "Contrôler la pagination et les libellés de filière.",
-        "is_primary": True,
+        "is_primary": False,
         "supports_scraping": True,
     },
     {
@@ -84,7 +84,7 @@ SOURCES = [
         "default_scan_time": "06:20",
         "description": "Plateforme emploi locale ivoirienne.",
         "notes": "Source locale pertinente pour les offres PME.",
-        "is_primary": True,
+        "is_primary": False,
         "supports_scraping": True,
     },
     {
