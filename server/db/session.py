@@ -69,4 +69,6 @@ def init_db() -> None:
     from db.base import Base
     import models  # noqa: F401
 
+    # Base.metadata.drop_all(bind=engine)
+
     Base.metadata.create_all(bind=engine)

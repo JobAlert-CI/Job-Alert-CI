@@ -25,6 +25,9 @@ class JobOfferStatus(StrEnum):
     ARCHIVED = "archived"
     DUPLICATE = "duplicate"
     HIDDEN = "hidden"
+    BRUTE = "brute"
+    PROCESSING = "processing"
+    REJECTED = "rejected"
 
 
 class JobOfferOrigin(StrEnum):
@@ -39,6 +42,29 @@ class IngestionAction(StrEnum):
     DUPLICATE = "duplicate"
     SKIPPED = "skipped"
     FAILED = "failed"
+
+
+class AiOfferStatus(StrEnum):
+    PENDING = "pending"
+    PROCESSING = "processing"
+    SKIPPED = "skipped"
+    NOOP = "noop"
+    FAILED = "failed"
+
+
+class AiProcessingJobTrigger(StrEnum):
+    IMMEDIATE = "immediate"
+    SWEEP = "sweep"
+    MANUAL = "manual"
+
+
+class AiProcessingJobStatus(StrEnum):
+    PENDING = "pending"
+    RUNNING = "running"
+    COMPLETED = "completed"
+    FAILED = "failed"
+    SKIPPED = "skipped"
+    LOCKED = "locked"
 
 
 class SubscriberStatus(StrEnum):

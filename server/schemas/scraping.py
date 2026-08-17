@@ -31,6 +31,9 @@ class ScrapeRunRead(TimestampRead):
     started_at: datetime | None = None
     finished_at: datetime | None = None
     triggered_by: str
+    external_batch_id: str | None = None
+    run_reference: str | None = None
+    scraped_at: datetime | None = None
     total_raw: int
     total_inserted: int
     total_updated: int

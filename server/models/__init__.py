@@ -1,4 +1,5 @@
 from models.admin import AdminActionLog, Administrator, SiteSetting
+from models.ai import AiProcessingJob
 from models.content import (
     ContactMessage,
     ContentPage,
@@ -21,6 +22,9 @@ from models.emails import EmailDeliveryAttempt, EmailDigest, EmailDigestOffer
 from models.enums import (
     AdminAction,
     AdminRole,
+    AiOfferStatus,
+    AiProcessingJobStatus,
+    AiProcessingJobTrigger,
     ContactMessageStatus,
     ContentStatus,
     ContentType,
@@ -61,6 +65,10 @@ __all__ = [
     "AdminActionLog",
     "AdminRole",
     "Administrator",
+    "AiOfferStatus",
+    "AiProcessingJob",
+    "AiProcessingJobStatus",
+    "AiProcessingJobTrigger",
     "Article",
     "ArticleCategory",
     "ArticleKeyFigure",

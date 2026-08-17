@@ -7,7 +7,7 @@ from sqlalchemy import Boolean, CheckConstraint, DateTime, Float, ForeignKey, In
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from db.base import Base, SoftDeleteMixin, TimestampMixin, UUIDPrimaryKeyMixin
-from models.enums import IngestionAction, JobOfferOrigin, JobOfferStatus
+from models.enums import AiOfferStatus, IngestionAction, JobOfferOrigin, JobOfferStatus
 from models.types import enum_column
 
 """Domaine offres.
@@ -19,6 +19,7 @@ stats, origine admin/scraping) avec les garde-fous de ServerJobAlert 2
 
 if TYPE_CHECKING:
     from models.admin import Administrator
+    from models.ai import AiProcessingJob
     from models.emails import EmailDigestOffer
     from models.referentials import ContractType, EducationLevel, ExperienceLevel, Filiere, FiliereSpecialty, Location, Source
     from models.scraping import SourceScrapeRun
@@ -57,6 +58,8 @@ class JobOffer(UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin, Base):
     experience_level_id: Mapped[str | None] = mapped_column(ForeignKey("experience_levels.id", ondelete="SET NULL"), index=True, nullable=True)
     education_level_id: Mapped[str | None] = mapped_column(ForeignKey("education_levels.id", ondelete="SET NULL"), index=True, nullable=True)
     admin_id: Mapped[str | None] = mapped_column(ForeignKey("administrators.id", ondelete="SET NULL"), nullable=True)
+    source_scrape_run_id: Mapped[str | None] = mapped_column(ForeignKey("source_scrape_runs.id", ondelete="SET NULL"), index=True, nullable=True)
+    ai_processing_job_id: Mapped[str | None] = mapped_column(ForeignKey("ai_processing_jobs.id", ondelete="SET NULL"), index=True, nullable=True)
 
     status: Mapped[JobOfferStatus] = mapped_column(
         enum_column(JobOfferStatus), default=JobOfferStatus.ACTIVE, index=True, nullable=False
@@ -88,6 +91,16 @@ class JobOffer(UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin, Base):
     view_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     save_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
 
+    ai_status: Mapped[AiOfferStatus] = mapped_column(
+        enum_column(AiOfferStatus), default=AiOfferStatus.PENDING, index=True, nullable=False
+    )
+    ai_provider: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    ai_model: Mapped[str | None] = mapped_column(String(160), nullable=True)
+    ai_task_id: Mapped[str | None] = mapped_column(String(255), index=True, nullable=True)
+    ai_error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
+    ai_confidence: Mapped[float | None] = mapped_column(Float, nullable=True)
+    ai_processed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
     company: Mapped["Company"] = relationship(back_populates="offers")
     source: Mapped["Source"] = relationship(back_populates="offers")
     location: Mapped["Location | None"] = relationship(back_populates="offers")
@@ -97,6 +110,8 @@ class JobOffer(UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin, Base):
     experience_level: Mapped["ExperienceLevel | None"] = relationship(back_populates="offers")
     education_level: Mapped["EducationLevel | None"] = relationship(back_populates="offers")
     admin: Mapped["Administrator | None"] = relationship(back_populates="offers")
+    source_scrape_run: Mapped["SourceScrapeRun | None"] = relationship(back_populates="offers")
+    ai_processing_job: Mapped["AiProcessingJob | None"] = relationship(back_populates="offers")
     duplicate_of: Mapped["JobOffer | None"] = relationship(remote_side="JobOffer.id")
     detail: Mapped["JobOfferDetail | None"] = relationship(back_populates="offer", cascade="all, delete-orphan", uselist=False)
     filiere_links: Mapped[list["OfferFiliere"]] = relationship(back_populates="offer", cascade="all, delete-orphan")

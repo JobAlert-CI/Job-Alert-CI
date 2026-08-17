@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter
 
+from api.v1 import ingestion
 from api.v1.public import articles, contact, filieres, offers, referentials, sources, stats, subscriptions
 from api.v1.admin import (
     admins,
@@ -28,6 +29,7 @@ api_router.include_router(articles.router)
 api_router.include_router(subscriptions.router)
 api_router.include_router(contact.router)
 api_router.include_router(stats.router)
+api_router.include_router(ingestion.router)
 
 # ─── Routes admin protégées ──────────────────────────────
 api_router.include_router(auth.router)

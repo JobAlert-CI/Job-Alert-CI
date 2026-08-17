@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import secrets
+
 from fastapi import Depends, Header, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -25,6 +27,14 @@ def require_admin_api_key(x_admin_api_key: str | None = Header(default=None)) ->
         raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Admin API non configuree")
     if x_admin_api_key != settings.admin_api_key:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Cle admin invalide")
+
+
+def require_scraper_token(x_scraper_token: str | None = Header(default=None)) -> None:
+    settings = get_settings()
+    if not settings.scraper_api_token:
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Ingestion non configuree")
+    if not x_scraper_token or not secrets.compare_digest(x_scraper_token, settings.scraper_api_token):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token scraper invalide")
 
 
 def _extract_bearer_token(authorization: str | None) -> str:
@@ -73,4 +83,4 @@ def require_roles(*roles: str):
     return _check
 
 
-__all__ = ["get_db", "require_admin_api_key", "get_current_admin", "require_roles"]
+__all__ = ["get_db", "require_admin_api_key", "require_scraper_token", "get_current_admin", "require_roles"]

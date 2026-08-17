@@ -54,6 +54,10 @@ def _list_env(name: str, default: list[str]) -> list[str]:
     return [item.strip().rstrip("/") for item in raw_value.split(",") if item.strip()]
 
 
+def _str_env(name: str, default: str) -> str:
+    return getenv(name, default).strip()
+
+
 def _database_url() -> str:
     """Construit le DSN PostgreSQL a partir de DATABASE_URL ou DB_*.
 
@@ -104,6 +108,13 @@ class Settings:
     email_from: str = field(default_factory=lambda: getenv("EMAIL_FROM", "JobAlert CI <bonjour@jobalert.ci>"))
     daily_collection_hour: int = field(default_factory=lambda: _int_env("DAILY_COLLECTION_HOUR", 6))
     daily_digest_hour: int = field(default_factory=lambda: _int_env("DAILY_DIGEST_HOUR", 8))
+    scraper_api_token: str | None = field(default_factory=lambda: getenv("SCRAPER_API_TOKEN") or None)
+    ingestion_batch_size_max: int = field(default_factory=lambda: _int_env("INGESTION_BATCH_SIZE_MAX", 500))
+    ai_enabled: bool = field(default_factory=lambda: _bool_env("AI_ENABLED", False))
+    celery_broker_url: str = field(default_factory=lambda: _str_env("CELERY_BROKER_URL", "redis://localhost:6379/0"))
+    celery_result_backend: str = field(default_factory=lambda: _str_env("CELERY_RESULT_BACKEND", "redis://localhost:6379/1"))
+    redis_url: str = field(default_factory=lambda: _str_env("REDIS_URL", "redis://localhost:6379/2"))
+    api_base_url: str = field(default_factory=lambda: _str_env("API_BASE_URL", "http://localhost:8000"))
     admin_api_key: str | None = field(default_factory=lambda: getenv("ADMIN_API_KEY") or None)
     admin_jwt_secret: str = field(
         default_factory=lambda: getenv("ADMIN_JWT_SECRET") or "dev-insecure-secret-change-me"

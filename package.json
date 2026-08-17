@@ -5,8 +5,16 @@
   "main": "index.js",
   "scripts": {
     "dev:client": "cd ./client && npm run dev",
-    "dev:server": "cd ./server && uvicorn main:app --reload",
-    "dev": "concurrently \"cd ./server && uvicorn main:app --reload\" \"cd ./client && npm run dev\"",
+    "dev:server": "cd ./server && .\\.venv\\Scripts\\python.exe -m uvicorn main:app --reload",
+    "dev:worker:ingestion": "cd ./server && .\\.venv\\Scripts\\python.exe -m celery -A celery_app.celery_app worker -Q ingestion --loglevel=info --pool=solo",
+    "dev:worker:ai": "cd ./server && .\\.venv\\Scripts\\python.exe -m celery -A celery_app.celery_app worker -Q ai --loglevel=info --pool=solo",
+    "dev:beat": "cd ./server && .\\.venv\\Scripts\\python.exe -m celery -A celery_app.celery_app beat --loglevel=info",
+    "scrape:goafrica": "cd ./server && .\\.venv\\Scripts\\python.exe -m celery -A celery_app.celery_app call tasks.scrapers.run_source_scraper --args='[\"goafrica\"]'",
+    "scrape:jobivoire": "cd ./server && .\\.venv\\Scripts\\python.exe -m celery -A celery_app.celery_app call tasks.scrapers.run_source_scraper --args='[\"jobivoire\"]'",
+    "scrape:educarriere": "cd ./server && .\\.venv\\Scripts\\python.exe -m celery -A celery_app.celery_app call tasks.scrapers.run_source_scraper --args='[\"educarriere\"]'",
+    "scrape:all": "concurrently -n goafrica,jobivoire,educarriere -c blue,magenta,cyan \"npm run scrape:goafrica\" \"npm run scrape:jobivoire\" \"npm run scrape:educarriere\"",
+    "seed:scraper-sources": "cd ./server && .\\.venv\\Scripts\\python.exe -m scripts.seed_scraper_sources",
+    "dev": "concurrently -n api,client,ingestion,ai,beat -c green,cyan,yellow,magenta,blue \"npm run dev:server\" \"npm run dev:client\" \"npm run dev:worker:ingestion\" \"npm run dev:worker:ai\" \"npm run dev:beat\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
