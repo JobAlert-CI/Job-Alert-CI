@@ -1,0 +1,62 @@
+[
+    {
+        "title": "*OFFRE DE SOUTIEN SCOLAIRE ⛔️*",
+        "source_url": "https://www.goafricaonline.com/ci/emploi/job-21676-offre-de-soutien-scolaire",
+        "canonical_url": "https://www.goafricaonline.com/ci/emploi/job-21676-offre-de-soutien-scolaire",
+        "location_raw": "Cocody Riviera 4 synacassi 1 Abidjan - Côte d’Ivoire",
+        "salary_raw": null,
+        "published_at": "2026-08-14T00:00:00.000Z",
+        "collected_at": "2026-08-18T13:15:49.767Z",
+        "first_seen_at": "2026-08-18T13:15:49.767Z",
+        "last_seen_at": "2026-08-18T13:15:49.767Z",
+        "expires_at": "2026-08-30T00:00:00.000Z",
+        "application_deadline_at": "2026-08-30T00:00:00.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": "Cocody",
+            "label": "Cocody Riviera 4 synacassi 1 Abidjan - Côte d’Ivoire"
+        },
+        "contract_type": {
+            "code": "CDD",
+            "label": "Apprentissage / Alternance / CDD"
+        },
+        "experience_level": {
+            "code": "JUNIOR",
+            "label": "+ de 1 an d’expérience",
+            "min_years": 1,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_2",
+            "label": "BAC+2",
+            "rank": 2
+        },
+        "description": "MONPROFCHEZMOI est un service d’accompagnement éducatif et de soutien scolaire à Abidjan, recherche urgemment un(e) *enseignant(e) expérimenté(e) et pédagogue* Matières: Mathématique, Physique-Chimie et SVT Classe: 6ème en Tle Système: Français, Ivoirien, Bilingue Séances : 2 séances de 2h par semaine Lieu : Abidjan, Cocody Chaîne WhatsApp Monprofchezmoi : https://lnkd.in/ebtNhncn Date limite: 24/08/2026 Dossier de candidature Les candidats intéressés sont invités à transmettre par mail : rh@monprofchezmoi-ci.com -Un CV actualisé ; -Une copie des diplômes, certificats ou attestations de formation ; -Tout document justifiant de leur expérience professionnelle.",
+        "company": {
+            "name": "MONPROFCHEZMOI",
+            "website_url": "https://www.goafricaonline.com/ci/1204682-monprofchezmoi-centres-formation-abidjan-cote-ivoire",
+            "type": "Formations, éducation > Centres de formation",
+            "description": "MONPROFCHEZMOI est un service d’accompagnement éducatif et de soutien scolaire à Abidjan, recherche urgemment un(e) *enseignant(e) expérimenté(e) et pédagogue*"
+        },
+        "company_hint": null,
+        "application_email": "rh@monprofchezmoi-ci.com",
+        "application_emails": [
+            "rh@monprofchezmoi-ci.com"
+        ],
+        "remote_work": "Sans télétravail",
+        "raw_fields": {
+            "contract_raw": "Apprentissage / Alternance / CDD",
+            "experience_raw": "+ de 1 an d’expérience",
+            "education_raw": "Bac+2",
+            "published_raw": "Posté le 14 août 2026",
+            "expires_raw": "dimanche 30 août 2026 à 00:00"
+        },
+        "detail": {
+            "source_text": "MONPROFCHEZMOI est un service d’accompagnement éducatif et de soutien scolaire à Abidjan, recherche urgemment un(e) *enseignant(e) expérimenté(e) et pédagogue* Matières: Mathématique, Physique-Chimie et SVT Classe: 6ème en Tle Système: Français, Ivoirien, Bilingue Séances : 2 séances de 2h par semaine Lieu : Abidjan, Cocody Chaîne WhatsApp Monprofchezmoi : https://lnkd.in/ebtNhncn Date limite: 24/08/2026 Dossier de candidature Les candidats intéressés sont invités à transmettre par mail : rh@monprofchezmoi-ci.com -Un CV actualisé ; -Une copie des diplômes, certificats ou attestations de formation ; -Tout document justifiant de leur expérience professionnelle."
+        },
+        "télétravail": "Sans télétravail",
+        "is_télétravail": false,
+        "active": "2026-08-14T00:00:00.000Z"
+    }
+]

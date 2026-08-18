@@ -4,6 +4,8 @@ import argparse
 import hashlib
 import json
 import os
+import re
+import unicodedata
 from datetime import datetime, time, timezone
 from pathlib import Path
 from typing import Any
@@ -18,19 +20,42 @@ KNOWN_CONTRACT_CODES = {
     "stage": "stage",
     "mission": "mission",
     "alternance": "alternance",
+    "interim": "mission",
+    "freelance": "mission",
 }
 
 EDUCATION_CODE_MAP = {
     "bac": "bac",
+    "cap": "bac",
+    "bepc": "bac",
+    "bac_1": "bac",
+    "bac+1": "bac",
+    "bac_plus_1": "bac",
     "bac_2": "bac-2",
     "bac+2": "bac-2",
     "bac_plus_2": "bac-2",
     "bac_3": "bac-3",
     "bac+3": "bac-3",
     "bac_plus_3": "bac-3",
+    "bac_4": "bac-3",
+    "bac+4": "bac-3",
+    "bac_plus_4": "bac-3",
     "bac_5": "bac-5",
     "bac+5": "bac-5",
     "bac_plus_5": "bac-5",
+    "bac_8": "bac-8",
+    "bac+8": "bac-8",
+    "bac_plus_8": "bac-8",
+}
+
+EXPERIENCE_CODE_MAP = {
+    "debutant": "debutant",
+    "stagiaire": "debutant",
+    "etudiant": "debutant",
+    "junior": "1-3",
+    "confirme": "3-5",
+    "senior": "5-plus",
+    "inconnu": None,
 }
 
 
@@ -48,6 +73,21 @@ def _nested(data: dict[str, Any], *keys: str) -> Any:
             return None
         current = current.get(key)
     return current
+
+
+def _strip_accents(value: str) -> str:
+    normalized = unicodedata.normalize("NFKD", value)
+    return "".join(char for char in normalized if not unicodedata.combining(char))
+
+
+def _code_key(value: Any) -> str | None:
+    text = _clean(value)
+    if not text:
+        return None
+    text = _strip_accents(text).lower()
+    text = text.replace("+", "_plus_")
+    text = re.sub(r"[^a-z0-9]+", "_", text)
+    return text.strip("_") or None
 
 
 def _as_datetime(value: Any) -> str | None:
@@ -81,36 +121,78 @@ def _source_reference(source_code: str, job: dict[str, Any]) -> str | None:
 
 
 def _contract_code(job: dict[str, Any]) -> str | None:
-    raw_code = _clean(_nested(job, "contract_type", "code"))
-    if not raw_code:
+    raw_code = _code_key(_nested(job, "contract_type", "code")) or _code_key(_nested(job, "contract_type", "label"))
+    if not raw_code or raw_code == "inconnu":
         return None
-    normalized = raw_code.lower().replace("_", "-").replace("+", "-")
-    normalized = normalized.removeprefix("emploi-")
+    normalized = raw_code.replace("_", "-").removeprefix("emploi-")
     return KNOWN_CONTRACT_CODES.get(normalized)
 
 
 def _education_code(job: dict[str, Any]) -> str | None:
-    raw_code = _clean(_nested(job, "education_level", "code"))
-    if not raw_code:
+    raw_code = _code_key(_nested(job, "education_level", "code")) or _code_key(_nested(job, "education_level", "label"))
+    if not raw_code or raw_code == "inconnu":
         return None
-    normalized = raw_code.lower().replace("-", "_")
-    return EDUCATION_CODE_MAP.get(normalized)
+    mapped = EDUCATION_CODE_MAP.get(raw_code)
+    if mapped:
+        return mapped
+    rank = _nested(job, "education_level", "rank")
+    if isinstance(rank, int):
+        if rank >= 8:
+            return "bac-8"
+        if rank >= 5:
+            return "bac-5"
+        if rank >= 3:
+            return "bac-3"
+        if rank >= 2:
+            return "bac-2"
+        if rank >= 0:
+            return "bac"
+    return None
 
 
 def _experience_code(job: dict[str, Any]) -> str | None:
-    raw = _clean(_nested(job, "experience_level", "code")) or _clean(job.get("experience_level"))
-    if not raw:
-        return None
-    normalized = raw.lower()
-    if "debut" in normalized or "etudiant" in normalized or "stagiaire" in normalized:
+    raw_code = _code_key(_nested(job, "experience_level", "code")) or _code_key(_nested(job, "experience_level", "label")) or _code_key(job.get("experience_level"))
+    if raw_code in EXPERIENCE_CODE_MAP:
+        return EXPERIENCE_CODE_MAP[raw_code]
+
+    min_years = _nested(job, "experience_level", "min_years")
+    max_years = _nested(job, "experience_level", "max_years")
+    if isinstance(min_years, int):
+        if min_years >= 5:
+            return "5-plus"
+        if min_years >= 3:
+            return "3-5"
+        if min_years >= 1:
+            return "1-3"
         return "debutant"
-    if "1" in normalized and "3" in normalized:
+    if isinstance(max_years, int):
+        if max_years <= 1:
+            return "debutant"
+        if max_years <= 3:
+            return "1-3"
+        if max_years <= 5:
+            return "3-5"
+        return "5-plus"
+
+    if not raw_code:
+        return None
+    if "debut" in raw_code or "etudiant" in raw_code or "stagiaire" in raw_code:
+        return "debutant"
+    if "1" in raw_code and "3" in raw_code:
         return "1-3"
-    if "3" in normalized and "5" in normalized:
+    if "3" in raw_code and "5" in raw_code:
         return "3-5"
-    if "senior" in normalized or "+ de 5" in normalized or "5" in normalized:
+    if "senior" in raw_code or "5" in raw_code:
         return "5-plus"
     return None
+
+
+def _company_name(job: dict[str, Any]) -> str | None:
+    company = job.get("company")
+    return (
+        _clean(job.get("company_name"))
+        or _clean(_nested(job, "company", "name")) if isinstance(company, dict) else None
+    ) or _clean(job.get("company_hint"))
 
 
 def to_ingest_offer(source_code: str, job: dict[str, Any], *, default_filiere_code: str | None = None) -> dict[str, Any] | None:
@@ -129,6 +211,8 @@ def to_ingest_offer(source_code: str, job: dict[str, Any], *, default_filiere_co
         "source_url": source_url,
         "canonical_url": _clean(job.get("canonical_url")),
         "published_at": _as_datetime(job.get("published_at")),
+        "expires_at": _as_datetime(job.get("expires_at")),
+        "application_deadline_at": _as_datetime(job.get("application_deadline_at")),
         "location_raw": _clean(job.get("location_raw")),
         "salary_raw": _clean(job.get("salary_raw")),
         "description": description,
@@ -139,6 +223,22 @@ def to_ingest_offer(source_code: str, job: dict[str, Any], *, default_filiere_co
         "education_level_code": _education_code(job),
     }
     return {key: value for key, value in item.items() if value is not None}
+
+
+def load_jobs(json_file: Path) -> list[dict[str, Any]]:
+    data = json.loads(json_file.read_text(encoding="utf-8-sig"))
+    if isinstance(data, list):
+        jobs = data
+    elif isinstance(data, dict):
+        jobs = next(
+            (data[key] for key in ("offers", "jobs", "data", "items") if isinstance(data.get(key), list)),
+            None,
+        )
+    else:
+        jobs = None
+    if not isinstance(jobs, list) or not all(isinstance(job, dict) for job in jobs):
+        raise ValueError("Le fichier JSON doit contenir une liste d'offres ou une enveloppe avec offers/jobs/data/items.")
+    return jobs
 
 
 def build_batch(source_code: str, jobs: list[dict[str, Any]], *, run_reference: str | None = None) -> tuple[dict[str, Any], int]:
@@ -211,9 +311,10 @@ def main() -> None:
     if not token:
         raise SystemExit("SCRAPER_API_TOKEN est requis.")
 
-    jobs = json.loads(args.json_file.read_text(encoding="utf-8"))
-    if not isinstance(jobs, list):
-        raise SystemExit("Le fichier JSON doit contenir une liste d'offres.")
+    try:
+        jobs = load_jobs(args.json_file)
+    except ValueError as exc:
+        raise SystemExit(str(exc)) from exc
 
     batch, skipped = build_batch(args.source_code, jobs, run_reference=f"file:{args.json_file.name}")
     if skipped:

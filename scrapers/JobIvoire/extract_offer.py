@@ -738,6 +738,18 @@ def clean_description(text: Optional[str]) -> str:
 # --------------------------------------------------
 
 def parse_french_date(raw: Optional[str], end_of_day: bool = False) -> Optional[datetime]:
+    """
+    Parse une date française avec gestion des formats relatifs et absolus.
+    
+    Gère :
+      - "Aujourd'hui", "Aujourd'hui, 11:30"
+      - "Hier", "Hier, 09:40"
+      - "Avant-hier", "Avant-hier, 23:30"
+      - "15/08/2026", "15-08-2026", "15.08.2026"
+      - "15/08/2026 16:50" (heure ignorée)
+      - "15 août 2026", "1er août 2026"
+      - Formats ISO (2026-08-15, 2026-08-15T14:30:00Z)
+    """
     if not raw:
         logger.debug("[parse_french_date] Date brute vide.")
         return None
@@ -747,7 +759,15 @@ def parse_french_date(raw: Optional[str], end_of_day: bool = False) -> Optional[
         logger.debug("[parse_french_date] Date brute vide après nettoyage.")
         return None
 
-    # ISO direct, si jamais
+    # Nettoyage des préfixes courants
+    raw = re.sub(
+        r"^(publi[ée]e?|post[ée]e?|mis\s+en\s+ligne|date\s+de\s+publication|publication|date\s+de\s+cr[ée]ation)\s*[:\-–—]?\s*(le\s*)?",
+        "",
+        raw,
+        flags=re.IGNORECASE
+    ).strip()
+
+    # ISO direct, si jamais (2026-08-15 ou 2026-08-15T14:30:00Z)
     try:
         iso_raw = raw.replace("Z", "+00:00")
         dt = datetime.fromisoformat(iso_raw)
@@ -760,30 +780,69 @@ def parse_french_date(raw: Optional[str], end_of_day: bool = False) -> Optional[
     now = utc_now()
     base_date = None
 
-    if "hier" in normalized:
+    # ⚠️ IMPORTANT : vérifier "avant-hier" AVANT "hier"
+    # car "hier" est contenu dans "avant-hier"
+    if "avant-hier" in normalized or "avant hier" in normalized:
+        logger.debug(f"[parse_french_date] 'Avant-hier' détecté dans '{raw}'")
+        base_date = (now - timedelta(days=2)).date()
+    elif "hier" in normalized:
+        logger.debug(f"[parse_french_date] 'Hier' détecté dans '{raw}'")
         base_date = (now - timedelta(days=1)).date()
     elif "aujourd" in normalized:
+        logger.debug(f"[parse_french_date] 'Aujourd'hui' détecté dans '{raw}'")
         base_date = now.date()
     else:
-        m = re.search(r"(\d{1,2})/(\d{1,2})/(\d{4})", raw)
+        # Enlever l'heure éventuelle après une date numérique
+        # Ex: "14/08/2026 16:50" -> "14/08/2026"
+        cleaned_no_time = re.sub(
+            r"(\d{1,2}[/.-]\d{1,2}[/.-]\d{4})\s+\d{1,2}[:h]\d{2}.*",
+            r"\1",
+            raw
+        )
+
+        # Format numérique FR : 15/08/2026, 15-08-2026, 15.08.2026
+        m = re.search(r"(\d{1,2})[/.-](\d{1,2})[/.-](\d{4})", cleaned_no_time)
         if m:
             day, month, year = int(m.group(1)), int(m.group(2)), int(m.group(3))
         else:
-            m2 = re.search(r"(\d{4})-(\d{1,2})-(\d{1,2})", raw)
+            # Format ISO inversé : 2026-08-15
+            m2 = re.search(r"(\d{4})-(\d{1,2})-(\d{1,2})", cleaned_no_time)
             if not m2:
-                logger.debug(f"[parse_french_date] Format de date non reconnu : '{raw}'.")
-                return None
-            year, month, day = int(m2.group(1)), int(m2.group(2)), int(m2.group(3))
+                # Format texte FR : 15 août 2026, 1er août 2026
+                m3 = re.search(
+                    r"(\d{1,2})(?:er)?\s+([a-zûéàê]+)\.?\s+(\d{4})",
+                    normalized
+                )
+                if m3:
+                    day = int(m3.group(1))
+                    month_text = m3.group(2)
+                    year = int(m3.group(3))
+                    month_key = month_text[:3]
+                    # Dictionnaire inline pour éviter les dépendances
+                    mois_fr = {
+                        "jan": 1, "fev": 2, "mar": 3, "avr": 4,
+                        "mai": 5, "jun": 6, "jui": 7, "jul": 7,
+                        "aou": 8, "sep": 9, "oct": 10, "nov": 11, "dec": 12,
+                    }
+                    month = mois_fr.get(month_key)
+                    if not month:
+                        logger.debug(f"[parse_french_date] Mois inconnu : '{month_text}'")
+                        return None
+                else:
+                    logger.debug(f"[parse_french_date] Format de date non reconnu : '{raw}'")
+                    return None
+            else:
+                year, month, day = int(m2.group(1)), int(m2.group(2)), int(m2.group(3))
 
         try:
             base_date = datetime(year, month, day, tzinfo=timezone.utc).date()
         except ValueError:
-            logger.warning(f"[parse_french_date] DATE INVALIDE : '{raw}'.")
+            logger.warning(f"[parse_french_date] DATE INVALIDE : '{raw}'")
             return None
 
+    # Extraction de l'heure (optionnelle)
     hour = 0
     minute = 0
-
     m_time = re.search(r"(\d{1,2})[:h](\d{2})", raw)
     if m_time:
         try:
@@ -795,6 +854,7 @@ def parse_french_date(raw: Optional[str], end_of_day: bool = False) -> Optional[
         except Exception:
             pass
 
+    # Si pas d'heure et end_of_day=True, on met 23:59:59
     if hour == 0 and minute == 0 and end_of_day:
         return datetime.combine(base_date, dt_time(23, 59, 59), tzinfo=timezone.utc)
 
@@ -1342,7 +1402,7 @@ def parse_job_html(
         "published_raw",
         extract_labeled_value,
         header_text,
-        r"Publi[ée]\s+le",
+        r"Publi[ée]\s+:",
         DEFAULT_STOP_LABELS,
         1,
     )

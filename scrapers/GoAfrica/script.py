@@ -23,6 +23,8 @@ from playwright.sync_api import (
 )
 from selectolax.parser import HTMLParser
 
+from extract_offer import parse_job_html_go
+
 # =============================================================================
 # CHARGEMENT DU .ENV
 # =============================================================================
@@ -114,14 +116,14 @@ except ImportError:
 # CONFIGURATION GLOBALE
 # =============================================================================
 
-BASE_URL = os.getenv("SCRAPER_BASE_URL", "https://www.goafricaonline.com/").strip()
-SEARCH_QUERY = os.getenv("SCRAPER_SEARCH_QUERY", "cote").strip()
+BASE_URL = os.getenv("GO_BASE_URL", "https://www.goafricaonline.com/").strip()
+SEARCH_QUERY = os.getenv("GO_SEARCH_QUERY", "cote").strip()
 
-OUTPUT_FILE = Path(os.getenv("SCRAPER_OUTPUT_FILE", "../donnees_jobs.json"))
-FAILED_FILE = Path(os.getenv("SCRAPER_FAILED_FILE", "../failed_jobs.json"))
-LOG_FILE = Path(os.getenv("SCRAPER_LOG_FILE", "../logsGo.log"))
+OUTPUT_FILE = Path(os.getenv("GO_OUTPUT_FILE", "../donnees_jobs_Go.json"))
+FAILED_FILE = Path(os.getenv("GO_FAILED_FILE", "../failed_jobs_Go.json"))
+LOG_FILE = Path(os.getenv("GO_LOG_FILE", "../logsGo.log"))
 
-HEADLESS = os.getenv("SCRAPER_HEADLESS", "1").strip().lower() in {
+HEADLESS = os.getenv("GO_HEADLESS", "1").strip().lower() in {
     "1",
     "true",
     "yes",
@@ -129,26 +131,65 @@ HEADLESS = os.getenv("SCRAPER_HEADLESS", "1").strip().lower() in {
 }
 
 try:
-    MAX_PAGES = max(1, int(os.getenv("SCRAPER_MAX_PAGES", "20")))
+    MAX_PAGES = max(1, int(os.getenv("GO_MAX_PAGES", "20")))
 except ValueError:
     MAX_PAGES = 20
 
 try:
-    MAX_JOBS = max(0, int(os.getenv("SCRAPER_MAX_JOBS", "0")))
+    MAX_JOBS = max(0, int(os.getenv("GO_MAX_JOBS", "0")))
 except ValueError:
     MAX_JOBS = 0
 
+# =============================================================================
+# FILTRE DE FRAÎCHEUR DES OFFRES (GoAfricaOnline)
+# =============================================================================
+
 try:
-    NAVIGATION_TIMEOUT_MS = int(os.getenv("SCRAPER_NAV_TIMEOUT_MS", "45000"))
+    MAX_DAYS_OLD = int(os.getenv("SCRAPER_MAX_DAYS_OLD", "1"))
+except ValueError:
+    MAX_DAYS_OLD = 1
+
+# Pas de date d'expiration sur les cartes GoAfricaOnline
+CHECK_EXPIRATION = False
+
+# Sélecteurs pour les cartes GoAfricaOnline
+CARD_SELECTORS = (
+    "div.grid.grid-header",
+    "div.grid-header",
+    "div[class*='grid-header']",
+)
+
+CARD_LINK_SELECTORS = (
+    "a.stretched-link",
+    "a.font-bold",
+    "a[grid-area='title']",
+    "a",
+)
+
+# L'icône clock est à l'intérieur d'un div qui contient la date
+PUBLISHED_DATE_ICON_SELECTORS = (
+    "i.tnp.tnp-clock",
+    "i[class*='tnp-clock']",
+    "i[class*='clock']",
+)
+
+MOIS_FR_CARD = {
+    "janvier": 1, "février": 2, "fevrier": 2, "mars": 3, "avril": 4,
+    "mai": 5, "juin": 6, "juillet": 7, "août": 8, "aout": 8,
+    "septembre": 9, "octobre": 10, "novembre": 11, "décembre": 12, "decembre": 12
+}
+
+try:
+    NAVIGATION_TIMEOUT_MS = int(os.getenv("GO_NAV_TIMEOUT_MS", "45000"))
 except ValueError:
     NAVIGATION_TIMEOUT_MS = 45000
 
 try:
-    ACTION_TIMEOUT_MS = int(os.getenv("SCRAPER_ACTION_TIMEOUT_MS", "8000"))
+    ACTION_TIMEOUT_MS = int(os.getenv("GO_ACTION_TIMEOUT_MS", "8000"))
 except ValueError:
     ACTION_TIMEOUT_MS = 8000
 
-LOG_LEVEL = os.getenv("SCRAPER_LOG_LEVEL", "INFO").strip().upper()
+LOG_LEVEL = os.getenv("GO_LOG_LEVEL", "INFO").strip().upper()
 if LOG_LEVEL not in {"TRACE", "DEBUG", "INFO", "SUCCESS", "WARNING", "ERROR", "CRITICAL"}:
     LOG_LEVEL = "INFO"
 
@@ -857,474 +898,353 @@ def goto_next_page(page: Page, current_page_number: int) -> bool:
 # COLLECTE DES LIENS
 # =============================================================================
 
-def extract_links_from_current_page(page: Page) -> list[str]:
+# =============================================================================
+# FILTRE DE FRAÎCHEUR - GoAfricaOnline
+# =============================================================================
+
+def parse_card_date(text: Optional[str]) -> Optional[datetime]:
     """
-    Extrait les liens de la page courante en utilisant plusieurs sélecteurs.
+    Parse une date au format "Posté le 13 août 2026" ou "13 août 2026".
+    Retourne un datetime UTC ou None.
+    """
+    if not text:
+        return None
+    
+    # Nettoyage
+    cleaned = clean_text(text)
+    if not cleaned:
+        return None
+    
+    # Enlever le préfixe "Posté le "
+    cleaned = re.sub(r"^post[ée]e?\s+le\s*", "", cleaned, flags=re.IGNORECASE).strip()
+    
+    # Format texte FR : "13 août 2026", "1er août 2026"
+    normalized = remove_accents(cleaned).lower()
+    
+    # Pattern : jour (1 ou 2 chiffres, optionnel "er"), mois (lettres), année
+    match = re.search(r"(\d{1,2})(?:er)?\s+([a-zûé]+)\s+(\d{4})", normalized)
+    if match:
+        jour = int(match.group(1))
+        mois_texte = match.group(2)
+        annee = int(match.group(3))
+        
+        if mois_texte not in MOIS_FR_CARD:
+            logger.debug(f"Mois inconnu : '{mois_texte}' dans '{text}'")
+            return None
+        
+        mois_chiffre = MOIS_FR_CARD[mois_texte]
+        
+        try:
+            return datetime(annee, mois_chiffre, jour, tzinfo=timezone.utc)
+        except ValueError as exc:
+            logger.debug(f"Date invalide : {jour}/{mois_chiffre}/{annee} <- '{text}' : {exc}")
+            return None
+    
+    # Format numérique FR : 13/08/2026
+    match = re.search(r"(\d{1,2})[/.-](\d{1,2})[/.-](\d{4})", cleaned)
+    if match:
+        day, month, year = match.groups()
+        try:
+            return datetime(int(year), int(month), int(day), tzinfo=timezone.utc)
+        except ValueError:
+            return None
+    
+    logger.debug(f"Format de date non reconnu : '{text}'")
+    return None
+
+
+def extract_card_published_date(card: Any) -> Optional[datetime]:
+    """
+    Extrait la date de publication depuis une carte GoAfricaOnline.
+    
+    HTML typique :
+        <div class="flex ... [grid-area:date]">
+            <i class="tnp tnp-clock"></i> Posté le 13 août 2026
+        </div>
+    
+    Stratégie : trouver l'icône i.tnp.tnp-clock, puis prendre le texte du parent.
+    """
+    for icon_selector in PUBLISHED_DATE_ICON_SELECTORS:
+        try:
+            icon_node = card.css_first(icon_selector)
+            if icon_node is None:
+                continue
+            
+            # Remonter au parent pour récupérer le texte complet
+            parent = icon_node.parent
+            if parent is None:
+                continue
+            
+            text = clean_text(safe_text(parent))
+            if not text:
+                continue
+            
+            dt = parse_card_date(text)
+            if dt:
+                logger.debug(f"Date de publication extraite : {dt.date()} <- '{text}'")
+                return dt
+        except Exception as exc:
+            logger.debug(f"Erreur extraction date avec icône '{icon_selector}' : {exc}")
+    
+    # Fallback : chercher directement dans le texte de la carte
+    try:
+        card_text = clean_text(safe_text(card))
+        if card_text:
+            match = re.search(
+                r"post[ée]e?\s+le\s+(\d{1,2}(?:er)?\s+[a-zûé]+\s+\d{4})",
+                card_text,
+                re.IGNORECASE,
+            )
+            if match:
+                dt = parse_card_date(match.group(1))
+                if dt:
+                    logger.debug(f"Date de publication extraite via fallback : {dt.date()}")
+                    return dt
+    except Exception as exc:
+        logger.debug(f"Erreur extraction date via fallback : {exc}")
+    
+    logger.debug("Date de publication non trouvée sur cette carte.")
+    return None
+
+
+def is_offer_fresh(
+    card: Any,
+    url: str,
+    reference_date: Optional[datetime] = None,
+) -> tuple[bool, str]:
+    """
+    Vérifie si une offre est fraîche (publiée récemment).
+    Sur GoAfricaOnline, pas de date d'expiration sur les cartes.
+    
+    Retourne un tuple (is_valid, reason).
+    """
+    now = reference_date or datetime.now(timezone.utc)
+    today_date = now.date()
+    
+    logger.debug(f"[{url}] Vérification de fraîcheur (date de référence : {today_date})")
+    
+    published_dt = extract_card_published_date(card)
+    
+    if published_dt is None:
+        logger.debug(f"[{url}] Date de publication introuvable, offre acceptée par défaut.")
+        return True, "date non détectée, offre acceptée"
+    
+    days_old = (today_date - published_dt.date()).days
+    logger.debug(f"[{url}] Offre publiée il y a {days_old} jour(s) (le {published_dt.date()})")
+    
+    # Si MAX_DAYS_OLD < 0, on désactive le filtre de fraîcheur
+    if MAX_DAYS_OLD >= 0 and days_old > MAX_DAYS_OLD:
+        reason = f"offre trop ancienne (publiée il y a {days_old} jour(s), le {published_dt.date()})"
+        return False, reason
+    
+    if days_old < 0:
+        logger.debug(f"[{url}] Date de publication dans le futur ({published_dt.date()}), offre acceptée.")
+    
+    return True, f"publiée le {published_dt.date()}"
+
+
+def extract_links_from_current_page(page: Page) -> tuple[list[str], list[str], bool]:
+    """
+    Extrait les liens de la page courante avec filtrage de fraîcheur.
+    
+    Retourne un tuple :
+      - fresh_links : offres fraîches (récentes)
+      - fallback_links : tous les liens valides (pour le fallback si aucune offre fraîche)
+      - stop_signal : True si une offre non fraîche a été rencontrée
+                      (signale qu'il faut arrêter la pagination)
     """
     html = build_html_parser(page)
-
+    
     if html is None:
-        return []
-
-    links: list[str] = []
+        return [], [], False
+    
+    fresh_links: list[str] = []
+    fallback_links: list[str] = []
     seen_local: set[str] = set()
-
-    for selector, require_keyword in LINK_SELECTOR_CONFIGS:
+    stop_signal = False
+    
+    stats = {
+        "total_cards": 0,
+        "fresh": 0,
+        "rejected_too_old": 0,
+        "rejected_no_link": 0,
+    }
+    
+    # Récupérer les cartes - essayer div.grid.grid-header d'abord
+    cards = []
+    for card_selector in CARD_SELECTORS:
         try:
-            anchors = html.css(selector)
+            cards = html.css(card_selector)
+            if cards:
+                logger.debug(f"Cartes trouvées avec le sélecteur '{card_selector}' : {len(cards)}")
+                break
         except Exception as exc:
-            logger.debug(f"Sélecteur de liens invalide '{selector}' : {exc}")
+            logger.debug(f"Sélecteur de carte invalide '{card_selector}' : {exc}")
             continue
-
-        if not anchors:
-            continue
-
-        found = 0
-
-        for a_tag in anchors:
+    
+    if not cards:
+        logger.warning("Aucune carte d'offre trouvée sur cette page.")
+        return [], [], False
+    
+    stats["total_cards"] = len(cards)
+    
+    # Parcourir chaque carte
+    for card_index, card in enumerate(cards, start=1):
+        # --- Extraction du lien ---
+        href = None
+        
+        for link_selector in CARD_LINK_SELECTORS:
             try:
+                a_tag = card.css_first(link_selector)
+                if a_tag is None:
+                    continue
                 attributes = getattr(a_tag, "attributes", None) or {}
                 href = attributes.get("href")
-
-                url = normalize_url(href)
-                if not url:
-                    continue
-
-                if require_keyword and not is_probable_job_link(url):
-                    continue
-
-                if url not in seen_local:
-                    seen_local.add(url)
-                    links.append(url)
-                    found += 1
-            except Exception as exc:
-                logger.debug(f"Erreur lors de l'extraction d'un lien : {exc}")
-
-        if links:
-            logger.debug(f"{found} lien(s) collectés avec le sélecteur '{selector}'.")
-            break
-
-    return links
+                if href:
+                    break
+            except Exception:
+                continue
+        
+        url = normalize_url(href)
+        if not url:
+            stats["rejected_no_link"] += 1
+            logger.debug(f"Carte {card_index} : lien invalide ou absent")
+            continue
+        
+        # --- On ajoute TOUJOURS le lien au fallback ---
+        if url not in seen_local:
+            seen_local.add(url)
+            fallback_links.append(url)
+        
+        # --- Vérification de fraîcheur ---
+        is_valid, reason = is_offer_fresh(card, url)
+        
+        if not is_valid:
+            stats["rejected_too_old"] += 1
+            logger.info(f"🛑 Offre non fraîche [{url}] : {reason}")
+            logger.info("   -> ARRÊT IMMÉDIAT de la collecte sur cette page")
+            stop_signal = True
+            break  # On arrête immédiatement la boucle sur les cartes
+        
+        # --- Offre fraîche : on l'ajoute ---
+        if url not in fresh_links:
+            fresh_links.append(url)
+            stats["fresh"] += 1
+            logger.info(f"✅ Offre fraîche acceptée [{url}] : {reason}")
+    
+    # Log récapitulatif
+    logger.info(
+        f"📊 Filtrage page terminé : "
+        f"{stats['fresh']} fraîche(s) | "
+        f"{stats['rejected_too_old']} trop ancienne(s) | "
+        f"{stats['rejected_no_link']} sans lien "
+        f"(sur {stats['total_cards']} carte(s) analysée(s))"
+    )
+    
+    if stop_signal:
+        logger.warning("🛑 SIGNAL D'ARRÊT ÉMIS : une offre non fraîche a été rencontrée.")
+    
+    return fresh_links, fallback_links, stop_signal
 
 
 def collect_all_job_links(page: Page) -> list[str]:
     """
     Collecte les liens de postes sur plusieurs pages.
+    
+    Logique :
+      - Si on rencontre une offre non fraîche → arrêt immédiat
+      - Si à la fin on a au moins 1 offre fraîche → on les retourne
+      - Si on a 0 offre fraîche → fallback sur les 10 premières offres (sans filtre)
     """
-    links: list[str] = []
-    seen: set[str] = set()
-
+    fresh_links: list[str] = []
+    all_fallback_links: list[str] = []
+    seen_fresh: set[str] = set()
+    seen_fallback: set[str] = set()
+    
     current_page_number = 1
     max_pages = max(1, MAX_PAGES)
-
+    
+    logger.info(
+        f"Filtre de fraîcheur actif : MAX_DAYS_OLD={MAX_DAYS_OLD} "
+        f"(pas de vérification d'expiration sur GoAfricaOnline)"
+    )
+    
     while current_page_number <= max_pages:
         logger.info(f"Collecte des liens sur la page {current_page_number}.")
-
+        
         wait_for_page_ready(page)
         auto_scroll(page)
-
-        page_links = extract_links_from_current_page(page)
-        new_links = [link for link in page_links if link not in seen]
-
-        if new_links:
-            seen.update(new_links)
-            links.extend(new_links)
-
+        
+        page_fresh, page_fallback, stop_signal = extract_links_from_current_page(page)
+        
+        # Ajoute les offres fraîches (dédupliquées)
+        new_fresh = [link for link in page_fresh if link not in seen_fresh]
+        if new_fresh:
+            seen_fresh.update(new_fresh)
+            fresh_links.extend(new_fresh)
+        
+        # Ajoute les offres de fallback (dédupliquées)
+        new_fallback = [link for link in page_fallback if link not in seen_fallback]
+        if new_fallback:
+            seen_fallback.update(new_fallback)
+            all_fallback_links.extend(new_fallback)
+        
         logger.info(
             f"Page {current_page_number} : "
-            f"{len(page_links)} lien(s) détecté(s), "
-            f"{len(new_links)} nouveau(x), "
-            f"total collecté : {len(links)}."
+            f"{len(page_fresh)} fraîche(s), "
+            f"{len(page_fallback)} totale(s), "
+            f"total fraîches collectées : {len(fresh_links)}."
         )
-
-        if not new_links and current_page_number > 1:
-            logger.info("Aucun nouveau lien sur cette page. Arrêt de la pagination.")
+        
+        # --- Cas 1 : arrêt demandé (offre non fraîche rencontrée) ---
+        if stop_signal:
+            logger.info(
+                "Arrêt de la pagination : une offre non fraîche a été rencontrée. "
+                f"On conserve les {len(fresh_links)} offre(s) fraîche(s) déjà collectée(s)."
+            )
             break
-
+        
+        # --- Cas 2 : aucune nouvelle offre fraîche et page > 1 ---
+        if not new_fresh and current_page_number > 1:
+            logger.info("Aucune nouvelle offre fraîche sur cette page. Arrêt de la pagination.")
+            break
+        
+        # --- Cas 3 : nombre max de pages atteint ---
         if current_page_number >= max_pages:
             logger.info("Nombre maximum de pages atteint.")
             break
-
+        
+        # --- Pagination ---
         if not goto_next_page(page, current_page_number):
             logger.info("Fin de la pagination.")
             break
-
+        
         current_page_number += 1
-
-    logger.info(f"Nombre total de liens collectés : {len(links)}")
-    return links
-
-
-# =============================================================================
-# UTILITAIRES D'EXTRACTION DE DONNÉES
-# =============================================================================
-
-def iter_ancestors(node: Any, max_levels: int = 3):
-    """
-    Retourne le nœud puis ses parents, utile pour récupérer le texte autour d'une icône.
-    """
-    current = node
-
-    for _ in range(max_levels):
-        if current is None:
-            break
-
-        yield current
-
-        try:
-            current = current.parent
-        except Exception:
-            break
-
-
-def extract_nearest_icon_text(
-        container: Any,
-        icon_selectors: tuple[str, ...] | list[str],
-        field_name: str,
-        url: str,
-        max_levels: int = 4,
-        log_if_missing: bool = True,
-) -> Optional[str]:
-    """
-    Cherche une icône puis remonte seulement vers le premier texte pertinent.
-
-    L'objectif est d'éviter de récupérer tout le conteneur parent contenant
-    tous les badges.
-    """
-    if container is None:
-        if log_if_missing:
-            logger.warning(f"{field_name} : conteneur absent sur {url}.")
-        return None
-
-    icon_node = find_first_node(container, icon_selectors)
-
-    if icon_node is None:
-        if log_if_missing:
-            logger.warning(
-                f"{field_name} : icône introuvable sur {url}. "
-                f"Sélecteurs testés : {', '.join(icon_selectors)}."
-            )
-        return None
-
-    first_text: Optional[str] = None
-    current = icon_node
-
-    for level in range(max_levels):
-        if current is None:
-            break
-
-        cleaned = clean_text(safe_text(current))
-
-        if cleaned:
-            if first_text is None:
-                first_text = cleaned
-
-            attributes = getattr(current, "attributes", None) or {}
-            css_class = str(attributes.get("class", ""))
-
-            # Si on est clairement sur un badge, on retourne immédiatement.
-            if any(hint in css_class for hint in BADGE_CLASS_HINTS):
-                logger.debug(
-                    f"{field_name} : badge trouvé au niveau {level} sur {url} : {cleaned[:120]}"
-                )
-                return cleaned
-
-        try:
-            current = current.parent
-        except Exception:
-            break
-
-    if first_text:
-        logger.debug(
-            f"{field_name} : texte le plus proche trouvé sur {url} : {first_text[:120]}"
+    
+    # ============================================================
+    # DÉCISION FINALE
+    # ============================================================
+    
+    if fresh_links:
+        logger.info(
+            f"✅ Collecte terminée avec {len(fresh_links)} offre(s) fraîche(s)."
         )
-        return first_text
-
-    if log_if_missing:
-        logger.warning(f"{field_name} : aucun texte proche de l'icône sur {url}.")
-
-    return None
-
-
-def extract_icon_text_from_roots(
-        roots: tuple[Any, ...] | list[Any],
-        icon_selectors: tuple[str, ...] | list[str],
-        field_name: str,
-        url: str,
-) -> Optional[str]:
-    """
-    Essaie plusieurs racines de recherche : content, main_container, html complet.
-    """
-    for root in roots:
-        if root is None:
-            continue
-
-        value = extract_nearest_icon_text(
-            container=root,
-            icon_selectors=icon_selectors,
-            field_name=field_name,
-            url=url,
-            log_if_missing=False,
-        )
-
-        if value:
-            return value
-
+        return fresh_links
+    
+    # Aucune offre fraîche → fallback
+    fallback_count = min(10, len(all_fallback_links))
     logger.warning(
-        f"{field_name} : icône/texte introuvable dans les conteneurs testés sur {url}."
+        f"⚠️ Aucune offre fraîche trouvée. "
+        f"Fallback : récupération des {fallback_count} première(s) offre(s) "
+        f"sans tenir compte de la date."
     )
-    return None
+    return all_fallback_links[:10]
 
 
-def extract_value_from_text(
-        text: Optional[str],
-        patterns: Optional[list[str]] = None,
-        fallback: bool = True,
-) -> Optional[str]:
-    """
-    Extrait une valeur à partir d'un texte en utilisant des patterns.
-    Si aucun pattern ne matche, retourne le texte nettoyé si fallback=True.
-    """
-    cleaned = clean_text(text)
 
-    if not cleaned:
-        return None
-
-    for pattern in patterns or []:
-        try:
-            match = re.search(pattern, cleaned, re.IGNORECASE)
-            if match and match.group(1).strip():
-                return match.group(1).strip()
-        except re.error as exc:
-            logger.error(f"Regex invalide '{pattern}' : {exc}")
-
-    return cleaned if fallback else None
-
-
-def extract_icon_value(
-        container: Any,
-        icon_selectors: tuple[str, ...] | list[str],
-        field_name: str,
-        url: str,
-        patterns: Optional[list[str]] = None,
-) -> Optional[str]:
-    """
-    Cherche une icône, puis extrait le texte autour.
-    Si patterns est fourni, essaie d'extraire la valeur après un libellé.
-    """
-    if container is None:
-        logger.warning(f"{field_name} : conteneur absent sur {url}.")
-        return None
-
-    icon_node = find_first_node(container, icon_selectors)
-
-    if icon_node is None:
-        logger.warning(
-            f"{field_name} : icône introuvable sur {url}. "
-            f"Sélecteurs testés : {', '.join(icon_selectors)}."
-        )
-        return None
-
-    last_text: Optional[str] = None
-
-    for ancestor in iter_ancestors(icon_node, max_levels=3):
-        raw_text = safe_text(ancestor)
-        cleaned = clean_text(raw_text)
-
-        if not cleaned:
-            continue
-
-        last_text = cleaned
-
-        if not patterns:
-            return cleaned
-
-        for pattern in patterns:
-            try:
-                match = re.search(pattern, cleaned, re.IGNORECASE)
-                if match and match.group(1).strip():
-                    return match.group(1).strip()
-            except re.error as exc:
-                logger.error(f"{field_name} : regex invalide '{pattern}' : {exc}")
-
-    if patterns and last_text:
-        truncated = last_text[:120] + ("..." if len(last_text) > 120 else "")
-        logger.warning(
-            f"{field_name} : pattern non trouvé sur {url}. "
-            f"Retour du texte brut : '{truncated}'."
-        )
-
-    return last_text
-
-
-def extract_meta_content(html: HTMLParser, selectors: tuple[str, ...] | list[str]) -> Optional[str]:
-    """
-    Extrait le contenu d'une balise meta.
-    """
-    node = find_first_node(html, selectors)
-
-    if node is None:
-        return None
-
-    try:
-        attributes = getattr(node, "attributes", None) or {}
-        return clean_text(attributes.get("content"))
-    except Exception as exc:
-        logger.debug(f"Erreur lors de l'extraction meta : {exc}")
-        return None
-
-
-def extract_title(content: Any, html: HTMLParser, url: str) -> Optional[str]:
-    """
-    Extrait le titre du poste avec plusieurs fallbacks.
-    """
-    title_selectors = (
-        "div.text-gray-800.font-black",
-        "h1",
-        "[class*='title']",
-        "[data-testid*='title']",
-    )
-
-    node = find_first_node(content, title_selectors) or find_first_node(html, title_selectors)
-
-    if node:
-        title = clean_text(safe_text(node))
-        if title:
-            return title
-
-    meta_title = extract_meta_content(
-        html,
-        (
-            'meta[property="og:title"]',
-            'meta[name="twitter:title"]',
-        ),
-    )
-
-    if meta_title:
-        return meta_title
-
-    title_node = html.css_first("title")
-    title = clean_text(safe_text(title_node))
-
-    if title:
-        return title
-
-    logger.warning(f"Titre du poste introuvable sur {url}.")
-    return None
-
-
-def extract_description(content: Any, html: HTMLParser, url: str) -> Optional[str]:
-    """
-    Extrait la description du poste avec plusieurs fallbacks.
-    """
-    description_selectors = (
-        "div.font-normal.text-gray-700.overflow-wrap-anywhere",
-        "div[class*='description']",
-        "article",
-        "main",
-    )
-
-    node = find_first_node(content, description_selectors) or find_first_node(
-        html,
-        description_selectors,
-    )
-
-    if node:
-        description = clean_text(safe_text(node))
-        if description and len(description) > 20:
-            return description
-
-    meta_description = extract_meta_content(
-        html,
-        (
-            'meta[property="og:description"]',
-            'meta[name="description"]',
-        ),
-    )
-
-    if meta_description:
-        return meta_description
-
-    logger.warning(f"Description du poste introuvable ou trop courte sur {url}.")
-    return None
-
-
-def make_iso_date(year: str, month: str, day: str) -> Optional[str]:
-    """
-    Convertit une date en ISO si elle est valide.
-    """
-    try:
-        return datetime(int(year), int(month), int(day)).date().isoformat()
-    except (ValueError, TypeError):
-        return None
-
-
-def parse_date_to_iso(date_str: Optional[str]) -> Optional[str]:
-    """
-    Convertit plusieurs formats de date en ISO YYYY-MM-DD.
-
-    Gère :
-    - 2026-08-06
-    - 06/08/2026
-    - 06.08.2026
-    - 06-08-2026
-    - Posté le 6 août 2026
-    - 6 août 2026
-    - 1er août 2026
-    """
-    if not date_str:
-        return None
-
-    cleaned = clean_text(date_str)
-
-    if not cleaned:
-        return None
-
-    # ISO déjà présent : 2026-08-06
-    match = re.search(r"(\d{4})-(\d{2})-(\d{2})", cleaned)
-    if match:
-        iso = make_iso_date(*match.groups())
-        if iso:
-            return iso
-
-    # Format numérique FR : 06/08/2026, 06.08.2026, 06-08-2026
-    match = re.search(r"(\d{1,2})[/.-](\d{1,2})[/.-](\d{4})", cleaned)
-    if match:
-        day, month, year = match.groups()
-        iso = make_iso_date(year, month, day)
-        if iso:
-            return iso
-
-    # Format texte FR : 6 août 2026, Posté le 6 août 2026, 1er août 2026
-    normalized = remove_accents(cleaned).lower()
-
-    # Nettoyage des préfixes fréquents
-    normalized = re.sub(
-        r"^(poste|publie|mis en ligne|date de creation|creation)\s*(le|:)?\s*",
-        "",
-        normalized,
-    )
-
-    match = re.search(
-        r"(\d{1,2})(?:er)?\s+([a-z]+)\.?\s+(\d{4})",
-        normalized,
-    )
-
-    if match:
-        day, month_text, year = match.groups()
-
-        month_key = month_text[:3]
-        month_text = MONTH_ALIASES.get(month_key, month_text)
-        month = MOIS_FR.get(month_text)
-
-        if month:
-            iso = make_iso_date(year, month, day)
-            if iso:
-                return iso
-
-    logger.debug(f"Date non parsable : '{date_str}' -> valeur nettoyée : '{cleaned}'.")
-    return cleaned
-
+# =============================================================================
+# EXTRACTION DES DONNÉES D'UN POSTE
+# =============================================================================
 
 def is_true_teletravail(text: Optional[str]) -> bool:
     """
@@ -1349,324 +1269,36 @@ def is_true_teletravail(text: Optional[str]) -> bool:
     )
 
 
-# =============================================================================
-# EXTRACTION DES DONNÉES D'ENTREPRISE
-# =============================================================================
-
-def get_data_company(html: HTMLParser, url: str) -> dict[str, Any]:
-    """
-    Extrait les informations de l'entreprise.
-    """
-    company: dict[str, Any] = {
-        "website_url": None,
-        "name": None,
-        "type": None,
-        "description": None,
-    }
-
-    try:
-        container = find_first_node(html, COMPANY_CONTAINER_SELECTORS) or html
-
-        link_node = find_first_node(container, COMPANY_LINK_SELECTORS)
-
-        if link_node:
-            attributes = getattr(link_node, "attributes", None) or {}
-            company["website_url"] = normalize_url(attributes.get("href"))
-            company["name"] = clean_text(safe_text(link_node))
-        else:
-            logger.warning(f"Lien ou nom de l'entreprise non trouvé sur {url}.")
-
-        type_node = find_first_node(container, COMPANY_TYPE_SELECTORS)
-
-        if type_node:
-            company["type"] = clean_text(safe_text(type_node))
-        else:
-            logger.warning(f"Type de l'entreprise non trouvé sur {url}.")
-
-        desc_node = find_first_node(container, COMPANY_DESC_SELECTORS)
-
-        if desc_node:
-            company["description"] = clean_text(safe_text(desc_node))
-        else:
-            logger.warning(f"Description de l'entreprise non trouvée sur {url}.")
-
-    except Exception as exc:
-        logger.opt(exception=True).error(
-            f"Erreur lors de l'extraction des données de l'entreprise sur {url} : {exc}"
-        )
-
-    return company
-
-
-# =============================================================================
-# EXTRACTION DES DONNÉES D'UN POSTE
-# =============================================================================
-
 def get_data_job(html: HTMLParser, url: str) -> dict[str, Any]:
     """
-    Extrait les données d'une page de poste.
+    Extrait les données d'une page de poste en utilisant le parser unifié.
     """
-    logger.info(f"Début de l'extraction des données sur {url}.")
-
-    job: dict[str, Any] = {
-        "source_url": url,
-        "collected_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-    }
-
-    main_container = find_first_node(html, MAIN_CONTAINER_SELECTORS)
-
-    if main_container is None:
-        logger.error(
-            f"Conteneur principal introuvable sur {url}. "
-            "Bascule sur le document entier."
-        )
-        main_container = html
-
-    content = find_first_node(main_container, JOB_CONTENT_SELECTORS) or main_container
-
-    # Ordre de recherche pour les badges
-    roots = (content, main_container, html)
-
-    # Titre
-    job["title"] = extract_title(content, html, url)
-
-    # Type
-    type_raw = extract_icon_text_from_roots(
-        roots,
-        (
-            "i.tnp.tnp-file-signature",
-            "i[class*='file-signature']",
-            "i[class*='contract']",
-        ),
-        "type",
-        url,
-    )
-
-    contract = extract_value_from_text(
-        type_raw,
-        [r"Type\s*:\s*(.+)"],
-        fallback=True,
-    )
-    job["contract_type"] = {
-        "code": contract.lower() if contract else contract,
-        "label": contract
-    }
-
-    # Salaire
-    salaire_raw = extract_icon_text_from_roots(
-        roots,
-        (
-            "i.tnp.tnp-user-salary",
-            "i[class*='file-user-salary']",
-            "i[class*='salary']",
-        ),
-        "salary",
-        url,
-    )
-    if salaire_raw:
-        clean_text_salary = unicodedata.normalize("NFKD", salaire_raw)
-        salaire_raw = re.sub(r"\s+", " ", clean_text_salary).strip()
-    job["salary_raw"] = salaire_raw
-
-    # Durée / Temps complet
-    duree_raw = extract_icon_text_from_roots(
-        roots,
-        (
-            "i.tnp.tnp-calendar",
-            "i[class*='calendar']",
-        ),
-        "durée",
-        url,
-    )
-    job["durée"] = extract_value_from_text(
-        duree_raw,
-        [r"Dur[ée]e\s*:\s*(.+)"],
-        fallback=True,
-    )
-
-    # Télétravail
-    teletravail_raw = extract_icon_text_from_roots(
-        roots,
-        (
-            "i.tnp.tnp-house-laptop",
-            "i[class*='house-laptop']",
-            "i[class*='remote']",
-        ),
-        "télétravail",
-        url,
-    )
-    job["télétravail"] = extract_value_from_text(
-        teletravail_raw,
-        [r"T[ée]l[ée]travail\s*:\s*(.+)"],
-        fallback=True,
-    )
-    job["is_télétravail"] = is_true_teletravail(job["télétravail"])
-
-    # Expérience
-    job["experience_level"] = extract_icon_text_from_roots(
-        roots,
-        (
-            "i.tnp.tnp-briefcase-1",
-            "i[class*='briefcase']",
-            "i[class*='experience']",
-        ),
-        "expérience",
-        url,
-    )
-
-    # Niveau
-    niveau_raw = extract_icon_text_from_roots(
-        roots,
-        (
-            "i.tnp.tnp-diploma-outlined",
-            "i[class*='diploma']",
-            "i[class*='graduation']",
-        ),
-        "niveau",
-        url,
-    )
-    education = extract_value_from_text(
-        niveau_raw,
-        [
-            r"Niveau d['’]études\s*:\s*(.+)",
-            r"Niveau\s*:\s*(.+)",
-        ],
-        fallback=True,
-    )
-    job["education_level"] = {
-        "code": education.lower(),
-        "label": education
-    }
-
-    # Langue
-    langue_raw = extract_icon_text_from_roots(
-        roots,
-        (
-            "i.tnp.tnp-comment-dots",
-            "i[class*='comment']",
-            "i[class*='language']",
-        ),
-        "langue",
-        url,
-    )
-    job["langue"] = extract_value_from_text(
-        langue_raw,
-        [r"Langue\s*:\s*(.+)"],
-        fallback=True,
-    )
-
-    # Adresse
-    address_raw = extract_icon_text_from_roots(
-        roots,
-        ("address",),
-        "adresse",
-        url,
-    )
-
-    if not address_raw:
-        address_raw = extract_icon_text_from_roots(
-            roots,
-            (
-                "i.tnp.tnp-map-pin",
-                "i[class*='map']",
-            ),
-            "adresse",
-            url,
-        )
-
-    location = extract_value_from_text(
-        address_raw,
-        [
-            r"Adresse du poste\s*:\s*(.+)",
-            r"Adresse\s*:\s*(.+)",
-        ],
-        fallback=True,
-    )
-    job["location_raw"] = location
-    job["location"] = {
-        "country_code": "CI",
-        "label": location
-    }
-
-    # Description
-    job["detail"] = {
-        "source_text": extract_description(content, html, url)
-    }
-
-    # Date de création / publication
-    # On cherche en priorité dans main_container, puis dans tout le HTML.
-    date_roots = (main_container, html, content)
-
-    raw_date_created = extract_icon_text_from_roots(
-        date_roots,
-        (
-            "i.tnp.tnp-clock",
-            "i[class*='clock']",
-        ),
-        "date creation",
-        url,
-    )
-
-    if not raw_date_created:
-        raw_date_created = extract_meta_content(
-            html,
-            (
-                'meta[property="article:published_time"]',
-                'meta[property="og:article:published_time"]',
-                'meta[name="publish-date"]',
-                'meta[name="date"]',
-            ),
-        )
-
-    job["published_at"] = parse_date_to_iso(raw_date_created)
-
-    # Active
-    # Avec le HTML fourni, il n'y a pas de badge dédié "active".
-    # Le plus pertinent est donc d'utiliser la date de publication.
-    # Si tu préfères null, remplace par : job["active"] = None
-    job["active"] = job.get("published_at") or raw_date_created
-
-    # Date échéance
-    footer_container = find_first_node(
-        main_container,
-        (
-            'div[class*="gap-[12px]"][class*="pt-[8px]"]',
-            "footer",
-        ),
-    )
-
-    date_echeance_node = find_first_node(
-        footer_container or main_container,
-        (
-            "div.text-brand-blue.font-bold",
-            'div[class*="echeance"]',
-            'div[class*="deadline"]',
-        ),
-    )
-
-    raw_date_echeance = (
-        clean_text(safe_text(date_echeance_node))
-        if date_echeance_node
-        else None
-    )
-
-    job["expires_at"] = parse_date_to_iso(raw_date_echeance)
-
-    # Entreprise
-    job["company"] = get_data_company(html, url)
-
+    logger.info(f"Début de l'extraction des données sur {url} via extract_offer_Go.")
+    
+    job_data = parse_job_html_go(html, source_url=url)
+    
     useful_fields = (
-        job.get("title"),
-        job.get("detail"),
-        job.get("location"),
-        job.get("contract_type"),
+        job_data.get("title"),
+        job_data.get("description"),
+        job_data.get("location_raw"),
     )
-
     if not any(useful_fields):
         logger.warning(f"Aucun champ réellement utile trouvé sur {url}.")
+        
+    # 3. Couche d'adaptation (Adapter) pour la rétrocompatibilité
+    # (Au cas où ton API ou la suite du script attend les anciennes clés)
+        
+    # Mapping du télétravail
+    remote_raw = job_data.get("remote_work")
+    if remote_raw:
+        job_data["télétravail"] = remote_raw
+        job_data["is_télétravail"] = is_true_teletravail(remote_raw)
+        
+    # Le statut "active" peut être déduit de la date de publication
+    if not job_data.get("active"):
+        job_data["active"] = job_data.get("published_at")
 
-    return job
-
+    return job_data
 
 # =============================================================================
 # TRAITEMENT DES LIENS DE POSTES
