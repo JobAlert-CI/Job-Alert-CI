@@ -126,6 +126,46 @@ HEADLESS = os.getenv("EDUC_HEADLESS", "1").strip().lower() in {
     "on",
 }
 
+# =============================================================================
+# FILTRE DE FRAÎCHEUR DES OFFRES
+# =============================================================================
+
+try:
+    MAX_DAYS_OLD = int(os.getenv("SCRAPER_MAX_DAYS_OLD", "1"))
+except ValueError:
+    MAX_DAYS_OLD = 1
+
+CHECK_EXPIRATION = os.getenv("SCRAPER_CHECK_EXPIRATION", "1").strip().lower() in {
+    "1", "true", "yes", "on",
+}
+
+CARD_SELECTORS = (
+    "div.ej-card",
+    "div.job-card",
+    "div.job-item",
+    "article.job-item",
+)
+
+CARD_LINK_SELECTORS = (
+    "a.ej-poste",
+    "a.stretched-link",
+    "a.job-link",
+    "a[href]",
+)
+
+PUBLISHED_DATE_SELECTORS = (
+    "span.ej-lieu",
+    "span.ej-date",
+    "span[class*='date']",
+    "div.ej-meta span",
+)
+
+EXPIRATION_DATE_SELECTORS = (
+    "div.ej-expire",
+    "div[class*='expire']",
+    "div[class*='deadline']",
+)
+
 try:
     MAX_PAGES = max(1, int(os.getenv("EDUC_MAX_PAGES", "20")))
 except ValueError:
@@ -841,65 +881,157 @@ def goto_next_page(page: Page, current_page_number: int) -> bool:
 # COLLECTE DES LIENS
 # =============================================================================
 
-def extract_links_from_current_page(page: Page) -> list[str]:
+def extract_links_from_current_page(page: Page) -> tuple[list[str], list[str], bool]:
     """
-    Extrait les liens de la page courante en utilisant plusieurs sélecteurs.
+    Extrait les liens de la page courante avec filtrage de fraîcheur.
+
+    Retourne un tuple :
+      - fresh_links : offres fraîches (récentes et non expirées)
+      - fallback_links : tous les liens valides (pour le fallback si aucune offre fraîche)
+      - stop_signal : True si une offre non fraîche a été rencontrée
+                      (signale qu'il faut arrêter la pagination)
     """
     html = build_html_parser(page)
 
     if html is None:
-        return []
+        return [], [], False
 
-    links: list[str] = []
+    fresh_links: list[str] = []
+    fallback_links: list[str] = []
     seen_local: set[str] = set()
+    stop_signal = False
 
-    for selector, require_keyword in LIST_SELECTOR_CONFIGS:
-        try:
-            anchors = html.css(selector)
-        except Exception as exc:
-            logger.debug(f"Sélecteur de liens invalide '{selector}' : {exc}")
-            continue
+    stats = {
+        "total_cards": 0,
+        "fresh": 0,
+        "rejected_too_old": 0,
+        "rejected_expired": 0,
+        "rejected_no_link": 0,
+    }
 
-        if not anchors:
-            continue
-
-        found = 0
-
-        for a_tag in anchors:
+    # Récupérer les cartes - essayer div.ej-card d'abord (Educarriere)
+    cards = []
+    try:
+        cards = html.css("div.ej-card")
+    except Exception:
+        pass
+    
+    # Fallback sur les autres sélecteurs si nécessaire
+    if not cards:
+        for card_selector in CARD_SELECTORS:
             try:
+                cards = html.css(card_selector)
+                if cards:
+                    logger.debug(f"Cartes trouvées avec le sélecteur '{card_selector}'")
+                    break
+            except Exception as exc:
+                logger.debug(f"Sélecteur de carte invalide '{card_selector}' : {exc}")
+                continue
+
+    if not cards:
+        logger.warning("Aucune carte d'offre trouvée sur cette page.")
+        return [], [], False
+
+    stats["total_cards"] = len(cards)
+    logger.debug(f"Nombre de cartes détectées : {len(cards)}")
+
+    # Parcourir chaque carte
+    for card_index, card in enumerate(cards, start=1):
+        # --- Extraction du lien ---
+        href = None
+        
+        # Essayer d'abord a.ej-poste (comme dans scriptEduc.py)
+        try:
+            a_tag = card.css_first("a.ej-poste")
+            if a_tag:
                 attributes = getattr(a_tag, "attributes", None) or {}
                 href = attributes.get("href")
+        except Exception:
+            pass
 
-                url = normalize_url(href)
-                if not url:
+        # Fallback sur les autres sélecteurs si nécessaire
+        if not href:
+            for link_selector in CARD_LINK_SELECTORS:
+                try:
+                    a_tag = card.css_first(link_selector)
+                    if a_tag is None:
+                        continue
+                    attributes = getattr(a_tag, "attributes", None) or {}
+                    href = attributes.get("href")
+                    if href:
+                        break
+                except Exception:
                     continue
 
-                if require_keyword and not is_probable_job_link(url):
-                    continue
+        url = normalize_url(href)
+        if not url:
+            stats["rejected_no_link"] += 1
+            logger.debug(f"Carte {card_index} : lien invalide ou absent")
+            continue
 
-                if url not in seen_local:
-                    seen_local.add(url)
-                    links.append(url)
-                    found += 1
-            except Exception as exc:
-                logger.debug(f"Erreur lors de l'extraction d'un lien : {exc}")
+        # --- On ajoute TOUJOURS le lien au fallback ---
+        if url not in seen_local:
+            seen_local.add(url)
+            fallback_links.append(url)
 
-        if links:
-            logger.debug(f"{found} lien(s) collectés avec le sélecteur '{selector}'.")
-            break
+        # --- Vérification de fraîcheur et d'expiration ---
+        is_valid, reason = is_offer_fresh_and_active(card, url)
 
-    return links
+        if not is_valid:
+            if "expirée" in reason:
+                stats["rejected_expired"] += 1
+            else:
+                stats["rejected_too_old"] += 1
+
+            logger.info(f"🛑 Offre non fraîche [{url}] : {reason}")
+            logger.info("   -> ARRÊT IMMÉDIAT de la collecte sur cette page")
+            
+            stop_signal = True
+            break  # On arrête immédiatement la boucle sur les cartes
+
+        # --- Offre fraîche : on l'ajoute ---
+        if url not in fresh_links:
+            fresh_links.append(url)
+            stats["fresh"] += 1
+            logger.info(f"✅ Offre fraîche acceptée [{url}] : {reason}")
+
+    # Log récapitulatif
+    logger.info(
+        f"📊 Filtrage page terminé : "
+        f"{stats['fresh']} fraîche(s) | "
+        f"{stats['rejected_too_old']} trop ancienne(s) | "
+        f"{stats['rejected_expired']} expirée(s) | "
+        f"{stats['rejected_no_link']} sans lien "
+        f"(sur {stats['total_cards']} carte(s) analysée(s))"
+    )
+
+    if stop_signal:
+        logger.warning("🛑 SIGNAL D'ARRÊT ÉMIS : une offre non fraîche a été rencontrée.")
+
+    return fresh_links, fallback_links, stop_signal
 
 
 def collect_all_job_links(page: Page) -> list[str]:
     """
     Collecte les liens de postes sur plusieurs pages.
+
+    Logique :
+        - Si on rencontre une offre non fraîche → arrêt immédiat
+        - Si à la fin on a au moins 1 offre fraîche → on les retourne
+        - Si on a 0 offre fraîche → fallback sur les 10 premières offres (sans filtre)
     """
-    links: list[str] = []
-    seen: set[str] = set()
+    fresh_links: list[str] = []
+    all_fallback_links: list[str] = []
+    seen_fresh: set[str] = set()
+    seen_fallback: set[str] = set()
 
     current_page_number = 1
     max_pages = max(1, MAX_PAGES)
+
+    logger.info(
+        f"Filtre de fraîcheur actif : MAX_DAYS_OLD={MAX_DAYS_OLD}, "
+        f"CHECK_EXPIRATION={CHECK_EXPIRATION}"
+    )
 
     while current_page_number <= max_pages:
         logger.info(f"Collecte des liens sur la page {current_page_number}.")
@@ -907,41 +1039,261 @@ def collect_all_job_links(page: Page) -> list[str]:
         wait_for_page_ready(page)
         auto_scroll(page)
 
-        page_links = extract_links_from_current_page(page)
-        new_links = [link for link in page_links if link not in seen]
+        page_fresh, page_fallback, stop_signal = extract_links_from_current_page(page)
 
-        if new_links:
-            seen.update(new_links)
-            links.extend(new_links)
+        # Ajoute les offres fraîches (dédupliquées)
+        new_fresh = [link for link in page_fresh if link not in seen_fresh]
+        if new_fresh:
+            seen_fresh.update(new_fresh)
+            fresh_links.extend(new_fresh)
+
+        # Ajoute les offres de fallback (dédupliquées)
+        new_fallback = [link for link in page_fallback if link not in seen_fallback]
+        if new_fallback:
+            seen_fallback.update(new_fallback)
+            all_fallback_links.extend(new_fallback)
 
         logger.info(
             f"Page {current_page_number} : "
-            f"{len(page_links)} lien(s) détecté(s), "
-            f"{len(new_links)} nouveau(x), "
-            f"total collecté : {len(links)}."
+            f"{len(page_fresh)} fraîche(s), "
+            f"{len(page_fallback)} totale(s), "
+            f"total fraîches collectées : {len(fresh_links)}."
         )
 
-        if not new_links and current_page_number > 1:
-            logger.info("Aucun nouveau lien sur cette page. Arrêt de la pagination.")
+        # --- Cas 1 : arrêt demandé (offre non fraîche rencontrée) ---
+        if stop_signal:
+            logger.info(
+                "Arrêt de la pagination : une offre non fraîche a été rencontrée. "
+                f"On conserve les {len(fresh_links)} offre(s) fraîche(s) déjà collectée(s)."
+            )
             break
 
+        # --- Cas 2 : aucune nouvelle offre fraîche et page > 1 ---
+        if not new_fresh and current_page_number > 1:
+            logger.info("Aucune nouvelle offre fraîche sur cette page. Arrêt de la pagination.")
+            break
+
+        # --- Cas 3 : nombre max de pages atteint ---
         if current_page_number >= max_pages:
             logger.info("Nombre maximum de pages atteint.")
             break
 
+        # --- Pagination ---
         if not goto_next_page(page, current_page_number):
             logger.info("Fin de la pagination.")
             break
 
         current_page_number += 1
 
-    logger.info(f"Nombre total de liens collectés : {len(links)}")
-    return links
+    # ============================================================
+    # DÉCISION FINALE
+    # ============================================================
 
+    if fresh_links:
+        logger.info(
+            f"✅ Collecte terminée avec {len(fresh_links)} offre(s) fraîche(s)."
+        )
+        return fresh_links
+
+    # Aucune offre fraîche → fallback
+    fallback_count = min(10, len(all_fallback_links))
+    logger.warning(
+        f"⚠️ Aucune offre fraîche trouvée. "
+        f"Fallback : récupération des {fallback_count} première(s) offre(s) "
+        f"sans tenir compte de la date."
+    )
+    return all_fallback_links[:10]
 
 # =============================================================================
 # UTILITAIRES D'EXTRACTION
 # =============================================================================
+
+def parse_date_from_text(text: Optional[str]) -> Optional[datetime]:
+    """
+    Extrait une date au format DD/MM/YYYY d'un texte.
+    Retourne un objet datetime avec timezone UTC ou None si non trouvée.
+    """
+    if not text:
+        return None
+    
+    cleaned = clean_text(text)
+    if not cleaned:
+        return None
+    
+    # Format numérique FR : 15/08/2026, 15-08-2026, 15.08.2026
+    match = re.search(r"(\d{1,2})[/.-](\d{1,2})[/.-](\d{4})", cleaned)
+    if match:
+        day, month, year = match.groups()
+        try:
+            return datetime(int(year), int(month), int(day), tzinfo=timezone.utc)
+        except ValueError:
+            logger.debug(f"Date invalide détectée : '{cleaned}'")
+            return None
+    
+    # Format texte FR : 15 août 2026
+    normalized = remove_accents(cleaned).lower()
+    match = re.search(r"(\d{1,2})(?:er)?\s+([a-z]+)\.?\s+(\d{4})", normalized)
+    if match:
+        day, month_text, year = match.groups()
+        month_key = month_text[:3]
+        month_text = MONTH_ALIASES.get(month_key, month_text)
+        month = MOIS_FR.get(month_text)
+        if month:
+            try:
+                return datetime(int(year), int(month), int(day), tzinfo=timezone.utc)
+            except ValueError:
+                return None
+    
+    return None
+
+
+def extract_card_published_date(card: Any) -> Optional[datetime]:
+    """
+    Extrait la date de publication depuis une carte d'offre.
+    
+    Sur Educarriere, il y a plusieurs span.ej-lieu :
+    - Le premier contient le lieu (ex: "port bouet Anani")
+    - Le dernier contient la date (ex: "Publié le 15/08/2026")
+    
+    On cherche donc le span qui contient "Publié" ou une date au format DD/MM/YYYY.
+    """
+    # Méthode 1 : Chercher parmi tous les span.ej-lieu (comme dans scriptEduc.py)
+    try:
+        nodes = card.css("span.ej-lieu")
+        if nodes:
+            # Parcourir TOUS les span.ej-lieu et prendre celui qui contient une date
+            for node in nodes:
+                try:
+                    text = clean_text(safe_text(node))
+                    if not text:
+                        continue
+                    
+                    normalized = remove_accents(text).lower()
+                    
+                    # Vérifier si ce span contient une date de publication
+                    if "publi" in normalized or re.search(r"\d{1,2}[/.-]\d{1,2}[/.-]\d{4}", text):
+                        # Enlever le préfixe "Publié le "
+                        text = re.sub(r"^publi[ée]\s+le\s*", "", text, flags=re.IGNORECASE).strip()
+                        
+                        dt = parse_date_from_text(text)
+                        if dt:
+                            logger.debug(f"Date de publication extraite : {dt.date()} <- '{text}'")
+                            return dt
+                except Exception as exc:
+                    logger.debug(f"Erreur lors de l'extraction depuis un span.ej-lieu : {exc}")
+    except Exception as exc:
+        logger.debug(f"Erreur lors de la recherche des span.ej-lieu : {exc}")
+    
+    # Méthode 2 : Fallback sur les autres sélecteurs
+    for selector in PUBLISHED_DATE_SELECTORS:
+        try:
+            node = card.css_first(selector)
+            if node is None:
+                continue
+            
+            text = clean_text(safe_text(node))
+            if not text:
+                continue
+            
+            normalized = remove_accents(text).lower()
+            
+            if re.search(r"publi|post|mis en ligne|\d{1,2}[/.-]\d{1,2}[/.-]\d{4}", normalized):
+                # Enlever les préfixes courants
+                text = re.sub(r"^publi[ée]\s+le\s*", "", text, flags=re.IGNORECASE).strip()
+                
+                dt = parse_date_from_text(text)
+                if dt:
+                    logger.debug(f"Date de publication extraite via fallback : {dt.date()} <- '{text}'")
+                    return dt
+        except Exception as exc:
+            logger.debug(f"Erreur extraction date publication avec '{selector}' : {exc}")
+    
+    logger.debug("Date de publication non trouvée sur cette carte.")
+    return None
+
+
+def extract_card_expiration_date(card: Any) -> Optional[datetime]:
+    """Extrait la date d'expiration depuis une carte d'offre."""
+    for selector in EXPIRATION_DATE_SELECTORS:
+        try:
+            node = card.css_first(selector)
+            if node is None:
+                continue
+            
+            text = clean_text(safe_text(node))
+            if not text:
+                continue
+            
+            normalized = remove_accents(text).lower()
+            
+            if re.search(r"expir|limite|cl[oô]ture|\d{1,2}[/.-]\d{1,2}[/.-]\d{4}", normalized):
+                # Enlever le préfixe "Expire le "
+                text = re.sub(r"^expire?\s+le\s*", "", text, flags=re.IGNORECASE).strip()
+                
+                dt = parse_date_from_text(text)
+                if dt:
+                    logger.debug(f"Date d'expiration extraite : {dt.date()} <- '{text}'")
+                    return dt
+        except Exception as exc:
+            logger.debug(f"Erreur extraction date expiration avec '{selector}' : {exc}")
+    
+    logger.debug("Date d'expiration non trouvée sur cette carte.")
+    return None
+
+
+def is_offer_fresh_and_active(
+    card: Any,
+    url: str,
+    reference_date: Optional[datetime] = None,
+) -> tuple[bool, str]:
+    """
+    Vérifie si une offre est fraîche (publiée récemment) et toujours active (non expirée).
+    """
+    now = reference_date or datetime.now(timezone.utc)
+    today_date = now.date()
+    
+    logger.debug(f"[{url}] Vérification de fraîcheur (date de référence : {today_date})")
+
+    # 1. Vérification de la date de publication
+    published_dt = extract_card_published_date(card)
+
+    if published_dt is None:
+        logger.debug(f"[{url}] Date de publication introuvable, offre acceptée par défaut.")
+    else:
+        days_old = (today_date - published_dt.date()).days
+        logger.debug(f"[{url}] Offre publiée il y a {days_old} jour(s) (le {published_dt.date()})")
+        
+        # Si MAX_DAYS_OLD < 0, on désactive le filtre de fraîcheur
+        if MAX_DAYS_OLD >= 0 and days_old > MAX_DAYS_OLD:
+            reason = f"offre trop ancienne (publiée il y a {days_old} jour(s), le {published_dt.date()})"
+            return False, reason
+        
+        if days_old < 0:
+            logger.debug(f"[{url}] Date de publication dans le futur ({published_dt.date()}), offre acceptée.")
+
+    # 2. Vérification de la date d'expiration
+    if CHECK_EXPIRATION:
+        expiration_dt = extract_card_expiration_date(card)
+        
+        if expiration_dt is not None:
+            logger.debug(f"[{url}] Date d'expiration : {expiration_dt.date()}")
+            if expiration_dt.date() < today_date:
+                reason = f"offre expirée (expirée le {expiration_dt.date()})"
+                return False, reason
+            logger.debug(f"[{url}] Offre encore valide jusqu'au {expiration_dt.date()}.")
+
+    # Construire la raison de succès
+    parts = []
+    if published_dt:
+        parts.append(f"publiée le {published_dt.date()}")
+    if CHECK_EXPIRATION:
+        expiration_dt = extract_card_expiration_date(card)
+        if expiration_dt:
+            parts.append(f"expire le {expiration_dt.date()}")
+
+    reason = ", ".join(parts) if parts else "dates non détectées, offre acceptée"
+    return True, reason
+
 
 def extract_meta_content(html: HTMLParser, selectors: tuple[str, ...] | list[str]) -> Optional[str]:
     """
