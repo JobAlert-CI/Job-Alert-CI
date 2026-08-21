@@ -6,6 +6,7 @@
   "scripts": {
     "dev:client": "cd ./client && npm run dev",
     "dev:server": "cd ./server && .\\.venv\\Scripts\\python.exe -m uvicorn main:app --reload",
+    "dev:run": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
     "dev:worker:ingestion": "cd ./server && .\\.venv\\Scripts\\python.exe -m celery -A celery_app.celery_app worker -Q ingestion --loglevel=info --pool=solo",
     "dev:worker:ai": "cd ./server && .\\.venv\\Scripts\\python.exe -m celery -A celery_app.celery_app worker -Q ai --loglevel=info --pool=solo",
     "dev:beat": "cd ./server && .\\.venv\\Scripts\\python.exe -m celery -A celery_app.celery_app beat --loglevel=info",
