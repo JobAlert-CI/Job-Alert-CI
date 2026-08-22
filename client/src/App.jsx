@@ -18,6 +18,7 @@ import Registered from "./Pages/Registered";
 import Faq from "./Pages/Support/FAQ";
 import MentionsLegales from "./Pages/Support/MentionsLegales";
 import Contact from "./Pages/Support/Contact";
+import Admin from "./Pages/Admin";
 import { prefetchHome } from "./tools/home.tools";
 import { prefetchHowItWorks } from "./tools/ccm.tools";
 import { OffresFiltersProvider } from "./contexts/Offres.context";
@@ -66,6 +67,9 @@ const App = () => {
               <Route path="/conseils" element={<Conseils />} />
               <Route path="/conseils/:slug" element={<DetailsConseil />} />
             </Route>
+            {/* Espace Administration */}
+            <Route path="/admin/*" element={<Admin />} />
+            <Route path="/admin" element={<Admin />} />
           </Routes>
       </BrowserRouter>
     </TooltipProvider>
