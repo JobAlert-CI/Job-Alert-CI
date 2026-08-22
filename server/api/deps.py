@@ -37,6 +37,14 @@ def require_scraper_token(x_scraper_token: str | None = Header(default=None)) ->
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token scraper invalide")
 
 
+def require_internal_token(x_internal_token: str | None = Header(default=None)) -> None:
+    settings = get_settings()
+    if not settings.internal_api_token:
+        raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="API interne non configuree")
+    if not x_internal_token or not secrets.compare_digest(x_internal_token, settings.internal_api_token):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token interne invalide")
+
+
 def _extract_bearer_token(authorization: str | None) -> str:
     if not authorization or not authorization.lower().startswith("bearer "):
         raise HTTPException(
@@ -83,4 +91,11 @@ def require_roles(*roles: str):
     return _check
 
 
-__all__ = ["get_db", "require_admin_api_key", "require_scraper_token", "get_current_admin", "require_roles"]
+__all__ = [
+    "get_db",
+    "require_admin_api_key",
+    "require_scraper_token",
+    "require_internal_token",
+    "get_current_admin",
+    "require_roles",
+]

@@ -111,10 +111,13 @@ class Settings:
     scraper_api_token: str | None = field(default_factory=lambda: getenv("SCRAPER_API_TOKEN") or None)
     ingestion_batch_size_max: int = field(default_factory=lambda: _int_env("INGESTION_BATCH_SIZE_MAX", 500))
     ai_enabled: bool = field(default_factory=lambda: _bool_env("AI_ENABLED", False))
+    ai_key_encryption_secret: str | None = field(default_factory=lambda: getenv("AI_KEY_ENCRYPTION_SECRET") or None)
+    ai_circuit_breaker_minutes: int = field(default_factory=lambda: _int_env("AI_CIRCUIT_BREAKER_MINUTES", 15))
     celery_broker_url: str = field(default_factory=lambda: _str_env("CELERY_BROKER_URL", "redis://localhost:6379/0"))
     celery_result_backend: str = field(default_factory=lambda: _str_env("CELERY_RESULT_BACKEND", "redis://localhost:6379/1"))
     redis_url: str = field(default_factory=lambda: _str_env("REDIS_URL", "redis://localhost:6379/2"))
     api_base_url: str = field(default_factory=lambda: _str_env("API_BASE_URL", "http://localhost:8000"))
+    internal_api_token: str | None = field(default_factory=lambda: getenv("INTERNAL_API_TOKEN") or None)
     admin_api_key: str | None = field(default_factory=lambda: getenv("ADMIN_API_KEY") or None)
     admin_jwt_secret: str = field(
         default_factory=lambda: getenv("ADMIN_JWT_SECRET") or "dev-insecure-secret-change-me"

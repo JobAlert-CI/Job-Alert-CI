@@ -1,0 +1,277 @@
+[
+    {
+        "title": "ASSISTANT(E) COMMERCIAL(E)",
+        "source_url": "https://www.goafricaonline.com/ci/emploi/job-21742-assistante-commerciale",
+        "canonical_url": "https://www.goafricaonline.com/ci/emploi/job-21742-assistante-commerciale",
+        "location_raw": "Angré Djorobité Abidjan - Côte d’Ivoire",
+        "salary_raw": "100 k/500 k F CFA / mois",
+        "published_at": "2026-08-20T00:00:00.000Z",
+        "collected_at": "2026-08-22T04:44:50.617Z",
+        "first_seen_at": "2026-08-22T04:44:50.617Z",
+        "last_seen_at": "2026-08-22T04:44:50.617Z",
+        "expires_at": null,
+        "application_deadline_at": null,
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": "Angré",
+            "label": "Angré Djorobité Abidjan - Côte d’Ivoire"
+        },
+        "contract_type": {
+            "code": "CDD",
+            "label": "CDD"
+        },
+        "experience_level": {
+            "code": "JUNIOR",
+            "label": "de 2 ans à 5 ans d’expérience",
+            "min_years": 2,
+            "max_years": 5
+        },
+        "education_level": {
+            "code": "BAC_PLUS_2",
+            "label": "BAC+2",
+            "rank": 2
+        },
+        "description": "COM&SIG, spécialisée dans la communication visuelle, recrute un(e) Assistant(e) Commercial(e) pour accompagner le développement de ses activités. Le poste consiste à assurer le soutien administratif et opérationnel de l’équipe commerciale, à suivre les prospects et clients et à contribuer au développement du chiffre d’affaires tout en garantissant une bonne qualité de service. ### Missions principales Gestion administrative des ventes * Rédiger et envoyer les devis, offres commerciales et contrats. * Enregistrer et suivre les commandes clients. * Assurer la gestion administrative des dossiers commerciaux. * Mettre à jour la base de données clients et le CRM. * Préparer les documents nécessaires aux appels d’offres. Suivi commercial * Suivre les devis jusqu’à leur validation. * Effectuer les relances téléphoniques et par e-mail. * Informer les clients sur l’état d’avancement de leurs demandes. * Organiser les rendez-vous et préparer les dossiers de visite des commerciaux. Relation client * Accueillir et renseigner les clients par téléphone ou en présentiel. * Répondre aux demandes d’information. * Traiter les réclamations de premier niveau. * Contribuer à la satisfaction et à la fidélisation des clients. Reporting et coordination * Élaborer les tableaux de bord et suivre les objectifs commerciaux. * Produire les rapports hebdomadaires et mensuels. * Mettre à jour les indicateurs de performance. * Collaborer avec les équipes techniques, administratives et financières. * Assurer le suivi des livraisons et des prestations. * Veiller au respect des délais convenus avec les clients. Communication commerciale * Participer aux actions de prospection. * Contribuer à la préparation des supports commerciaux. * Participer à l’organisation des salons, événements et campagnes de communication. ### Profil recherché * Être titulaire d’un Bac+2 à Bac+3 en Commerce, Gestion commerciale, Marketing, Assistanat de direction ou domaine équivalent. * Justifier d’au moins 2 ans d’expérience dans un poste similaire. * Être organisé, rigoureux, autonome et réactif. * Avoir un bon sens du service client et un bon esprit d’équipe. * Être capable de gérer plusieurs dossiers simultanément et de travailler sous pression. ### Compétences requises * Bonne maîtrise de Word, Excel et PowerPoint. * Bonne maîtrise des techniques administratives et commerciales. * Connaissance des techniques de vente et de relation client. * Excellentes capacités rédactionnelles et communicationnelles. * Maîtrise d’un CRM constitue un atout. * Notions de facturation et de gestion commerciale. * Discrétion et respect de la confidentialité. Pour postuler, cliquer sur le bouton « Postuler ».",
+        "company": {
+            "name": "COM&SIG",
+            "website_url": "https://www.goafricaonline.com/ci/1366631-com-sig-agences-communication-abidjan-cote-ivoire",
+            "type": "Communication, publicité > Agences de communication",
+            "description": "Agence de communication globale, nous mettons notre créativité et notre expertise au service de vos projets en Côte d'Ivoire et dans toute la sous-région. Forte de 10 ans d'expérience et de plus de 500 réalisations, notre équipe jeune et pluridisciplinaire vous accompagne pas à pas pour concevoir des stratégies adaptées à vos besoins."
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": "Sans télétravail",
+        "raw_fields": {
+            "contract_raw": "CDD",
+            "experience_raw": "de 2 ans à 5 ans d’expérience",
+            "education_raw": "Bac+2",
+            "published_raw": "Posté le 20 août 2026",
+            "expires_raw": null
+        },
+        "télétravail": "Sans télétravail",
+        "is_télétravail": false,
+        "active": "2026-08-20T00:00:00.000Z"
+    },
+    {
+        "title": "Manager Commercial(e)",
+        "source_url": "https://www.goafricaonline.com/ci/emploi/job-21743-manager-commerciale",
+        "canonical_url": "https://www.goafricaonline.com/ci/emploi/job-21743-manager-commerciale",
+        "location_raw": "Angré Djorobité Abidjan - Côte d’Ivoire",
+        "salary_raw": "100 k/500 k F CFA / mois",
+        "published_at": "2026-08-20T00:00:00.000Z",
+        "collected_at": "2026-08-22T04:44:59.462Z",
+        "first_seen_at": "2026-08-22T04:44:59.462Z",
+        "last_seen_at": "2026-08-22T04:44:59.462Z",
+        "expires_at": null,
+        "application_deadline_at": null,
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": "Angré",
+            "label": "Angré Djorobité Abidjan - Côte d’Ivoire"
+        },
+        "contract_type": {
+            "code": "CDI",
+            "label": "CDI"
+        },
+        "experience_level": {
+            "code": "SENIOR",
+            "label": "+ de 5 ans d’expérience",
+            "min_years": 5,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_4",
+            "label": "BAC+4",
+            "rank": 4
+        },
+        "description": "COM&SIG, spécialisée dans la communication visuelle, recrute un(e) Manager Commercial(e) pour piloter et développer son activité commerciale. Le/la titulaire du poste sera chargé(e) de définir et mettre en œuvre la stratégie commerciale, développer le portefeuille clients, fidéliser les partenaires et garantir l’atteinte des objectifs de chiffre d’affaires. Il/elle encadrera également l’équipe commerciale et veillera à la satisfaction des clients. ### Missions principales Stratégie commerciale * Élaborer et mettre en œuvre le plan d’action commercial. * Identifier les opportunités de marché et développer de nouveaux segments. * Définir les objectifs commerciaux à court, moyen et long terme. Développement commercial * Prospecter et développer de nouveaux comptes clients. * Développer les relations avec les clients stratégiques. * Négocier les contrats et conclure les ventes. * Participer à la préparation et au suivi des appels d’offres. * Représenter l’entreprise lors des salons, foires et événements professionnels. Management de l’équipe commerciale * Encadrer, accompagner et motiver l’équipe commerciale. * Répartir les objectifs et suivre leur réalisation. * Organiser des réunions commerciales régulières. * Évaluer les performances individuelles et collectives. Relation client * Garantir la qualité du service et assurer le suivi des grands comptes. * Gérer les réclamations complexes. * Mettre en place des actions favorisant la fidélisation des clients. Pilotage de la performance * Élaborer et suivre les tableaux de bord commerciaux. * Analyser les résultats et proposer des actions correctives. * Présenter les rapports d’activité à la Direction Générale. ### Profil recherché * Être titulaire d’un Bac+4 à Bac+5 en Commerce, Marketing, Management, Gestion ou domaine équivalent. * Justifier d’au moins 5 ans d’expérience dans une fonction commerciale. * Disposer d’au moins 2 ans d’expérience dans le management d’équipe. * Avoir une excellente présentation et faire preuve de professionnalisme. * Être autonome, rigoureux, organisé et capable de travailler sous pression. * Posséder un bon leadership et un excellent esprit d’équipe. ### Compétences requises * Maîtrise des techniques de vente et de négociation. * Élaboration et pilotage de stratégies commerciales. * Gestion et développement d’un portefeuille clients. * Maîtrise de la prospection B2B et des appels d’offres. * Bonne maîtrise des outils CRM et du Pack Office. * Capacité à analyser les indicateurs de performance. * Excellentes aptitudes en communication et en relation client. * Esprit d’analyse et sens de l’organisation. Pour postuler, cliquer sur le bouton « Postuler ».",
+        "company": {
+            "name": "COM&SIG",
+            "website_url": "https://www.goafricaonline.com/ci/1366631-com-sig-agences-communication-abidjan-cote-ivoire",
+            "type": "Communication, publicité > Agences de communication",
+            "description": "Agence de communication globale, nous mettons notre créativité et notre expertise au service de vos projets en Côte d'Ivoire et dans toute la sous-région. Forte de 10 ans d'expérience et de plus de 500 réalisations, notre équipe jeune et pluridisciplinaire vous accompagne pas à pas pour concevoir des stratégies adaptées à vos besoins."
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": "Sans télétravail",
+        "raw_fields": {
+            "contract_raw": "CDI",
+            "experience_raw": "+ de 5 ans d’expérience",
+            "education_raw": "Bac+4",
+            "published_raw": "Posté le 20 août 2026",
+            "expires_raw": null
+        },
+        "télétravail": "Sans télétravail",
+        "is_télétravail": false,
+        "active": "2026-08-20T00:00:00.000Z"
+    },
+    {
+        "title": "Technicien(ne) en Énergie Solaire",
+        "source_url": "https://www.goafricaonline.com/ci/emploi/job-21744-technicienne-en-energie-solaire",
+        "canonical_url": "https://www.goafricaonline.com/ci/emploi/job-21744-technicienne-en-energie-solaire",
+        "location_raw": "2 plateau derriere sococe Abidjan - Côte d’Ivoire",
+        "salary_raw": null,
+        "published_at": "2026-08-20T00:00:00.000Z",
+        "collected_at": "2026-08-22T04:45:09.792Z",
+        "first_seen_at": "2026-08-22T04:45:09.792Z",
+        "last_seen_at": "2026-08-22T04:45:09.792Z",
+        "expires_at": null,
+        "application_deadline_at": null,
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": "Plateau",
+            "label": "2 plateau derriere sococe Abidjan - Côte d’Ivoire"
+        },
+        "contract_type": {
+            "code": "CDI",
+            "label": "CDI"
+        },
+        "experience_level": {
+            "code": "JUNIOR",
+            "label": "de 2 ans à 5 ans d’expérience",
+            "min_years": 2,
+            "max_years": 5
+        },
+        "education_level": {
+            "code": "BAC_PLUS_3",
+            "label": "BAC+3",
+            "rank": 3
+        },
+        "description": "EPHACO recrute un(e) Technicien(ne) en Énergie Solaire pour renforcer son département SAV. Sous la responsabilité du Responsable Technique, le/la technicien(ne) interviendra sur l’installation, la maintenance et le dépannage des systèmes solaires et électriques. Il/elle assurera également le suivi des interventions et l’accompagnement des clients afin de garantir le bon fonctionnement des installations. ### Missions principales * Installer, entretenir et dépanner les systèmes électriques et solaires. * Analyser les performances des installations et optimiser leur rendement. * Diagnostiquer les pannes et résoudre rapidement les dysfonctionnements. * Conseiller et former les clients à l’utilisation des équipements. * Assurer le suivi et la documentation des interventions. * Veiller au respect des procédures techniques et des règles de sécurité. ### Profil recherché * Justifier d’au moins 3 ans d’expérience dans un poste similaire. * Être disponible immédiatement. * Maîtriser l’installation et le dépannage des systèmes photovoltaïques et électriques. * Savoir lire et interpréter les plans et schémas électriques. * Posséder une bonne expérience pratique du terrain. ### Compétences et qualités requises * Maîtrise des systèmes photovoltaïques et électriques. * Diagnostic et résolution des pannes. * Lecture de plans et schémas électriques. * Rigueur et autonomie. * Esprit d’équipe. * Sens du résultat. * Bon relationnel avec les clients. * Respect strict des consignes de sécurité. Pour postuler, cliquer sur le bouton « Postuler ».",
+        "company": {
+            "name": "EPHACO",
+            "website_url": "https://www.goafricaonline.com/ci/844748-ephaco-produits-pharmaceutiques-abidjan-cote-ivoire",
+            "type": "Santé > Produits pharmaceutiques",
+            "description": "Spécialiste de la pharmacie et de l’agencement de pharmacie. Fortes de centaines de réalisations (créations, aménagements, transferts, rénovations, extensions, regroupements…). Nous sommes présents dans six pays."
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": "Sans télétravail",
+        "raw_fields": {
+            "contract_raw": "CDI",
+            "experience_raw": "de 2 ans à 5 ans d’expérience",
+            "education_raw": "Bac+3",
+            "published_raw": "Posté le 20 août 2026",
+            "expires_raw": null
+        },
+        "télétravail": "Sans télétravail",
+        "is_télétravail": false,
+        "active": "2026-08-20T00:00:00.000Z"
+    },
+    {
+        "title": "Agents Commerciaux B2B & B2C",
+        "source_url": "https://www.goafricaonline.com/ci/emploi/job-21745-agents-commerciaux-b2b-et-b2c",
+        "canonical_url": "https://www.goafricaonline.com/ci/emploi/job-21745-agents-commerciaux-b2b-et-b2c",
+        "location_raw": "2 plateau derriere sococe Abidjan - Côte d’Ivoire",
+        "salary_raw": null,
+        "published_at": "2026-08-20T00:00:00.000Z",
+        "collected_at": "2026-08-22T04:45:18.930Z",
+        "first_seen_at": "2026-08-22T04:45:18.930Z",
+        "last_seen_at": "2026-08-22T04:45:18.930Z",
+        "expires_at": null,
+        "application_deadline_at": null,
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": "Plateau",
+            "label": "2 plateau derriere sococe Abidjan - Côte d’Ivoire"
+        },
+        "contract_type": {
+            "code": "CDI",
+            "label": "CDI"
+        },
+        "experience_level": {
+            "code": "JUNIOR",
+            "label": "de 2 ans à 5 ans d’expérience",
+            "min_years": 2,
+            "max_years": 5
+        },
+        "education_level": {
+            "code": "BAC_PLUS_2",
+            "label": "BAC+2",
+            "rank": 2
+        },
+        "description": "Dans le cadre du développement de ses activités, EPHACO recrute des Commerciaux B2B & B2C expérimentés pour renforcer son équipe commerciale. Sous la responsabilité du Responsable Commercial, les candidats seront chargés de développer le portefeuille clients, promouvoir les produits et services de l’entreprise, négocier les offres et contribuer à l’atteinte des objectifs commerciaux. ### Missions principales * Prospecter et développer un portefeuille de clients B2B et B2C. * Identifier les besoins des clients et proposer des solutions adaptées. * Promouvoir et vendre les produits et services d’EPHACO. * Développer et fidéliser la clientèle. * Négocier les offres commerciales jusqu’à la conclusion des ventes. * Atteindre et dépasser les objectifs commerciaux fixés. * Effectuer un reporting régulier des activités commerciales. * Participer aux actions de prospection, démonstrations et événements commerciaux. ### Profil recherché * Être titulaire d’un Bac+2 à Bac+5 en Commerce, Marketing, Gestion ou domaine équivalent. * Justifier d’au moins 3 ans d’expérience dans la vente B2B, B2C ou les deux. * Maîtriser les techniques de prospection et de négociation. * Avoir une bonne capacité à convaincre et à développer un portefeuille clients. * Posséder une bonne présentation et d’excellentes capacités de communication. * Être disponible immédiatement. * Le permis de conduire et la mobilité constituent des atouts. ### Compétences et qualités requises * Maîtrise des techniques commerciales, de prospection et de négociation. * Maîtrise des outils informatiques, notamment CRM et Microsoft Office. * Dynamisme et autonomie. * Forte culture du résultat. * Excellent relationnel. * Sens de l’organisation. * Esprit d’équipe. * Persévérance et goût du challenge. * Intégrité et professionnalisme. ### Dossier de candidature Le dossier doit comprendre : * Un CV à jour. * Une lettre de motivation. * Les copies des diplômes ou attestations. * Les certificats de travail. Pour postuler, cliquer sur le bouton « Postuler ».",
+        "company": {
+            "name": "EPHACO",
+            "website_url": "https://www.goafricaonline.com/ci/844748-ephaco-produits-pharmaceutiques-abidjan-cote-ivoire",
+            "type": "Santé > Produits pharmaceutiques",
+            "description": "Spécialiste de la pharmacie et de l’agencement de pharmacie. Fortes de centaines de réalisations (créations, aménagements, transferts, rénovations, extensions, regroupements…). Nous sommes présents dans six pays."
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": "Sans télétravail",
+        "raw_fields": {
+            "contract_raw": "CDI",
+            "experience_raw": "de 2 ans à 5 ans d’expérience",
+            "education_raw": "Bac+2",
+            "published_raw": "Posté le 20 août 2026",
+            "expires_raw": null
+        },
+        "télétravail": "Sans télétravail",
+        "is_télétravail": false,
+        "active": "2026-08-20T00:00:00.000Z"
+    },
+    {
+        "title": "STAGIAIRE COMMERCIAL(E)",
+        "source_url": "https://www.goafricaonline.com/ci/emploi/job-21746-stagiaire-commerciale",
+        "canonical_url": "https://www.goafricaonline.com/ci/emploi/job-21746-stagiaire-commerciale",
+        "location_raw": "Angré Djorobité Abidjan - Côte d’Ivoire",
+        "salary_raw": "100 k/500 k F CFA / mois",
+        "published_at": "2026-08-20T00:00:00.000Z",
+        "collected_at": "2026-08-22T04:45:27.314Z",
+        "first_seen_at": "2026-08-22T04:45:27.314Z",
+        "last_seen_at": "2026-08-22T04:45:27.314Z",
+        "expires_at": null,
+        "application_deadline_at": null,
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": "Angré",
+            "label": "Angré Djorobité Abidjan - Côte d’Ivoire"
+        },
+        "contract_type": {
+            "code": "CDI",
+            "label": "CDI"
+        },
+        "experience_level": {
+            "code": "JUNIOR",
+            "label": "- de 2 ans d’expérience",
+            "min_years": null,
+            "max_years": 2
+        },
+        "education_level": {
+            "code": "BAC_PLUS_2",
+            "label": "BAC+2",
+            "rank": 2
+        },
+        "description": "COM&SIG, spécialisée dans la communication visuelle, recrute un(e) Stagiaire Commercial(e) pour renforcer son équipe commerciale. Sous la supervision du Responsable Commercial, le/la stagiaire participera à la prospection, au suivi des prospects et clients, à la préparation des offres commerciales et à la mise à jour des outils de suivi. Ce stage permettra d’acquérir une première expérience pratique dans la vente, la prospection et la relation client. ### Missions principales * Participer à la prospection de nouveaux clients. * Assister à la préparation et au suivi des devis et offres commerciales. * Effectuer les relances des prospects et suivre les demandes clients. * Mettre à jour le fichier clients et les outils de suivi commercial. * Participer à la préparation des rendez-vous et supports commerciaux. * Appuyer le Responsable Commercial dans le suivi des actions commerciales. * Collecter et transmettre les informations recueillies sur le terrain. ### Profil recherché * Être titulaire d’un Bac+2 à Bac+3 en Commerce, Gestion commerciale, Marketing ou domaine équivalent. * Aucune expérience professionnelle n’est exigée. * Un stage de qualification ou une immersion professionnelle dans le domaine commercial constitue un atout. * Être motivé(e) à apprendre et à évoluer dans le secteur de la communication visuelle. * Faire preuve de dynamisme, rigueur, curiosité et capacité d’adaptation. ### Compétences requises * Notions en techniques de vente et de prospection. * Connaissances de base en gestion commerciale et relation client. * Maîtrise de Word et Excel. * Bonnes capacités rédactionnelles et relationnelles. * Sens du service client. * Bonne présentation et professionnalisme. * Esprit d’équipe et capacité à travailler sous supervision. * Réactivité, organisation et rigueur. Pour postuler, cliquer sur le bouton « Postuler ».",
+        "company": {
+            "name": "COM&SIG",
+            "website_url": "https://www.goafricaonline.com/ci/1366631-com-sig-agences-communication-abidjan-cote-ivoire",
+            "type": "Communication, publicité > Agences de communication",
+            "description": "Agence de communication globale, nous mettons notre créativité et notre expertise au service de vos projets en Côte d'Ivoire et dans toute la sous-région. Forte de 10 ans d'expérience et de plus de 500 réalisations, notre équipe jeune et pluridisciplinaire vous accompagne pas à pas pour concevoir des stratégies adaptées à vos besoins."
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": "Sans télétravail",
+        "raw_fields": {
+            "contract_raw": "CDI",
+            "experience_raw": "- de 2 ans d’expérience",
+            "education_raw": "Bac+2",
+            "published_raw": "Posté le 20 août 2026",
+            "expires_raw": null
+        },
+        "télétravail": "Sans télétravail",
+        "is_télétravail": false,
+        "active": "2026-08-20T00:00:00.000Z"
+    }
+]

@@ -1,5 +1,5 @@
 from models.admin import AdminActionLog, Administrator, SiteSetting
-from models.ai import AiProcessingJob
+from models.ai import AIApiKey, AIAlert, AIFiliereSuggestion, AIJob, AIOfferAttempt, AiProcessingJob
 from models.content import (
     ContactMessage,
     ContentPage,
@@ -22,6 +22,13 @@ from models.emails import EmailDeliveryAttempt, EmailDigest, EmailDigestOffer
 from models.enums import (
     AdminAction,
     AdminRole,
+    AIAlertSeverity,
+    AIErrorType,
+    AIFiliereSuggestionStatus,
+    AIJobStatus,
+    AIJobTrigger,
+    AIOfferAttemptStatus,
+    AIProviderType,
     AiOfferStatus,
     AiProcessingJobStatus,
     AiProcessingJobTrigger,
@@ -65,6 +72,18 @@ __all__ = [
     "AdminActionLog",
     "AdminRole",
     "Administrator",
+    "AIApiKey",
+    "AIAlert",
+    "AIAlertSeverity",
+    "AIErrorType",
+    "AIFiliereSuggestion",
+    "AIFiliereSuggestionStatus",
+    "AIJob",
+    "AIJobStatus",
+    "AIJobTrigger",
+    "AIOfferAttempt",
+    "AIOfferAttemptStatus",
+    "AIProviderType",
     "AiOfferStatus",
     "AiProcessingJob",
     "AiProcessingJobStatus",

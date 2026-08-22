@@ -119,10 +119,26 @@ class OfferVisibilityUpdate(ORMModel):
     visible_site: bool
 
 
+JobOfferStatusLiteral = Literal[
+    "active",
+    "expired",
+    "filled",
+    "archived",
+    "duplicate",
+    "hidden",
+    "brut",
+    "ai_processing",
+    "pending_review",
+    "brute",
+    "processing",
+    "rejected",
+]
+
+
 class OfferStatusUpdate(ORMModel):
-    status: Literal["active", "expired", "filled", "archived", "duplicate", "hidden", "brute", "processing", "rejected"]
+    status: JobOfferStatusLiteral
 
 
 class OfferBulkStatusUpdate(ORMModel):
     offer_ids: list[str] = Field(min_length=1, description="IDs des offres à modifier.")
-    status: Literal["active", "expired", "filled", "archived", "duplicate", "hidden", "brute", "processing", "rejected"]
+    status: JobOfferStatusLiteral

@@ -1,0 +1,315 @@
+[
+    {
+        "title": "CHAUFFEUR",
+        "source_url": "https://emploi.educarriere.ci/offre-154201-chauffeur.html",
+        "canonical_url": "https://emploi.educarriere.ci/offre-154201-chauffeur.html",
+        "location_raw": "Abidjan Marcory Résidentiel",
+        "salary_raw": null,
+        "published_at": "2026-08-21T00:00:00.000Z",
+        "collected_at": "2026-08-22T04:47:28.884Z",
+        "first_seen_at": "2026-08-22T04:47:28.884Z",
+        "last_seen_at": "2026-08-22T04:47:28.884Z",
+        "expires_at": "2026-08-31T00:00:00.000Z",
+        "application_deadline_at": "2026-08-31T00:00:00.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": "Marcory",
+            "label": "Abidjan Marcory Résidentiel"
+        },
+        "specialty": {
+            "code": "ressources humaines",
+            "label": "Ressources Humaines"
+        },
+        "contract_type": {
+            "code": "CDD",
+            "label": "Emploi (CDD)"
+        },
+        "experience_level": {
+            "code": "INCONNU",
+            "label": null,
+            "min_years": null,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_1",
+            "label": "BAC+1",
+            "rank": 1
+        },
+        "description": "Détails de l'offre Principales tâches 1. Conduite du camion Conduire le camion benne-grue pour effectuer les déplacements et livraisons sur les différents sites. Respecter le Code de la route et les règles de sécurité routière en vigueur en Côte d’Ivoire. Adapter sa conduite à l’état des routes, aux conditions météorologiques et à la charge transportée. Respecter les itinéraires et les horaires définis par le responsable. Veiller à la bonne répartition et à la sécurisation de la charge. 2. Chargement et transport des matériaux Transporter différents matériaux : sable, gravier, terre, ciment, équipements, matériaux de construction, etc. Contrôler visuellement la nature et la quantité de la cargaison avant le départ. S'assurer que la benne est correctement chargée et sécurisée. Éviter toute surcharge du véhicule. Effectuer les livraisons sur les chantiers ou sites indiqués. 3. Utilisation de la grue Installer et stabiliser correctement le camion avant toute opération de levage. Manipuler la grue auxiliaire conformément aux consignes du fabricant et aux règles de sécurité. Charger et décharger les équipements ou matériaux à l’aide de la grue. Vérifier l’état des accessoires de levage avant leur utilisation. Respecter les capacités maximales de levage de la grue. Maintenir une distance de sécurité avec les personnes, bâtiments, véhicules et lignes électriques. Signaler immédiatement toute anomalie constatée sur la grue. 4. Entretien courant du camion Effectuer les contrôles quotidiens avant le démarrage : niveaux d’huile et de liquide, pneus, freins, éclairage, batterie, etc. Vérifier l'état de la benne, de la grue et des équipements de sécurité. Effectuer les petites opérations d'entretien relevant de ses compétences. Signaler rapidement toute panne ou défaillance mécanique au responsable. Maintenir le véhicule propre et en bon état. 5. Documents et suivi des missions Tenir à jour le carnet de bord du véhicule. Renseigner les fiches de mission, bons de livraison et documents de transport. Contrôler les kilométrages et les consommations de carburant. Signaler les incidents, accidents, retards ou difficultés rencontrés lors des missions. Veiller à la présence des documents administratifs et techniques nécessaires à l'utilisation du véhicule. 6. Sécurité et responsabilité Porter les équipements de protection individuelle requis sur les chantiers. Respecter strictement les consignes de sécurité de l'entreprise et du chantier. Ne pas transporter de personnes dans des conditions non autorisées. Vérifier que la zone de manœuvre est dégagée avant toute opération de levage ou de déchargement. Informer immédiatement le responsable en cas d'accident, de dommage ou de situation dangereuse. Qualités et compétences requises Le chauffeur de camion benne-grue doit notamment avoir : Un permis de conduire adapté à la catégorie du véhicule ; Une bonne maîtrise de la conduite des poids lourds ; Une expérience dans la conduite de camion benne et/ou l'utilisation d'une grue auxiliaire ; Une bonne connaissance des règles de sécurité routière et de chantier ; De la vigilance, de la ponctualité et un bon sens des responsabilités ; Une bonne capacité à effectuer les contrôles et l'entretien courant du véhicule. En résumé : le chauffeur de camion benne-grue est responsable de la conduite, du transport, du chargement/déchargement, des opérations de levage et du bon entretien de son véhicule, tout en veillant en permanence à la sécurité des personnes, des biens et des équipements.",
+        "company": {
+            "name": null,
+            "website_url": null,
+            "type": null,
+            "description": null
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": null,
+        "raw_fields": {
+            "contract_raw": "Emploi (CDD)",
+            "experience_raw": null,
+            "education_raw": "BAC, BAC+1, BAC+2, BEPC",
+            "published_raw": "Publiée le 21/08/2026",
+            "expires_raw": "31/08/2026",
+            "secteur_raw": "Ressources Humaines"
+        },
+        "secteur": {
+            "code": "ressources humaines",
+            "label": "Ressources Humaines"
+        },
+        "active": "2026-08-21T00:00:00.000Z"
+    },
+    {
+        "title": "Comptable contrôleur",
+        "source_url": "https://emploi.educarriere.ci/offre-154200-comptable-controleur.html",
+        "canonical_url": "https://emploi.educarriere.ci/offre-154200-comptable-controleur.html",
+        "location_raw": "Abidjan Marcory Résidentiel",
+        "salary_raw": null,
+        "published_at": "2026-08-21T00:00:00.000Z",
+        "collected_at": "2026-08-22T04:47:41.367Z",
+        "first_seen_at": "2026-08-22T04:47:41.367Z",
+        "last_seen_at": "2026-08-22T04:47:41.367Z",
+        "expires_at": "2026-08-31T00:00:00.000Z",
+        "application_deadline_at": "2026-08-31T00:00:00.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": "Marcory",
+            "label": "Abidjan Marcory Résidentiel"
+        },
+        "specialty": {
+            "code": "ressources humaines",
+            "label": "Ressources Humaines"
+        },
+        "contract_type": {
+            "code": "CDD",
+            "label": "Emploi (CDD)"
+        },
+        "experience_level": {
+            "code": "INCONNU",
+            "label": null,
+            "min_years": null,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_1",
+            "label": "BAC+1",
+            "rank": 1
+        },
+        "description": "Détails de l'offre Principales tâches 1. Contrôle des recettes Contrôler quotidiennement les recettes de l’hébergement, du restaurant, du bar, de la blanchisserie, des événements, etc. Vérifier les encaissements en espèces, par carte bancaire, mobile money, virement et autres moyens de paiement. Rapprocher les recettes enregistrées dans le logiciel hôtelier avec les pièces justificatives et les bordereaux d’encaissement. Contrôler les annulations, remises, gratuités, corrections et remboursements. Vérifier les écarts entre les recettes théoriques et les encaissements réels. 2. Contrôle des opérations de caisse Contrôler les caisses des différents services. Vérifier les fonds de caisse et les arrêtés de caisse journaliers. Effectuer des contrôles inopinés de caisse. Identifier et justifier les éventuels écarts de caisse. S’assurer du dépôt régulier des espèces en banque. 3. Contrôle de l’hébergement Vérifier les arrivées et départs des clients. Contrôler les factures et folios clients. Vérifier que toutes les consommations des clients sont correctement facturées. Contrôler les tarifs appliqués, les réductions et les gratuités. Effectuer le rapprochement entre l’occupation des chambres et le chiffre d’affaires enregistré. 4. Contrôle restaurant et bar Contrôler les tickets de caisse et additions. Vérifier la concordance entre les commandes, les consommations et les facturations. Contrôler les annulations et offerts. Effectuer le rapprochement entre les ventes enregistrées et les stocks consommés. Signaler les anomalies constatées. 5. Comptabilité fournisseurs Contrôler les factures fournisseurs avant leur comptabilisation. Vérifier la conformité entre les bons de commande, bons de livraison et factures. Préparer ou contrôler les règlements fournisseurs. Assurer le suivi des comptes fournisseurs et des échéances. Participer aux inventaires et au contrôle des achats. 6. Comptabilité générale Saisir et contrôler les opérations comptables. Effectuer les rapprochements bancaires. Suivre les comptes clients et fournisseurs. Participer aux travaux de clôture mensuelle. Préparer les éléments nécessaires aux déclarations fiscales et sociales, selon l’organisation de l’entreprise. Participer à la préparation des états financiers. 7. Contrôle des stocks Participer aux inventaires physiques des boissons, denrées alimentaires, produits d’entretien, linge et autres consommables. Comparer les stocks théoriques aux stocks physiques. Analyser les écarts et rechercher leur origine. Contrôler les sorties de stocks et les consommations des différents services. Suivre les pertes, casses, périmés et démarques. 8. Contrôle interne et reporting Mettre en place et appliquer les procédures de contrôle interne. Détecter les erreurs, anomalies ou irrégularités. Préparer des rapports de contrôle à l’attention de la Direction. Produire des tableaux de bord : chiffre d’affaires, encaissements, créances, dépenses, écarts de caisse, consommations, etc. Proposer des mesures correctives pour améliorer la maîtrise des recettes et des dépenses. Exemple de routine quotidienne Matin : Récupération des rapports de caisse et du rapport de nuit. Contrôle des recettes de la veille. Vérification des encaissements et des dépôts. Analyse des écarts éventuels. Dans la journée : Contrôle des opérations des différents services. Vérification des factures et pièces comptables. Suivi des fournisseurs et des règlements. Contrôle des stocks et des mouvements sensibles. Fin de journée : Contrôle des caisses. Rapprochement des ventes avec les encaissements. Vérification des opérations exceptionnelles. Élaboration du rapport de contrôle quotidien. En résumé Le comptable contrôleur hôtelier doit être particulièrement attentif à trois éléments : les recettes, les dépenses et les stocks. Son objectif principal est de s'assurer que toute opération réalisée dans l'hôtel est correctement autorisée, justifiée, enregistrée et contrôlée, afin de limiter les erreurs, les pertes et les risques de fraude.",
+        "company": {
+            "name": null,
+            "website_url": null,
+            "type": null,
+            "description": null
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": null,
+        "raw_fields": {
+            "contract_raw": "Emploi (CDD)",
+            "experience_raw": null,
+            "education_raw": "BAC, BAC+1, BAC+2, BAC+3, BAC+4",
+            "published_raw": "Publiée le 21/08/2026",
+            "expires_raw": "31/08/2026",
+            "secteur_raw": "Ressources Humaines"
+        },
+        "secteur": {
+            "code": "ressources humaines",
+            "label": "Ressources Humaines"
+        },
+        "active": "2026-08-21T00:00:00.000Z"
+    },
+    {
+        "title": "COMMERCIAL BTP",
+        "source_url": "https://emploi.educarriere.ci/offre-154199-commercial-btp.html",
+        "canonical_url": "https://emploi.educarriere.ci/offre-154199-commercial-btp.html",
+        "location_raw": "Abidjan",
+        "salary_raw": null,
+        "published_at": "2026-08-21T00:00:00.000Z",
+        "collected_at": "2026-08-22T04:47:53.644Z",
+        "first_seen_at": "2026-08-22T04:47:53.644Z",
+        "last_seen_at": "2026-08-22T04:47:53.644Z",
+        "expires_at": "2026-09-30T00:00:00.000Z",
+        "application_deadline_at": "2026-09-30T00:00:00.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": null,
+            "label": "Abidjan"
+        },
+        "specialty": {
+            "code": "ressources humaines",
+            "label": "Ressources Humaines"
+        },
+        "contract_type": {
+            "code": "INCONNU",
+            "label": "Emploi"
+        },
+        "experience_level": {
+            "code": "INCONNU",
+            "label": null,
+            "min_years": null,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_2",
+            "label": "BAC+2",
+            "rank": 2
+        },
+        "description": "Détails de l'offre ???? Elite Intérim Côte d'Ivoire recrute 01 COMMERCIAL BTP (H/F) pour un partenaire spécialisé dans le domaine Distribution des matériaux de constructions (ciments, fer à béton, graviers). ???? Vous êtes intéressé(e) par cette opportunité ? Consultez l’offre complète et postulez via le lien ci-dessous :???? https://ats.talenteo.com/job-apply/92f9e08190722ce7e315",
+        "company": {
+            "name": null,
+            "website_url": null,
+            "type": null,
+            "description": null
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": null,
+        "raw_fields": {
+            "contract_raw": "Emploi",
+            "experience_raw": null,
+            "education_raw": "BAC+2",
+            "published_raw": "Publiée le 21/08/2026",
+            "expires_raw": "30/09/2026",
+            "secteur_raw": "Ressources Humaines"
+        },
+        "secteur": {
+            "code": "ressources humaines",
+            "label": "Ressources Humaines"
+        },
+        "active": "2026-08-21T00:00:00.000Z"
+    },
+    {
+        "title": "Commercial en Imprimerie",
+        "source_url": "https://emploi.educarriere.ci/offre-154198-commercial-en-imprimerie.html",
+        "canonical_url": "https://emploi.educarriere.ci/offre-154198-commercial-en-imprimerie.html",
+        "location_raw": "Bouaké",
+        "salary_raw": null,
+        "published_at": "2026-08-21T00:00:00.000Z",
+        "collected_at": "2026-08-22T04:48:07.134Z",
+        "first_seen_at": "2026-08-22T04:48:07.134Z",
+        "last_seen_at": "2026-08-22T04:48:07.134Z",
+        "expires_at": "2026-09-21T00:00:00.000Z",
+        "application_deadline_at": "2026-09-21T00:00:00.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": "Bouaké",
+            "district": null,
+            "label": "Bouaké"
+        },
+        "specialty": {
+            "code": "imprimerie",
+            "label": "Imprimerie"
+        },
+        "contract_type": {
+            "code": "STAGE",
+            "label": "Stage"
+        },
+        "experience_level": {
+            "code": "INCONNU",
+            "label": null,
+            "min_years": null,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_1",
+            "label": "BAC+1",
+            "rank": 1
+        },
+        "description": "Détails de l'offre Commercial Terrain & Grands Comptes (H/F) – Secteur Imprimerie Digital 360 est une Imprimerie moderne et dynamique, spécialisée dans la réalisation de supports de communication (print traditionnel, grand format, packaging et web-to-print), nous accompagnons nos clients de la conception à la livraison. Pour soutenir notre croissance, nous recherchons un Commercial Print / Attaché Commercial (H/F). Missions Rattaché(e) à la Direction Commerciale, votre rôle est de développer et de fidéliser un portefeuille de clients professionnels (B2B) : Prospection active : Identifier de nouveaux prospects (PME, grands comptes, agences de communication, collectivités) et déclencher de nouvelles opportunités. Conseil technique :Analyser les besoins des clients et les orienter vers les meilleures solutions d'impression (choix du papier, façonnage, grammage, techniques d'impression offset/numérique). Négociation & Suivi :Élaborer les devis en lien avec le bureau d'études, négocier les offres et assurer le suivi de la commande jusqu'à la livraison. Fidélisation :Entretenir une relation de confiance durable avec vos clients pour maximiser leur récurrence. Profil recherché Résider à Bouaké Expérience :1 à 5 ans minimum sur un poste commercial, idéalement dans le secteur des arts graphiques, de l'imprimerie ou du packaging ou autres. Compétences : Excellente maîtrise des techniques de vente B2B et bonne connaissance de la chaîne graphique. Qualités :Tempérament chasseur, goût du challenge, rigueur, très bon relationnel et écoute active. Conditions Type de contrat: Stage Rémunération: Fixe + Variable motivant (déplafonné) Postuler en envoyant votre CV à ponny@digital360.ci ou georges@digital360.ci",
+        "company": {
+            "name": null,
+            "website_url": null,
+            "type": null,
+            "description": null
+        },
+        "company_hint": null,
+        "application_email": "ponny@digital360.ci",
+        "application_emails": [
+            "ponny@digital360.ci",
+            "georges@digital360.ci"
+        ],
+        "remote_work": null,
+        "raw_fields": {
+            "contract_raw": "Stage",
+            "experience_raw": null,
+            "education_raw": "BAC, BAC+1, BAC+2, BAC+3, Terminale",
+            "published_raw": "Publiée le 21/08/2026",
+            "expires_raw": "21/09/2026",
+            "secteur_raw": "Imprimerie"
+        },
+        "secteur": {
+            "code": "imprimerie",
+            "label": "Imprimerie"
+        },
+        "active": "2026-08-21T00:00:00.000Z"
+    },
+    {
+        "title": "CHAUFFEUR PROFESSIONNEL",
+        "source_url": "https://emploi.educarriere.ci/offre-154197-chauffeur-professionnel.html",
+        "canonical_url": "https://emploi.educarriere.ci/offre-154197-chauffeur-professionnel.html",
+        "location_raw": "Abidjan",
+        "salary_raw": null,
+        "published_at": "2026-08-21T00:00:00.000Z",
+        "collected_at": "2026-08-22T04:48:25.535Z",
+        "first_seen_at": "2026-08-22T04:48:25.535Z",
+        "last_seen_at": "2026-08-22T04:48:25.535Z",
+        "expires_at": "2026-08-27T00:00:00.000Z",
+        "application_deadline_at": "2026-08-27T00:00:00.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": null,
+            "label": "Abidjan"
+        },
+        "specialty": {
+            "code": "batiment, commerce/ventes",
+            "label": "Bâtiment, Commerce/Ventes"
+        },
+        "contract_type": {
+            "code": "INCONNU",
+            "label": "Emploi"
+        },
+        "experience_level": {
+            "code": "INCONNU",
+            "label": null,
+            "min_years": null,
+            "max_years": null
+        },
+        "education_level": {
+            "code": null,
+            "label": "Terminale",
+            "rank": null
+        },
+        "description": "Détails de l'offre ENTREPRISE RECRUTE POUR SA DIRECTION GENERALE: Un (01) Chauffeur Professionnel Le candidat aura pour principales missions: - Assurer en toute sécurité le transport du Directeur Général dans le cadre de ses activités à Abidjan ainsi qu'à l'intérieur du pays en cas de besoin. - Veiller au respect scrupuleux du Code de la Route et des règles de sécurité. - S'assurer de la propreté permanente et du bon état de fonctionnement du véhicule du Directeur Général. - Effectuer les contrôles quotidiens et signaler toute anomalie ou besoin d'entretien. - Tenir à jour les documents administratifs et le carnet de bord du véhicule. Profile: - Etre titulaire d'un permis de conduire valide. - Justifier d'au moins trois (03) ans d'expérience en qualité de Chauffeur Professionnel. - Avoir une excellente connaissance de la ville d'Abidjan et ses banlieues ainsi que des principaux axes routiers de la Côte d'Ivoire. - Etre ponctuel, discret, courtois et avoir le sens des responsabilités. - Avoir une bonne présentation physique et être soigné dans son apparence.",
+        "company": {
+            "name": null,
+            "website_url": null,
+            "type": null,
+            "description": null
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": null,
+        "raw_fields": {
+            "contract_raw": "Emploi",
+            "experience_raw": null,
+            "education_raw": "Terminale",
+            "published_raw": "Publiée le 21/08/2026",
+            "expires_raw": "27/08/2026",
+            "secteur_raw": "Bâtiment, Commerce/Ventes"
+        },
+        "secteur": {
+            "code": "batiment, commerce/ventes",
+            "label": "Bâtiment, Commerce/Ventes"
+        },
+        "active": "2026-08-21T00:00:00.000Z"
+    }
+]

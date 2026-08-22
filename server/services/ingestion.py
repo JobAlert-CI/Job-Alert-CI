@@ -254,7 +254,7 @@ def ingest_offer_batch(db: Session, payload: IngestBatchCreate) -> IngestBatchSu
                 contract_type_id=contract_type.id if contract_type else None,
                 experience_level_id=experience_level.id if experience_level else None,
                 education_level_id=education_level.id if education_level else None,
-                status=JobOfferStatus.BRUTE,
+                status=JobOfferStatus.BRUT,
                 origin=JobOfferOrigin.SCRAPING,
                 visible_site=False,
                 source_reference=item.source_reference,

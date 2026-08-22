@@ -9,6 +9,7 @@ from pathlib import Path
 from uuid import uuid4
 
 import httpx
+from celery import chord, group
 from sqlalchemy import select
 
 from celery_app import celery_app
@@ -144,3 +145,23 @@ def run_source_scraper(self, source_code: str) -> dict:
             data = response.json()
         logger.info("Scraper source termine", extra={"source_code": source_code, "batch_id": batch_id, "response": data})
         return data
+
+
+@celery_app.task(name="tasks.scrapers.run_active_scrapers")
+def run_active_scrapers() -> dict:
+    with session_scope() as db:
+        source_codes = list(
+            db.scalars(
+                select(Source.code)
+                .where(Source.status == SourceStatus.ACTIVE, Source.supports_scraping.is_(True))
+                .order_by(Source.priority, Source.code)
+            )
+        )
+
+    if not source_codes:
+        return {"status": "skipped", "reason": "no_active_sources"}
+
+    from tasks.ai_processing import trigger_ai_processing
+
+    workflow = chord(group(run_source_scraper.s(source_code) for source_code in source_codes))(trigger_ai_processing.s())
+    return {"status": "queued", "source_codes": source_codes, "task_id": workflow.id}

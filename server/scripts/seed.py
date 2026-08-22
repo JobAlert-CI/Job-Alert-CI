@@ -53,7 +53,7 @@ SOURCES = [
         "description": "Portail généraliste d'offres d'emploi pour la Côte d'Ivoire.",
         "notes": "Source principale : structure HTML à surveiller.",
         "is_primary": False,
-        "supports_scraping": True,
+        "supports_scraping": False,
     },
     {
         "code": "goafrica",

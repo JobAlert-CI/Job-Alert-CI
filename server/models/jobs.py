@@ -99,7 +99,11 @@ class JobOffer(UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin, Base):
     ai_task_id: Mapped[str | None] = mapped_column(String(255), index=True, nullable=True)
     ai_error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
     ai_confidence: Mapped[float | None] = mapped_column(Float, nullable=True)
+    ai_attempts: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    ai_last_attempt_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     ai_processed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    requires_admin_review: Mapped[bool] = mapped_column(Boolean, default=False, index=True, nullable=False)
+    suggested_filiere_payload: Mapped[dict | None] = mapped_column(JSON, nullable=True)
 
     company: Mapped["Company"] = relationship(back_populates="offers")
     source: Mapped["Source"] = relationship(back_populates="offers")
@@ -123,6 +127,8 @@ class JobOffer(UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin, Base):
         UniqueConstraint("source_id", "source_reference", name="uq_job_offers_source_reference"),
         CheckConstraint("view_count >= 0", name="job_offer_view_count_positive"),
         CheckConstraint("save_count >= 0", name="job_offer_save_count_positive"),
+        CheckConstraint("ai_attempts >= 0", name="job_offer_ai_attempts_positive"),
+        CheckConstraint("ai_confidence IS NULL OR (ai_confidence >= 0 AND ai_confidence <= 1)", name="job_offer_ai_confidence_range"),
         Index("ix_job_offers_feed", "visible_site", "status", "published_at"),
         Index("ix_job_offers_search", "normalized_title", "visible_site", "status"),
     )

@@ -22,13 +22,15 @@ celery_app.conf.update(
     enable_utc=True,
     task_routes={
         "tasks.ai_processing.process_raw_offers": {"queue": "ai"},
+        "tasks.ai_processing.trigger_ai_processing": {"queue": "ai"},
+        "tasks.ai_processing.sweep_raw_offers": {"queue": "ai"},
         "tasks.scrapers.run_source_scraper": {"queue": "ingestion"},
+        "tasks.scrapers.run_active_scrapers": {"queue": "ingestion"},
     },
     beat_schedule={
         "ai-process-raw-offers-sweep": {
-            "task": "tasks.ai_processing.process_raw_offers",
+            "task": "tasks.ai_processing.sweep_raw_offers",
             "schedule": 300.0,
-            "kwargs": {"trigger_type": "sweep"},
             "options": {"queue": "ai"},
         },
         # "scrape-emploi-dakar-0600": {
@@ -39,19 +41,19 @@ celery_app.conf.update(
         # },
         "scrape-goafrica-0600": {
             "task": "tasks.scrapers.run_source_scraper",
-            "schedule": crontab(hour=6, minute=0),
+            "schedule": crontab(hour=4, minute=44),
             "args": ("goafrica",),
             "options": {"queue": "ingestion"},
         },
         "scrape-jobivoire-0610": {
             "task": "tasks.scrapers.run_source_scraper",
-            "schedule": crontab(hour=6, minute=10),
+            "schedule": crontab(hour=4, minute=45),
             "args": ("jobivoire",),
             "options": {"queue": "ingestion"},
         },
         "scrape-educarriere-0620": {
             "task": "tasks.scrapers.run_source_scraper",
-            "schedule": crontab(hour=6, minute=20),
+            "schedule": crontab(hour=4, minute=46),
             "args": ("educarriere",),
             "options": {"queue": "ingestion"},
         },

@@ -25,7 +25,11 @@ class JobOfferStatus(StrEnum):
     ARCHIVED = "archived"
     DUPLICATE = "duplicate"
     HIDDEN = "hidden"
-    BRUTE = "brute"
+    BRUT = "brut"
+    BRUTE = "brut"
+    LEGACY_BRUTE = "brute"
+    AI_PROCESSING = "ai_processing"
+    PENDING_REVIEW = "pending_review"
     PROCESSING = "processing"
     REJECTED = "rejected"
 
@@ -65,6 +69,67 @@ class AiProcessingJobStatus(StrEnum):
     FAILED = "failed"
     SKIPPED = "skipped"
     LOCKED = "locked"
+
+
+class AIProviderType(StrEnum):
+    OPENAI_COMPATIBLE = "openai_compatible"
+    OPENAI = "openai"
+    MISTRAL = "mistral"
+    GROQ = "groq"
+    ANTHROPIC = "anthropic"
+    GOOGLE_GEMINI = "google_gemini"
+    OLLAMA = "ollama"
+    CUSTOM_HTTP = "custom_http"
+    MOCK = "mock"
+
+
+class AIJobTrigger(StrEnum):
+    AUTO = "auto"
+    MANUAL = "manual"
+    DELAYED_CHECK = "delayed_check"
+    SWEEP = "sweep"
+
+
+class AIJobStatus(StrEnum):
+    PENDING = "pending"
+    RUNNING = "running"
+    COMPLETED = "completed"
+    PARTIAL_FAILURE = "partial_failure"
+    FAILED = "failed"
+
+
+class AIOfferAttemptStatus(StrEnum):
+    PENDING = "pending"
+    SUCCESS = "success"
+    INVALID = "invalid"
+    FAILED = "failed"
+    REVIEW_REQUIRED = "review_required"
+
+
+class AIErrorType(StrEnum):
+    TIMEOUT = "timeout"
+    NETWORK_ERROR = "network_error"
+    RATE_LIMIT = "rate_limit"
+    AUTHENTICATION_ERROR = "authentication_error"
+    QUOTA_EXCEEDED = "quota_exceeded"
+    MODEL_NOT_FOUND = "model_not_found"
+    SERVER_ERROR = "server_error"
+    INVALID_JSON_RESPONSE = "invalid_json_response"
+    CONTENT_POLICY_ERROR = "content_policy_error"
+    UNKNOWN_ERROR = "unknown_error"
+
+
+class AIAlertSeverity(StrEnum):
+    INFO = "info"
+    WARNING = "warning"
+    ERROR = "error"
+    CRITICAL = "critical"
+
+
+class AIFiliereSuggestionStatus(StrEnum):
+    PENDING = "pending"
+    APPROVED = "approved"
+    REJECTED = "rejected"
 
 
 class SubscriberStatus(StrEnum):
