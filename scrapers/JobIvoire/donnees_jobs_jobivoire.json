@@ -7,9 +7,9 @@
         "location_raw": "ABIDJAN",
         "salary_raw": "proposé",
         "published_at": null,
-        "collected_at": "2026-08-22T04:46:10.809Z",
-        "first_seen_at": "2026-08-22T04:46:10.809Z",
-        "last_seen_at": "2026-08-22T04:46:10.809Z",
+        "collected_at": "2026-08-22T11:50:53.714Z",
+        "first_seen_at": "2026-08-22T11:50:53.714Z",
+        "last_seen_at": "2026-08-22T11:50:53.714Z",
         "expires_at": "2026-08-30T23:59:59.000Z",
         "application_deadline_at": "2026-08-30T23:59:59.000Z",
         "location": {
@@ -61,9 +61,9 @@
         "location_raw": "Abidjan Attoban",
         "salary_raw": "proposé",
         "published_at": null,
-        "collected_at": "2026-08-22T04:46:20.359Z",
-        "first_seen_at": "2026-08-22T04:46:20.359Z",
-        "last_seen_at": "2026-08-22T04:46:20.359Z",
+        "collected_at": "2026-08-22T11:50:59.753Z",
+        "first_seen_at": "2026-08-22T11:50:59.753Z",
+        "last_seen_at": "2026-08-22T11:50:59.753Z",
         "expires_at": "2026-08-31T23:59:59.000Z",
         "application_deadline_at": "2026-08-31T23:59:59.000Z",
         "location": {
@@ -116,9 +116,9 @@
         "location_raw": "Abidjan",
         "salary_raw": "proposé",
         "published_at": null,
-        "collected_at": "2026-08-22T04:46:28.137Z",
-        "first_seen_at": "2026-08-22T04:46:28.137Z",
-        "last_seen_at": "2026-08-22T04:46:28.137Z",
+        "collected_at": "2026-08-22T11:51:07.322Z",
+        "first_seen_at": "2026-08-22T11:51:07.322Z",
+        "last_seen_at": "2026-08-22T11:51:07.322Z",
         "expires_at": "2026-08-31T23:59:59.000Z",
         "application_deadline_at": "2026-08-31T23:59:59.000Z",
         "location": {
@@ -170,9 +170,9 @@
         "location_raw": "Bouaké",
         "salary_raw": "proposé",
         "published_at": null,
-        "collected_at": "2026-08-22T04:46:36.382Z",
-        "first_seen_at": "2026-08-22T04:46:36.382Z",
-        "last_seen_at": "2026-08-22T04:46:36.382Z",
+        "collected_at": "2026-08-22T11:51:14.832Z",
+        "first_seen_at": "2026-08-22T11:51:14.832Z",
+        "last_seen_at": "2026-08-22T11:51:14.832Z",
         "expires_at": "2026-09-21T23:59:59.000Z",
         "application_deadline_at": "2026-09-21T23:59:59.000Z",
         "location": {
@@ -226,9 +226,9 @@
         "location_raw": "Abidjan",
         "salary_raw": "proposé",
         "published_at": null,
-        "collected_at": "2026-08-22T04:46:43.771Z",
-        "first_seen_at": "2026-08-22T04:46:43.771Z",
-        "last_seen_at": "2026-08-22T04:46:43.771Z",
+        "collected_at": "2026-08-22T11:51:20.875Z",
+        "first_seen_at": "2026-08-22T11:51:20.875Z",
+        "last_seen_at": "2026-08-22T11:51:20.875Z",
         "expires_at": "2026-08-27T23:59:59.000Z",
         "application_deadline_at": "2026-08-27T23:59:59.000Z",
         "location": {
@@ -270,6 +270,277 @@
             "contract_raw": "Emploi",
             "experience_raw": "Étudiant / Stagiaire",
             "education_raw": null
+        }
+    },
+    {
+        "title": "COMMERCIAL IMMOBIELIER",
+        "source_reference": "EI-15264",
+        "source_url": "https://www.jobivoire.ci/job/details/commercial-immobielier",
+        "canonical_url": "https://www.jobivoire.ci/job/details/commercial-immobielier",
+        "location_raw": "Abidjan",
+        "salary_raw": "proposé",
+        "published_at": null,
+        "collected_at": "2026-08-22T11:51:28.665Z",
+        "first_seen_at": "2026-08-22T11:51:28.665Z",
+        "last_seen_at": "2026-08-22T11:51:28.665Z",
+        "expires_at": "2026-09-30T23:59:59.000Z",
+        "application_deadline_at": "2026-09-30T23:59:59.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": null,
+            "label": "Abidjan",
+            "normalized_label": "abidjan, côte d'ivoire"
+        },
+        "specialty": {
+            "code": "RESSOURCESHUMAINES",
+            "label": "Ressources Humaines"
+        },
+        "contract_type": {
+            "code": "INCONNU",
+            "label": "Emploi"
+        },
+        "experience_level": {
+            "code": "STAGIAIRE",
+            "label": "Étudiant / Stagiaire",
+            "min_years": null,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_2",
+            "label": "BAC+2",
+            "rank": 2
+        },
+        "description": "???? Elite Intérim Côte d'Ivoire recrute 01 hashtag COMMERCIAL IMMOBILIER (H/F) pour un partenaire. ???? Vous êtes intéressé(e) par cette opportunité ? Consultez l’offre complète et postulez via le lien ci-dessous :???? https://ats.talenteo.com/job-apply/f416507c948a980ef782",
+        "company_name": "Ivoire",
+        "company_hint": null,
+        "application_email": "contact@jobivoire.ci",
+        "application_emails": [
+            "contact@jobivoire.ci"
+        ],
+        "raw_fields": {
+            "published_raw": null,
+            "deadline_raw": "30/09/2026",
+            "contract_raw": "Emploi",
+            "experience_raw": "Étudiant / Stagiaire",
+            "education_raw": "BAC+2"
+        }
+    },
+    {
+        "title": "COMMERCIAL BTP",
+        "source_reference": "UI-16095",
+        "source_url": "https://www.jobivoire.ci/job/details/commercial-btp-5",
+        "canonical_url": "https://www.jobivoire.ci/job/details/commercial-btp-5",
+        "location_raw": "Abidjan",
+        "salary_raw": "proposé",
+        "published_at": null,
+        "collected_at": "2026-08-22T11:51:35.083Z",
+        "first_seen_at": "2026-08-22T11:51:35.083Z",
+        "last_seen_at": "2026-08-22T11:51:35.083Z",
+        "expires_at": "2026-09-30T23:59:59.000Z",
+        "application_deadline_at": "2026-09-30T23:59:59.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": null,
+            "label": "Abidjan",
+            "normalized_label": "abidjan, côte d'ivoire"
+        },
+        "specialty": {
+            "code": "RESSOURCESHUMAINES",
+            "label": "Ressources Humaines"
+        },
+        "contract_type": {
+            "code": "INCONNU",
+            "label": "Emploi"
+        },
+        "experience_level": {
+            "code": "STAGIAIRE",
+            "label": "Étudiant / Stagiaire",
+            "min_years": null,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_2",
+            "label": "BAC+2",
+            "rank": 2
+        },
+        "description": "???? Elite Intérim Côte d'Ivoire recrute 01 COMMERCIAL BTP (H/F) pour un partenaire spécialisé dans le domaine Distribution des matériaux de constructions (ciments, fer à béton, graviers). ???? Vous êtes intéressé(e) par cette opportunité ? Consultez l’offre complète et postulez via le lien ci-dessous :???? https://ats.talenteo.com/job-apply/92f9e08190722ce7e315",
+        "company_name": "Ivoire",
+        "company_hint": null,
+        "application_email": "contact@jobivoire.ci",
+        "application_emails": [
+            "contact@jobivoire.ci"
+        ],
+        "raw_fields": {
+            "published_raw": null,
+            "deadline_raw": "30/09/2026",
+            "contract_raw": "Emploi",
+            "experience_raw": "Étudiant / Stagiaire",
+            "education_raw": "BAC+2"
+        }
+    },
+    {
+        "title": "STAGIAIRE ASSISTANT(E) DE DIRECTION",
+        "source_reference": "YL-57711",
+        "source_url": "https://www.jobivoire.ci/job/details/stagiaire-assistante-de-direction-21",
+        "canonical_url": "https://www.jobivoire.ci/job/details/stagiaire-assistante-de-direction-21",
+        "location_raw": "Riviera Palmeraie Résidentiel",
+        "salary_raw": "proposé",
+        "published_at": null,
+        "collected_at": "2026-08-22T11:51:41.936Z",
+        "first_seen_at": "2026-08-22T11:51:41.936Z",
+        "last_seen_at": "2026-08-22T11:51:41.936Z",
+        "expires_at": "2026-09-21T23:59:59.000Z",
+        "application_deadline_at": "2026-09-21T23:59:59.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": "Riviera",
+            "label": "Riviera Palmeraie Résidentiel",
+            "normalized_label": "riviera, abidjan, côte d'ivoire"
+        },
+        "specialty": {
+            "code": "SPECIALTY",
+            "label": ", consultez nos articles business"
+        },
+        "contract_type": {
+            "code": "STAGE",
+            "label": "Stage"
+        },
+        "experience_level": {
+            "code": "DEBUTANT",
+            "label": "Étudiant / Stagiaire",
+            "min_years": 0,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_1",
+            "label": "BAC+1",
+            "rank": 1
+        },
+        "description": "1 PRÉSENTATION DE L'ENTREPRISE Smart Innovation Center est une Entreprise de Services Numériques (ESN) spécialisée dans le développement d'applications (Web & Mobile), la création de sites internet et l'intégration de systèmes réseaux et télécoms. Dans le cadre du renforcement de notre accueil, nous recherchons un(e) Stagiaire Assistant(e) de Direction pour assurer l'accueil physique et téléphonique de l'entreprise ainsi que la réception et le suivi du courrier entrant. 2 MISSION PRINCIPALE Au sein de notre entreprise, le/la Stagiaire Assistant(e) de Direction a pour mission d'assurer un accueil de qualité auprès des visiteurs et interlocuteurs de l'entreprise, et de garantir la réception, l'enregistrement et la distribution du courrier entrant. 3 RESPONSABILITÉS ET MISSIONS Accueil physique et téléphonique • Accueillir et orienter les visiteurs, clients et partenaires de l’entreprise ; • Réceptionner et transférer les appels téléphoniques entrants ; • Renseigner les visiteurs sur les services et interlocuteurs de l’entreprise ; • Veiller à la bonne tenue et à la bonne image de l’espace d’accueil. Réception et gestion du courrier • Réceptionner, enregistrer et distribuer le courrier et les colis entrants ; • Tenir à jour le registre du courrier et assurer la traçabilité des documents reçus ; • Assurer le classement et l’archivage des documents administratifs. Appui administratif • Assister les équipes dans diverses tâches administratives courantes ; • Participer à la gestion des fournitures de bureau ; • Contribuer à la bonne organisation générale de l’accueil et des espaces communs. 4 PROFIL ATTENDU A. Formation et Expérience • Diplôme : Niveau Bac à Bac+2 en Assistanat, Secrétariat, Communication ou équivalent • Expérience : une première expérience en accueil ou en secrétariat est un atout ; débutant(e) accepté(e). B. Compétences Techniques (Hard Skills) • Bonne maîtrise des outils bureautiques (Word, Excel, Outlook) ; • Bonne expression orale et écrite en français ; • Maîtrise des techniques d'accueil physique et téléphonique ; • Notions de gestion administrative, de classement et d'archivage ; C. Qualités Personnelles (Soft Skills) • Sens de l'accueil, courtoisie et présentation soignée ; • Discrétion et sens de la confidentialité ; • Rigueur, ponctualité et sens de l'organisation. 5 CONDITIONS • Poste basé à Abidjan. • Type de contrat : Stage. • Durée du stage : 3 à 6 mois, renouvelable selon les besoins. • Indemnité de stage : selon la politique de l'entreprise. • Prise de poste : dès que possible. • Rattachement hiérarchique : La Responsable Marketing. 6 MODALITES DE CANDIDATURE Veuillez transmettre vos CV ainsi qu’une lettre de motivation à l’adresse suivante : recrutement@sm-ic.com Les candidatures devront être envoyées au plus tard le 21 septembre 2026.",
+        "company_name": "Espace",
+        "company_hint": null,
+        "application_email": "contact@jobivoire.ci",
+        "application_emails": [
+            "contact@jobivoire.ci",
+            "recrutement@sm-ic.com"
+        ],
+        "raw_fields": {
+            "published_raw": null,
+            "deadline_raw": "21/09/2026",
+            "contract_raw": "Stage",
+            "experience_raw": "Étudiant / Stagiaire",
+            "education_raw": "BAC+1"
+        }
+    },
+    {
+        "title": "CHAUFFEUR",
+        "source_reference": "CW-94401",
+        "source_url": "https://www.jobivoire.ci/job/details/chauffeur-145",
+        "canonical_url": "https://www.jobivoire.ci/job/details/chauffeur-145",
+        "location_raw": "Abidjan Marcory Résidentiel",
+        "salary_raw": "proposé",
+        "published_at": null,
+        "collected_at": "2026-08-22T11:51:48.621Z",
+        "first_seen_at": "2026-08-22T11:51:48.621Z",
+        "last_seen_at": "2026-08-22T11:51:48.621Z",
+        "expires_at": "2026-08-31T23:59:59.000Z",
+        "application_deadline_at": "2026-08-31T23:59:59.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": "Marcory",
+            "label": "Abidjan Marcory Résidentiel",
+            "normalized_label": "marcory, abidjan, côte d'ivoire"
+        },
+        "specialty": {
+            "code": "RESSOURCESHUMAINES",
+            "label": "Ressources Humaines"
+        },
+        "contract_type": {
+            "code": "CDD",
+            "label": "Emploi (CDD)"
+        },
+        "experience_level": {
+            "code": "STAGIAIRE",
+            "label": "Étudiant / Stagiaire",
+            "min_years": null,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_1",
+            "label": "BAC+1",
+            "rank": 1
+        },
+        "description": "Principales tâches 1. Conduite du camion Conduire le camion benne-grue pour effectuer les déplacements et livraisons sur les différents sites. Respecter le Code de la route et les règles de sécurité routière en vigueur en Côte d’Ivoire. Adapter sa conduite à l’état des routes, aux conditions météorologiques et à la charge transportée. Respecter les itinéraires et les horaires définis par le responsable. Veiller à la bonne répartition et à la sécurisation de la charge. 2. Chargement et transport des matériaux Transporter différents matériaux : sable, gravier, terre, ciment, équipements, matériaux de construction, etc. Contrôler visuellement la nature et la quantité de la cargaison avant le départ. S'assurer que la benne est correctement chargée et sécurisée. Éviter toute surcharge du véhicule. Effectuer les livraisons sur les chantiers ou sites indiqués. 3. Utilisation de la grue Installer et stabiliser correctement le camion avant toute opération de levage. Manipuler la grue auxiliaire conformément aux consignes du fabricant et aux règles de sécurité. Charger et décharger les équipements ou matériaux à l’aide de la grue. Vérifier l’état des accessoires de levage avant leur utilisation. Respecter les capacités maximales de levage de la grue. Maintenir une distance de sécurité avec les personnes, bâtiments, véhicules et lignes électriques. Signaler immédiatement toute anomalie constatée sur la grue. 4. Entretien courant du camion Effectuer les contrôles quotidiens avant le démarrage : niveaux d’huile et de liquide, pneus, freins, éclairage, batterie, etc. Vérifier l'état de la benne, de la grue et des équipements de sécurité. Effectuer les petites opérations d'entretien relevant de ses compétences. Signaler rapidement toute panne ou défaillance mécanique au responsable. Maintenir le véhicule propre et en bon état. 5. Documents et suivi des missions Tenir à jour le carnet de bord du véhicule. Renseigner les fiches de mission, bons de livraison et documents de transport. Contrôler les kilométrages et les consommations de carburant. Signaler les incidents, accidents, retards ou difficultés rencontrés lors des missions. Veiller à la présence des documents administratifs et techniques nécessaires à l'utilisation du véhicule. 6. Sécurité et responsabilité Porter les équipements de protection individuelle requis sur les chantiers. Respecter strictement les consignes de sécurité de l'entreprise et du chantier. Ne pas transporter de personnes dans des conditions non autorisées. Vérifier que la zone de manœuvre est dégagée avant toute opération de levage ou de déchargement. Informer immédiatement le responsable en cas d'accident, de dommage ou de situation dangereuse. Qualités et compétences requises Le chauffeur de camion benne-grue doit notamment avoir : Un permis de conduire adapté à la catégorie du véhicule ; Une bonne maîtrise de la conduite des poids lourds ; Une expérience dans la conduite de camion benne et/ou l'utilisation d'une grue auxiliaire ; Une bonne connaissance des règles de sécurité routière et de chantier ; De la vigilance, de la ponctualité et un bon sens des responsabilités ; Une bonne capacité à effectuer les contrôles et l'entretien courant du véhicule. En résumé : le chauffeur de camion benne-grue est responsable de la conduite, du transport, du chargement/déchargement, des opérations de levage et du bon entretien de son véhicule, tout en veillant en permanence à la sécurité des personnes, des biens et des équipements.",
+        "company_name": "Espace",
+        "company_hint": null,
+        "application_email": "contact@jobivoire.ci",
+        "application_emails": [
+            "contact@jobivoire.ci"
+        ],
+        "raw_fields": {
+            "published_raw": null,
+            "deadline_raw": "31/08/2026",
+            "contract_raw": "Emploi (CDD)",
+            "experience_raw": "Étudiant / Stagiaire",
+            "education_raw": "BAC+1"
+        }
+    },
+    {
+        "title": "Comptable contrôleur",
+        "source_reference": "SN-16624",
+        "source_url": "https://www.jobivoire.ci/job/details/comptable-controleur",
+        "canonical_url": "https://www.jobivoire.ci/job/details/comptable-controleur",
+        "location_raw": "Abidjan Marcory Résidentiel",
+        "salary_raw": "proposé",
+        "published_at": null,
+        "collected_at": "2026-08-22T11:51:56.187Z",
+        "first_seen_at": "2026-08-22T11:51:56.187Z",
+        "last_seen_at": "2026-08-22T11:51:56.187Z",
+        "expires_at": "2026-08-31T23:59:59.000Z",
+        "application_deadline_at": "2026-08-31T23:59:59.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": "Marcory",
+            "label": "Abidjan Marcory Résidentiel",
+            "normalized_label": "marcory, abidjan, côte d'ivoire"
+        },
+        "specialty": {
+            "code": "RESSOURCESHUMAINES",
+            "label": "Ressources Humaines"
+        },
+        "contract_type": {
+            "code": "CDD",
+            "label": "Emploi (CDD)"
+        },
+        "experience_level": {
+            "code": "STAGIAIRE",
+            "label": "Étudiant / Stagiaire",
+            "min_years": null,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_1",
+            "label": "BAC+1",
+            "rank": 1
+        },
+        "description": "Principales tâches 1. Contrôle des recettes Contrôler quotidiennement les recettes de l’hébergement, du restaurant, du bar, de la blanchisserie, des événements, etc. Vérifier les encaissements en espèces, par carte bancaire, mobile money, virement et autres moyens de paiement. Rapprocher les recettes enregistrées dans le logiciel hôtelier avec les pièces justificatives et les bordereaux d’encaissement. Contrôler les annulations, remises, gratuités, corrections et remboursements. Vérifier les écarts entre les recettes théoriques et les encaissements réels. 2. Contrôle des opérations de caisse Contrôler les caisses des différents services. Vérifier les fonds de caisse et les arrêtés de caisse journaliers. Effectuer des contrôles inopinés de caisse. Identifier et justifier les éventuels écarts de caisse. S’assurer du dépôt régulier des espèces en banque. 3. Contrôle de l’hébergement Vérifier les arrivées et départs des clients. Contrôler les factures et folios clients. Vérifier que toutes les consommations des clients sont correctement facturées. Contrôler les tarifs appliqués, les réductions et les gratuités. Effectuer le rapprochement entre l’occupation des chambres et le chiffre d’affaires enregistré. 4. Contrôle restaurant et bar Contrôler les tickets de caisse et additions. Vérifier la concordance entre les commandes, les consommations et les facturations. Contrôler les annulations et offerts. Effectuer le rapprochement entre les ventes enregistrées et les stocks consommés. Signaler les anomalies constatées. 5. Comptabilité fournisseurs Contrôler les factures fournisseurs avant leur comptabilisation. Vérifier la conformité entre les bons de commande, bons de livraison et factures. Préparer ou contrôler les règlements fournisseurs. Assurer le suivi des comptes fournisseurs et des échéances. Participer aux inventaires et au contrôle des achats. 6. Comptabilité générale Saisir et contrôler les opérations comptables. Effectuer les rapprochements bancaires. Suivre les comptes clients et fournisseurs. Participer aux travaux de clôture mensuelle. Préparer les éléments nécessaires aux déclarations fiscales et sociales, selon l’organisation de l’entreprise. Participer à la préparation des états financiers. 7. Contrôle des stocks Participer aux inventaires physiques des boissons, denrées alimentaires, produits d’entretien, linge et autres consommables. Comparer les stocks théoriques aux stocks physiques. Analyser les écarts et rechercher leur origine. Contrôler les sorties de stocks et les consommations des différents services. Suivre les pertes, casses, périmés et démarques. 8. Contrôle interne et reporting Mettre en place et appliquer les procédures de contrôle interne. Détecter les erreurs, anomalies ou irrégularités. Préparer des rapports de contrôle à l’attention de la Direction. Produire des tableaux de bord : chiffre d’affaires, encaissements, créances, dépenses, écarts de caisse, consommations, etc. Proposer des mesures correctives pour améliorer la maîtrise des recettes et des dépenses. Exemple de routine quotidienne Matin : Récupération des rapports de caisse et du rapport de nuit. Contrôle des recettes de la veille. Vérification des encaissements et des dépôts. Analyse des écarts éventuels. Dans la journée : Contrôle des opérations des différents services. Vérification des factures et pièces comptables. Suivi des fournisseurs et des règlements. Contrôle des stocks et des mouvements sensibles. Fin de journée : Contrôle des caisses. Rapprochement des ventes avec les encaissements. Vérification des opérations exceptionnelles. Élaboration du rapport de contrôle quotidien. En résumé Le comptable contrôleur hôtelier doit être particulièrement attentif à trois éléments : les recettes, les dépenses et les stocks. Son objectif principal est de s'assurer que toute opération réalisée dans l'hôtel est correctement autorisée, justifiée, enregistrée et contrôlée, afin de limiter les erreurs, les pertes et les risques de fraude.",
+        "company_name": "Espace",
+        "company_hint": null,
+        "application_email": "contact@jobivoire.ci",
+        "application_emails": [
+            "contact@jobivoire.ci"
+        ],
+        "raw_fields": {
+            "published_raw": null,
+            "deadline_raw": "31/08/2026",
+            "contract_raw": "Emploi (CDD)",
+            "experience_raw": "Étudiant / Stagiaire",
+            "education_raw": "BAC+1"
         }
     }
 ]

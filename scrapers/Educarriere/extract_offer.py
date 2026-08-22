@@ -268,7 +268,7 @@ def parse_french_date(raw: Optional[str]) -> Optional[datetime]:
 # ==============================================================================
 # EXTRACTION SPÉCIFIQUE EDUCARRIERE
 # ==============================================================================
-def get_data_company_educ(tree) -> Dict[str, Any]:
+def get_data_company_educ(tree, description: Optional[str] = None) -> Dict[str, Any]:
     company = {"website_url": None, "name": None, "type": None, "description": None}
     try:
         container = find_first_node(tree, COMPANY_CONTAINER_SELECTORS) or tree
@@ -288,8 +288,22 @@ def get_data_company_educ(tree) -> Dict[str, Any]:
                 
         desc_node = find_first_node(container, COMPANY_DESC_SELECTORS)
         if desc_node: company["description"] = safe_node_text(desc_node)
+
+        # Extraction heuristique si le nom n'est pas trouvé via sélecteurs
+        if not company["name"] and description:
+            m = re.search(r"([A-Z][A-Za-zÀ-ÿ0-9&\- ]{2,60})\s+recrute", description)
+            if m:
+                company["name"] = clean_text(m.group(1))
+            elif re.search(r"recruteur\s+confidentiel|anonyme|confidentiel", description, re.I):
+                company["name"] = "Recruteur confidentiel"
+            else:
+                company["name"] = "Confidentiel"
+        elif not company["name"]:
+            company["name"] = "Confidentiel"
     except Exception as e:
         logger.debug(f"Erreur extraction company: {e}")
+        if not company["name"]:
+            company["name"] = "Confidentiel"
     return company
 
 # ==============================================================================
@@ -350,7 +364,7 @@ def parse_job_html_educ(html: Union[str, bytes, Any], source_url: Optional[str] 
     expires_dt = parse_french_date(expires_raw)
 
     # 5. Entreprise et Emails
-    company_data = get_data_company_educ(tree)
+    company_data = get_data_company_educ(tree, description=description)
     emails = extract_emails_from_text(description)
     
     # 6. Construction du résultat (Format identique à extract_offer.py)
@@ -375,8 +389,9 @@ def parse_job_html_educ(html: Union[str, bytes, Any], source_url: Optional[str] 
         "experience_level": experience_level,
         "education_level": education_level,
         "description": description,
+        "company_name": company_data.get("name") or "Confidentiel",
         "company": {
-            "name": company_data.get("name"),
+            "name": company_data.get("name") or "Confidentiel",
             "website_url": company_data.get("website_url"),
             "type": company_data.get("type"),
             "description": company_data.get("description")

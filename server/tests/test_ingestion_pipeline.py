@@ -275,6 +275,9 @@ def test_noop_ai_job_activates_valid_brute_offer(db_session, monkeypatch):
             db_session.rollback()
             raise
 
+    import dataclasses
+    mock_settings = dataclasses.replace(ai_processing.get_settings(), ai_enabled=False)
+    monkeypatch.setattr(ai_processing, "get_settings", lambda: mock_settings)
     monkeypatch.setattr(ai_processing, "session_scope", test_scope)
     result = ai_processing.process_raw_offers(scrape_run_id=scrape_run.id, trigger_type="manual")
 

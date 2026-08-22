@@ -85,7 +85,7 @@ SOURCES = [
         "description": "Plateforme emploi locale ivoirienne.",
         "notes": "Source locale pertinente pour les offres PME.",
         "is_primary": False,
-        "supports_scraping": True,
+        "supports_scraping": False,
     },
     {
         "code": "linkedin",
@@ -101,7 +101,7 @@ SOURCES = [
         "description": "Réseau professionnel international.",
         "notes": "Protections anti-scraping fortes : délais et plan de repli requis.",
         "is_primary": False,
-        "supports_scraping": True,
+        "supports_scraping": False,
     },
     {
         "code": "jobivoire",

@@ -6,9 +6,9 @@
         "location_raw": "Angré Djorobité Abidjan - Côte d’Ivoire",
         "salary_raw": "100 k/500 k F CFA / mois",
         "published_at": "2026-08-20T00:00:00.000Z",
-        "collected_at": "2026-08-22T04:44:50.617Z",
-        "first_seen_at": "2026-08-22T04:44:50.617Z",
-        "last_seen_at": "2026-08-22T04:44:50.617Z",
+        "collected_at": "2026-08-22T11:48:35.434Z",
+        "first_seen_at": "2026-08-22T11:48:35.434Z",
+        "last_seen_at": "2026-08-22T11:48:35.434Z",
         "expires_at": null,
         "application_deadline_at": null,
         "location": {
@@ -61,9 +61,9 @@
         "location_raw": "Angré Djorobité Abidjan - Côte d’Ivoire",
         "salary_raw": "100 k/500 k F CFA / mois",
         "published_at": "2026-08-20T00:00:00.000Z",
-        "collected_at": "2026-08-22T04:44:59.462Z",
-        "first_seen_at": "2026-08-22T04:44:59.462Z",
-        "last_seen_at": "2026-08-22T04:44:59.462Z",
+        "collected_at": "2026-08-22T11:48:46.794Z",
+        "first_seen_at": "2026-08-22T11:48:46.794Z",
+        "last_seen_at": "2026-08-22T11:48:46.794Z",
         "expires_at": null,
         "application_deadline_at": null,
         "location": {
@@ -116,9 +116,9 @@
         "location_raw": "2 plateau derriere sococe Abidjan - Côte d’Ivoire",
         "salary_raw": null,
         "published_at": "2026-08-20T00:00:00.000Z",
-        "collected_at": "2026-08-22T04:45:09.792Z",
-        "first_seen_at": "2026-08-22T04:45:09.792Z",
-        "last_seen_at": "2026-08-22T04:45:09.792Z",
+        "collected_at": "2026-08-22T11:48:58.265Z",
+        "first_seen_at": "2026-08-22T11:48:58.265Z",
+        "last_seen_at": "2026-08-22T11:48:58.265Z",
         "expires_at": null,
         "application_deadline_at": null,
         "location": {
@@ -171,9 +171,9 @@
         "location_raw": "2 plateau derriere sococe Abidjan - Côte d’Ivoire",
         "salary_raw": null,
         "published_at": "2026-08-20T00:00:00.000Z",
-        "collected_at": "2026-08-22T04:45:18.930Z",
-        "first_seen_at": "2026-08-22T04:45:18.930Z",
-        "last_seen_at": "2026-08-22T04:45:18.930Z",
+        "collected_at": "2026-08-22T11:49:09.250Z",
+        "first_seen_at": "2026-08-22T11:49:09.250Z",
+        "last_seen_at": "2026-08-22T11:49:09.250Z",
         "expires_at": null,
         "application_deadline_at": null,
         "location": {
@@ -226,9 +226,9 @@
         "location_raw": "Angré Djorobité Abidjan - Côte d’Ivoire",
         "salary_raw": "100 k/500 k F CFA / mois",
         "published_at": "2026-08-20T00:00:00.000Z",
-        "collected_at": "2026-08-22T04:45:27.314Z",
-        "first_seen_at": "2026-08-22T04:45:27.314Z",
-        "last_seen_at": "2026-08-22T04:45:27.314Z",
+        "collected_at": "2026-08-22T11:49:20.603Z",
+        "first_seen_at": "2026-08-22T11:49:20.603Z",
+        "last_seen_at": "2026-08-22T11:49:20.603Z",
         "expires_at": null,
         "application_deadline_at": null,
         "location": {
@@ -267,6 +267,281 @@
             "contract_raw": "CDI",
             "experience_raw": "- de 2 ans d’expérience",
             "education_raw": "Bac+2",
+            "published_raw": "Posté le 20 août 2026",
+            "expires_raw": null
+        },
+        "télétravail": "Sans télétravail",
+        "is_télétravail": false,
+        "active": "2026-08-20T00:00:00.000Z"
+    },
+    {
+        "title": "Assistant(e) de Régulation",
+        "source_url": "https://www.goafricaonline.com/ci/emploi/job-21747-assistante-de-regulation",
+        "canonical_url": "https://www.goafricaonline.com/ci/emploi/job-21747-assistante-de-regulation",
+        "location_raw": "Abidjan - Côte d’Ivoire",
+        "salary_raw": null,
+        "published_at": "2026-08-20T00:00:00.000Z",
+        "collected_at": "2026-08-22T11:49:29.703Z",
+        "first_seen_at": "2026-08-22T11:49:29.703Z",
+        "last_seen_at": "2026-08-22T11:49:29.703Z",
+        "expires_at": null,
+        "application_deadline_at": null,
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": null,
+            "label": "Abidjan - Côte d’Ivoire"
+        },
+        "contract_type": {
+            "code": "CDD",
+            "label": "CDD"
+        },
+        "experience_level": {
+            "code": "JUNIOR",
+            "label": "de 2 ans à 5 ans d’expérience",
+            "min_years": 2,
+            "max_years": 5
+        },
+        "education_level": {
+            "code": "BAC_PLUS_2",
+            "label": "BAC+2",
+            "rank": 2
+        },
+        "description": "EMC SARL recrute un(e) Assistant(e) Régulateur pour accompagner la gestion des demandes de transport médicalisé. Le poste consiste à réceptionner et enregistrer les demandes, participer à la planification des missions, suivre les ambulances et faciliter la coordination entre les patients, établissements de santé, équipes médicales, ambulanciers et chauffeurs. ### Missions principales * Recevoir et traiter les demandes de transport par téléphone, WhatsApp, e-mail ou autres moyens de communication. * Recueillir et vérifier les informations concernant les patients et les missions. * Enregistrer les demandes dans les outils de régulation. * Assister le Régulateur dans l’affectation des ambulances et des équipages. * Vérifier la disponibilité des véhicules et des équipes. * Participer à la planification des missions selon leur urgence et leur localisation. * Suivre les déplacements des ambulances et signaler les retards ou incidents. * Assurer la communication entre les équipes de terrain, les établissements de santé et les familles. * Renseigner les fiches de mission et suivre les horaires de départ et d’arrivée. * Participer à la collecte des informations nécessaires à la facturation. * Classer et archiver les documents. * Contribuer aux rapports d’activité et aux statistiques de transport. ### Profil recherché * Niveau BAC à BAC+3. * Formation en secrétariat, administration, logistique, transport, santé, soins infirmiers ou domaine similaire. * Une expérience dans le transport sanitaire, les urgences, un centre d’appel, la logistique ou la coordination d’équipes constitue un atout. * Bonne maîtrise du français à l’oral et à l’écrit. * La connaissance de l’environnement sanitaire ivoirien et des principales structures de santé d’Abidjan est un avantage. ### Compétences requises * Maîtrise de Word, Excel, de la messagerie et des outils de régulation ou de dispatching. * Capacité à gérer plusieurs demandes simultanément. * Bonne organisation et gestion des informations. * Notions sur le fonctionnement d’un service d’ambulance ou de transport sanitaire. * Des connaissances de base en vocabulaire médical constituent un atout. * Réactivité, sang-froid et résistance au stress. * Sens des priorités et de l’organisation. * Excellente communication. * Esprit d’équipe, ponctualité et disponibilité. * Discrétion, confidentialité et sens du service au patient. Pour postuler, cliquer sur le bouton « Postuler ».",
+        "company": {
+            "name": "EMC (ETABLISSEMENT MAMADOU COULIBALY)",
+            "website_url": "https://www.goafricaonline.com/ci/43699-emc-travail-temporaire-interim-abidjan-cote-ivoire",
+            "type": "Emploi > Travail temporaire - Intérim",
+            "description": "ETABLISSEMENT MAMADOU COULIBALY intervient dans la Sous-Traitance, le Travail Temporaire (Intérim), le Recrutement. La satisfaction de nos clients est notre priorité et pour répondre efficacement à leurs attentes respectives, nous mettons à leur disposition une équipe de professionnels expérimentés capable de les conseiller dans les domaines de la gestion des ressources humaines et organisation."
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": "Sans télétravail",
+        "raw_fields": {
+            "contract_raw": "CDD",
+            "experience_raw": "de 2 ans à 5 ans d’expérience",
+            "education_raw": "Bac+2",
+            "published_raw": "Posté le 20 août 2026",
+            "expires_raw": null
+        },
+        "télétravail": "Sans télétravail",
+        "is_télétravail": false,
+        "active": "2026-08-20T00:00:00.000Z"
+    },
+    {
+        "title": "Stagiaire en Génie Civil",
+        "source_url": "https://www.goafricaonline.com/ci/emploi/job-21748-stagiaire-en-genie-civil",
+        "canonical_url": "https://www.goafricaonline.com/ci/emploi/job-21748-stagiaire-en-genie-civil",
+        "location_raw": "Abidjan - Côte d’Ivoire",
+        "salary_raw": null,
+        "published_at": "2026-08-20T00:00:00.000Z",
+        "collected_at": "2026-08-22T11:49:39.982Z",
+        "first_seen_at": "2026-08-22T11:49:39.982Z",
+        "last_seen_at": "2026-08-22T11:49:39.982Z",
+        "expires_at": null,
+        "application_deadline_at": null,
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": null,
+            "label": "Abidjan - Côte d’Ivoire"
+        },
+        "contract_type": {
+            "code": "STAGE",
+            "label": "Stage"
+        },
+        "experience_level": {
+            "code": "JUNIOR",
+            "label": "- de 2 ans d’expérience",
+            "min_years": null,
+            "max_years": 2
+        },
+        "education_level": {
+            "code": "BAC_PLUS_2",
+            "label": "BAC+2",
+            "rank": 2
+        },
+        "description": "MATRELEC recherche un(e) Stagiaire en Génie Civil pour renforcer ses équipes. Le/la stagiaire participera aux études techniques et commerciales liées aux projets de construction, notamment à l’analyse des dossiers, l’étude des plans, le calcul des métrés et la préparation des devis. Il/elle contribuera également à l’élaboration des offres et à l’analyse des appels d’offres. ### Missions principales * Analyser les dossiers techniques et les documents des projets. * Étudier les plans et réaliser les métrés. * Élaborer les devis quantitatifs et estimatifs. * Participer aux études de prix. * Contribuer à la préparation des offres techniques et financières. * Participer à l’analyse des dossiers d’appels d’offres. ### Profil recherché Le candidat doit être organisé, rigoureux et capable d’analyser des documents techniques. Il doit également avoir un bon esprit d’équipe et être capable de travailler avec précision sur plusieurs tâches liées aux études de projets. ### Compétences requises * Bonne maîtrise de Microsoft Excel. * Notions d’utilisation d’AutoCAD. * Capacité d’analyse. * Rigueur et précision. * Sens de l’organisation. * Esprit d’équipe. Pour postuler, cliquer sur le bouton « Postuler ».",
+        "company": {
+            "name": "MATRELEC",
+            "website_url": "https://www.goafricaonline.com/ci/49138-matrelec-genie-electrique-abidjan-cote-ivoire",
+            "type": "Energie > Génie Électrique / Électriciens",
+            "description": "MATRELEC est une société qui intervient dans les secteurs suivants: Electricité – courant fort – courant faible – HTA-BT-EP- télécom fibre optique; Hydraulique et plomberie; forage horizontal dirigé. L'entreprise s’est toujours investit à offrir des services de qualité dans l’exécution de ses travaux et aussi dans le respect des délais."
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": "Sans télétravail",
+        "raw_fields": {
+            "contract_raw": "Stage",
+            "experience_raw": "- de 2 ans d’expérience",
+            "education_raw": "Bac+2",
+            "published_raw": "Posté le 20 août 2026",
+            "expires_raw": null
+        },
+        "télétravail": "Sans télétravail",
+        "is_télétravail": false,
+        "active": "2026-08-20T00:00:00.000Z"
+    },
+    {
+        "title": "Commercial(e) Confirmé(e)",
+        "source_url": "https://www.goafricaonline.com/ci/emploi/job-21749-commerciale-confirmee",
+        "canonical_url": "https://www.goafricaonline.com/ci/emploi/job-21749-commerciale-confirmee",
+        "location_raw": "Angré Terminus 81/82 Abidjan - Côte d’Ivoire",
+        "salary_raw": null,
+        "published_at": "2026-08-20T00:00:00.000Z",
+        "collected_at": "2026-08-22T11:49:49.617Z",
+        "first_seen_at": "2026-08-22T11:49:49.617Z",
+        "last_seen_at": "2026-08-22T11:49:49.617Z",
+        "expires_at": null,
+        "application_deadline_at": null,
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": "Angré",
+            "label": "Angré Terminus 81/82 Abidjan - Côte d’Ivoire"
+        },
+        "contract_type": {
+            "code": "CDD",
+            "label": "CDD"
+        },
+        "experience_level": {
+            "code": "JUNIOR",
+            "label": "de 2 ans à 5 ans d’expérience",
+            "min_years": 2,
+            "max_years": 5
+        },
+        "education_level": {
+            "code": "BAC",
+            "label": "BAC",
+            "rank": 0
+        },
+        "description": "Une société de placement de personnel recrute deux Commerciaux Senior pour le compte d’un cabinet spécialisé dans la formation et l’impression numérique. Sous la supervision de la direction commerciale et marketing, les commerciaux auront pour mission de développer les ventes, prospecter de nouveaux clients, présenter les services de l’entreprise, négocier les contrats et fidéliser la clientèle existante. ### Missions principales * Participer au développement de la stratégie commerciale. * Prospecter et développer de nouveaux clients. * Présenter les produits et services de l’entreprise. * Développer les ventes et atteindre les objectifs fixés. * Négocier et conclure les contrats. * Assurer le suivi et la fidélisation des clients. * Analyser le marché et suivre les tendances commerciales. * Effectuer une veille concurrentielle. * Développer et entretenir les relations avec les clients. * Collaborer avec les équipes internes. * Assurer un reporting régulier des activités commerciales. ### Profil recherché Le candidat doit avoir une solide expérience commerciale et être capable de travailler de manière autonome. Il doit être orienté vers les résultats, avoir le sens du challenge et être capable de développer efficacement un portefeuille clients. ### Compétences requises * Excellentes capacités de communication et de négociation. * Maîtrise des techniques de vente. * Bonne maîtrise des outils informatiques. * Capacité à travailler en autonomie. * Bonne gestion du temps. * Forte orientation résultats. * Capacité à atteindre et dépasser les objectifs commerciaux. * Sens du relationnel et de la fidélisation client. ### Conditions de travail * Nombre de postes : 2 * Lieu : Cocody, Angré Terminus 81/82 * Jours de travail : lundi à samedi * Rémunération : salaire de base + prime de performance calculée en fonction du chiffre d’affaires personnel réalisé. Pour postuler, cliquer sur le bouton « Postuler ».",
+        "company": {
+            "name": "SOCIETE DE PLACEMENT DE PERSONNEL DE COTE D'IVOIRE - SPPCI Sarl",
+            "website_url": "https://www.goafricaonline.com/ci/801549-sppci-agences-recrutement-abidjan-cote-ivoire",
+            "type": "Emploi > Agences de recrutement",
+            "description": "Agence de placement de personnel."
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": "Sans télétravail",
+        "raw_fields": {
+            "contract_raw": "CDD",
+            "experience_raw": "de 2 ans à 5 ans d’expérience",
+            "education_raw": "Bac",
+            "published_raw": "Posté le 20 août 2026",
+            "expires_raw": null
+        },
+        "télétravail": "Sans télétravail",
+        "is_télétravail": false,
+        "active": "2026-08-20T00:00:00.000Z"
+    },
+    {
+        "title": "Technicien(ne) Supérieur(e) en Génie Civil – Études de Prix",
+        "source_url": "https://www.goafricaonline.com/ci/emploi/job-21750-technicienne-superieure-en-genie-civil-etudes-de-prix",
+        "canonical_url": "https://www.goafricaonline.com/ci/emploi/job-21750-technicienne-superieure-en-genie-civil-etudes-de-prix",
+        "location_raw": "Abidjan - Côte d’Ivoire",
+        "salary_raw": null,
+        "published_at": "2026-08-20T00:00:00.000Z",
+        "collected_at": "2026-08-22T11:50:00.656Z",
+        "first_seen_at": "2026-08-22T11:50:00.656Z",
+        "last_seen_at": "2026-08-22T11:50:00.656Z",
+        "expires_at": null,
+        "application_deadline_at": null,
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": null,
+            "label": "Abidjan - Côte d’Ivoire"
+        },
+        "contract_type": {
+            "code": "CDD",
+            "label": "CDD"
+        },
+        "experience_level": {
+            "code": "JUNIOR",
+            "label": "de 2 ans à 5 ans d’expérience",
+            "min_years": 2,
+            "max_years": 5
+        },
+        "education_level": {
+            "code": "BAC_PLUS_2",
+            "label": "BAC+2",
+            "rank": 2
+        },
+        "description": "MATRELEC recherche un(e) Technicien(ne) Supérieur(e) en Génie Civil pour renforcer son Service Études de Prix. Sous la responsabilité du Responsable du service, le/la candidat(e) participera à l’analyse des dossiers techniques, à l’étude des plans, au calcul des métrés et à la préparation des devis. Il/elle contribuera également à l’évaluation des coûts et à la préparation des offres dans le cadre des appels d’offres. ### Missions principales * Analyser les dossiers techniques et les documents des projets. * Étudier les plans et réaliser les métrés. * Élaborer les devis quantitatifs et estimatifs. * Évaluer les coûts des travaux. * Participer à la préparation des offres techniques et financières. * Analyser les dossiers d’appels d’offres. * Contribuer aux études de prix et à l’estimation des coûts des projets. ### Profil recherché Le candidat doit être rigoureux, précis et organisé, avec une bonne capacité d’analyse. Il doit être capable de travailler avec des documents techniques et de réaliser des estimations fiables dans le cadre des études de prix. ### Compétences requises * Bonne maîtrise de Microsoft Excel. * Maîtrise du logiciel AutoCAD. * Bonne capacité d’analyse. * Rigueur et précision. * Sens de l’organisation. * Aptitude à travailler sur des dossiers techniques et des études de prix. Pour postuler, cliquer sur le bouton « Postuler ».",
+        "company": {
+            "name": "MATRELEC",
+            "website_url": "https://www.goafricaonline.com/ci/49138-matrelec-genie-electrique-abidjan-cote-ivoire",
+            "type": "Energie > Génie Électrique / Électriciens",
+            "description": "MATRELEC est une société qui intervient dans les secteurs suivants: Electricité – courant fort – courant faible – HTA-BT-EP- télécom fibre optique; Hydraulique et plomberie; forage horizontal dirigé. L'entreprise s’est toujours investit à offrir des services de qualité dans l’exécution de ses travaux et aussi dans le respect des délais."
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": "Sans télétravail",
+        "raw_fields": {
+            "contract_raw": "CDD",
+            "experience_raw": "de 2 ans à 5 ans d’expérience",
+            "education_raw": "Bac+2",
+            "published_raw": "Posté le 20 août 2026",
+            "expires_raw": null
+        },
+        "télétravail": "Sans télétravail",
+        "is_télétravail": false,
+        "active": "2026-08-20T00:00:00.000Z"
+    },
+    {
+        "title": "Responsable de Site",
+        "source_url": "https://www.goafricaonline.com/ci/emploi/job-21751-responsable-de-site",
+        "canonical_url": "https://www.goafricaonline.com/ci/emploi/job-21751-responsable-de-site",
+        "location_raw": "Abidjan - Côte d’Ivoire",
+        "salary_raw": null,
+        "published_at": "2026-08-20T00:00:00.000Z",
+        "collected_at": "2026-08-22T11:50:11.215Z",
+        "first_seen_at": "2026-08-22T11:50:11.215Z",
+        "last_seen_at": "2026-08-22T11:50:11.215Z",
+        "expires_at": null,
+        "application_deadline_at": null,
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": null,
+            "label": "Abidjan - Côte d’Ivoire"
+        },
+        "contract_type": {
+            "code": "INTERIM",
+            "label": "Intérim"
+        },
+        "experience_level": {
+            "code": "JUNIOR",
+            "label": "de 2 ans à 5 ans d’expérience",
+            "min_years": 2,
+            "max_years": 5
+        },
+        "education_level": {
+            "code": "BAC_PLUS_4",
+            "label": "BAC+4",
+            "rank": 4
+        },
+        "description": "AFREX recrute, pour le compte de l’un de ses partenaires, un(e) Site Manager chargé(e) d’assurer la gestion globale d’un site et la coordination des équipes. Il/elle veille au bon fonctionnement quotidien des opérations, au respect des procédures et des normes de sécurité, tout en assurant le suivi des performances et la satisfaction des parties prenantes. ### Missions principales * Assurer la gestion opérationnelle quotidienne du site. * Superviser et coordonner les différentes équipes. * Veiller au respect des procédures, des standards de qualité et des règles de sécurité. * Organiser et optimiser les activités afin d’améliorer l’efficacité des opérations. * Suivre les performances du site et proposer des actions d’amélioration. * Gérer les incidents et apporter des solutions adaptées. * Assurer la communication avec les clients, partenaires et autres parties prenantes. * Élaborer les rapports d’activité et suivre les indicateurs de performance. ### Profil recherché * Être titulaire d’un Bac+4/5 en Management, Gestion, Administration ou domaine connexe. * Justifier d’une expérience confirmée dans la gestion de site ou à un poste similaire. * Maîtriser l’anglais. * Posséder de solides compétences en leadership et en gestion d’équipe. * Être organisé et savoir gérer les priorités. * Être capable de travailler sous pression et de résoudre efficacement les problèmes. * Avoir un bon relationnel et une forte orientation vers les résultats. Pour postuler, cliquer sur le bouton « Postuler ».",
+        "company": {
+            "name": "AFREX GROUP SA",
+            "website_url": "https://www.goafricaonline.com/ci/1365066-afrex-group-exploitation-miniere-abidjan-cote-ivoire",
+            "type": "Industries > Exploitation minière",
+            "description": null
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": "Sans télétravail",
+        "raw_fields": {
+            "contract_raw": "Intérim",
+            "experience_raw": "de 2 ans à 5 ans d’expérience",
+            "education_raw": "Bac+4",
             "published_raw": "Posté le 20 août 2026",
             "expires_raw": null
         },

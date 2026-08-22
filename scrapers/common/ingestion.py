@@ -191,14 +191,15 @@ def _company_name(job: dict[str, Any]) -> str | None:
     company = job.get("company")
     return (
         _clean(job.get("company_name"))
-        or _clean(_nested(job, "company", "name")) if isinstance(company, dict) else None
-    ) or _clean(job.get("company_hint"))
+        or (_clean(_nested(job, "company", "name")) if isinstance(company, dict) else None)
+        or _clean(job.get("company_hint"))
+    )
 
 
 def to_ingest_offer(source_code: str, job: dict[str, Any], *, default_filiere_code: str | None = None) -> dict[str, Any] | None:
     title = _clean(job.get("title"))
     source_url = _clean(job.get("source_url"))
-    company_name = _clean(job.get("company_name")) or _clean(_nested(job, "company", "name")) or _clean(job.get("company_hint"))
+    company_name = _company_name(job) or "Confidentiel"
 
     if not title or not source_url or not company_name:
         return None

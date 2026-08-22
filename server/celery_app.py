@@ -41,19 +41,19 @@ celery_app.conf.update(
         # },
         "scrape-goafrica-0600": {
             "task": "tasks.scrapers.run_source_scraper",
-            "schedule": crontab(hour=4, minute=44),
+            "schedule": crontab(hour=6, minute=00),
             "args": ("goafrica",),
             "options": {"queue": "ingestion"},
         },
-        "scrape-jobivoire-0610": {
+        "scrape-jobivoire-0605": {
             "task": "tasks.scrapers.run_source_scraper",
-            "schedule": crontab(hour=4, minute=45),
+            "schedule": crontab(hour=6, minute=5),
             "args": ("jobivoire",),
             "options": {"queue": "ingestion"},
         },
-        "scrape-educarriere-0620": {
+        "scrape-educarriere-0610": {
             "task": "tasks.scrapers.run_source_scraper",
-            "schedule": crontab(hour=4, minute=46),
+            "schedule": crontab(hour=6, minute=10),
             "args": ("educarriere",),
             "options": {"queue": "ingestion"},
         },
