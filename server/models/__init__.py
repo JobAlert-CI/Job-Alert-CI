@@ -18,7 +18,7 @@ from models.editorial import (
     DailyTip,
     SeriesArticle,
 )
-from models.emails import EmailDeliveryAttempt, EmailDigest, EmailDigestOffer
+from models.emails import EmailDeliveryAttempt, EmailDigest, EmailDigestOffer, TransactionalEmailEvent
 from models.enums import (
     AdminAction,
     AdminRole,
@@ -45,6 +45,8 @@ from models.enums import (
     SourceStatus,
     SubscriberStatus,
     TokenPurpose,
+    TransactionalEmailPurpose,
+    TransactionalEmailStatus,
 )
 from models.jobs import Company, JobOffer, JobOfferDetail, OfferFiliere, OfferIngestionEvent
 from models.referentials import (
@@ -139,5 +141,8 @@ __all__ = [
     "SubscriberStatus",
     "SubscriberToken",
     "TokenPurpose",
+    "TransactionalEmailEvent",
+    "TransactionalEmailPurpose",
+    "TransactionalEmailStatus",
     "UnsubscribeEvent",
 ]

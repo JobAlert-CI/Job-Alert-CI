@@ -59,9 +59,15 @@ const updatePreferences = async (token, data) => {
   return response.data
 }
 
+const resendConfirmation = async (email) => {
+  const response = await api.post(`${API_URL}/resend-confirmation`, { email })
+  return response.data
+}
+
 export default {
   subscribe,
   ConfirmSubscribe,
+  resendConfirmation,
   unsubscribe,
   getPreferences,
   updatePreferences

@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Literal
 
-from pydantic import AliasChoices, BaseModel, ConfigDict, Field, field_validator
+from pydantic import AliasChoices, BaseModel, ConfigDict, EmailStr, Field, field_validator
 
 from schemas.base import TimestampRead
 
@@ -94,3 +94,42 @@ class SubscriberAdminUpdate(BaseModel):
 class SubscriberStatusUpdate(BaseModel):
     status: Literal["active", "unsubscribed", "bouncing", "paused"]
     reason: str | None = Field(default=None, max_length=500)
+
+
+# ─── Confirmation d'email ────────────────────────────────
+
+
+class SubscriptionCreateResponse(SubscriberRead):
+    """Reponse de POST /api/subscriptions.
+
+    Herite de tous les champs de `SubscriberRead` (aucune rupture pour les
+    clients existants qui parsent deja ce contrat) et ajoute les informations
+    du flux de confirmation d'email en champs optionnels additifs.
+    """
+
+    requires_confirmation: bool = False
+    confirmation_message: str | None = None
+
+
+class EmailConfirmationResult(BaseModel):
+    """Reponse de GET /api/subscriptions/confirm/{token}."""
+
+    message: str
+    email: str
+
+
+class ResendConfirmationCreate(BaseModel):
+    """Corps de POST /api/subscriptions/resend-confirmation."""
+
+    model_config = ConfigDict(populate_by_name=True)
+
+    email: EmailStr
+
+
+class ResendConfirmationResponse(BaseModel):
+    """Reponse generique de renvoi, volontairement peu informative pour ne pas
+    permettre l'enumeration des emails inscrits (voir cahier des charges,
+    section 'Endpoint de renvoi de confirmation')."""
+
+    message: str
+    email: str | None = None

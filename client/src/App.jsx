@@ -15,12 +15,12 @@ import Conseils from "./Pages/Conseils";
 import DetailsConseil from "./Pages/DetailsConseil";
 import Sources from "./Pages/Sources";
 import Registered from "./Pages/Registered";
+import ConfirmationInscription from "./Pages/ConfirmationInscription";
 import Faq from "./Pages/Support/FAQ";
 import MentionsLegales from "./Pages/Support/MentionsLegales";
 import Contact from "./Pages/Support/Contact";
 import { prefetchHome } from "./tools/home.tools";
 import { prefetchHowItWorks } from "./tools/ccm.tools";
-import { OffresFiltersProvider } from "./contexts/Offres.context";
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -55,6 +55,7 @@ const App = () => {
               <Route path="comment-ca-marche" element={<HowItWorks />} loader={prefetchHowItWorks} />
               <Route path="sources" element={<Sources />} />
               <Route path="inscription" element={<Registered />} />
+              <Route path="inscription/confirmation/:token" element={<ConfirmationInscription />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/faq" element={<Faq />} />
               <Route path="/mentions-legales" element={<MentionsLegales />} />

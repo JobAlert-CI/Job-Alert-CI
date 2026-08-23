@@ -817,3 +817,42 @@ export const registeredSeo = () => ({
     ],
   },
 })
+
+export const confirmationSeo = () => ({
+  title: "Confirmation d'inscription | JobAlert CI",
+  description:
+    "Confirmez votre adresse email pour activer votre alerte quotidienne d'offres d'emploi JobAlert CI.",
+  path: "/inscription/confirmation",
+  image: "/screen.png",
+  imageAlt: "Confirmation d'inscription JobAlert CI",
+  keywords: "confirmation email, validation alerte emploi, JobAlert CI",
+  type: "website",
+  locale: "fr_CI",
+  structuredData: {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": `${siteUrl}/inscription/confirmation#webpage`,
+        url: `${siteUrl}/inscription/confirmation`,
+        name: "Confirmation d'inscription | JobAlert CI",
+        description:
+          "Confirmez votre adresse email pour activer votre alerte quotidienne d'offres d'emploi JobAlert CI.",
+        inLanguage: "fr-CI",
+        isPartOf: {
+          "@id": `${siteUrl}/#website`,
+        },
+        about: {
+          "@id": `${siteUrl}/#service`,
+        },
+        primaryImageOfPage: absoluteUrl("/screen.png"),
+      },
+      makeBreadcrumb([
+        { name: "Accueil", url: `${siteUrl}/` },
+        { name: "Inscription", url: `${siteUrl}/inscription` },
+        { name: "Confirmation", url: `${siteUrl}/inscription/confirmation` },
+      ]),
+    ],
+  },
+})
+

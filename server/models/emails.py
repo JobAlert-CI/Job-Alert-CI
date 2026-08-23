@@ -7,7 +7,7 @@ from sqlalchemy import CheckConstraint, Date, DateTime, ForeignKey, Integer, JSO
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from db.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
-from models.enums import DigestStatus, EmailAttemptStatus
+from models.enums import DigestStatus, EmailAttemptStatus, TransactionalEmailPurpose, TransactionalEmailStatus
 from models.types import enum_column
 
 """Historique des digests email.
@@ -89,3 +89,39 @@ class EmailDeliveryAttempt(UUIDPrimaryKeyMixin, TimestampMixin, Base):
         UniqueConstraint("digest_id", "attempt_no", name="uq_email_delivery_attempts_digest_attempt"),
         CheckConstraint("attempt_no >= 1 AND attempt_no <= 3", name="email_delivery_attempt_no_range"),
     )
+
+
+class TransactionalEmailEvent(UUIDPrimaryKeyMixin, TimestampMixin, Base):
+    """Journal des emails transactionnels (confirmation, renvoi, gestion, desinscription).
+
+    Distinct de `EmailDigest`/`EmailDeliveryAttempt` qui couvrent les digests
+    quotidiens: ici on trace chaque tentative d'envoi individuelle faite via
+    un provider transactionnel (Resend), y compris quand l'abonne n'existe
+    plus (subscriber_id nullable, SET NULL) pour garder l'historique de debug.
+
+    Regle de securite: `request_payload`/`response_payload` ne doivent jamais
+    contenir de cle API ni de token brut, seulement ce qui est utile au debug.
+    """
+
+    __tablename__ = "transactional_email_events"
+
+    subscriber_id: Mapped[str | None] = mapped_column(
+        ForeignKey("subscribers.id", ondelete="SET NULL"), index=True, nullable=True
+    )
+    purpose: Mapped[TransactionalEmailPurpose] = mapped_column(
+        enum_column(TransactionalEmailPurpose), index=True, nullable=False
+    )
+    to_email: Mapped[str] = mapped_column(String(320), nullable=False)
+    provider: Mapped[str] = mapped_column(String(40), default="resend", nullable=False)
+    provider_email_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    status: Mapped[TransactionalEmailStatus] = mapped_column(
+        enum_column(TransactionalEmailStatus), default=TransactionalEmailStatus.QUEUED, index=True, nullable=False
+    )
+    attempts: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
+    last_error: Mapped[str | None] = mapped_column(Text, nullable=True)
+    request_payload: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    response_payload: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+
+    subscriber: Mapped["Subscriber | None"] = relationship()
+
+    __table_args__ = (CheckConstraint("attempts >= 0", name="attempts_positive"),)

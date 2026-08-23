@@ -168,6 +168,22 @@ class EmailAttemptStatus(StrEnum):
     FAILED = "failed"
 
 
+class TransactionalEmailPurpose(StrEnum):
+    """Motif d'un email transactionnel (distinct de TokenPurpose: RESEND_CONFIRMATION
+    n'a pas de token dedie, c'est un renvoi du meme purpose CONFIRM_EMAIL)."""
+
+    CONFIRM_EMAIL = "confirm_email"
+    RESEND_CONFIRMATION = "resend_confirmation"
+    MANAGE_ALERT = "manage_alert"
+    UNSUBSCRIBE = "unsubscribe"
+
+
+class TransactionalEmailStatus(StrEnum):
+    QUEUED = "queued"
+    SENT = "sent"
+    FAILED = "failed"
+
+
 class ContentStatus(StrEnum):
     DRAFT = "draft"
     PUBLISHED = "published"

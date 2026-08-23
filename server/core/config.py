@@ -27,7 +27,17 @@ def _load_dotenv_file() -> None:
         key, value = line.split("=", 1)
         key = key.strip().removeprefix("export ").strip()
         if key and key not in os.environ:
-            os.environ[key] = value.strip().strip('"').strip("'")
+            val = value.strip()
+            if val.startswith(('"', "'")):
+                quote = val[0]
+                end_idx = val.find(quote, 1)
+                if end_idx != -1:
+                    val = val[1:end_idx]
+                else:
+                    val = val.strip(quote)
+            else:
+                val = val.split("#", 1)[0].strip()
+            os.environ[key] = val
 
 
 _load_dotenv_file()
@@ -107,6 +117,23 @@ class Settings:
     auto_create_tables: bool = field(default_factory=lambda: _bool_env("AUTO_CREATE_TABLES", False))
     email_from: str = field(default_factory=lambda: getenv("EMAIL_FROM", "JobAlert CI <bonjour@jobalert.ci>"))
     daily_collection_hour: int = field(default_factory=lambda: _int_env("DAILY_COLLECTION_HOUR", 6))
+    # ─── Confirmation d'email (Resend) ────────────────────────────────
+    # Secret: ne jamais logger ni exposer resend_api_key dans une reponse API.
+    resend_api_key: str | None = field(default_factory=lambda: getenv("RESEND_API_KEY") or None)
+    email_from_address: str = field(default_factory=lambda: _str_env("EMAIL_FROM_ADDRESS", "notifications@jobalert.ci"))
+    email_from_name: str = field(default_factory=lambda: _str_env("EMAIL_FROM_NAME", "JobAlert CI"))
+    public_base_url: str = field(default_factory=lambda: _str_env("PUBLIC_BASE_URL", "https://jobalert.ci"))
+    confirm_email_token_ttl_hours: int = field(default_factory=lambda: _int_env("CONFIRM_EMAIL_TOKEN_TTL_HOURS", 24))
+    email_confirmation_required: bool = field(default_factory=lambda: _bool_env("EMAIL_CONFIRMATION_REQUIRED", True))
+    email_provider: str = field(default_factory=lambda: _str_env("EMAIL_PROVIDER", "resend"))
+    resend_timeout_seconds: int = field(default_factory=lambda: _int_env("RESEND_TIMEOUT_SECONDS", 10))
+    email_max_retries: int = field(default_factory=lambda: _int_env("EMAIL_MAX_RETRIES", 3))
+    email_retry_backoff_seconds: int = field(default_factory=lambda: _int_env("EMAIL_RETRY_BACKOFF_SECONDS", 5))
+    email_rate_limit_resend_per_hour: int = field(default_factory=lambda: _int_env("EMAIL_RATE_LIMIT_RESEND_PER_HOUR", 3))
+    support_email: str = field(default_factory=lambda: _str_env("SUPPORT_EMAIL", "support@jobalert.ci"))
+    # Secret du webhook Resend (Svix). Optionnel: sans lui le webhook refuse les appels signes.
+    resend_webhook_secret: str | None = field(default_factory=lambda: getenv("RESEND_WEBHOOK_SECRET") or None)
+    email_bounce_threshold: int = field(default_factory=lambda: _int_env("EMAIL_BOUNCE_THRESHOLD", 2))
     daily_digest_hour: int = field(default_factory=lambda: _int_env("DAILY_DIGEST_HOUR", 8))
     scraper_api_token: str | None = field(default_factory=lambda: getenv("SCRAPER_API_TOKEN") or None)
     ingestion_batch_size_max: int = field(default_factory=lambda: _int_env("INGESTION_BATCH_SIZE_MAX", 500))
