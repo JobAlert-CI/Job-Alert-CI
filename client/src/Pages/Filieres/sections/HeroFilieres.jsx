@@ -1,4 +1,4 @@
-// src/pages/filieres/sections/HeroFilieres.jsx
+
 import { Link } from "react-router-dom"
 import { motion } from "framer-motion"
 import { ArrowRight, Bell, ChevronRight, LayoutGrid } from "lucide-react"

@@ -1,4 +1,4 @@
-// src/pages/sources/components/CarteSource.jsx
+
 import { Link } from "react-router-dom"
 import { motion } from "framer-motion"
 import {
@@ -40,6 +40,7 @@ const StatsSource = ({ s }) => (
 )
 
 const CarteSource = ({ s, index, featured = false, className }) => {
+  console.log(s)
   const hue = HUES[s.hue] ?? HUES.sky
 
   return (

@@ -1,4 +1,4 @@
-// src/pages/conseils/detail/conseil-detail.constants.js
+
 import { Lightbulb } from "lucide-react"
 import { HUES } from "@/lib/hues"
 import { useEffect } from "react"

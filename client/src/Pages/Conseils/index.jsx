@@ -1,4 +1,4 @@
-// src/pages/conseils/index.jsx
+
 import Seo from "@/components/seo/Seo"
 import { conseilsSeo } from "@/lib/seo"
 import {

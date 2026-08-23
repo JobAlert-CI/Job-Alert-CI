@@ -1,4 +1,4 @@
-// src/pages/filieres/detail/components/FiliereFilterGroups.jsx
+
 import { Briefcase, CalendarDays, GraduationCap, Layers, MapPin, Zap } from "lucide-react"
 import { MiniCalendar } from "@/components/shared"
 import { BRAND_HUE } from "@/lib/hues"

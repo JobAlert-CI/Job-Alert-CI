@@ -1,4 +1,4 @@
-// src/pages/sources/components/BandeauDedup.jsx
+
 import { motion } from "framer-motion"
 import { Check, Fingerprint, X } from "lucide-react"
 import { CountUp } from "@/components/shared"

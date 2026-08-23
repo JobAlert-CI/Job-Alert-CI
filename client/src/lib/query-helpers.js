@@ -1,4 +1,4 @@
-// src/lib/query-helpers.js
+
 
 /** Une 404 est définitive : inutile de la retenter. */
 export const isNotFoundError = (error) =>

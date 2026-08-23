@@ -1,4 +1,4 @@
-// src/pages/home/components/EmptyOffers.jsx
+
 import { Link } from "react-router-dom"
 import { Bell } from "lucide-react"
 

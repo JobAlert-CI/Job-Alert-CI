@@ -1,4 +1,4 @@
-// src/pages/offres/detail/sections/CorpsOffre.jsx
+
 import SectionDescription from "../components/SectionDescription"
 import CarteEntreprise from "../components/CarteEntreprise"
 import CarteAlerte from "../components/CarteAlerte"

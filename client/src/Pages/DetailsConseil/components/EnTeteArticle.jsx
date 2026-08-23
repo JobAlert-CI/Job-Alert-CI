@@ -1,4 +1,4 @@
-// src/pages/conseils/detail/components/EnTeteArticle.jsx
+
 import { useEffect, useRef, useState } from "react"
 import { Link } from "react-router-dom"
 import { motion } from "framer-motion"

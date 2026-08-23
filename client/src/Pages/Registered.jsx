@@ -1,4 +1,4 @@
-// src/pages/inscription/index.jsx
+
 import { Fragment, useMemo, useState } from "react"
 import { Link, useSearchParams } from "react-router-dom"
 import { AnimatePresence, motion } from "framer-motion"
@@ -439,7 +439,7 @@ const EtapePreferences = ({ form, toggleFiliere }) => {
           )
           return bloque ? (
             <Tooltip key={f.code}>
-              <TooltipTrigger asChild><span>{btn}</span></TooltipTrigger>
+              <TooltipTrigger ><span>{btn}</span></TooltipTrigger>
               <TooltipContent side="top">3 filières maximum — désélectionnez-en une d'abord.</TooltipContent>
             </Tooltip>
           ) : (

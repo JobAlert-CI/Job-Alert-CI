@@ -1,4 +1,4 @@
-// src/pages/conseils/sections/HeroConseils.jsx
+
 import { useMemo } from "react"
 import { Link } from "react-router-dom"
 import { motion } from "framer-motion"

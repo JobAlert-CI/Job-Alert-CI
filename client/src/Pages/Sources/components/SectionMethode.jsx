@@ -1,4 +1,4 @@
-// src/pages/sources/components/SectionMethode.jsx
+
 import { Link } from "react-router-dom"
 import { motion } from "framer-motion"
 import { ArrowRight, Radar } from "lucide-react"

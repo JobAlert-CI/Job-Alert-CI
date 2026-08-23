@@ -1,4 +1,4 @@
-// src/pages/conseils/sections/GrilleBibliotheque.jsx
+
 import { useCallback, useRef } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import { Bell, SearchX } from "lucide-react"

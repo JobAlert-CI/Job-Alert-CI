@@ -53,7 +53,7 @@ const FaqSection = ({
         viewport={{ once: true, margin: "-60px" }}
         transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
       >
-        <Accordion type="single" collapsible defaultValue={defaultOpen ?? questions[0]?.id} className="w-full border-0">
+        <Accordion type="single" collapsible="true" defaultValue={defaultOpen ?? questions[0]?.id} className="w-full border-0">
           {questions.map((q) => (
             <AccordionItem key={q.id} value={q.id} className={cn("group", separated ? "border-outline-variant/40" : "border-0")}>
               <AccordionTrigger className="py-5 text-left font-heading text-[15px] font-bold text-brand-navy transition-colors duration-200 hover:text-brand-orange hover:no-underline group-data-open:text-brand-orange">

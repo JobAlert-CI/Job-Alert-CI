@@ -1,4 +1,4 @@
-// src/pages/sources/sources.constants.js
+
 import {
   Activity, Fingerprint, Radar, ShieldCheck,
 } from "lucide-react"
@@ -68,7 +68,7 @@ export const fadeUp = {
   },
 }
 
-// src/pages/sources/sources.adapter.js
+
 import { HUES } from "@/lib/hues"
 
 /* ════════════════════════════════════════════════════════════════════
@@ -210,7 +210,7 @@ export const adaptSources = (sourcesApi = [], statsParSourceList = []) => {
 /* ════════════════════════════════════════════════════════════════════
    CLÉS DE CACHE — préfixe commun.
 ════════════════════════════════════════════════════════════════════ */
-// src/pages/sources/sources.queries.js
+
 
 export const sourcesKeys = {
   root: ["sources"],

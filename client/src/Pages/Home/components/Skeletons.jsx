@@ -1,4 +1,4 @@
-// src/pages/home/components/Skeletons.jsx
+
 import { Skeleton } from "@/components/ui/skeleton"
 
 export const OfferSkeleton = () => (

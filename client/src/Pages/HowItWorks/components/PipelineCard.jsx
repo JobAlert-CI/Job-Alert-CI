@@ -1,4 +1,4 @@
-// src/pages/comment-ca-marche/components/PipelineCard.jsx
+
 import { useEffect, useMemo, useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Check, Clock, MailCheck } from "lucide-react"
@@ -40,13 +40,15 @@ const PipelineCard = () => {
   const stateOf = (index) =>
     delivered || tick > index ? "done" : tick === index ? "active" : "pending"
 
+  const sourcesChips = useMemo(() => sources?.filter((s) => s.status === "active" && s.supports_scraping), [sources])?.slice(0, 3)
+
   const chips = useMemo(() => {
-    if (!Array.isArray(sources)) return []
-    return sources.map((source, index) => ({
+    if (!Array.isArray(sourcesChips)) return []
+    return sourcesChips.map((source, index) => ({
       ...source,
       ...CHIP_POSITIONS[index % CHIP_POSITIONS.length],
     }))
-  }, [sources])
+  }, [sourcesChips])
 
   const activeSourcesCount = getActiveSources(sources).length
 

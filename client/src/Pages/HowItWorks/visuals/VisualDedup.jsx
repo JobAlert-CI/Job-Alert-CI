@@ -1,4 +1,4 @@
-// src/pages/comment-ca-marche/visuals/VisualDedup.jsx
+
 import { motion } from "framer-motion"
 import { Fingerprint } from "lucide-react"
 import { VisualFrame } from "@/components/shared"

@@ -1,4 +1,4 @@
-// src/pages/comment-ca-marche/visuals/VisualEnvoi.jsx
+
 import { motion } from "framer-motion"
 import { BadgeCheck, RefreshCw } from "lucide-react"
 import { VisualFrame } from "@/components/shared"

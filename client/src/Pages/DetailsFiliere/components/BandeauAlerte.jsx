@@ -1,4 +1,4 @@
-// src/pages/filieres/detail/components/BandeauAlerte.jsx
+
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { motion } from "framer-motion"

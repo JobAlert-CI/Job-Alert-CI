@@ -1,6 +1,6 @@
-// src/pages/home/home.constants.js
+
 import { queryClient } from "@/lib/queryClient"
-import { getOfferSats, getOfferSatsByFiliere } from "@/api/public/stats"
+import { getOfferSats, getOfferSatsByFiliere, getGlobalSats } from "@/api/public/stats"
 import { getOffers } from "@/api/public/offers"
 import { useMemo } from "react"
 import { useQuery } from "@tanstack/react-query"
@@ -10,7 +10,7 @@ export const SCRAPE_TIME = "6h02"
 export const EMAIL_DELIVERY_TIME = "8h00"
 export const MAX_PREVIEW_OFFERS = 4
 export const MAX_RECENT_OFFERS = 6
-export const SOURCE_COUNT_FALLBACK = 4
+export const SOURCE_COUNT_FALLBACK = 0
 export const FILIERE_STATS_LIMIT = 28
 
 export const containerVariants = {
@@ -41,7 +41,7 @@ export const homeKeys = {
 }
 
 export const useHomeStats = () =>
-  useQuery({ queryKey: homeKeys.stats, queryFn: getOfferSats })
+  useQuery({ queryKey: homeKeys.stats, queryFn: getGlobalSats })
 
 export const useFiliereStats = () =>
   useQuery({
@@ -80,8 +80,8 @@ export const useHomeMetrics = () => {
     const statsReady = !statsPending && !statsError
     const filieresReady = !filieresPending && !filieresError
 
-    const newOffersCount = statsReady ? stats?.new_offers ?? null : null
-    const totalOffersCount = statsReady ? stats?.total_offers ?? null : null
+    const newOffersCount = statsReady ? stats?.new_today ?? null : null
+    const totalOffersCount = statsReady ? stats?.active_offers ?? null : null
 
     return {
       newOffersCount,

@@ -1,4 +1,4 @@
-// src/pages/offres/detail/components/CartePostuler.jsx
+
 import { motion } from "framer-motion"
 import {
   ArrowUpRight, Bookmark, BookmarkCheck, Check, Clock, Link2, ShieldCheck,
@@ -139,7 +139,7 @@ const CartePostuler = () => {
               Empreinte de dédoublonnage
             </span>
             <Tooltip>
-              <TooltipTrigger asChild>
+              <TooltipTrigger >
                 <code
                   tabIndex={0}
                   className="cursor-help rounded-sm font-mono text-[11px] font-bold text-brand-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"

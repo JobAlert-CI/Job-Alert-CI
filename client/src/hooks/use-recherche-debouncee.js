@@ -1,4 +1,4 @@
-// src/hooks/use-recherche-debouncee.js
+
 import { useEffect, useState } from "react"
 
 /**

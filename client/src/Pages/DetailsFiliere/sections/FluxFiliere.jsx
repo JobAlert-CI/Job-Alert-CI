@@ -1,4 +1,4 @@
-// src/pages/filieres/detail/sections/FluxFiliere.jsx
+
 import { Link } from "react-router-dom"
 import { AnimatePresence, motion } from "framer-motion"
 import {

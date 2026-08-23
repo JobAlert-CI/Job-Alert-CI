@@ -1,4 +1,4 @@
-// src/pages/home/sections/Hero.jsx
+
 import { Link } from "react-router-dom"
 import { motion } from "framer-motion"
 import { ArrowRight, BadgeCheck, Bell, Check, Clock, Radar } from "lucide-react"
@@ -23,8 +23,7 @@ import {
   MAX_PREVIEW_OFFERS,
   useHomeStats,
   useFiliereStats,
-  useRecentOffers,
-  resolveSourceCount
+  useRecentOffers
 } from "@/tools/home.tools"
 
 /* ------------------------------------------------------------------ */
@@ -59,7 +58,7 @@ const CollecteBadge = ({ isPending, isError, count }) => {
   return (
     <motion.div variants={fadeUp}>
       <Tooltip>
-        <TooltipTrigger asChild>
+        <TooltipTrigger>
           <span className="inline-flex cursor-default items-center gap-2.5 rounded-full border border-emerald-500/25 bg-emerald-500/10 py-1.5 pl-2.5 pr-4 text-xs font-semibold text-emerald-700">
             <PulseDot color="bg-emerald-500" />
             {count > 0
@@ -101,12 +100,10 @@ const Hero = () => {
     ? offers.slice(0, MAX_PREVIEW_OFFERS)
     : JOBS_APERCU.slice(0, MAX_PREVIEW_OFFERS)
 
-  const newOffersCount = stats?.new_offers ?? 0
+  const newOffersCount = stats?.new_today ?? 0
+  const activeOffersCount = stats?.active_offers ?? 0
   const filieresCount = statsFil?.length
-  const sourceCount = resolveSourceCount(statsFil, {
-    isPending: filPending,
-    isError: filError,
-  })
+  const sourceCount = stats?.sources ?? 0
   const remainingOffers = Math.max(0, newOffersCount - MAX_PREVIEW_OFFERS)
   const showRemainingBadge = !statsPending && !statsError && remainingOffers > 0
 
@@ -115,7 +112,7 @@ const Hero = () => {
   const getStatValue = (value) => (statsUnavailable ? 0 : value)
 
   const STATS = [
-    { value: getStatValue(newOffersCount), suffix: "", label: "offres collectées ce matin" },
+    { value: getStatValue(newOffersCount > 0 ? newOffersCount : activeOffersCount), suffix: "", label: newOffersCount > 0 ? "offres collectées ce matin" : "offres actives" },
     { value: getStatValue(sourceCount), suffix: "", label: "sources scannées à 6h00" },
     { value: getStatValue(filieresCount), suffix: "", label: "filières métiers couvertes" },
     { value: 8, suffix: "h00", label: "envoi quotidien garanti" },
@@ -292,7 +289,7 @@ const Hero = () => {
                   <img
                     src="/logo2.svg"
                     alt="JobAlert CI"
-                    className="size-6"
+                    className="h-full"
                     loading="lazy"
                   />
                 </span>
@@ -376,7 +373,7 @@ const Hero = () => {
                           </p>
                         </div>
                         <Tooltip>
-                          <TooltipTrigger asChild>
+                          <TooltipTrigger >
                             <Badge
                               variant="outline"
                               className="shrink-0 gap-1 rounded-full border-outline-variant/60 bg-surface-container-low/60 px-2 py-0.5 text-[10px] font-semibold text-on-surface-variant"
@@ -461,5 +458,6 @@ const Hero = () => {
     </section>
   )
 }
+
 
 export default Hero

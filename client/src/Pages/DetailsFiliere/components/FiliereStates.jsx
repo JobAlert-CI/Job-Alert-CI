@@ -1,4 +1,4 @@
-// src/pages/filieres/detail/components/FiliereStates.jsx
+
 import { Link } from "react-router-dom"
 import { motion } from "framer-motion"
 import { AlertTriangle, LayoutGrid, Loader2, RefreshCw, SearchX } from "lucide-react"

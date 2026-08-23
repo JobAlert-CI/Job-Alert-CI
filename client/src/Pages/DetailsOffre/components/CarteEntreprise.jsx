@@ -1,4 +1,4 @@
-// src/pages/offres/detail/components/CarteEntreprise.jsx
+
 import { motion } from "framer-motion"
 import { Building2, MapPin } from "lucide-react"
 import { useOffreDetail } from "@/contexts/DetailsOffre.context"

@@ -1,4 +1,4 @@
-// src/pages/sources/components/CompteReboursScan.jsx
+
 import { useEffect, useState } from "react"
 
 /** Compte à rebours vers le prochain scan de 6h00. */

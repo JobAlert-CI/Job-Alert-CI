@@ -1,4 +1,4 @@
-// src/pages/sources/index.jsx
+
 import Seo from "@/components/seo/Seo"
 import { sourcesSeo } from "@/lib/seo"
 import { formatApiError } from "@/api/errors"

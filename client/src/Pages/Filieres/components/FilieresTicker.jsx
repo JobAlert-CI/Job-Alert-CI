@@ -1,4 +1,4 @@
-// src/pages/filieres/components/FilieresTicker.jsx
+
 import { useMemo } from "react"
 import { Ticker } from "@/components/shared"
 import { HUES } from "@/lib/hues"

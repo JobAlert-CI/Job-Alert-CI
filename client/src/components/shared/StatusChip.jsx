@@ -12,7 +12,7 @@ const DOTS = { emerald: "bg-emerald-500", orange: "bg-brand-orange", navy: "bg-b
 /** Badge « statut vivant » avec pastille ping + tooltip optionnel. */
 const StatusChip = ({ children, tooltip, tone = "emerald", ping = true, className }) => (
   <Tooltip>
-    <TooltipTrigger asChild>
+    <TooltipTrigger >
       <span className={cn(
         "inline-flex cursor-default items-center gap-2.5 rounded-full border py-1.5 pl-2.5 pr-4 text-xs font-semibold",
         TONES[tone],

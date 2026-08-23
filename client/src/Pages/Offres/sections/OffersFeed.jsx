@@ -1,4 +1,4 @@
-// src/pages/offres/sections/OffersFeed.jsx
+
 import { memo, useCallback, useMemo, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import { AlertTriangle, RefreshCw, X } from "lucide-react"

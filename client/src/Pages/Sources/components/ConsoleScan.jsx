@@ -1,4 +1,4 @@
-// src/pages/sources/components/ConsoleScan.jsx
+
 import { useMemo } from "react"
 import { motion } from "framer-motion"
 import {
@@ -150,7 +150,7 @@ const ConsoleScan = () => {
                 const pos = POSITIONS_RADAR[i % POSITIONS_RADAR.length]
                 return (
                   <Tooltip key={s.rawCode}>
-                    <TooltipTrigger asChild>
+                    <TooltipTrigger >
                       <span
                         className="absolute z-10 -translate-x-1/2 -translate-y-1/2 cursor-default"
                         style={{ left: `${pos.x}%`, top: `${pos.y}%` }}

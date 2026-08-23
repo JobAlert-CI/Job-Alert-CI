@@ -1,4 +1,4 @@
-// src/pages/home/sections/RecentOffers.jsx
+
 import { Link } from "react-router-dom"
 import { motion } from "framer-motion"
 import { ArrowRight, ArrowUpRight } from "lucide-react"

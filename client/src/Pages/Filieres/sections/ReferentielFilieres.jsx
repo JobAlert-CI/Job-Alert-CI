@@ -1,4 +1,4 @@
-// src/pages/filieres/sections/ReferentielFilieres.jsx
+
 import { useMemo } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import { ArrowDownAZ, ArrowDownWideNarrow, Search, X } from "lucide-react"

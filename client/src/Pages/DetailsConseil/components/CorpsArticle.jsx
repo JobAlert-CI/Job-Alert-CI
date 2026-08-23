@@ -1,4 +1,4 @@
-// src/pages/conseils/detail/components/CorpsArticle.jsx
+
 import { memo } from "react"
 import { motion } from "framer-motion"
 import { BadgeCheck, Bell, Check, Lightbulb, Quote, Sparkles } from "lucide-react"

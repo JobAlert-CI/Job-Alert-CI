@@ -1,4 +1,4 @@
-// src/pages/filieres/detail/components/RecapCard.jsx
+
 import { Fragment } from "react"
 import { motion } from "framer-motion"
 import { Clock, Mail, ShieldCheck, Zap } from "lucide-react"

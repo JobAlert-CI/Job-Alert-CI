@@ -36,11 +36,11 @@ const FeedOffreCard = ({ offre, index = 0, to, className }) => {
             {/* {offre.fresh && <BadgeNouveau variant="solid" />} */}
           </div>
           <p className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[13px] text-muted-foreground">
-            <span className="font-medium text-on-surface-variant">{offre.company?.name}</span>
+            <span className="font-medium text-on-surface-variant">{offre.company?.name ?? "N/A"}</span>
             <span aria-hidden>·</span>
-            <span className="inline-flex items-center gap-1"><MapPin className="size-3" />{offre.location?.city}</span>
+            <span className="inline-flex items-center gap-1"><MapPin className="size-3" />{offre?.location_raw ?? offre.location?.city ?? "N/A"}</span>
             <span aria-hidden>·</span>
-            <span>{offre.contract_type?.label}</span>
+            <span>{offre.contract_type?.label ?? "N/A"}</span>
           </p>
         </div>
         <ChipSource

@@ -1,4 +1,4 @@
-// src/pages/comment-ca-marche/visuals/VisualCollecte.jsx
+
 import { Link } from "react-router-dom"
 import { motion } from "framer-motion"
 import { Database, ShieldAlert } from "lucide-react"

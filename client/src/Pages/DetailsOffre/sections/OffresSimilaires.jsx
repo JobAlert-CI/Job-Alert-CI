@@ -1,4 +1,4 @@
-// src/pages/offres/detail/sections/OffresSimilaires.jsx
+
 import { ArrowRight } from "lucide-react"
 import { CtaLink, OfferCard, SectionHeading } from "@/components/shared"
 import { OfferCardSkeleton } from "@/components/shared/SkeletonsOffres"

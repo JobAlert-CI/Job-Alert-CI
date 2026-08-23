@@ -1,4 +1,4 @@
-// src/pages/offres/sections/FiltersBar.jsx
+
 import { memo, useEffect, useRef, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import {

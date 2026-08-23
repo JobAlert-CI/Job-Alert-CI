@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import func, select
@@ -34,7 +34,7 @@ def list_sources_page(db: Session = Depends(get_db)):
         .order_by(Source.priority.asc())
     ).all()
     
-    since = datetime.utcnow().replace(tzinfo=None) - timedelta(days=7)
+    today = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
     
     results = []
     for s in sources:
@@ -44,7 +44,7 @@ def list_sources_page(db: Session = Depends(get_db)):
         ) or 0
         new_offers = db.scalar(
             select(func.count(JobOffer.id))
-            .where(JobOffer.source_id == s.id, JobOffer.first_seen_at >= since, *_public_filters())
+            .where(JobOffer.source_id == s.id, JobOffer.first_seen_at >= today, *_public_filters())
         ) or 0
         
         last_run = db.scalar(

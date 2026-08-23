@@ -1,4 +1,4 @@
-// src/lib/navigation-data.js
+
 import { useQuery } from "@tanstack/react-query"
 import {
   Building2, Calculator, Code2, FileText, GraduationCap, Handshake,

@@ -32,7 +32,7 @@ export const TRI_DRAWER = [
   { k: "courts", l: "Lecture courte" },
 ]
 
-// src/pages/conseils/conseils.animations.js
+
 export const containerVariants = {
   hidden: {},
   visible: { transition: { staggerChildren: 0.1, delayChildren: 0.1 } },
@@ -55,7 +55,7 @@ export const variantsGlissementDoux = {
   sortir: (dir) => ({ opacity: 0, x: -24 * dir, transition: { duration: 0.25, ease: "easeIn" } }),
 }
 
-// src/pages/conseils/conseils.utils.js
+
 
 /** Normalisation recherche : minuscules + suppression des accents. */
 export const normaliser = (texte = "") =>

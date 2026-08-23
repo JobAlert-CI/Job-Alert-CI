@@ -1,4 +1,4 @@
-// src/pages/offres/detail/components/MiniCollecte.jsx
+
 import { motion } from "framer-motion"
 import { SourceLogo } from "@/components/shared"
 import { useCollecteJourQuery } from "@/tools/offre-detail.tools"

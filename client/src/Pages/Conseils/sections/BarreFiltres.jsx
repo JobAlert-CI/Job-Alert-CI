@@ -1,4 +1,4 @@
-// src/pages/conseils/sections/BarreFiltres.jsx
+
 import {
   ArrowUpDown, Lightbulb, Search, SlidersHorizontal, X,
 } from "lucide-react"

@@ -1,4 +1,4 @@
-// src/components/ReuOffres/FilterOptions.jsx
+
 import { memo } from "react"
 import { Skeleton } from "@/components/ui/skeleton"
 import { CheckRow, SourceLogo } from "@/components/shared"

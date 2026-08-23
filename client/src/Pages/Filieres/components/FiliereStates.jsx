@@ -1,4 +1,4 @@
-// src/pages/filieres/components/FiliereStates.jsx
+
 import { motion } from "framer-motion"
 import { AlertTriangle, RefreshCw, SearchX } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"

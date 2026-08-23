@@ -1,4 +1,4 @@
-// src/pages/filieres/detail/filiere-detail.context.jsx
+
 import {
   createContext, useCallback, useContext, useEffect, useMemo, useState,
 } from "react"

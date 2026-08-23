@@ -1,4 +1,4 @@
-// src/pages/offres/detail/sections/HeroOffre.jsx
+
 import { Link } from "react-router-dom"
 import { motion } from "framer-motion"
 import {

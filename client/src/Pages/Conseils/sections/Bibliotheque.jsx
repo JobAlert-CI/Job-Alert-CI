@@ -1,4 +1,4 @@
-// src/pages/conseils/sections/Bibliotheque.jsx
+
 import { SectionHeading } from "@/components/shared"
 import {
   useArticlesQuery, useCategoriesQuery, useDailyTipsQuery,

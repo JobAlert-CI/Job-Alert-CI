@@ -1,4 +1,4 @@
-// src/pages/offres/detail/components/CarteAlerte.jsx
+
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Bell, Mail } from "lucide-react"

@@ -1,4 +1,4 @@
-// src/lib/referentiels-query.js
+
 import { useQuery } from "@tanstack/react-query"
 import { formatApiError } from "@/api/errors"
 import {

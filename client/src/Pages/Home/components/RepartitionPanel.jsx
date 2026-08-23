@@ -1,4 +1,4 @@
-// src/pages/home/components/RepartitionPanel.jsx
+
 import { motion } from "framer-motion"
 import { Bell, Zap } from "lucide-react"
 import { cn } from "@/lib/utils"

@@ -1,4 +1,4 @@
-// src/pages/comment-ca-marche/HowItWorks.jsx
+
 import { Radar } from "lucide-react"
 import Seo from "@/components/seo/Seo"
 import { howItWorksSeo } from "@/lib/seo"

@@ -34,7 +34,7 @@ export const TRACE_PATH =
   "C 292 2272, 512 2330, 498 2520"
 
 
-// src/pages/comment-ca-marche/ccm.animations.js
+
 export const containerVariants = {
   hidden: {},
   visible: { transition: { staggerChildren: 0.1, delayChildren: 0.1 } },
@@ -49,7 +49,7 @@ export const fadeUp = {
   },
 }
 
-// src/pages/comment-ca-marche/ccm.utils.js
+
 /** Statut d'affichage d'une source (pastille + libellé). */
 export const getSourceStatus = (source) => {
   if (!source)

@@ -1,4 +1,4 @@
-// src/pages/offres/components/FeedStates.jsx
+
 import { memo } from "react"
 import { Link } from "react-router-dom"
 import { motion } from "framer-motion"

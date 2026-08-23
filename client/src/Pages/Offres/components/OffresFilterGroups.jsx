@@ -1,4 +1,4 @@
-// src/pages/offres/components/OffresFilterGroups.jsx
+
 import {
   Briefcase, CalendarDays, GraduationCap, Layers, MapPin,
   Sparkles, Zap,

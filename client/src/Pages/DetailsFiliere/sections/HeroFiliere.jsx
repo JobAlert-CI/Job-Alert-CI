@@ -1,4 +1,4 @@
-// src/pages/filieres/detail/sections/HeroFiliere.jsx
+
 import { Link } from "react-router-dom"
 import { motion } from "framer-motion"
 import { Bell, ChevronRight, LayoutGrid, Sparkles } from "lucide-react"
@@ -99,7 +99,7 @@ const HeroFiliere = () => {
               <div className="mt-2.5 flex flex-wrap gap-2">
                 {meta.keywords.map((kw) => (
                   <Tooltip key={kw}>
-                    <TooltipTrigger asChild>
+                    <TooltipTrigger >
                       <span
                         tabIndex={0}
                         className="cursor-help rounded-full border border-outline-variant/60 bg-white/80 px-3 py-1 text-xs font-medium text-on-surface-variant backdrop-blur-sm transition-colors hover:border-brand-navy/40 hover:text-brand-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"

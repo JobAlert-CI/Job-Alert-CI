@@ -1,4 +1,4 @@
-// src/pages/comment-ca-marche/sections/HeroHowItWorks.jsx
+
 import { motion } from "framer-motion"
 import { Bell, LayoutGrid } from "lucide-react"
 import {

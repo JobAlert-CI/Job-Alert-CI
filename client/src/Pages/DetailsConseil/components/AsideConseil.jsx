@@ -1,4 +1,4 @@
-// src/pages/conseils/detail/components/AsideConseil.jsx
+
 import { memo, useMemo } from "react"
 import { Link } from "react-router-dom"
 import { Bell, RefreshCw, Sparkles } from "lucide-react"

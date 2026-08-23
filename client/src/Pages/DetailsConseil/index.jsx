@@ -1,4 +1,4 @@
-// src/pages/conseils/detail/index.jsx
+
 import Seo from "@/components/seo/Seo"
 import { conseilSeo } from "@/lib/seo"
 import { formatApiError } from "@/api/errors"

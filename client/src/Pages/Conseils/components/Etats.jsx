@@ -1,4 +1,4 @@
-// src/pages/conseils/components/Etats.jsx
+
 import { Link } from "react-router-dom"
 import { motion } from "framer-motion"
 import { AlertTriangle, ChevronRight, Inbox, RefreshCw } from "lucide-react"

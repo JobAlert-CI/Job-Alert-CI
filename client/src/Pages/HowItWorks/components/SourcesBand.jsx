@@ -1,4 +1,4 @@
-// src/pages/comment-ca-marche/components/SourcesBand.jsx
+
 import { Link } from "react-router-dom"
 import { AlertCircle, ArrowRight } from "lucide-react"
 import { SourceLogo } from "@/components/shared"

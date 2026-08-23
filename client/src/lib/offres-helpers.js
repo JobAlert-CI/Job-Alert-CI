@@ -1,4 +1,4 @@
-// src/lib/offres-helpers.js
+
 import { fmtDay, sameDay } from "@/lib/dates"
 
 /** Label d'un code dans une liste de référentiel (repli = le code). */

@@ -1,4 +1,4 @@
-// src/pages/offres/detail/sections/BandeCloture.jsx
+
 import { motion } from "framer-motion"
 import { ArrowRight, Bell } from "lucide-react"
 import { CtaLink } from "@/components/shared"

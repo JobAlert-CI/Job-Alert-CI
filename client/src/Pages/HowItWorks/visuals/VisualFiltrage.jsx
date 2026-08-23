@@ -1,4 +1,4 @@
-// src/pages/comment-ca-marche/visuals/VisualFiltrage.jsx
+
 import { Link } from "react-router-dom"
 import { motion } from "framer-motion"
 import { SlidersHorizontal } from "lucide-react"

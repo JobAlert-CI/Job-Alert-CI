@@ -1,4 +1,4 @@
-// src/pages/filieres/sections/BandeMechanique.jsx
+
 import { Fragment } from "react"
 import { Link } from "react-router-dom"
 import { motion } from "framer-motion"

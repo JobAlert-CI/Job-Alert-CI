@@ -1,4 +1,4 @@
-// src/pages/sources/components/SectionSources.jsx
+
 import { AlertTriangle, RefreshCw } from "lucide-react"
 import { SectionHeading } from "@/components/shared"
 import { useSourcesContext } from "@/contexts/Sources.context"

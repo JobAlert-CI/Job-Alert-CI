@@ -1,4 +1,4 @@
-// src/pages/home/components/OffersFeed.jsx
+
 import { FeedOffreCard } from "@/components/shared"
 import { useRecentOffers } from "../../../tools/home.tools"
 import { OfferSkeleton } from "./Skeletons"

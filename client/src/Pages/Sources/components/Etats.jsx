@@ -1,4 +1,4 @@
-// src/pages/sources/components/Etats.jsx
+
 import { motion } from "framer-motion"
 import {
   AlertTriangle, ArrowRight, Inbox, RefreshCw,

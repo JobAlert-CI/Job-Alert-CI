@@ -1,4 +1,4 @@
-// src/hooks/use-glissement.js
+
 import { useState } from "react"
 
 const SEUIL_SWIPE_PX = 56

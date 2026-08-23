@@ -1,4 +1,4 @@
-// src/pages/filieres/index.jsx
+
 import Seo from "@/components/seo/Seo"
 import { filieresSeo } from "@/lib/seo"
 import { useFilieresAdapted } from "@/tools/filieres.tools"

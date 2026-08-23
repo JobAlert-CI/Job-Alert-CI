@@ -1,4 +1,4 @@
-// src/pages/offres/detail/components/OffreStates.jsx
+
 import { motion } from "framer-motion"
 import { AlertTriangle, ArrowRight, Loader2, RefreshCw, SearchX } from "lucide-react"
 import { CtaLink } from "@/components/shared"

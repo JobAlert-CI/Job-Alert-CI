@@ -1,4 +1,4 @@
-// src/pages/conseils/detail/conseil-detail.context.jsx
+
 import { createContext, useContext, useEffect, useMemo } from "react"
 import { useParams } from "react-router-dom"
 import {

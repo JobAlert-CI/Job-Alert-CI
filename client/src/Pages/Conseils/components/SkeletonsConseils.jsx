@@ -1,4 +1,4 @@
-// src/pages/conseils/components/SkeletonsConseils.jsx
+
 import { cn } from "@/lib/utils"
 
 /* Brique de base (locale, pour ne pas confondre avec le Skeleton shadcn). */

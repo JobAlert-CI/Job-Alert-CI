@@ -1,4 +1,4 @@
-// src/pages/comment-ca-marche/sections/EtapesDetail.jsx
+
 import { useRef } from "react"
 import { useScroll, useSpring } from "framer-motion"
 import { Fingerprint, Radar, Send, SlidersHorizontal } from "lucide-react"

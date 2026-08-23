@@ -1,4 +1,4 @@
-// src/pages/offres/detail/index.jsx
+
 import Seo from "@/components/seo/Seo"
 import { offreSeo as buildOffreSeo } from "@/lib/seo"
 import { OffreDetailProvider, useOffreDetail } from "@/contexts/DetailsOffre.context"

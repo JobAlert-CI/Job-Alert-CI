@@ -1,4 +1,4 @@
-// src/components/shared/SommaireFlottant.jsx
+
 import { useRef, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import { List, X } from "lucide-react"

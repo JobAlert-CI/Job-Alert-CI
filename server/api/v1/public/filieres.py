@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -38,7 +38,7 @@ def list_filieres_page(
         .order_by(Filiere.label.asc() if sort == "az" else Filiere.sort_order.asc())
     ).all()
     
-    since = datetime.utcnow().replace(tzinfo=None) - timedelta(days=7)
+    today = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
     
     results = []
     for f in filieres:
@@ -48,7 +48,7 @@ def list_filieres_page(
         ) or 0
         new_offers = db.scalar(
             select(func.count(JobOffer.id))
-            .where(JobOffer.primary_filiere_id == f.id, JobOffer.first_seen_at >= since, *_public_filters())
+            .where(JobOffer.primary_filiere_id == f.id, JobOffer.first_seen_at >= today, *_public_filters())
         ) or 0
         subscribers = db.scalar(
             select(func.count(SubscriberFiliere.id))

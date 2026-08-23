@@ -1,4 +1,4 @@
-// src/pages/home/Home.jsx
+
 import { MessageCircleQuestion } from "lucide-react"
 import Seo from "@/components/seo/Seo"
 import { homeSeo } from "@/lib/seo"

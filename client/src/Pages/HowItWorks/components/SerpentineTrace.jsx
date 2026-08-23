@@ -1,4 +1,4 @@
-// src/pages/comment-ca-marche/components/SerpentineTrace.jsx
+
 import { useRef } from "react"
 import { motion } from "framer-motion"
 import { TRACE_PATH, TRACE_VIEWBOX } from "@/tools/ccm.tools"

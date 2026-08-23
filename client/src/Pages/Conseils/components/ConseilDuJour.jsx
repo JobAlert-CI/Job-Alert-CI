@@ -1,4 +1,4 @@
-// src/pages/conseils/components/ConseilDuJour.jsx
+
 import { useMemo } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import { Lightbulb, MoveHorizontal } from "lucide-react"

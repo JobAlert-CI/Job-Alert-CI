@@ -1,4 +1,4 @@
-// src/pages/conseils/components/Sidebar.jsx
+
 import { useMemo } from "react"
 import { Link } from "react-router-dom"
 import { ArrowRight, Bell, BookOpen, Clock, Flame } from "lucide-react"

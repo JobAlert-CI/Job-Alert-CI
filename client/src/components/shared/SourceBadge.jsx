@@ -12,7 +12,7 @@ export const SourceLogo = ({ code, className = "size-6" }) => {
 
 export const ChipSource = ({ source, tooltip, className, logoClassName = "size-6" }) => (
   <Tooltip>
-    <TooltipTrigger asChild>
+    <TooltipTrigger >
       <span className={cn(
         "inline-flex cursor-default items-center gap-1.5 rounded-full border border-outline-variant/50 bg-surface-container-low/60 px-2.5 py-1 text-[11px] font-semibold text-on-surface-variant",
         className

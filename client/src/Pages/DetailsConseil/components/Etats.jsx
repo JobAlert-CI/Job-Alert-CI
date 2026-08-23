@@ -1,4 +1,4 @@
-// src/pages/conseils/detail/components/Etats.jsx
+
 import { motion } from "framer-motion"
 import { AlertTriangle, ArrowRight, Inbox, RefreshCw, SearchX } from "lucide-react"
 import { cn } from "@/lib/utils"

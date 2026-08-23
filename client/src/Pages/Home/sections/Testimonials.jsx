@@ -1,4 +1,4 @@
-// src/pages/home/sections/Testimonials.jsx
+
 import { Link } from "react-router-dom"
 import { ArrowRight } from "lucide-react"
 import { SectionHeading, TemoignageCard } from "@/components/shared"

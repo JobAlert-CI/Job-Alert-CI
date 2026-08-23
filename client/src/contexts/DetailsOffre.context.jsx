@@ -1,4 +1,4 @@
-// src/pages/offres/detail/offre-detail.context.jsx
+
 import {
   createContext, useCallback, useContext, useEffect, useMemo, useRef, useState,
 } from "react"

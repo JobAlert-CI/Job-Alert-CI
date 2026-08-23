@@ -40,7 +40,7 @@ const FiliereLargeCard = ({ f, index, className }) => {
         <div className="mt-4 flex flex-wrap gap-1.5">
           {f.keywords.slice(0, 3).map((kw) => (
             <Tooltip key={kw}>
-              <TooltipTrigger asChild>
+              <TooltipTrigger >
                 <span className="cursor-help rounded-full border border-outline-variant/60 bg-surface-container-low/60 px-2.5 py-1 text-[11px] font-medium text-on-surface-variant transition-colors hover:border-brand-navy/40 hover:text-brand-navy">
                   {kw}
                 </span>

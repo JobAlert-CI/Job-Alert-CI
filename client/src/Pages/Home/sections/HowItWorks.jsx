@@ -1,4 +1,4 @@
-// src/pages/home/sections/HowItWorks.jsx
+
 import { useRef } from "react"
 import { Link } from "react-router-dom"
 import { motion, useScroll, useSpring } from "framer-motion"
@@ -13,16 +13,11 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { SectionHeading } from "@/components/shared"
-import { SOURCE_COUNT_FALLBACK, useFiliereStats, getActiveSourcesCount } from "@/tools/home.tools"
+import { useHomeStats } from "@/tools/home.tools"
 
-const HowItWorks = () => {
-  // Se sert dans le même cache que Hero → aucune requête supplémentaire
-  const { data: statsFil } = useFiliereStats()
-  const activeCount = getActiveSourcesCount(statsFil)
-  const sourceCount =
-    Number.isFinite(activeCount) && activeCount > 0
-      ? Math.max(activeCount, SOURCE_COUNT_FALLBACK)
-      : SOURCE_COUNT_FALLBACK
+const HowItWorks = () => {  
+  const { data: stats } = useHomeStats()
+  const sourceCount = stats?.sources ?? 0
 
   const timelineRef = useRef(null)
   const { scrollYProgress } = useScroll({

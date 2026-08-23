@@ -1,4 +1,4 @@
-// src/pages/conseils/sections/BandeDonnees.jsx
+
 import { motion } from "framer-motion"
 import { ArrowRight, Bell, TrendingUp } from "lucide-react"
 import { CountUp, CtaLink } from "@/components/shared"

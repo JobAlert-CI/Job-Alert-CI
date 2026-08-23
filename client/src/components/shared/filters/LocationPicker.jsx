@@ -1,4 +1,4 @@
-// src/pages/offres/components/OffresFilterGroups.jsx
+
 import { useState } from "react"
 import { MapPin, Search, X, } from "lucide-react"
 import { CheckRow } from "@/components/shared"

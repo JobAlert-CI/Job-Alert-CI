@@ -1,4 +1,4 @@
-// src/pages/conseils/detail/components/ContinuerLecture.jsx
+
 import { AlertTriangle, ArrowRight, RefreshCw } from "lucide-react"
 import { CarteArticle, CtaLink, SectionHeading } from "@/components/shared"
 import { useConseilDetail } from "@/contexts/DetailsConseil.context"

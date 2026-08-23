@@ -1,4 +1,4 @@
-// src/pages/offres/detail/components/SectionDescription.jsx
+
 import { motion } from "framer-motion"
 import { Briefcase, Check, Sparkles } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
@@ -82,7 +82,7 @@ const SectionDescription = () => {
           <div className="mt-2.5 flex flex-wrap gap-2">
             {(detail.tags || []).map((kw) => (
               <Tooltip key={kw}>
-                <TooltipTrigger asChild>
+                <TooltipTrigger >
                   <span className="cursor-help rounded-full border border-outline-variant/60 bg-white px-3 py-1 text-xs font-medium text-on-surface-variant transition-colors hover:border-brand-navy/40 hover:text-brand-navy">
                     {kw}
                   </span>

@@ -1,4 +1,4 @@
-// src/pages/filieres/components/CollectePanel.jsx
+
 import { useMemo } from "react"
 import { motion } from "framer-motion"
 import { CheckCircle2, Clock, ShieldCheck } from "lucide-react"

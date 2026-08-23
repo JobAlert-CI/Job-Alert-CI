@@ -1,4 +1,4 @@
-// src/pages/offres/sections/HeroOffres.jsx
+
 import { Link } from "react-router-dom"
 import { motion } from "framer-motion"
 import {
@@ -128,7 +128,7 @@ const FluxCard = () => {
                   transition={{ delay: 0.55 + i * 0.1, duration: 0.4 }}
                 >
                   <Tooltip>
-                    <TooltipTrigger asChild>
+                    <TooltipTrigger >
                       <div className="relative flex cursor-default flex-col items-center gap-1.5 rounded-lg border border-outline-variant/50 bg-surface-container-low/50 px-1 py-2.5 transition-colors hover:border-brand-navy/30 hover:bg-surface-container-low">
                         <span className="absolute right-1 top-1 grid size-3.5 place-items-center rounded-full bg-emerald-500 text-white" aria-hidden>
                           <Check className="size-2" strokeWidth={4} />

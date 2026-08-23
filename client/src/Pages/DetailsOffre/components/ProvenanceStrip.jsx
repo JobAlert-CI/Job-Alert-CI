@@ -1,4 +1,4 @@
-// src/pages/offres/detail/components/ProvenanceStrip.jsx
+
 import { Fragment } from "react"
 import { motion } from "framer-motion"
 import { Check } from "lucide-react"
