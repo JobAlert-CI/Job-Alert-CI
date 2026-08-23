@@ -102,7 +102,7 @@ const MenuTile = ({ item }) => {
           <Icon className="size-5" strokeWidth={2} />
         </span>
         <span className="min-w-0">
-          <span className="block truncate text-[13px] font-semibold leading-tight text-on-surface">
+          <span className="block truncate-2 md:truncate text-[13px] font-semibold leading-tight text-on-surface">
             {item.label}
           </span>
           <span className="block text-[11px] font-medium text-muted-foreground">
@@ -130,7 +130,7 @@ const AllTile = ({ to, icon: Icon, label, count, unit }) => (
         <Icon className="size-5" strokeWidth={2} />
       </span>
       <span className="min-w-0">
-        <span className="block truncate text-[13px] font-semibold leading-tight text-on-surface">{label}</span>
+        <span className="block truncate-2 text-[13px] font-semibold leading-tight text-on-surface">{label}</span>
         <span className="block text-[11px] font-medium text-muted-foreground">
           {count} {unit}
         </span>
@@ -312,8 +312,7 @@ const Header = () => {
                       Collecte terminée —{" "}
                       <strong className="font-semibold text-white">
                         {nouveauxCeMatin} nouvelle{nouveauxCeMatin > 1 ? "s" : ""} offre{nouveauxCeMatin > 1 ? "s" : ""}
-                      </strong>{" "}
-                      à 6h02
+                      </strong>
                     </>
                   ) : (
                     <>Collecte du jour en cours…</>
@@ -407,7 +406,7 @@ const Header = () => {
                         Explorer par filière métier
                       </p>
                       <p className="text-xs font-medium text-muted-foreground">
-                        {totalActives} offre{totalActives > 1 ? "s" : ""} active{totalActives > 1 ? "s" : ""} · mises à jour chaque matin à 6h00
+                        {totalActives} offre{totalActives > 1 ? "s" : ""} active{totalActives > 1 ? "s" : ""} · mises à jour chaque matin à 8h00
                       </p>
                     </div>
                     <motion.div
@@ -475,7 +474,19 @@ const Header = () => {
                   </aside>
                 </div>
                 {/* Bandeau bas — inchangé */}
-                {/* ... */}
+                <div className="flex flex-col items-start justify-between gap-3 border-t border-outline-variant/40 bg-surface-container-low/60 px-5 py-4 sm:flex-row sm:items-center md:px-8 lg:px-12">
+                  <p className="flex items-center gap-2 text-[13px] text-on-surface-variant">
+                    <Bell className="size-4 shrink-0 text-brand-orange" />
+                    Recevez uniquement les offres de vos filières, chaque matin à 8h00 dans votre boîte mail.
+                  </p>
+                  <Link
+                    to="/inscription"
+                    className="group inline-flex items-center gap-1.5 text-[13px] font-bold text-brand-navy transition-colors hover:text-brand-orange"
+                  >
+                    Créer mon alerte gratuite
+                    <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
+                  </Link>
+                </div>  
               </MegaPanel>
             )}
 

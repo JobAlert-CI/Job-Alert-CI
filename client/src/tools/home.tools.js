@@ -6,7 +6,6 @@ import { useMemo } from "react"
 import { useQuery } from "@tanstack/react-query"
 import getFiliereTheme from "@/lib/filiere-theme"
 
-export const SCRAPE_TIME = "6h02"
 export const EMAIL_DELIVERY_TIME = "8h00"
 export const MAX_PREVIEW_OFFERS = 4
 export const MAX_RECENT_OFFERS = 6

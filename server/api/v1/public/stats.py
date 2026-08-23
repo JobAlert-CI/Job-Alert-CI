@@ -8,12 +8,14 @@ from api.deps import get_db
 from models import ContractType, Filiere, JobOffer, JobOfferStatus, Source, ScrapeRun, Subscriber, SubscriberStatus
 from api.v1.public.offers import _public_filters
 from schemas.offer_stats import OfferStatsBucketRead, OfferStatsSummaryRead
+from ._time_utils import today_start_utc
 
 router = APIRouter(prefix="/api/stats", tags=["stats"])
 
-def _get_today_start() -> datetime:
-    """Retourne le début du jour actuel (Minuit) en UTC pour correspondre au TIMESTAMPTZ."""
-    return datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+# Alias conservé pour compatibilité (ancien nom utilisé ailleurs dans le code) :
+# la logique réelle vit maintenant dans _time_utils.today_start_utc, partagée
+# avec filieres.py et sources.py pour éviter toute divergence future.
+_get_today_start = today_start_utc
 
 @router.get("/offers", response_model=OfferStatsSummaryRead)
 def get_offer_stats(

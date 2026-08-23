@@ -23,7 +23,7 @@ const TickerSources = () => {
   )
 
   if (!items.length) return null
-  return <Ticker variant="dark" label="En direct" duration={220} items={items} />
+  return <Ticker variant="dark" label="En direct" duration={180} items={items} />
 }
 
 export default TickerSources

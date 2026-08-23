@@ -104,7 +104,7 @@ const GrilleBibliotheque = () => {
 
       <p className="mt-8 flex items-center gap-2 text-xs text-muted-foreground">
         <span className="size-1.5 rounded-full bg-brand-orange" aria-hidden />
-        Nouveau conseil chaque mardi à 6h02 · écrit à partir des offres collectées la veille
+        Nouveau conseil chaque mardi à 8h00 · écrit à partir des offres collectées la veille
       </p>
     </div>
   )

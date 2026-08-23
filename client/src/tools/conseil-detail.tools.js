@@ -79,7 +79,7 @@ const codeLocalDepuisCategorie = (categorieApi) => {
 const metaCategorie = (code) => CATEGORIES?.find((c) => c.code === code) ?? CATEGORIE_DEFAUT
 
 const adapterCategorieApi = (categorieApi) => {
-  const code = codeLocalDepuisCategorie(categorieApi)
+  const code = categorieApi?.code ?? codeLocalDepuisCategorie(categorieApi)
   const meta = metaCategorie(code)
   return {
     ...meta,
@@ -136,7 +136,9 @@ const adapterSections = (sectionsApi = []) => {
 /* ─── Articles ─── */
 export const adaptArticleDetail = (raw) => {
   if (!raw?.slug) return null
+  console.log(raw)
   const category = adapterCategorieApi(raw.category)
+  console.log("category", category)
   return {
     id: raw.id ?? raw.slug,
     slug: raw.slug,

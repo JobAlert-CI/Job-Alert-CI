@@ -7,7 +7,6 @@ import {
 import { SiFacebook, SiInstagram, SiX } from "@icons-pack/react-simple-icons"
 import { FaLinkedin } from "react-icons/fa6"
 import { cn } from "@/lib/utils"
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { Badge } from "@/components/ui/badge"
 import { useNavigationData } from "@/lib/navigation-data"
 import { HUES } from "@/lib/hues"
@@ -153,7 +152,7 @@ const Footer = () => {
             </h2>
 
             <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-white/65">
-              Choisissez jusqu'à 3 filières, on s'occupe du reste : 4 sources scannées chaque matin,
+              Choisissez jusqu'à 3 filières, on s'occupe du reste : Les meilleurs sources scannées chaque matin,
               un seul email par jour, zéro doublon.
             </p>
 
@@ -277,8 +276,8 @@ const Footer = () => {
             className="flex flex-col gap-4 sm:col-span-2 lg:col-span-4"
           >
             <div className="flex items-center gap-2.5">
-              <div className="h-8 md:h-9 bg-white rounded-lg">
-                <img src="/logo2.svg" alt="JobAlert CI" className="h-full w-auto object-contain" />
+              <div className="size-9 bg-white rounded-full">
+                <img src="/logo2.svg" alt="JobAlert CI" className="h-full w-auto object-contain" loading="eager" />
               </div>
               <div className="flex flex-col">
                 <span className="font-heading text-xl font-black leading-tight text-white">JobAlert CI</span>
@@ -290,22 +289,6 @@ const Footer = () => {
               Votre boussole vers l'emploi en Côte d'Ivoire. Chaque matin à 8h00, les offres de vos
               filières arrivent directement dans votre boîte mail sans rien à faire.
             </p>
-
-            {/* Statut de la collecte */}
-            <Tooltip>
-              <TooltipTrigger>
-                <span className="inline-flex w-fit justify-center cursor-default items-center gap-2 rounded-full border border-emerald-400/25 bg-emerald-400/10 px-3 py-1.5 text-[11px] font-semibold text-emerald-300">
-                  <span className="relative flex size-1.5">
-                    <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                    <span className="relative inline-flex size-1.5 rounded-full bg-emerald-400" />
-                  </span>
-                  Collecte du jour terminée · 6h02
-                </span>
-              </TooltipTrigger>
-              <TooltipContent side="top" className="max-w-57.5 text-center">
-                Nos 4 sources sont scannées chaque matin à 6h00 — prochain envoi à 8h00.
-              </TooltipContent>
-            </Tooltip>
 
             {/* Réseaux sociaux */}
             <div className="flex gap-3">
@@ -419,19 +402,26 @@ const Footer = () => {
             <Radar className="size-3.5 text-brand-orange/70" />
             Offres collectées sur
             {sourcesList.length > 0 ? (
-              sourcesList.map((s, i) => (
-                <a
-                  href={s.base_url}
-                  key={s.code}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 font-semibold text-white/60 hover:text-brand-orange"
-                >
-                  <SourceLogo code={s.code} className="size-4 rounded-sm" />
-                  {s.name}
-                  {i < sourcesList.length - 1 && <span className="text-white/20">·</span>}
-                </a>
-              ))
+              <>
+                {sourcesList?.slice(0, 4)?.map((source) => (
+                  <a
+                    href={source.base_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    key={source.id || source.code}
+                    className="inline-flex items-center gap-2 px-1.5 py-1.5 text-[0.5rem] font-semibold text-white transition-colors hover:bg-white/20 rounded-full"
+                  >
+                    <SourceLogo code={source.code || source.name} className="size-4" />
+                    {source.name}
+                  </a>
+                ))}
+
+                {sourcesList?.length > 4 && (
+                  <span className="inline-flex items-center gap-2 px-1.5 py-1.5 text-[0.58rem] font-semibold text-white transition-colors hover:bg-white/20 rounded-full">
+                    + {sourcesList.length - 4}
+                  </span>
+                )}
+              </>
             ) : (
               <span className="font-semibold text-white/60">nos sources partenaires</span>
             )}
@@ -440,7 +430,7 @@ const Footer = () => {
           <div className="flex items-center gap-4">
             <span className="hidden h-3 w-px bg-white/15 md:block" aria-hidden />
             <p className="flex items-center gap-2">
-              Fait avec passion pour la Côte d'Ivoire
+              Fait avec passion et ❤ pour la Côte d'Ivoire
               <span className="flex items-end gap-0.75" aria-hidden>
                 <span className="h-3 w-1 rounded-xs bg-[#FF8200]" />
                 <span className="h-3 w-1 rounded-xs bg-white" />

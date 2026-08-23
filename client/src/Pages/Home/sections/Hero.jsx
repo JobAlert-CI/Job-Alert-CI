@@ -18,7 +18,6 @@ import { REASSURANCES, JOBS_APERCU } from "@/data/constanteMetier"
 import {
   containerVariants, 
   fadeUp,
-  SCRAPE_TIME,
   EMAIL_DELIVERY_TIME,
   MAX_PREVIEW_OFFERS,
   useHomeStats,
@@ -62,8 +61,8 @@ const CollecteBadge = ({ isPending, isError, count }) => {
           <span className="inline-flex cursor-default items-center gap-2.5 rounded-full border border-emerald-500/25 bg-emerald-500/10 py-1.5 pl-2.5 pr-4 text-xs font-semibold text-emerald-700">
             <PulseDot color="bg-emerald-500" />
             {count > 0
-              ? `Collecte terminée · ${count} offre${count !== 1 ? "s" : ""} à ${SCRAPE_TIME}`
-              : `Collecte terminée à ${SCRAPE_TIME}`}
+              ? `Collecte terminée · ${count} offre${count !== 1 ? "s" : ""} collectées`
+              : `Collecte terminée`}
           </span>
         </TooltipTrigger>
         <TooltipContent side="bottom" className="max-w-62.5 text-center">
@@ -268,8 +267,7 @@ const Hero = () => {
               <Radar className="size-3 text-brand-orange" aria-hidden />
               {filPending || filError
                 ? "Sources"
-                : `${sourceCount} source${sourceCount !== 1 ? "s" : ""}`}{" "}
-              · {SCRAPE_TIME}
+                : `${sourceCount} source${sourceCount !== 1 ? "s" : ""}`}
             </motion.span>
 
             {/* Chip 0 doublon */}
@@ -289,7 +287,6 @@ const Hero = () => {
                   <img
                     src="/logo2.svg"
                     alt="JobAlert CI"
-                    className="h-full"
                     loading="lazy"
                   />
                 </span>
@@ -389,8 +386,7 @@ const Hero = () => {
                             </Badge>
                           </TooltipTrigger>
                           <TooltipContent side="top">
-                            Collectée sur {offer.source?.name || "source partenaire"} à{" "}
-                            {SCRAPE_TIME}
+                            Collectée sur {offer.source?.name || "source partenaire"}
                           </TooltipContent>
                         </Tooltip>
                       </motion.li>

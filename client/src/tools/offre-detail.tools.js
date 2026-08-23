@@ -49,10 +49,10 @@ export const ALERTE_REASSURANCES = [
 ]
 
 /** Chaîne de provenance — l'ADN veille, affichée dès l'ouverture. */
-export const buildProvenanceSteps = (offre, meta) => [
-  { icon: Radar, t: "06:02", l: `Collectée via ${offre.sourceLabel || offre.source}`, done: true },
-  { icon: Fingerprint, t: "06:04", l: "0 doublon · hash unique", done: true },
-  { icon: Tag, t: "07:15", l: `Taggée ${meta.label}`, done: true },
+export const buildProvenanceSteps = (offre) => [
+  { icon: Radar, t: "06h00", l: `Collectée via ${offre.sourceLabel || offre.source}`, done: true },
+  { icon: Fingerprint, t: "06h15", l: "0 doublon · hash unique", done: true },
+  { icon: Tag, t: "07h00", l: `Taggée ${offre.filiere}`, done: true },
   { icon: Send, t: "08:00", l: "Au récap du matin", done: false },
 ]
 

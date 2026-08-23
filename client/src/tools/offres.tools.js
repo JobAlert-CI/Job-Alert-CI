@@ -3,9 +3,9 @@ import { formatApiError } from "@/api/errors"
 import { getOffers } from "@/api/public/offers"
 import { useOffresFilters } from "@/contexts/Offres.context"
 import {
-  getOfferSats, getOfferSatsByContract, getOfferSatsByFiliere, getOfferSatsBySource,
+  getOfferSats, getOfferSatsByContract, getOfferSatsByFiliere, getOfferSatsBySource, getGlobalSats
 } from "@/api/public/stats"
-import { Radar, Fingerprint, Send } from "lucide-react"
+import { Radar, Fingerprint, Send, FilterIcon } from "lucide-react"
 import { useMemo} from "react"
 import { adaptOffers, mergeOffers, toIsoEnd, toIsoStart } from "@/lib/offers-adapter"
 import { settled } from "@/lib/query-helpers"
@@ -22,9 +22,10 @@ export const PAGE_SIZE = 12
 
 /** Pipeline du matin affiché dans la FluxCard (décoratif). */
 export const PIPELINE = [
-  { icon: Radar, t: "06:02", l: "Collecte", done: true },
-  { icon: Fingerprint, t: "06:04", l: "Dédoublonnage", done: true },
-  { icon: Send, t: "08:00", l: "Envoi", done: false },
+  { icon: Radar, t: "06h00", l: "Collecte", done: false },
+  { icon: Fingerprint, t: "06h15", l: "Dédoublonnage", done: true },
+  { icon: FilterIcon, t: "07h00", l: "Filtrage", done: true },
+  { icon: Send, t: "08h00", l: "Envoi", done: false },
 ]
 
 /** Filtres ↔ URL : /offres?fil=tech-dev&src=linkedin&loc=<uuid>&tri=az */
@@ -90,21 +91,24 @@ export const useOffersOverviewQuery = () =>
   useQuery({
     queryKey: offresKeys.overview,
     queryFn: async () => {
-      const [summary, bySource] = await Promise.allSettled([
-        getOfferSats({ new_since_days: 1 }),
-        getOfferSatsBySource({ new_since_days: 1 }),
+      const [glob, summary, bySource] = await Promise.allSettled([
+        getGlobalSats(),
+        getOfferSats(),
+        getOfferSatsBySource(),
       ])
       const s = summary.status === "fulfilled" ? summary.value : null
+      const g = glob.status === "fulfilled" ? glob.value : null
       return {
+        abonnees: g?.subscribers ?? 0,
         total: s?.total_offers ?? 0,
         nouveaux: s?.new_offers ?? 0,
-        parSource: settled(bySource).slice(0, 4).map((b) => ({
+        parSource: settled(bySource)?.map((b) => ({
           code: b.code,
           label: b.label ?? b.code,
           total: b.total_offers ?? 0,
           nouveaux: b.new_offers ?? 0,
         })),
-        error: summary.status === "rejected" ? formatApiError(summary.reason) : null,
+        error: summary.status === "rejected" || glob.status === "rejected" ? formatApiError(summary.reason || glob.reason) : null,
       }
     },
     staleTime: 5 * 60 * 1000,

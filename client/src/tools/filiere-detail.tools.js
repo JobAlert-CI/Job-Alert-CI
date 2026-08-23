@@ -1,4 +1,4 @@
-import { Filter as FilterIcon, Radar, Send } from "lucide-react"
+import { Filter as FilterIcon, Radar, Send, Fingerprint } from "lucide-react"
 import getFiliereTheme from "@/lib/filiere-theme"
 import { adaptOffer } from "@/lib/offers-adapter"
 import { toIsoEnd, toIsoStart } from "@/lib/offers-adapter"
@@ -28,8 +28,9 @@ export const CONFIG_FILTRES = {
 
 /** Pipeline du récap (RecapCard, décoratif). */
 export const PIPELINE_RECAP = [
-  { icon: Radar, t: "06h02", l: "Collecte" },
-  { icon: FilterIcon, t: "07h15", l: "Filtrage" },
+  { icon: Radar, t: "06h00", l: "Collecte" },
+  { icon: Fingerprint, t: "06h15", l: "Dédoublonnage" },
+  { icon: FilterIcon, t: "07h00", l: "Filtrage" },
   { icon: Send, t: "08h00", l: "Envoi" },
 ]
 

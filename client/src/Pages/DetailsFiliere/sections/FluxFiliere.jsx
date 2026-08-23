@@ -196,7 +196,7 @@ const FluxFiliere = () => {
               <SearchX className="mx-auto size-10 text-muted-foreground/50" aria-hidden />
               <h3 className="mt-4 font-heading text-lg font-bold text-brand-navy">Aucune offre trouvée</h3>
               <p className="mt-1 text-sm text-muted-foreground">
-                Le flux est vide pour le moment — la prochaine collecte est prévue à 6h02.
+                Le flux est vide pour le moment — la prochaine collecte est prévue à 6h00.
               </p>
             </motion.div>
           ) : videFauteDeFiltres ? (
@@ -378,7 +378,7 @@ const FluxFiliere = () => {
                 </span>
                 <h3 className="mt-4 font-heading text-xl font-extrabold text-brand-navy">Vous êtes à jour.</h3>
                 <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
-                  C'est tout pour aujourd'hui — demain à 6h02, on remet ça. Ou mieux :
+                  C'est tout pour aujourd'hui — demain à 6h00, on remet ça. Ou mieux :
                   recevez le flux directement à 8h00, sans avoir à revenir.
                 </p>
                 <div className="mt-6 flex flex-row items-center justify-center gap-3 max-sm:flex-col">
@@ -404,7 +404,7 @@ const FluxFiliere = () => {
 
         <p className="mt-8 flex items-center gap-2 text-xs text-muted-foreground">
           <span className={cn("size-1.5 rounded-full", hue.dot)} aria-hidden />
-          Mises à jour chaque matin à 6h02 · lien direct vers l'annonce d'origine
+          Mises à jour chaque matin à 8h00 · lien direct vers l'annonce d'origine
         </p>
       </div>
     </section>

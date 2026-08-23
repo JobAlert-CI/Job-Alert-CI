@@ -3,7 +3,7 @@ import { Link } from "react-router-dom"
 import { motion } from "framer-motion"
 import { ArrowRight, ArrowUpRight } from "lucide-react"
 import { CountUp, SectionHeading } from "@/components/shared"
-import { SCRAPE_TIME, useHomeMetrics, useRecentOffers, getViewState } from "@/tools/home.tools"
+import { useHomeMetrics, useRecentOffers, getViewState } from "@/tools/home.tools"
 import { OffersFeed } from "../components/OffersFeed"
 import { RepartitionPanel } from "../components/RepartitionPanel"
 
@@ -90,7 +90,7 @@ const RecentOffers = () => {
       <div className="mx-auto max-w-7xl px-6 md:px-12">
         <div className="flex flex-wrap items-end justify-between gap-6">
           <SectionHeading
-            eyebrow={`Collecte du jour · ${SCRAPE_TIME}`}
+            eyebrow="Collecte du jour"
             title={title}
             sub={SUBTITLES[viewState]}
           />

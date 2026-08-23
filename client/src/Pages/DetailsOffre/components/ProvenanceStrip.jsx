@@ -8,8 +8,8 @@ import { useOffreDetail } from "@/contexts/DetailsOffre.context"
 
 /* La chaîne de provenance — l'ADN veille, dès l'ouverture. */
 const ProvenanceStrip = () => {
-  const { offre, meta } = useOffreDetail()
-  const steps = buildProvenanceSteps(offre, meta)
+  const { offre } = useOffreDetail()
+  const steps = buildProvenanceSteps(offre)
 
   return (
     <div className="rounded-xl border border-outline-variant/40 bg-white/70 px-4 py-3.5 backdrop-blur-sm">

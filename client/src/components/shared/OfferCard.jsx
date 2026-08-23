@@ -84,6 +84,8 @@ const OfferCard = ({
       </Link>
       <a
         href={offre.lien || "#offre"}
+        target="_blank"
+        rel="noopener noreferrer"
         onClick={(e) => offre.lien ? undefined : e.preventDefault()}
         className="inline-flex h-8 items-center gap-1 px-2.5 font-heading text-xs font-bold text-[#B45309] transition-colors hover:underline"
       >
@@ -107,7 +109,7 @@ const OfferCard = ({
         style={{ borderTop: `3px solid ${hue.hex}` }}
       >
         <div className="flex items-center justify-between gap-2">
-          <ChipSource source={offre.source} />
+          <ChipSource source={offre.source} title={offre.sourceLabel}  />
           <div className="flex items-center gap-2">{isNew && <BadgeNouveau />}{bookmark}</div>
         </div>
         <Link to={detailLink} className="mt-3 font-heading text-base font-bold leading-snug text-brand-navy transition-colors hover:text-brand-orange">
@@ -183,7 +185,7 @@ const OfferCard = ({
           <div className="mt-3">{metaChips}</div>
           <div className="mt-3.5 flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2.5">
-              <ChipSource source={offre.source} />
+              <ChipSource source={offre.source} title={offre.sourceLabel} />
               <span className={cn("text-xs font-semibold", isNew ? "text-brand-orange" : "text-muted-foreground")}>
                 {publieLabel(offre.jours)}
               </span>

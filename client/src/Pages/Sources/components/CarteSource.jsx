@@ -40,7 +40,6 @@ const StatsSource = ({ s }) => (
 )
 
 const CarteSource = ({ s, index, featured = false, className }) => {
-  console.log(s)
   const hue = HUES[s.hue] ?? HUES.sky
 
   return (

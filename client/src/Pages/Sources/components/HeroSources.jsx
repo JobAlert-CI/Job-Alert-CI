@@ -56,7 +56,7 @@ const HeroSources = () => {
                   <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-500 opacity-70" />
                   <span className="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
                 </span>
-                Collecte terminée · {nbSources}/{nbSources} sources · 06h02
+                Collecte terminée · {nbSources}/{nbSources} sources · 06h00
               </span>
               <span className="inline-flex items-center gap-1.5 rounded-full border border-outline-variant/50 bg-white/80 px-3.5 py-1.5 text-[11px] font-bold text-on-surface-variant">
                 <ShieldCheck className="size-3 text-brand-orange" aria-hidden />

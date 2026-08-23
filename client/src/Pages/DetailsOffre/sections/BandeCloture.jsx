@@ -2,9 +2,13 @@
 import { motion } from "framer-motion"
 import { ArrowRight, Bell } from "lucide-react"
 import { CtaLink } from "@/components/shared"
+import { useCollecteJourQuery } from "@/tools/offre-detail.tools"
 
 /* Chute — dernier appel à l'alerte. Desktop-first : rangée en base. */
-const BandeCloture = () => (
+const BandeCloture = () => {
+  const { data: globalStats } = useCollecteJourQuery()
+
+  return (
   <section className="bg-surface-container-lowest pb-16">
     <div className="mx-auto max-w-7xl px-12 max-md:px-6">
       <motion.div
@@ -20,7 +24,7 @@ const BandeCloture = () => (
             <span className="text-brand-orange">Faites venir les offres.</span>
           </p>
           <p className="mt-1 text-sm text-muted-foreground">
-            Récapitulatif quotidien à 8h00 · 13 filières · 4 sources scannées à 6h02.
+            Récapitulatif quotidien à 8h00 sur cette filière · {globalStats?.sources?.length} sources scannées à 6h00.
           </p>
         </div>
         <div className="flex shrink-0 flex-row gap-2.5 max-sm:flex-col">
@@ -34,6 +38,6 @@ const BandeCloture = () => (
       </motion.div>
     </div>
   </section>
-)
+)}
 
 export default BandeCloture

@@ -34,7 +34,7 @@ const MiniCollecte = () => {
           <SourceLogo key={s.id ?? s.code} code={s.code ?? s.label} className="size-6 rounded" />
         ))}
         <span className="ml-auto text-[11px] font-semibold text-muted-foreground">
-          scannées à 6h02
+          scannées à 6h00
         </span>
       </div>
     </motion.div>

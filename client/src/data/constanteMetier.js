@@ -117,8 +117,8 @@ const TEMOIGNAGES = [
 
 const STEPS_HOW = [
   { time: "06h00", icon: Radar, title: "Collecte", desc: "Plusieurs scrapers parcourent les sites sources en parallèle, la panne d'une source ne bloque jamais les autres.", hex: "#F5A623", metric: "+42 offres brutes collectées" },
-  { time: "06h45", icon: Fingerprint, title: "Dédoublonnage", desc: "Chaque annonce reçoit un hash unique calculé depuis son lien.", hex: "#0F2D4D", metric: "12 doublons écartés" },
-  { time: "07h15", icon: Filter, title: "Filtrage", desc: "Les offres sont matchées avec vos 1 à 3 filières métiers.", hex: "#F5A623", metric: "3 offres matchées pour vous" },
+  { time: "06h15", icon: Fingerprint, title: "Dédoublonnage", desc: "Chaque annonce reçoit un hash unique calculé depuis son lien.", hex: "#0F2D4D", metric: "12 doublons écartés" },
+  { time: "07h00", icon: Filter, title: "Filtrage", desc: "Les offres sont matchées avec vos 1 à 3 filières métiers.", hex: "#F5A623", metric: "3 offres matchées pour vous" },
   { time: "08h00", icon: MailCheck, title: "Envoi", desc: "Votre récapitulatif personnalisé part par email, 3 tentatives en cas de panne SMTP.", hex: "#0F2D4D", metric: "Livré à 08h00:00" },
 ];
 

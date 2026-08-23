@@ -12,8 +12,7 @@ import {
   PIPELINE_TICK_COUNT,
   PIPELINE_DELIVERED_AT,
   SEND_TIME_LABEL,
-  formatDateFr, 
-  getActiveSources,
+  formatDateFr,
   useSources,
 } from "@/tools/ccm.tools"
 
@@ -24,7 +23,6 @@ import {
  */
 const PipelineCard = () => {
   const { data: sources, isPending, isError } = useSources()
-  // eslint-disable-next-line react-hooks/use-memo
   const dateFr = useMemo(formatDateFr, [])
   const [tick, setTick] = useState(0)
 
@@ -50,7 +48,7 @@ const PipelineCard = () => {
     }))
   }, [sourcesChips])
 
-  const activeSourcesCount = getActiveSources(sources).length
+  const activeSourcesCount = sourcesChips?.length
 
   return (
     <motion.div

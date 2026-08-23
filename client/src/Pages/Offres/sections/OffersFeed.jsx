@@ -266,7 +266,7 @@ const OffersFeed = () => {
 
         <p className="mt-8 flex items-center gap-2 text-xs text-muted-foreground">
           <span className="size-1.5 rounded-full bg-brand-orange" aria-hidden />
-          Mises à jour chaque matin à 6h02 · lien direct vers l'annonce d'origine
+          Mises à jour chaque matin à 6h00 · lien direct vers l'annonce d'origine
         </p>
       </div>
     </section>

@@ -61,14 +61,16 @@ const CartePostuler = () => {
           <SourceLogo code={offre.source} className="size-9 rounded-md" />
           <div className="min-w-0 flex-1">
             <p className="font-heading text-sm font-bold text-brand-navy">Annonce d'origine</p>
-            <p className="text-[11px] text-muted-foreground">Collectée à 6h02 · lien direct</p>
+            <p className="text-[11px] text-muted-foreground">Collectée à 6h00 · lien direct</p>
           </div>
-          <ChipSource source={offre.source} />
+          <ChipSource source={offre.source} title={offre.sourceLabel} />
         </div>
 
         <div className="px-5 py-5">
           <a
             href={offre.lien || "#offre"}
+            target="_blank"
+            rel="noopener noreferrer"
             onClick={(e) => (offre.lien ? undefined : e.preventDefault())}
             className="group flex h-12 items-center justify-center gap-2.5 rounded-lg bg-brand-orange text-[15px] font-bold text-white shadow-[0_12px_28px_-8px_rgba(245,166,35,0.5)] transition-all duration-300 hover:-translate-y-0.5 hover:brightness-110 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >

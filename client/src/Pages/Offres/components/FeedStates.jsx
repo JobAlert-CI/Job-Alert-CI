@@ -48,8 +48,8 @@ export const FeedEmptyState = memo(function FeedEmptyState({ hasActiveFilters, o
       </h3>
       <p className="mt-1 text-sm text-muted-foreground">
         {hasActiveFilters
-          ? "Élargissez vos filtres — ou attendez la collecte de demain 6h02."
-          : "Le flux est vide pour le moment — la prochaine collecte est prévue à 6h02."}
+          ? "Élargissez vos filtres — ou attendez la collecte de demain 6h00."
+          : "Le flux est vide pour le moment — la prochaine collecte est prévue à 6h00."}
       </p>
       {hasActiveFilters && (
         <button
@@ -139,7 +139,7 @@ export const FeedEndState = memo(function FeedEndState() {
           Vous êtes à jour.
         </h3>
         <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
-          C'est tout pour aujourd'hui — demain à 6h02, on remet ça. Ou mieux :
+          C'est tout pour aujourd'hui — demain à 6h00, on remet ça. Ou mieux :
           recevez le flux directement à 8h00, sans avoir à revenir.
         </p>
         <div className="mt-6 flex items-center justify-center gap-3 max-sm:flex-col">

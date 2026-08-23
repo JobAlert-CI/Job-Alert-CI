@@ -35,7 +35,7 @@ const RecapCard = () => {
         className={cn("absolute -top-4 left-5 z-20 inline-flex -rotate-3 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[11px] font-bold text-white shadow-lg sm:-left-4", hue.solid)}
       >
         <Zap className="size-3" aria-hidden />
-        +{meta.nouvelles} offres cette semaine
+        +{meta.nouvelles} offres aujourd'hui
       </motion.span>
       <motion.span
         initial={{ opacity: 0, scale: 0.8 }}
@@ -89,7 +89,7 @@ const RecapCard = () => {
                 <span className="flex items-center gap-2">
                   <span className={cn(
                     "grid size-7 shrink-0 place-items-center rounded-full border bg-white",
-                    i === 2 ? "border-brand-orange/50 text-brand-orange" : "border-outline-variant/60 text-muted-foreground"
+                    i === 1 || i === 2 ? "border-brand-orange/50 text-brand-orange" : "border-outline-variant/60 text-muted-foreground"
                   )}>
                     <s.icon className="size-3.5" aria-hidden />
                   </span>
@@ -133,7 +133,7 @@ const RecapCard = () => {
                     Nouveau
                   </span>
                 )}
-                <ChipSource source={o.source} />
+                <ChipSource source={o.source} title={o.sourceLabel} />
               </motion.li>
             ))}
         </ul>

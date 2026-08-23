@@ -28,35 +28,43 @@ const SectionDescription = () => {
         </h2>
         <p className="mt-4 leading-relaxed text-on-surface-variant">{detail.intro}</p>
 
-        <h3 className="mt-7 font-heading text-sm font-extrabold uppercase tracking-[0.14em] text-brand-navy">
-          Vos missions
-        </h3>
-        <ul className="mt-3.5 space-y-2.5">
-          {(detail.missions || []).map((m) => (
-            <li key={m} className="flex items-start gap-2.5 text-sm leading-relaxed text-on-surface-variant">
-              <span className="mt-0.5 flex size-4.5 shrink-0 items-center justify-center rounded-full bg-brand-orange/10">
-                <Check className="size-2.5 text-brand-orange" strokeWidth={3.5} aria-hidden />
-              </span>
-              {m}
-            </li>
-          ))}
-        </ul>
+        {detail.missions.length > 0 && (
+          <>
+            <h3 className="mt-7 font-heading text-sm font-extrabold uppercase tracking-[0.14em] text-brand-navy">
+              Vos missions
+            </h3>
+            <ul className="mt-3.5 space-y-2.5">
+              {(detail.missions || []).map((m) => (
+                <li key={m} className="flex items-start gap-2.5 text-sm leading-relaxed text-on-surface-variant">
+                  <span className="mt-0.5 flex size-4.5 shrink-0 items-center justify-center rounded-full bg-brand-orange/10">
+                    <Check className="size-2.5 text-brand-orange" strokeWidth={3.5} aria-hidden />
+                  </span>
+                  {m}
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
 
-        <h3 className="mt-7 font-heading text-sm font-extrabold uppercase tracking-[0.14em] text-brand-navy">
-          Profil recherché
-        </h3>
-        <ul className="mt-3.5 space-y-2.5">
-          {(detail.profile_requirements || detail.profil || []).map((p) => (
-            <li key={p} className="flex items-start gap-2.5 text-sm leading-relaxed text-on-surface-variant">
-              <span className="mt-0.5 flex size-4.5 shrink-0 items-center justify-center rounded-full bg-brand-navy/8">
-                <Check className="size-2.5 text-brand-navy" strokeWidth={3.5} aria-hidden />
-              </span>
-              {p}
-            </li>
-          ))}
-        </ul>
+        {(detail.profile_requirements || detail.profil).length > 0 && (
+          <>
+            <h3 className="mt-7 font-heading text-sm font-extrabold uppercase tracking-[0.14em] text-brand-navy">
+              Profil recherché
+            </h3>
+            <ul className="mt-3.5 space-y-2.5">
+              {(detail.profile_requirements || detail.profil || []).map((p) => (
+                <li key={p} className="flex items-start gap-2.5 text-sm leading-relaxed text-on-surface-variant">
+                  <span className="mt-0.5 flex size-4.5 shrink-0 items-center justify-center rounded-full bg-brand-navy/8">
+                    <Check className="size-2.5 text-brand-navy" strokeWidth={3.5} aria-hidden />
+                  </span>
+                  {p}
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
 
-        {avantages && (
+        {avantages.length > 0 && (
           <>
             <h3 className="mt-7 font-heading text-sm font-extrabold uppercase tracking-[0.14em] text-brand-navy">
               Avantages

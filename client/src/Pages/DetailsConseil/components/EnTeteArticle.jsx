@@ -176,7 +176,7 @@ const EnTeteArticle = () => {
           >
             <motion.div variants={fadeUp} className="flex flex-wrap items-center gap-2.5">
               <Link
-                to="/conseils"
+                to={`/conseils?cat=${cat.code}`}
                 className={cn(
                   "inline-flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em] transition-all duration-200 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                   hue.tile

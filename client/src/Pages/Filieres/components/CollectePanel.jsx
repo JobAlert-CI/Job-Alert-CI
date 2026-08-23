@@ -1,7 +1,6 @@
-
 import { useMemo } from "react"
 import { motion } from "framer-motion"
-import { CheckCircle2, Clock, ShieldCheck } from "lucide-react"
+import { CheckCircle2, Clock, MoreHorizontal, ShieldCheck } from "lucide-react"
 import {
   HoverCard, HoverCardContent, HoverCardTrigger,
 } from "@/components/ui/hover-card"
@@ -10,11 +9,16 @@ import { CountUp, CountdownEnvoi, SourceLogo } from "@/components/shared"
 import { useStatsParSourceQuery, adaptSourceStats } from "@/tools/filieres.tools"
 
 /* Panneau de collecte — se sert dans le cache et gère LUI-MÊME son
-   chargement : le héro n'attend plus ses données. */
+chargement : le héro n'attend plus ses données. */
 const CollectePanel = () => {
   const { data: rawSources, isPending } = useStatsParSourceQuery()
   const parSource = useMemo(() => adaptSourceStats(rawSources), [rawSources])
   const totalActives = parSource.reduce((acc, s) => acc + s.total, 0)
+
+  // ✅ Limitation à 4 sources visibles + calcul du reste
+  const MAX_VISIBLE = 4
+  const visibleSources = useMemo(() => parSource.slice(0, MAX_VISIBLE), [parSource])
+  const remainingCount = Math.max(0, parSource.length - MAX_VISIBLE)
 
   return (
     <motion.div
@@ -50,7 +54,7 @@ const CollectePanel = () => {
           <div className="min-w-0 flex-1">
             <p className="font-heading text-sm font-bold text-brand-navy">Collecte terminée</p>
             <p className="text-[11px] text-muted-foreground">
-              Aujourd'hui · 06:02 · {parSource.length} source{parSource.length > 1 ? "s" : ""} scannée{parSource.length > 1 ? "s" : ""}
+              Aujourd'hui · {parSource.length} source{parSource.length > 1 ? "s" : ""} scannée{parSource.length > 1 ? "s" : ""}
             </p>
           </div>
           <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-brand-navy px-2.5 py-1 text-[10px] font-bold text-white">
@@ -71,41 +75,70 @@ const CollectePanel = () => {
                 <Skeleton className="h-4 w-6" />
               </li>
             ))
-            : parSource.map((s, i) => (
-              <HoverCard key={s.code} openDelay={150}>
-                <HoverCardTrigger asChild>
+            : (
+              <>
+                {/* ✅ Affichage limité aux 4 premières sources */}
+                {visibleSources.map((s, i) => (
+                  <HoverCard key={s.code} openDelay={150}>
+                    <HoverCardTrigger asChild>
+                      <motion.li
+                        initial={{ opacity: 0, x: -14 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.4, delay: 0.55 + i * 0.12, ease: "easeOut" }}
+                        className="flex cursor-default items-center gap-3 rounded-lg px-2 py-3 transition-colors hover:bg-surface-container-low/60"
+                      >
+                        <span className="grid size-8 shrink-0 place-items-center rounded-md font-heading text-[10px] font-extrabold text-white">
+                          <SourceLogo code={s.code} />
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-[13px] font-semibold text-on-surface">{s.label}</p>
+                          <p className="text-[11px] text-muted-foreground">
+                            +{s.nouveaux} nouvelle{s.nouveaux > 1 ? "s" : ""} offre{s.nouveaux > 1 ? "s" : ""} · {s.total} au total
+                          </p>
+                        </div>
+                        <span className="shrink-0 font-heading text-sm font-extrabold text-brand-navy">{s.total}</span>
+                        <CheckCircle2 className="size-4 shrink-0 text-emerald-500" aria-hidden />
+                      </motion.li>
+                    </HoverCardTrigger>
+                    <HoverCardContent align="start" className="w-60">
+                      <p className="font-heading text-sm font-semibold">{s.label}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {s.total} offre{s.total > 1 ? "s" : ""} active{s.total > 1 ? "s" : ""} dont {s.nouveaux} nouvelle{s.nouveaux > 1 ? "s" : ""} ce matin.
+                      </p>
+                      <p className="mt-1.5 flex items-center gap-1.5 text-xs font-semibold text-emerald-600">
+                        <CheckCircle2 className="size-3.5" aria-hidden />
+                        Source opérationnelle
+                      </p>
+                    </HoverCardContent>
+                  </HoverCard>
+                ))}
+
+                {/* ✅ Indicateur "autres sources" si le total dépasse 4 */}
+                {remainingCount > 0 && (
                   <motion.li
                     initial={{ opacity: 0, x: -14 }}
                     animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.4, delay: 0.55 + i * 0.12, ease: "easeOut" }}
-                    className="flex cursor-default items-center gap-3 rounded-lg px-2 py-3 transition-colors hover:bg-surface-container-low/60"
+                    transition={{ duration: 0.4, delay: 0.55 + visibleSources.length * 0.12, ease: "easeOut" }}
+                    className="flex cursor-default items-center gap-3 rounded-lg px-2 py-3"
                   >
-                    {/* Corrigé : SourceLogo attend un code, pas un label */}
-                    <span className="grid size-8 shrink-0 place-items-center rounded-md font-heading text-[10px] font-extrabold text-white">
-                      <SourceLogo code={s.code} />
+                    <span className="grid size-8 shrink-0 place-items-center rounded-md bg-surface-container-high text-brand-navy">
+                      <MoreHorizontal className="size-4" aria-hidden />
                     </span>
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-[13px] font-semibold text-on-surface">{s.label}</p>
+                      <p className="truncate text-[13px] font-semibold text-on-surface">
+                        +{remainingCount} autre{remainingCount > 1 ? "s" : ""} source{remainingCount > 1 ? "s" : ""}
+                      </p>
                       <p className="text-[11px] text-muted-foreground">
-                        +{s.nouveaux} nouvelle{s.nouveaux > 1 ? "s" : ""} offre{s.nouveaux > 1 ? "s" : ""} · {s.total} au total
+                        Collectées ce matin
                       </p>
                     </div>
-                    <span className="shrink-0 font-heading text-sm font-extrabold text-brand-navy">{s.total}</span>
-                    <CheckCircle2 className="size-4 shrink-0 text-emerald-500" aria-hidden />
+                    <span className="shrink-0 rounded-full bg-brand-orange/15 px-2.5 py-0.5 font-heading text-[11px] font-bold text-brand-orange">
+                      {parSource.length} au total
+                    </span>
                   </motion.li>
-                </HoverCardTrigger>
-                <HoverCardContent align="start" className="w-60">
-                  <p className="font-heading text-sm font-semibold">{s.label}</p>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    {s.total} offre{s.total > 1 ? "s" : ""} active{s.total > 1 ? "s" : ""} dont {s.nouveaux} nouvelle{s.nouveaux > 1 ? "s" : ""} ce matin.
-                  </p>
-                  <p className="mt-1.5 flex items-center gap-1.5 text-xs font-semibold text-emerald-600">
-                    <CheckCircle2 className="size-3.5" aria-hidden />
-                    Source opérationnelle
-                  </p>
-                </HoverCardContent>
-              </HoverCard>
-            ))}
+                )}
+              </>
+            )}
         </ul>
 
         <CountdownEnvoi className="border-t border-outline-variant/40 bg-surface-container-low/40 px-5 py-4" />

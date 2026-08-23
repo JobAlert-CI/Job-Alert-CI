@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom"
 import { motion } from "framer-motion"
 import {
@@ -12,15 +11,14 @@ import { CountUp, CountdownEnvoi, CtaLink, SourceLogo, Ticker } from "@/componen
 import { HUES, BRAND_HUE } from "@/lib/hues"
 import { todayLong } from "@/lib/dates"
 import { StatSkeleton } from "@/components/shared/SkeletonsOffres"
-import { 
-  ABONNES, 
+import {
   PIPELINE,
   useOffresFeedModel,
-  useOfferReferentialsQuery, 
+  useOfferReferentialsQuery,
   useOffersOverviewQuery
 } from "@/tools/offres.tools"
 
-/* Variantes définies une seule fois au niveau module (pas recréées à chaque rendu). */
+/* Variantes définies une seule fois au niveau module */
 const containerVariants = {
   hidden: {},
   visible: { transition: { staggerChildren: 0.1, delayChildren: 0.1 } },
@@ -30,11 +28,10 @@ const fadeUp = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } },
 }
 
-/* ─────────────── Ticker — se sert dans le même cache que le feed ─────────────── */
+/* ─────────────── Ticker ─────────────── */
 export const OffresTicker = () => {
   const { offers } = useOffresFeedModel()
   const { data: refs } = useOfferReferentialsQuery()
-
   if (offers.length === 0) return null
   return (
     <Ticker
@@ -50,10 +47,20 @@ export const OffresTicker = () => {
   )
 }
 
-/* ─────────────── FluxCard — zéro prop, lit la vue d'ensemble ─────────────── */
+/* ─────────────── FluxCard ─────────────── */
 const FluxCard = () => {
   const { data: overview, isPending } = useOffersOverviewQuery()
-  const { parSource = [], nouveaux = 0 } = overview ?? {}
+  const { abonnees = 0, nouveaux = 0, parSource = [] } = overview ?? {}
+
+  const MAX_VISIBLE = 4
+  const visibleSources = parSource.slice(0, MAX_VISIBLE)
+  const remainingCount = Math.max(0, parSource.length - MAX_VISIBLE)
+  const displayCount = visibleSources.length + (remainingCount > 0 ? 1 : 0)
+
+  const gridColsClass = displayCount === 5 ? "grid-cols-5" : displayCount === 4 ? "grid-cols-4" : "grid-cols-3"
+
+  const step = 320 / (displayCount + 1)
+  const pathXs = Array.from({ length: displayCount }, (_, i) => step * (i + 1))
 
   return (
     <motion.div
@@ -93,7 +100,7 @@ const FluxCard = () => {
         className="absolute -bottom-4 right-8 z-20 inline-flex rotate-2 items-center gap-1.5 rounded-full border border-outline-variant/50 bg-white px-3.5 py-1.5 text-[11px] font-bold text-on-surface shadow-hover"
       >
         <Mail className="size-3 text-brand-orange" aria-hidden />
-        Envoyé à {ABONNES.toLocaleString("fr-FR")} abonnés
+        Envoyé à {abonnees.toLocaleString("fr-FR")} abonnés
       </motion.span>
 
       {/* Carte principale */}
@@ -107,50 +114,72 @@ const FluxCard = () => {
             <p className="font-heading text-sm font-bold text-brand-navy">
               {parSource.length || 0} source{parSource.length > 1 ? "s" : ""} → 1 flux
             </p>
-            <p className="text-[11px] text-muted-foreground">Collecte terminée aujourd'hui · 06:02</p>
+            <p className="text-[11px] text-muted-foreground">Collecte terminée aujourd'hui</p>
           </div>
           <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-brand-navy px-2.5 py-1 text-[10px] font-bold text-white">
             <Clock className="size-3" aria-hidden />
-            06:02
+            08:00
           </span>
         </div>
 
         <div className="px-5 pb-5 pt-4">
-          {/* Les sources collectées (données API) */}
-          <div className={cn("grid gap-2", parSource.length >= 4 || isPending ? "grid-cols-4" : "grid-cols-3")}>
+          <div className={cn("grid gap-2", isPending ? "grid-cols-4" : gridColsClass)}>
             {isPending && parSource.length === 0
               ? [0, 1, 2, 3].map((i) => <Skeleton key={i} className="h-18 rounded-lg" />)
-              : parSource.map((s, i) => (
-                <motion.div
-                  key={s.code}
-                  initial={{ opacity: 0, y: 12 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.55 + i * 0.1, duration: 0.4 }}
-                >
-                  <Tooltip>
-                    <TooltipTrigger >
-                      <div className="relative flex cursor-default flex-col items-center gap-1.5 rounded-lg border border-outline-variant/50 bg-surface-container-low/50 px-1 py-2.5 transition-colors hover:border-brand-navy/30 hover:bg-surface-container-low">
-                        <span className="absolute right-1 top-1 grid size-3.5 place-items-center rounded-full bg-emerald-500 text-white" aria-hidden>
-                          <Check className="size-2" strokeWidth={4} />
-                        </span>
-                        <SourceLogo code={s.code} className="size-7 rounded-md text-[9px]" />
-                        <span className="leading-none">
-                          <span className="block font-heading text-[12px] font-extrabold text-brand-navy">+{s.nouveaux}</span>
-                          <span className="mt-0.5 block text-[9px] font-semibold text-muted-foreground">{s.total} au total</span>
-                        </span>
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent side="bottom">
-                      {s.nouveaux} nouvelle{s.nouveaux > 1 ? "s" : ""} offre{s.nouveaux > 1 ? "s" : ""} via {s.label ?? s.code} · {s.total} active{s.total > 1 ? "s" : ""}
-                    </TooltipContent>
-                  </Tooltip>
-                </motion.div>
-              ))}
+              : (
+                <>
+                  {visibleSources.map((s, i) => (
+                    <motion.div
+                      key={s.code}
+                      initial={{ opacity: 0, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.55 + i * 0.1, duration: 0.4 }}
+                    >
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <div className="relative flex cursor-default flex-col items-center gap-1.5 rounded-lg border border-outline-variant/50 bg-surface-container-low/50 px-1 py-2.5 transition-colors hover:border-brand-navy/30 hover:bg-surface-container-low">
+                            <span className="absolute right-1 top-1 grid size-3.5 place-items-center rounded-full bg-emerald-500 text-white" aria-hidden>
+                              <Check className="size-2" strokeWidth={4} />
+                            </span>
+                            <SourceLogo code={s.code} className="size-7 rounded-md text-[9px]" />
+                            <span className="leading-none">
+                              <span className="block font-heading text-[12px] font-extrabold text-brand-navy">+{s.nouveaux}</span>
+                              <span className="mt-0.5 block text-[9px] font-semibold text-muted-foreground">{s.total} au total</span>
+                            </span>
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom">
+                          {s.nouveaux} nouvelle{s.nouveaux > 1 ? "s" : ""} offre{s.nouveaux > 1 ? "s" : ""} via {s.label ?? s.code} · {s.total} active{s.total > 1 ? "s" : ""}
+                        </TooltipContent>
+                      </Tooltip>
+                    </motion.div>
+                  ))}
+
+                  {remainingCount > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.55 + visibleSources.length * 0.1, duration: 0.4 }}
+                    >
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <div className="relative flex cursor-default flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-brand-orange/40 bg-brand-orange/5 px-1 py-2.5 transition-colors hover:border-brand-orange/60 hover:bg-brand-orange/10">
+                            <span className="font-heading text-[16px] font-extrabold text-brand-orange">+{remainingCount}</span>
+                            <span className="text-[9px] font-semibold text-muted-foreground text-center leading-tight">autres</span>
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom">
+                          {remainingCount} autre{remainingCount > 1 ? "s" : ""} source{remainingCount > 1 ? "s" : ""}
+                        </TooltipContent>
+                      </Tooltip>
+                    </motion.div>
+                  )}
+                </>
+              )}
           </div>
 
-          {/* Convergence animée vers le dé-doublonnage */}
           <svg viewBox="0 0 320 40" className="mt-1 w-full" fill="none" aria-hidden>
-            {[40, 120, 200, 280].map((x, i) => (
+            {pathXs.map((x, i) => (
               <motion.path
                 key={x}
                 d={`M${x} 0 C${x} 22 160 16 160 40`}
@@ -206,7 +235,6 @@ const FluxCard = () => {
               ))}
             </div>
           </div>
-
           <CountdownEnvoi className="mt-8 py-4" />
         </div>
       </div>
@@ -214,11 +242,10 @@ const FluxCard = () => {
   )
 }
 
-/* ─────────────── Héro — zéro prop, lit la vue d'ensemble ─────────────── */
+/* ─────────────── Héro ─────────────── */
 const HeroOffres = () => {
   const { data: overview, isPending } = useOffersOverviewQuery()
   const { total = 0, nouveaux = 0, parSource = [] } = overview ?? {}
-
   const COMPTEURS = [
     { valeur: total, label: "offres en ligne" },
     { valeur: nouveaux, label: "nouvelles ce matin" },
@@ -231,9 +258,7 @@ const HeroOffres = () => {
       <div className="absolute -top-32 right-[-10%] size-140 rounded-full bg-brand-orange/8 blur-3xl" aria-hidden />
       <div className="absolute -bottom-40 -left-40 size-120 rounded-full bg-brand-navy/5 blur-3xl" aria-hidden />
 
-      {/* Desktop-first : paddings desktop en base, déclassement via max-md */}
       <div className="relative z-10 mx-auto max-w-7xl px-12 pb-16 pt-10 max-md:px-6 max-md:pb-14 max-md:pt-8">
-        {/* Fil d'Ariane */}
         <motion.nav
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -249,29 +274,28 @@ const HeroOffres = () => {
         </motion.nav>
 
         <div className="mt-8 grid grid-cols-[1.05fr_0.95fr] items-center gap-16 max-lg:grid-cols-1 max-lg:gap-14">
-          {/* Colonne gauche */}
           <motion.div
             variants={containerVariants}
             initial="hidden"
             animate="visible"
             className="flex min-w-0 flex-col items-start gap-5"
           >
-            {/* Badges collecte */}
-            <motion.div variants={fadeUp} className="flex flex-wrap items-center gap-2.5">
+            {!isPending && (
+              <motion.div variants={fadeUp} className="flex flex-wrap items-center gap-2.5">
               <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3.5 py-1.5 text-[11px] font-bold text-emerald-700">
                 <span className="relative flex size-1.5" aria-hidden>
                   <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-500 opacity-70" />
                   <span className="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
                 </span>
-                Collecte du jour : {todayLong()}, 06h02
+                Collecte du jour : {todayLong()}
               </span>
               <span className="inline-flex items-center gap-1.5 rounded-full border border-outline-variant/50 bg-white/80 px-3.5 py-1.5 text-[11px] font-bold text-on-surface-variant">
                 <ShieldCheck className="size-3 text-brand-orange" aria-hidden />
                 {parSource.length || 0} source{parSource.length > 1 ? "s" : ""} scannée{parSource.length > 1 ? "s" : ""} · 0 doublon en base
               </span>
             </motion.div>
+          )}
 
-            {/* Titre */}
             <motion.h1
               variants={fadeUp}
               className="font-heading text-6xl font-black leading-[1.04] tracking-tight text-brand-navy max-xl:text-5xl max-sm:text-4xl"
@@ -279,13 +303,7 @@ const HeroOffres = () => {
               Les offres{" "}
               <span className="relative whitespace-nowrap text-brand-orange">
                 du jour
-                <svg
-                  className="absolute -bottom-1.5 left-0 w-full"
-                  viewBox="0 0 200 9"
-                  fill="none"
-                  preserveAspectRatio="none"
-                  aria-hidden
-                >
+                <svg className="absolute -bottom-1.5 left-0 w-full" viewBox="0 0 200 9" fill="none" preserveAspectRatio="none" aria-hidden>
                   <motion.path
                     d="M2 6.5C60 2.5 140 2.5 198 6.5"
                     stroke="#F5A623"
@@ -301,16 +319,14 @@ const HeroOffres = () => {
               ,<br className="max-sm:hidden" /> déjà triées.
             </motion.h1>
 
-            {/* Message */}
             <motion.p variants={fadeUp} className="max-w-xl text-lg leading-relaxed text-on-surface-variant max-md:text-base">
               {nouveaux > 0 ? `${nouveaux} nouvelle` : "Aucune"} opportunité{nouveaux > 1 ? "s" : ""} collectée{nouveaux > 1 ? "s" : ""} ce matin sur{" "}
-              {parSource.length ? parSource.map((s) => s.label ?? s.code).join(", ") : "nos sources partenaires"},
+              {parSource.length ? parSource.map((s) => s.label ?? s.code).slice(0, 4).join(", ") : "nos sources partenaires" }, {parSource.length > 3 && "et autres, "}
               dé-dupliquées par hash puis taggées par filière. Demain, inutile de
               revenir : votre sélection arrive par email à{" "}
               <strong className="font-bold text-brand-navy">8h00 précises</strong>.
             </motion.p>
 
-            {/* CTA */}
             <motion.div variants={fadeUp} className="mt-1 flex gap-3 max-sm:flex-col">
               <CtaLink to="/inscription" icon={Bell} animateIcon>
                 Créer mon alerte 8h00
@@ -320,7 +336,6 @@ const HeroOffres = () => {
               </CtaLink>
             </motion.div>
 
-            {/* Compteurs */}
             <motion.dl variants={fadeUp} className="mt-3 flex flex-wrap items-center gap-x-8 gap-y-4">
               {COMPTEURS.map((s) => (
                 <div key={s.label}>
@@ -340,7 +355,6 @@ const HeroOffres = () => {
             </motion.dl>
           </motion.div>
 
-          {/* Colonne droite */}
           <FluxCard />
         </div>
       </div>

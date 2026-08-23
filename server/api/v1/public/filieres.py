@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import datetime
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -11,6 +11,7 @@ from models import Filiere, JobOffer, Subscriber, SubscriberFiliere, SubscriberS
 from schemas.offers import JobOfferRead
 from schemas.referentials import FiliereRead
 from pydantic import BaseModel
+from ._time_utils import today_start_utc
 
 router = APIRouter(prefix="/api/filieres", tags=["filieres"])
 
@@ -38,7 +39,7 @@ def list_filieres_page(
         .order_by(Filiere.label.asc() if sort == "az" else Filiere.sort_order.asc())
     ).all()
     
-    today = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+    today = today_start_utc()
     
     results = []
     for f in filieres:
@@ -85,14 +86,14 @@ def get_filiere_detail(slug: str, db: Session = Depends(get_db)):
     if not f:
         raise HTTPException(status_code=404, detail="Filière introuvable")
 
-    since = datetime.utcnow().replace(tzinfo=None) - timedelta(days=7)
+    today = today_start_utc()
     active_offers = db.scalar(
         select(func.count(JobOffer.id))
         .where(JobOffer.primary_filiere_id == f.id, *_public_filters())
     ) or 0
     new_offers = db.scalar(
         select(func.count(JobOffer.id))
-        .where(JobOffer.primary_filiere_id == f.id, JobOffer.first_seen_at >= since, *_public_filters())
+        .where(JobOffer.primary_filiere_id == f.id, JobOffer.first_seen_at >= today, *_public_filters())
     ) or 0
     subscribers = db.scalar(
         select(func.count(SubscriberFiliere.id))
@@ -167,21 +168,21 @@ def list_filiere_offers(
 
 @router.get("/{slug}/stats", response_model=FiliereStatsRead)
 def get_filiere_stats(slug: str, db: Session = Depends(get_db)):
-    """Compteurs : actives, nouvelles (7j), abonnés."""
+    """Compteurs : actives, nouvelles (aujourd'hui), abonnés."""
     filiere = db.scalar(
         select(Filiere).where((Filiere.slug == slug) | (Filiere.code == slug))
     )
     if not filiere:
         raise HTTPException(status_code=404, detail="Filière introuvable")
         
-    since = datetime.utcnow().replace(tzinfo=None) - timedelta(days=7)
+    today = today_start_utc()
     active_offers = db.scalar(
         select(func.count(JobOffer.id))
         .where(JobOffer.primary_filiere_id == filiere.id, *_public_filters())
     ) or 0
     new_offers = db.scalar(
         select(func.count(JobOffer.id))
-        .where(JobOffer.primary_filiere_id == filiere.id, JobOffer.first_seen_at >= since, *_public_filters())
+        .where(JobOffer.primary_filiere_id == filiere.id, JobOffer.first_seen_at >= today, *_public_filters())
     ) or 0
     subscribers = db.scalar(
         select(func.count(SubscriberFiliere.id))

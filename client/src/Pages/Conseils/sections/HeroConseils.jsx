@@ -56,8 +56,8 @@ const HeroConseils = () => {
             className="flex flex-col items-start gap-5"
           >
             <motion.div variants={fadeUp}>
-              <StatusChip tooltip="Un nouveau conseil publié chaque mardi à 6h02, en même temps que la collecte des 4 sources.">
-                Nouveau conseil chaque mardi · 6h02
+              <StatusChip tooltip="Un nouveau conseil publié chaque mardi à 8h00, en même temps que la collecte des 4 sources.">
+                Nouveau conseil chaque mardi · 8h00
               </StatusChip>
             </motion.div>
 

@@ -10,7 +10,7 @@ export const SourceLogo = ({ code, className = "size-6" }) => {
   )
 }
 
-export const ChipSource = ({ source, tooltip, className, logoClassName = "size-6" }) => (
+export const ChipSource = ({ source, title, tooltip, className, logoClassName = "size-6" }) => (
   <Tooltip>
     <TooltipTrigger >
       <span className={cn(
@@ -18,9 +18,9 @@ export const ChipSource = ({ source, tooltip, className, logoClassName = "size-6
         className
       )}>
         <SourceLogo code={source} className={logoClassName} />
-        {source}
+        {title ?? source}
       </span>
     </TooltipTrigger>
-    <TooltipContent side="top">{tooltip ?? `Collectée sur ${source} ce matin`}</TooltipContent>
+    <TooltipContent side="top">{tooltip ?? `Collectée sur ${title ?? source} ce matin`}</TooltipContent>
   </Tooltip>
 )

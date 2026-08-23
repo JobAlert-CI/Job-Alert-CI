@@ -73,7 +73,7 @@ const HeroFilieres = () => {
                     <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-500 opacity-70" />
                     <span className="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
                   </span>
-                  Collecte 06:02 terminée
+                  Collecte terminée
                 </span>
               )}
             </motion.div>

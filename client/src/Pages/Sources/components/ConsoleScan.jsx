@@ -1,8 +1,7 @@
-
 import { useMemo } from "react"
 import { motion } from "framer-motion"
 import {
-  Check, Clock, Radar, ShieldCheck, Zap,
+  Check, Clock, MoreHorizontal, Radar, ShieldCheck, Zap,
 } from "lucide-react"
 import {
   HoverCard, HoverCardContent, HoverCardTrigger,
@@ -15,6 +14,8 @@ import { POSITIONS_RADAR } from "@/tools/sources.tools"
 import { CompteReboursScan } from "./CompteReboursScan"
 import { SourceLogo } from "@/components/shared"
 import { useSourcesContext } from "@/contexts/Sources.context"
+
+const MAX_VISIBLE_SOURCES = 4
 
 const formatDateFr = () => {
   const d = new Date().toLocaleDateString("fr-FR", {
@@ -33,6 +34,10 @@ const ConsoleScan = () => {
   const isLoading = (sourcesQuery.isPending || statsQuery.isPending) && sources.length === 0
   const hasError = (sourcesQuery.isError || statsQuery.isError) && sources.length === 0
 
+  // Sources visibles (4 premières) et reste
+  const visibleSources = useMemo(() => sources.slice(0, MAX_VISIBLE_SOURCES), [sources])
+  const remainingCount = Math.max(0, sources.length - MAX_VISIBLE_SOURCES)
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 32, rotate: 1.5 }}
@@ -47,6 +52,7 @@ const ConsoleScan = () => {
       >
         <div className="absolute inset-0 bg-pattern opacity-20" />
       </div>
+
       <motion.span
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1, y: [0, -7, 0] }}
@@ -63,6 +69,7 @@ const ConsoleScan = () => {
           ? `${nbSourcesActives}/${sources.length} sources actives`
           : isLoading ? "Chargement…" : "Aucune source"}
       </motion.span>
+
       <motion.span
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -83,7 +90,7 @@ const ConsoleScan = () => {
           <div className="min-w-0 flex-1">
             <p className="font-heading text-sm font-bold text-brand-navy">Radar de collecte</p>
             <p className="text-[11px] text-muted-foreground">
-              {dateFr} · dernier passage 06h02
+              {dateFr} · dernier passage 06h00
             </p>
           </div>
           <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-brand-navy px-2.5 py-1 text-[10px] font-bold text-white">
@@ -146,11 +153,12 @@ const ConsoleScan = () => {
                 transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
                 aria-hidden
               />
-              {sources.map((s, i) => {
+              {/* ✅ Radar limité aux 4 premières sources */}
+              {visibleSources.map((s, i) => {
                 const pos = POSITIONS_RADAR[i % POSITIONS_RADAR.length]
                 return (
                   <Tooltip key={s.rawCode}>
-                    <TooltipTrigger >
+                    <TooltipTrigger>
                       <span
                         className="absolute z-10 -translate-x-1/2 -translate-y-1/2 cursor-default"
                         style={{ left: `${pos.x}%`, top: `${pos.y}%` }}
@@ -180,15 +188,33 @@ const ConsoleScan = () => {
                   </Tooltip>
                 )
               })}
-              <span
-                className="absolute left-1/2 top-1/2 size-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand-orange shadow-[0_0_12px_rgba(245,166,35,0.8)]"
-                aria-hidden
-              />
+              {/* ✅ Indicateur "autres sources" au centre si > 4 */}
+              {remainingCount > 0 && (
+                <Tooltip>
+                  <TooltipTrigger>
+                    <span
+                      className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-20 flex size-10 cursor-default items-center justify-center rounded-full border-2 border-white/30 bg-brand-navy/80 text-[10px] font-bold text-white backdrop-blur-sm"
+                      aria-label={`${remainingCount} autre(s) source(s)`}
+                    >
+                      +{remainingCount}
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="text-center">
+                    +{remainingCount} autre{remainingCount > 1 ? "s" : ""} source{remainingCount > 1 ? "s" : ""}
+                  </TooltipContent>
+                </Tooltip>
+              )}
+              {!remainingCount && (
+                <span
+                  className="absolute left-1/2 top-1/2 size-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand-orange shadow-[0_0_12px_rgba(245,166,35,0.8)]"
+                  aria-hidden
+                />
+              )}
             </div>
           </div>
         )}
 
-        {/* Liste des sources */}
+        {/* Liste des sources — limitée à 4 */}
         <ul className="divide-y divide-outline-variant/30 px-3" role="list">
           {isLoading && sources.length === 0
             ? Array.from({ length: 4 }).map((_, i) => (
@@ -201,50 +227,79 @@ const ConsoleScan = () => {
                   <Skeleton className="h-4 w-6" />
                 </li>
               ))
-            : sources.map((s, i) => (
-                <HoverCard key={s.rawCode} openDelay={150}>
-                  <HoverCardTrigger asChild>
-                    <motion.li
-                      initial={{ opacity: 0, x: -14 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{
-                        duration: 0.4,
-                        delay: 0.55 + i * 0.12,
-                        ease: "easeOut",
-                      }}
-                      className="flex cursor-default items-center gap-3 rounded-lg px-2 py-3 transition-colors hover:bg-surface-container-low/60"
-                    >
-                      <SourceLogo code={s.code} className="size-9 rounded-lg" />
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-[13px] font-semibold text-on-surface">
-                          {s.code}
-                        </p>
-                        <p className="text-[11px] text-muted-foreground">
-                          Passage à {s.passage}
-                          {s.duree ? ` · ${s.duree}` : ""}
-                        </p>
-                      </div>
-                      <span className="shrink-0 font-heading text-sm font-extrabold text-brand-navy">
-                        +{s.nouveaux}
-                      </span>
-                      <span className="grid size-5 shrink-0 place-items-center rounded-full bg-emerald-500 text-white">
-                        <Check className="size-3" strokeWidth={4} aria-hidden />
-                      </span>
-                    </motion.li>
-                  </HoverCardTrigger>
-                  <HoverCardContent align="start" className="w-60">
-                    <p className="font-heading text-sm font-semibold">{s.code}</p>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                      {s.nouveaux} offre{s.nouveaux > 1 ? "s" : ""} extraite{s.nouveaux > 1 ? "s" : ""} ce matin.
-                      {" "}{s.total} offre{s.total > 1 ? "s" : ""} active{s.total > 1 ? "s" : ""} au total.
-                    </p>
-                    <p className="mt-1.5 flex items-center gap-1.5 text-xs font-semibold text-emerald-600">
-                      <ShieldCheck className="size-3.5" aria-hidden />
-                      Source opérationnelle
-                    </p>
-                  </HoverCardContent>
-                </HoverCard>
-              ))}
+            : (
+              <>
+                {visibleSources.map((s, i) => (
+                  <HoverCard key={s.rawCode} openDelay={150}>
+                    <HoverCardTrigger asChild>
+                      <motion.li
+                        initial={{ opacity: 0, x: -14 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{
+                          duration: 0.4,
+                          delay: 0.55 + i * 0.12,
+                          ease: "easeOut",
+                        }}
+                        className="flex cursor-default items-center gap-3 rounded-lg px-2 py-3 transition-colors hover:bg-surface-container-low/60"
+                      >
+                        <SourceLogo code={s.code} className="size-9 rounded-lg" />
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-[13px] font-semibold text-on-surface">
+                            {s.code}
+                          </p>
+                          <p className="text-[11px] text-muted-foreground">
+                            Passage à {s.passage}
+                            {s.duree ? ` · ${s.duree}` : ""}
+                          </p>
+                        </div>
+                        <span className="shrink-0 font-heading text-sm font-extrabold text-brand-navy">
+                          +{s.nouveaux}
+                        </span>
+                        <span className="grid size-5 shrink-0 place-items-center rounded-full bg-emerald-500 text-white">
+                          <Check className="size-3" strokeWidth={4} aria-hidden />
+                        </span>
+                      </motion.li>
+                    </HoverCardTrigger>
+                    <HoverCardContent align="start" className="w-60">
+                      <p className="font-heading text-sm font-semibold">{s.code}</p>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        {s.nouveaux} offre{s.nouveaux > 1 ? "s" : ""} extraite{s.nouveaux > 1 ? "s" : ""} ce matin.
+                        {" "}{s.total} offre{s.total > 1 ? "s" : ""} active{s.total > 1 ? "s" : ""} au total.
+                      </p>
+                      <p className="mt-1.5 flex items-center gap-1.5 text-xs font-semibold text-emerald-600">
+                        <ShieldCheck className="size-3.5" aria-hidden />
+                        Source opérationnelle
+                      </p>
+                    </HoverCardContent>
+                  </HoverCard>
+                ))}
+
+                {/* ✅ Indicateur "autres sources" en bas de liste */}
+                {remainingCount > 0 && (
+                  <motion.li
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.55 + MAX_VISIBLE_SOURCES * 0.12, ease: "easeOut" }}
+                    className="flex items-center gap-3 rounded-lg px-2 py-3"
+                  >
+                    <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-surface-container-high text-brand-navy">
+                      <MoreHorizontal className="size-4" aria-hidden />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[13px] font-semibold text-on-surface">
+                        +{remainingCount} autre{remainingCount > 1 ? "s" : ""} source{remainingCount > 1 ? "s" : ""}
+                      </p>
+                      <p className="text-[11px] text-muted-foreground">
+                        Sources actives supplémentaires collectées ce matin
+                      </p>
+                    </div>
+                    <span className="shrink-0 rounded-full bg-brand-orange/15 px-2.5 py-0.5 font-heading text-xs font-bold text-brand-orange">
+                      {sources.length} au total
+                    </span>
+                  </motion.li>
+                )}
+              </>
+            )}
         </ul>
 
         {/* Pied : prochain scan */}

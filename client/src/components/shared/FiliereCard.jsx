@@ -37,7 +37,7 @@ const FiliereLargeCard = ({ f, index, className }) => {
           {f.label}
         </h3>
         <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{f.tagline}</p>
-        <div className="mt-4 flex flex-wrap gap-1.5">
+        <div className="mt-4 flex flex-wrap gap-1.5 mb-3">
           {f.keywords.slice(0, 3).map((kw) => (
             <Tooltip key={kw}>
               <TooltipTrigger >

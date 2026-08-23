@@ -1,5 +1,3 @@
-from datetime import datetime, timedelta, timezone
-
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
@@ -10,6 +8,7 @@ from models import JobOffer, Source, SourceScrapeRun
 from schemas.offers import JobOfferRead
 from schemas.referentials import SourceRead
 from api.v1.public.offers import _public_filters, _load_offer_relations
+from ._time_utils import today_start_utc
 
 router = APIRouter(prefix="/api/sources", tags=["sources"])
 
@@ -34,7 +33,7 @@ def list_sources_page(db: Session = Depends(get_db)):
         .order_by(Source.priority.asc())
     ).all()
     
-    today = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+    today = today_start_utc()
     
     results = []
     for s in sources:
@@ -82,14 +81,14 @@ def get_source_detail(slug: str, db: Session = Depends(get_db)):
     if not s:
         raise HTTPException(status_code=404, detail="Source introuvable")
 
-    since = datetime.utcnow().replace(tzinfo=None) - timedelta(days=7)
+    today = today_start_utc()
     active_offers = db.scalar(
         select(func.count(JobOffer.id))
         .where(JobOffer.source_id == s.id, *_public_filters())
     ) or 0
     new_offers = db.scalar(
         select(func.count(JobOffer.id))
-        .where(JobOffer.source_id == s.id, JobOffer.first_seen_at >= since, *_public_filters())
+        .where(JobOffer.source_id == s.id, JobOffer.first_seen_at >= today, *_public_filters())
     ) or 0
     
     last_run = db.scalar(

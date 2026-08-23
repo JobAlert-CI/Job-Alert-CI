@@ -110,7 +110,7 @@ const CarrouselUne = ({ articles }) => {
 
         <div className="relative flex items-center gap-3 border-b border-white/10 px-6 py-4">
           <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-white font-heading text-[11px] font-black text-white">
-            <img src="/logo2.svg" alt="Logo JobAlert CI" className="h-full w-full" loading="lazy" />
+            <img src="/logo2.svg" alt="Logo JobAlert CI" loading="lazy" />
           </span>
           <div className="min-w-0 flex-1">
             <p className="text-[13px] font-bold">Le brief JobAlert CI</p>

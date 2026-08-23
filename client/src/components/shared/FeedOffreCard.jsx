@@ -45,7 +45,8 @@ const FeedOffreCard = ({ offre, index = 0, to, className }) => {
         </div>
         <ChipSource
           source={offre.source.code}
-          tooltip={`Collectée sur ${offre.source.code} à 6h02`}
+          title={offre.source.name}
+          tooltip={`Collectée sur ${offre.source.code}`}
           className="hidden md:inline-flex"
         />
         <ArrowUpRight className="size-4 shrink-0 text-outline-variant transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-brand-orange" />

@@ -67,7 +67,7 @@ const HeroOffre = () => {
           >
             <motion.div variants={fadeUp} className="flex flex-wrap items-center gap-2.5">
               <Link
-                to={`/filieres/${meta.code}`}
+                to={`/filieres/${offre.filiere}`}
                 className={cn(
                   "inline-flex items-center gap-2 rounded-full border border-transparent px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em] transition-all duration-200 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                   hue.tile
@@ -92,21 +92,24 @@ const HeroOffre = () => {
 
             <motion.div variants={fadeUp} className="flex flex-wrap items-center gap-x-4 gap-y-2">
               <CompanyHover offre={offre} totalOffres={ENTREPRISE_TOTAL_FALLBACK} />
-              <span className="inline-flex items-center gap-1 text-sm text-muted-foreground">
+              {offre.ville && <span className="inline-flex items-center gap-1 text-sm text-muted-foreground">
                 <MapPin className="size-3.5" aria-hidden />
                 {offre.ville}
-              </span>
-              <span className="rounded-md border border-outline-variant/60 bg-white/80 px-2.5 py-0.5 text-xs font-bold text-on-surface-variant">
+              </span>}
+
+              {offre.contrat && <span className="rounded-md border border-outline-variant/60 bg-white/80 px-2.5 py-0.5 text-xs font-bold text-on-surface-variant">
                 {offre.contrat}
-              </span>
-              <span className="inline-flex items-center gap-1 rounded-md border border-outline-variant/60 bg-white/80 px-2.5 py-0.5 text-xs font-semibold text-on-surface-variant">
+              </span>}
+
+              {offre.niveau && <span className="inline-flex items-center gap-1 rounded-md border border-outline-variant/60 bg-white/80 px-2.5 py-0.5 text-xs font-semibold text-on-surface-variant">
                 <GraduationCap className="size-3" aria-hidden />
                 {offre.niveau}
-              </span>
-              <span className="inline-flex items-center gap-1 rounded-md border border-outline-variant/60 bg-white/80 px-2.5 py-0.5 text-xs font-semibold text-on-surface-variant">
+              </span>}
+
+              {offre.experience && <span className="inline-flex items-center gap-1 rounded-md border border-outline-variant/60 bg-white/80 px-2.5 py-0.5 text-xs font-semibold text-on-surface-variant">
                 <Zap className="size-3" aria-hidden />
                 {offre.experience}
-              </span>
+              </span>}
             </motion.div>
 
             <motion.div variants={fadeUp} className="w-full">
@@ -117,6 +120,7 @@ const HeroOffre = () => {
             <motion.div variants={fadeUp} className="mt-1 flex flex-row gap-3 max-sm:flex-col">
               <a
                 href={offre.lien || "#offre"}
+                target="_blank"
                 onClick={(e) => (offre.lien ? undefined : e.preventDefault())}
                 className="group inline-flex items-center justify-center gap-2.5 rounded-lg bg-brand-orange px-7 py-3.5 text-base font-bold text-white shadow-[0_12px_28px_-8px_rgba(245,166,35,0.5)] transition-all duration-300 hover:-translate-y-0.5 hover:brightness-110 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               >
@@ -125,7 +129,7 @@ const HeroOffre = () => {
                   ? <FaLinkedin className="size-4.5 transition-transform duration-300 group-hover:scale-110" aria-hidden />
                   : <ArrowUpRight className="size-5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden />}
               </a>
-              <CtaLink to={`/inscription?filieres=${meta.code}`} variant="secondary" icon={Bell}>
+              <CtaLink to={`/inscription?filieres=${offre.filiere}`} variant="secondary" icon={Bell}>
                 Recevoir cette filière à 8h00
               </CtaLink>
             </motion.div>
