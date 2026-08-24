@@ -2,7 +2,8 @@
 import { AlertTriangle, ArrowRight, RefreshCw } from "lucide-react"
 import { CarteArticle, CtaLink, SectionHeading } from "@/components/shared"
 import { useConseilDetail } from "@/contexts/DetailsConseil.context"
-import { EtatVide, Skel } from "./Etats"
+import { EtatVide } from "./Etats"
+import {Skeleton} from "@/components/ui/skeleton"
 
 /* Grille « similaires » — consomme le contexte, gère ses propres états. */
 const ContinuerLecture = () => {
@@ -37,7 +38,7 @@ const ContinuerLecture = () => {
           {similarQuery.isPending ? (
             /* Desktop-first : 3 colonnes en base, repli 2 puis 1 */
             <div className="grid grid-cols-3 gap-4 max-xl:grid-cols-2 max-sm:grid-cols-1" aria-hidden="true">
-              {[0, 1, 2].map((i) => <Skel key={`similaire-skel-${i}`} className="h-56 rounded-xl" />)}
+              {[0, 1, 2].map((i) => <Skeleton key={`similaire-Skeleton-${i}`} className="h-56 rounded-xl" />)}
             </div>
           ) : similarQuery.isError ? (
             <EtatVide

@@ -21,7 +21,7 @@ export const OffersFeed = () => {
     return (
       <FeedList>
         {Array.from({ length: 5 }).map((_, index) => (
-          <OfferSkeleton key={index} />
+          <OfferSkeleton key={`offer-skeleton-${index}`} />
         ))}
       </FeedList>
     )

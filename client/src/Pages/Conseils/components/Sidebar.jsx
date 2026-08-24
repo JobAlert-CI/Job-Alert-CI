@@ -18,11 +18,11 @@ export const PlusLus = () => {
   const { data: articles } = useArticlesQuery()
 
   const top = useMemo(() => {
-    if (popular.data.length) return popular.data
+    if (popular?.data?.length) return popular?.data
     return [...articles]
       .sort((a, b) => (b.view_count || 0) - (a.view_count || 0))
       .slice(0, 5)
-  }, [popular.data, articles])
+  }, [popular?.data, articles])
 
   return (
     <div className="rounded-xl border border-outline-variant/40 bg-white p-5 shadow-soft">
@@ -31,19 +31,19 @@ export const PlusLus = () => {
         Les plus lus
       </p>
 
-      {popular.isPending && top.length === 0 ? (
+      {popular?.isPending && top?.length === 0 ? (
         <ListeSkeleton rows={5} className="mt-4" />
-      ) : top.length === 0 ? (
+      ) : top?.length === 0 ? (
         <p className="mt-4 text-xs text-muted-foreground">
           Aucun conseil disponible pour le moment.
         </p>
       ) : (
         <ol className="mt-4 space-y-1">
-          {top.map((a, i) => {
+          {top?.map((a, i) => {
             const hue = HUES[a.category?.hue] || HUES.sky
             return (
               <HoverCard key={a.slug ?? a.id} openDelay={200}>
-                <HoverCardTrigger asChild>
+                <HoverCardTrigger>
                   <li>
                     <Link
                       to={`/conseils/${a.slug}`}
@@ -93,15 +93,15 @@ export const SeriesListe = () => {
         Séries à suivre
       </p>
 
-      {isPending && series.length === 0 ? (
+      {isPending && series?.length === 0 ? (
         <ListeSkeleton rows={2} className="mt-4" />
-      ) : series.length === 0 ? (
+      ) : series?.length === 0 ? (
         <p className="mt-4 text-xs text-muted-foreground">
           Aucune série proposée pour le moment.
         </p>
       ) : (
         <div className="mt-4 space-y-2.5">
-          {series.map((s) => {
+          {series?.map((s) => {
             const hue = HUES[s.hue] || HUES.sky
             const aProgression =
               typeof s.lus === "number" && typeof s.total === "number" && s.total > 0

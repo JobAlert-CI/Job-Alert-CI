@@ -13,12 +13,12 @@ import {
 } from "@/tools/ccm.tools"
 
 const SkeletonRow = () => (
-  <li className="flex items-center gap-3 rounded-lg border border-outline-variant/40 bg-surface-container-lowest px-3.5 py-2.5">
+  <li className="flex items-center gap-3 rounded-lg border border-outline-variant/40 bg-surface-container-lowest px-3.5 py-2.5 h-11">
     <Skeleton className="size-2 shrink-0 rounded-full" />
     <Skeleton className="h-4 flex-1 max-w-35" />
     <Skeleton className="size-5 shrink-0 rounded-full" />
-    <Skeleton className="h-3 w-10 shrink-0" />
-    <Skeleton className="h-5 w-12 shrink-0 rounded-full" />
+    <Skeleton className="h-3 w-12 shrink-0" />
+    <Skeleton className="h-5 w-14 shrink-0 rounded-full" />
   </li>
 )
 
@@ -57,7 +57,7 @@ const VisualCollecte = () => {
 
       <ul className="mt-3.5 space-y-2">
         {isPending ? (
-          Array.from({ length: 4 }).map((_, index) => <SkeletonRow key={index} />)
+          Array.from({ length: 4 }).map((_, index) => <SkeletonRow key={`collecte-skeleton-${index}`} />)
         ) : isError ? (
           <ErrorRow onRetry={refetch} />
         ) : (
@@ -73,12 +73,10 @@ const VisualCollecte = () => {
                 className="flex items-center gap-3 rounded-lg border border-outline-variant/40 bg-surface-container-lowest px-3.5 py-2.5"
               >
                 <span className="relative flex size-2 shrink-0">
-                  <span
-                    className={cn(
-                      "absolute inline-flex size-full animate-ping rounded-full opacity-75",
-                      status.status === "active" ? "bg-emerald-400" : "bg-error"
-                    )}
-                  />
+                  <span className={cn(
+                    "absolute inline-flex size-full motion-safe:animate-ping rounded-full opacity-75",
+                    status.status === "active" ? "bg-emerald-400" : "bg-error"
+                  )} />
                   <span
                     className="relative inline-flex size-2 rounded-full"
                     style={{ background: s.color_hex || "#10b981" }}

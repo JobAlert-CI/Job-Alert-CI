@@ -1,55 +1,37 @@
 import axios from "axios"
 
-/* ════════════════════════════════════════════════════════════════════
-  Normalisation des erreurs API (FastAPI) → objet stable pour l'UI.
-  { message, status, details, validationErrors, isCanceled }
-════════════════════════════════════════════════════════════════════ */
 export const isCanceledError = (err) =>
+  err?.isCanceled === true ||
   axios.isCancel?.(err) === true ||
   err?.name === "CanceledError" ||
   err?.code === "ERR_CANCELED" ||
   err?.name === "AbortError"
 
 export const formatApiError = (err) => {
-  const formatted = {
-    message: "Une erreur inattendue est survenue.",
-    status: null,
-    details: null,
-    validationErrors: null,
-    isCanceled: isCanceledError(err),
-  }
-
-  if (formatted.isCanceled) {
-    formatted.message = "Requête annulée."
-    return formatted
+  // 1. Une requête annulée n'est PAS une erreur à afficher à l'utilisateur
+  if (isCanceledError(err)) {
+    return null 
   }
 
   if (axios.isAxiosError(err)) {
     if (err.response) {
       const data = err.response.data
-      formatted.status = err.response.status
-      formatted.details = data
       const detail = data?.detail
+      
+      // 2. On extrait toujours une chaîne de caractères exploitable par l'UI
       if (Array.isArray(detail)) {
-        formatted.message = "Certains filtres envoyés sont invalides."
-        formatted.validationErrors = detail.map((item) => ({
-          field: Array.isArray(item?.loc) ? item.loc.join(".") : String(item?.loc ?? ""),
-          message: item?.msg ?? "Valeur invalide",
-          type: item?.type ?? null,
-        }))
-      } else if (typeof detail === "string") {
-        formatted.message = detail
-      } else {
-        formatted.message = data?.message || err.response.statusText || `Erreur ${err.response.status}`
+        return detail.map((item) => item?.msg || "Valeur invalide").join(", ")
       }
-    } else if (err.request) {
-      formatted.message = "Le serveur ne répond pas — vérifiez votre connexion."
-    } else {
-      formatted.message = err.message
+      if (typeof detail === "string") {
+        return detail
+      }
+      return data?.message || err.response.statusText || `Erreur ${err.response.status}`
     }
-  } else if (err instanceof Error) {
-    formatted.message = err.message
+    if (err.request) {
+      return "Impossible de joindre le serveur. Vérifiez votre connexion."
+    }
   }
-
-  return formatted
+  
+  // Fallback sécurisé pour les objets Error standards
+  return err?.message || "Une erreur inattendue est survenue."
 }

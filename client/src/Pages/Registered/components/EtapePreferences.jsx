@@ -138,7 +138,7 @@ export const EtapePreferences = () => {
 
             return bloque ? (
               <Tooltip key={f.code}>
-                <TooltipTrigger asChild>
+                <TooltipTrigger>
                   <div className="w-full">{btn}</div>
                 </TooltipTrigger>
                 <TooltipContent side="top">

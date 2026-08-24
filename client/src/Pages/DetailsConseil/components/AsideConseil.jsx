@@ -7,7 +7,7 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/h
 import { CtaLink, Sommaire } from "@/components/shared"
 import { fmtVus } from "@/lib/query-helpers"
 import { useConseilDetail } from "@/contexts/DetailsConseil.context"
-import { Skel } from "./Etats"
+import { Skeleton } from "@/components/ui/skeleton"
 
 /* ─────────────── Suggestions — chargement/erreur/vide délégués ─────────────── */
 const MemeTheme = () => {
@@ -24,7 +24,7 @@ const MemeTheme = () => {
         <>
           <span className="sr-only" role="status">Chargement des suggestions…</span>
           <div className="mt-4 space-y-3" aria-hidden="true">
-            {[0, 1, 2].map((i) => <Skel key={`suggestion-skel-${i}`} className="h-12 w-full rounded-lg" />)}
+            {[0, 1, 2].map((i) => <Skeleton key={`suggestion-Skeleton-${i}`} className="h-12 w-full rounded-lg" />)}
           </div>
         </>
       ) : similarQuery.isError ? (
@@ -49,7 +49,7 @@ const MemeTheme = () => {
         <ul className="mt-4 space-y-1">
           {similar.map((x) => (
             <HoverCard key={x.slug} openDelay={200}>
-              <HoverCardTrigger asChild>
+              <HoverCardTrigger>
                 <li>
                   <Link
                     to={`/conseils/${x.slug}`}

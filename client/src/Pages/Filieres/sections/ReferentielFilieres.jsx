@@ -1,7 +1,6 @@
-
 import { useMemo } from "react"
 import { AnimatePresence, motion } from "framer-motion"
-import { ArrowDownAZ, ArrowDownWideNarrow, Search, X } from "lucide-react"
+import { AlertTriangle, ArrowDownAZ, ArrowDownWideNarrow, RefreshCw, Search, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { formatApiError } from "@/api/errors"
 import { FiliereCard } from "@/components/shared"
@@ -83,7 +82,6 @@ const ReferentielFilieres = () => {
   const { filieres, isPending, isError, error, refetch } = useFilieresAdapted()
   const search = useFilieresSearch()
 
-  /* Dérivés mémoïsés — recalculés uniquement quand la liste ou la recherche change */
   const filtered = useMemo(() => search.applyTo(filieres), [filieres, search])
   const top3 = useMemo(() => computeTop3(filieres), [filieres])
   const { large, compact } = useMemo(
@@ -120,10 +118,25 @@ const ReferentielFilieres = () => {
         {/* États délégués : chargement / erreur / contenu+vide */}
         {isPending && filieres.length === 0 ? (
           <FiliereGridSkeleton />
-        ) : isError ? (
+        ) : isError && filieres.length === 0 ? (
           <FiliereErrorState message={formatApiError(error)} onRetry={refetch} />
         ) : (
           <>
+            {/* Bandeau non-bloquant si une mise à jour en arrière-plan échoue */}
+            {isError && filieres.length > 0 && (
+              <div role="alert" className="mb-6 flex flex-wrap items-center gap-3 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-xs font-semibold text-amber-800">
+                <AlertTriangle className="size-4" aria-hidden />
+                Mise à jour indisponible — affichage des dernières informations connues.
+                <button
+                  type="button"
+                  onClick={() => refetch()}
+                  className="inline-flex items-center gap-1 rounded-sm font-bold underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  <RefreshCw className="size-3" aria-hidden /> Réessayer
+                </button>
+              </div>
+            )}
+
             {/* Desktop-first : 6 colonnes en base, repli 2 puis 1 */}
             <div className="mt-8 grid grid-cols-6 gap-4 max-lg:grid-cols-2 max-sm:grid-cols-1">
               <AnimatePresence mode="popLayout">

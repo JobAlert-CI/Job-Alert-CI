@@ -1,0 +1,1425 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+components/
+  FeedStates.jsx
+  OffresFilterGroups.jsx
+sections/
+  FiltersBar.jsx
+  HeroOffres.jsx
+  OffersFeed.jsx
+index.jsx
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path="components/FeedStates.jsx">
+import { memo } from "react"
+import { Link } from "react-router-dom"
+import { motion } from "framer-motion"
+import {
+  AlertTriangle, Bell, CheckCircle2, ChevronDown, Loader2, RefreshCw, SearchX,
+} from "lucide-react"
+import { PAGE_SIZE } from "@/tools/offres.tools"
+
+/* États du flux — composants présentationnels mémoïsés (props simples,
+   un seul niveau : pas de drilling). */
+
+export const FeedErrorState = memo(function FeedErrorState({ message, onRetry }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      role="alert"
+      className="mt-10 rounded-xl border border-destructive/30 bg-destructive/5 p-12 text-center"
+    >
+      <AlertTriangle className="mx-auto size-10 text-destructive/70" aria-hidden />
+      <h3 className="mt-4 font-heading text-lg font-bold text-brand-navy">
+        Le flux n'a pas pu être chargé
+      </h3>
+      <p className="mx-auto mt-1 max-w-md text-sm text-muted-foreground">{message}</p>
+      <button
+        type="button"
+        onClick={onRetry}
+        className="mt-5 inline-flex items-center gap-2 rounded-lg border border-brand-navy/20 px-5 py-2.5 text-sm font-bold text-brand-navy transition-all hover:border-brand-navy hover:bg-brand-navy hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        <RefreshCw className="size-4" aria-hidden /> Réessayer
+      </button>
+    </motion.div>
+  )
+})
+
+export const FeedEmptyState = memo(function FeedEmptyState({ hasActiveFilters, onReset }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      role="status"
+      className="mt-10 rounded-xl border border-dashed border-outline-variant/60 bg-white p-12 text-center"
+    >
+      <SearchX className="mx-auto size-10 text-muted-foreground/50" aria-hidden />
+      <h3 className="mt-4 font-heading text-lg font-bold text-brand-navy">
+        Aucune offre trouvée
+      </h3>
+      <p className="mt-1 text-sm text-muted-foreground">
+        {hasActiveFilters
+          ? "Élargissez vos filtres — ou attendez la collecte de demain 6h00."
+          : "Le flux est vide pour le moment — la prochaine collecte est prévue à 6h00."}
+      </p>
+      {hasActiveFilters && (
+        <button
+          type="button"
+          onClick={onReset}
+          className="mt-5 inline-flex items-center gap-2 rounded-lg border border-brand-navy/20 px-5 py-2.5 text-sm font-bold text-brand-navy transition-all hover:border-brand-navy hover:bg-brand-navy hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          Réinitialiser les filtres
+        </button>
+      )}
+    </motion.div>
+  )
+})
+
+export const LoadMoreBlock = memo(function LoadMoreBlock({
+  shown, total, isLoadingMore, disabled, onLoadMore,
+}) {
+  const pct = total > 0 ? Math.min(100, (shown / total) * 100) : 0
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.45 }}
+      className="mt-10 flex flex-col items-center gap-3.5"
+    >
+      <div className="w-full max-w-xs">
+        <div className="flex items-center justify-between text-[11px] font-semibold text-muted-foreground" aria-live="polite">
+          <span>{shown} affichée{shown > 1 ? "s" : ""}</span>
+          {total > 0 && <span>{total} au total</span>}
+        </div>
+        <div
+          className="mt-1.5 h-1 overflow-hidden rounded-full bg-surface-container-high"
+          role="progressbar"
+          aria-valuenow={Math.round(pct)}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-label="Progression du chargement des offres"
+        >
+          <motion.div
+            className="h-full rounded-full bg-brand-navy"
+            animate={{ width: `${pct}%` }}
+            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          />
+        </div>
+      </div>
+      <button
+        type="button"
+        onClick={onLoadMore}
+        disabled={isLoadingMore || disabled}
+        className="group inline-flex h-12 items-center gap-2.5 rounded-lg border border-brand-navy/25 bg-white px-7 text-sm font-bold text-brand-navy shadow-soft transition-all duration-300 hover:-translate-y-0.5 hover:border-brand-navy hover:bg-brand-navy hover:text-white hover:shadow-hover active:scale-[0.98] disabled:pointer-events-none disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        {isLoadingMore ? (
+          <>
+            <Loader2 className="size-4 animate-spin" aria-hidden />
+            Chargement des offres…
+          </>
+        ) : (
+          <>
+            <ChevronDown className="size-4 transition-transform duration-300 group-hover:translate-y-0.5" aria-hidden />
+            Charger {PAGE_SIZE} offres de plus ?
+          </>
+        )}
+      </button>
+      <p className="text-[11px] text-muted-foreground">
+        Par lots de {PAGE_SIZE} · groupées jour par jour
+      </p>
+    </motion.div>
+  )
+})
+
+export const FeedEndState = memo(function FeedEndState() {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 24 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      role="status"
+      className="mt-10 overflow-hidden rounded-xl border border-outline-variant/40 bg-white text-center shadow-soft"
+    >
+      <div className="mx-auto h-1 w-24 rounded-b-full bg-emerald-500" aria-hidden />
+      <div className="px-6 py-10">
+        <span className="mx-auto grid size-14 place-items-center rounded-full bg-emerald-500/10">
+          <CheckCircle2 className="size-7 text-emerald-600" aria-hidden />
+        </span>
+        <h3 className="mt-4 font-heading text-xl font-extrabold text-brand-navy">
+          Vous êtes à jour.
+        </h3>
+        <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
+          C'est tout pour aujourd'hui — demain à 6h00, on remet ça. Ou mieux :
+          recevez le flux directement à 8h00, sans avoir à revenir.
+        </p>
+        <div className="mt-6 flex items-center justify-center gap-3 max-sm:flex-col">
+          <Link
+            to="/inscription"
+            className="group inline-flex items-center gap-2 rounded-lg bg-brand-orange px-6 py-3 text-sm font-bold text-white shadow-soft transition-all duration-300 hover:-translate-y-0.5 hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <Bell className="size-4 transition-transform duration-300 group-hover:rotate-12" aria-hidden />
+            Créer mon alerte 8h00
+          </Link>
+          <button
+            type="button"
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            className="inline-flex items-center gap-2 rounded-lg border border-outline-variant/60 px-6 py-3 text-sm font-bold text-on-surface-variant transition-all hover:border-brand-navy/40 hover:text-brand-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            Retour en haut
+          </button>
+        </div>
+      </div>
+    </motion.div>
+  )
+})
+</file>
+
+<file path="components/OffresFilterGroups.jsx">
+import {
+  Briefcase, CalendarDays, GraduationCap, Layers, MapPin,
+  Sparkles, Zap,
+} from "lucide-react"
+import { CheckRow, MiniCalendar, SourceLogo } from "@/components/shared"
+import { Skeleton } from "@/components/ui/skeleton"
+import { HUES, BRAND_HUE } from "@/lib/hues"
+import { cn } from "@/lib/utils"
+import { useOfferCountsQuery, useOfferReferentialsQuery } from "@/tools/offres.tools"
+import { useOffresFilters } from "@/contexts/Offres.context"
+import LocationPicker from "@/components/shared/filters/LocationPicker"
+
+
+/* ─────────────── Sélecteur de localisation (réutilisé par la barre desktop) ─────────────── */
+
+/* ─────────────── Structure locale ─────────────── */
+const Group = ({ icon: Icon, title, children }) => (
+  <div className="border-b border-outline-variant/40 py-4 first:pt-0 last:border-0">
+    <p className="mb-2 flex items-center gap-2 font-heading text-[13px] font-extrabold text-brand-navy">
+      <Icon className="size-3.5 text-brand-orange" aria-hidden />
+      {title}
+    </p>
+    {children}
+  </div>
+)
+
+const OptionsSkeleton = ({ rows = 4 }) => (
+  <div className="space-y-1.5" aria-hidden="true">
+    {Array.from({ length: rows }, (_, i) => <Skeleton key={i} className="h-8 w-full rounded-md" />)}
+  </div>
+)
+
+/* ─────────────── Tous les groupes — 100 % autonome ─────────────── */
+const OffresFilterGroups = () => {
+  const { data: refs, isPending } = useOfferReferentialsQuery()
+  const { data: counts } = useOfferCountsQuery()
+  const { filters, toggle, setPeriod, setLocation, locationId } = useOffresFilters()
+
+  const {
+    filieres = [], sources = [], contrats = [],
+    experiences = [], niveaux = [], locations = [],
+  } = refs ?? {}
+
+  return (
+    <div className="flex flex-col">
+      <Group icon={Sparkles} title="Filière">
+        {isPending && filieres.length === 0 ? <OptionsSkeleton rows={5} /> : filieres.map((f) => (
+          <CheckRow
+            key={f.code}
+            checked={filters.filieres.has(f.code)}
+            onToggle={() => toggle("filieres", f.code)}
+            label={f.label}
+            count={counts.filieres?.[f.code] ?? 0}
+            lead={<span className={cn("size-2 shrink-0 rounded-full", (HUES[f.hue] ?? BRAND_HUE).dot)} aria-hidden />}
+          />
+        ))}
+      </Group>
+
+      <Group icon={MapPin} title="Localisation">
+        <LocationPicker
+          locations={locations}
+          value={locationId}
+          onChange={setLocation}
+          isLoading={isPending && locations.length === 0}
+        />
+      </Group>
+
+      <Group icon={Layers} title="Sources">
+        {isPending && sources.length === 0 ? <OptionsSkeleton /> : sources.map((s) => (
+          <CheckRow
+            key={s.code}
+            checked={filters.sources.has(s.code)}
+            onToggle={() => toggle("sources", s.code)}
+            label={s.label}
+            count={counts.sources?.[s.code] ?? 0}
+            lead={<SourceLogo code={s.code} className="size-5 rounded text-[8px]" />}
+          />
+        ))}
+      </Group>
+
+      <Group icon={Briefcase} title="Contrat">
+        {isPending && contrats.length === 0 ? <OptionsSkeleton /> : contrats.map((c) => (
+          <CheckRow
+            key={c.code}
+            checked={filters.contrats.has(c.code)}
+            onToggle={() => toggle("contrats", c.code)}
+            label={c.label}
+            count={counts.contrats?.[c.code] ?? 0}
+          />
+        ))}
+      </Group>
+
+      <Group icon={Zap} title="Expérience">
+        {isPending && experiences.length === 0 ? <OptionsSkeleton rows={3} /> : experiences.map((x) => (
+          <CheckRow
+            key={x.code}
+            checked={filters.experiences.has(x.code)}
+            onToggle={() => toggle("experiences", x.code)}
+            label={x.label}
+          />
+        ))}
+      </Group>
+
+      <Group icon={GraduationCap} title="Niveau d'études">
+        {isPending && niveaux.length === 0 ? <OptionsSkeleton rows={3} /> : niveaux.map((n) => (
+          <CheckRow
+            key={n.code}
+            checked={filters.niveaux.has(n.code)}
+            onToggle={() => toggle("niveaux", n.code)}
+            label={n.label}
+          />
+        ))}
+      </Group>
+
+      <Group icon={CalendarDays} title="Période de publication">
+        <MiniCalendar range={filters.period} onChange={setPeriod} hue={BRAND_HUE} />
+      </Group>
+    </div>
+  )
+}
+
+export default OffresFilterGroups
+</file>
+
+<file path="sections/FiltersBar.jsx">
+import { memo, useEffect, useRef, useState } from "react"
+import { AnimatePresence, motion } from "framer-motion"
+import {
+  ArrowUpDown, Briefcase, CalendarDays, Check, ChevronDown,
+  GraduationCap, Layers, MapPin, Search, SlidersHorizontal, Sparkles, X, Zap,
+} from "lucide-react"
+import { cn } from "@/lib/utils"
+import { Skeleton } from "@/components/ui/skeleton"
+import {
+  CheckRow, FilterPopover, FiltersDrawer, MiniCalendar, SourceLogo, ViewToggle,
+} from "@/components/shared"
+import { HUES, BRAND_HUE } from "@/lib/hues"
+import { SORTS } from "@/lib/referentiels"
+import useClickOutside from "@/hooks/use-click-outside"
+import { 
+  useOffresFeedModel,
+  getLocationLabel, 
+  getPeriodLabel,
+  useOfferCountsQuery, 
+  useOfferReferentialsQuery
+} from "@/tools/offres.tools"
+import { useOffresFilters } from "@/contexts/Offres.context"
+import LocationPicker from "@/components/shared/filters/LocationPicker"
+import OffresFilterGroups from "../components/OffresFilterGroups"
+
+/* ════════════════════════════════════════════════════════════════════
+   BARRE DE FILTRES STICKY
+   · Desktop-first : la barre complète est le rendu de base (max-lg:hidden),
+     la variante mobile est le déclassement (lg:hidden).
+   · La frappe clavier vit ici (état local) → elle ne re-rend jamais
+     le héro ni le flux.
+════════════════════════════════════════════════════════════════════ */
+
+/* Champ recherche partagé desktop / mobile */
+const SearchField = memo(function SearchField({ value, onChange, className, placeholder }) {
+  return (
+    <div className={cn("relative", className)}>
+      <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
+      <input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        aria-label="Rechercher une offre"
+        className="h-9 w-full rounded-lg border border-outline-variant/60 bg-surface-container-lowest pl-9 pr-8 text-[13px] outline-none transition-all placeholder:text-muted-foreground/70 focus:border-brand-navy/50 focus:ring-2 focus:ring-brand-navy/10"
+      />
+      {value && (
+        <button
+          type="button"
+          onClick={() => onChange("")}
+          aria-label="Effacer la recherche"
+          className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-sm text-muted-foreground hover:text-brand-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <X className="size-3.5" aria-hidden />
+        </button>
+      )}
+    </div>
+  )
+})
+
+/* Groupes d'options mémoïsés : ils ne re-rendent que sur changement de
+   contexte (filtres commités) ou de cache — jamais à la frappe clavier. */
+const FiliereOptions = memo(function FiliereOptions() {
+  const { data: refs, isPending } = useOfferReferentialsQuery()
+  const { data: counts } = useOfferCountsQuery()
+  const { filters, toggle } = useOffresFilters()
+
+  if (isPending && refs.filieres.length === 0) {
+    return (
+      <div className="max-h-72 overflow-y-auto pr-1" aria-hidden="true">
+        {[0, 1, 2, 3, 4].map((i) => <Skeleton key={i} className="mb-1.5 h-8 w-full rounded-md" />)}
+      </div>
+    )
+  }
+  return (
+    <div className="max-h-72 overflow-y-auto pr-1">
+      {refs.filieres.map((f) => (
+        <CheckRow
+          key={f.code}
+          checked={filters.filieres.has(f.code)}
+          onToggle={() => toggle("filieres", f.code)}
+          label={f.label}
+          count={counts.filieres[f.code] ?? 0}
+          lead={<span className={cn("size-2 shrink-0 rounded-full", (HUES[f.hue] ?? BRAND_HUE).dot)} aria-hidden />}
+        />
+      ))}
+    </div>
+  )
+})
+
+const SourceOptions = memo(function SourceOptions() {
+  const { data: refs, isPending } = useOfferReferentialsQuery()
+  const { data: counts } = useOfferCountsQuery()
+  const { filters, toggle } = useOffresFilters()
+
+  if (isPending && refs.sources.length === 0) {
+    return (
+      <div aria-hidden="true">
+        {[0, 1, 2].map((i) => <Skeleton key={i} className="mb-1.5 h-8 w-full rounded-md" />)}
+      </div>
+    )
+  }
+  return refs.sources.map((s) => (
+    <CheckRow
+      key={s.code}
+      checked={filters.sources.has(s.code)}
+      onToggle={() => toggle("sources", s.code)}
+      label={s.label}
+      count={counts.sources[s.code] ?? 0}
+      lead={<SourceLogo code={s.code} className="size-5 rounded text-[8px]" />}
+    />
+  ))
+})
+
+const ContratOptions = memo(function ContratOptions() {
+  const { data: refs } = useOfferReferentialsQuery()
+  const { data: counts } = useOfferCountsQuery()
+  const { filters, toggle } = useOffresFilters()
+  return refs.contrats.map((c) => (
+    <CheckRow
+      key={c.code}
+      checked={filters.contrats.has(c.code)}
+      onToggle={() => toggle("contrats", c.code)}
+      label={c.label}
+      count={counts.contrats[c.code] ?? 0}
+    />
+  ))
+})
+
+const ExperienceOptions = memo(function ExperienceOptions() {
+  const { data: refs } = useOfferReferentialsQuery()
+  const { filters, toggle } = useOffresFilters()
+  return refs.experiences.map((x) => (
+    <CheckRow
+      key={x.code}
+      checked={filters.experiences.has(x.code)}
+      onToggle={() => toggle("experiences", x.code)}
+      label={x.label}
+    />
+  ))
+})
+
+const NiveauOptions = memo(function NiveauOptions() {
+  const { data: refs } = useOfferReferentialsQuery()
+  const { filters, toggle } = useOffresFilters()
+  return refs.niveaux.map((n) => (
+    <CheckRow
+      key={n.code}
+      checked={filters.niveaux.has(n.code)}
+      onToggle={() => toggle("niveaux", n.code)}
+      label={n.label}
+    />
+  ))
+})
+
+const FiltersBar = () => {
+  const {
+    filters, valeurs, setScalar, setPeriod,
+    sort, view, locationId,
+    setSort, setView, setLocation, resetTout, activeCount,
+  } = useOffresFilters()
+  const { data: refs, isPending: refsPending } = useOfferReferentialsQuery()
+  const feed = useOffresFeedModel()
+
+  /* Recherche : état local → URL debouncée. La frappe ne re-rend que cette barre. */
+  const [queryLocale, setQueryLocale] = useState(valeurs.query)
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { setQueryLocale(valeurs.query) }, [valeurs.query])
+  useEffect(() => {
+    if (queryLocale === valeurs.query) return
+    const t = setTimeout(() => setScalar("query", queryLocale), 350)
+    return () => clearTimeout(t)
+  }, [queryLocale, valeurs.query, setScalar])
+
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  const [openPop, setOpenPop] = useState(null)
+  const sortRef = useRef(null)
+  useClickOutside(sortRef, () => setOpenPop((p) => (p === "sort" ? null : p)))
+
+  const pop = (k) => ({
+    open: openPop === k,
+    onToggle: () => setOpenPop((p) => (p === k ? null : k)),
+    onClose: () => setOpenPop((p) => (p === k ? null : p)),
+  })
+
+  return (
+    <div className="sticky top-1/10 z-40 border-b border-outline-variant/40 bg-background/85 backdrop-blur-md">
+      <div className="mx-auto max-w-7xl px-12 py-3 max-md:px-6">
+        {/* ═══ Desktop (rendu de base) ═══ */}
+        <div className="flex flex-wrap items-center gap-2 max-lg:hidden">
+          <SearchField
+            value={queryLocale}
+            onChange={setQueryLocale}
+            className="w-56"
+            placeholder="Rechercher un poste, une entreprise…"
+          />
+
+          <FilterPopover label="Filière" icon={Sparkles} count={filters.filieres.size} {...pop("filiere")} panelClassName="w-64">
+            <FiliereOptions />
+          </FilterPopover>
+
+          <FilterPopover
+            label={getLocationLabel(refs.locations, locationId)}
+            icon={MapPin}
+            count={locationId ? 1 : 0}
+            panelClassName="w-72 p-3"
+            {...pop("location")}
+          >
+            <LocationPicker
+              locations={refs.locations}
+              value={locationId}
+              onChange={(id) => { setLocation(id); setOpenPop(null) }}
+              isLoading={refsPending && refs.locations.length === 0}
+            />
+          </FilterPopover>
+
+          <FilterPopover label="Sources" icon={Layers} count={filters.sources.size} {...pop("source")}>
+            <SourceOptions />
+          </FilterPopover>
+          <FilterPopover label="Contrat" icon={Briefcase} count={filters.contrats.size} {...pop("contrat")}>
+            <ContratOptions />
+          </FilterPopover>
+          <FilterPopover label="Expérience" icon={Zap} count={filters.experiences.size} {...pop("exp")}>
+            <ExperienceOptions />
+          </FilterPopover>
+          <FilterPopover label="Niveau" icon={GraduationCap} count={filters.niveaux.size} {...pop("niveau")}>
+            <NiveauOptions />
+          </FilterPopover>
+          <FilterPopover
+            label={getPeriodLabel(filters.period)}
+            icon={CalendarDays}
+            count={filters.period.start || filters.period.end ? 1 : 0}
+            align="right"
+            panelClassName="w-[19.5rem] p-3"
+            {...pop("period")}
+          >
+            <MiniCalendar range={filters.period} onChange={setPeriod} hue={BRAND_HUE} />
+          </FilterPopover>
+
+          <div className="ml-auto flex items-center gap-2.5">
+            <span className="hidden text-xs text-muted-foreground xl:inline" role="status" aria-live="polite">
+              {feed.isLoading ? (
+                <Skeleton className="inline-block h-4 w-20 align-middle" />
+              ) : (
+                <>
+                  <strong className="font-heading text-sm font-bold text-brand-navy">
+                    {feed.offers.length}{feed.hasMore ? "+" : ""}
+                  </strong>{" "}
+                  offre{feed.offers.length > 1 ? "s" : ""}
+                </>
+              )}
+            </span>
+
+            {/* Tri — listbox accessible (aria-expanded, Échap, aria-selected) */}
+            <div ref={sortRef} className="relative">
+              <button
+                type="button"
+                onClick={() => setOpenPop((p) => (p === "sort" ? null : "sort"))}
+                aria-haspopup="listbox"
+                aria-expanded={openPop === "sort"}
+                aria-controls="offres-tri-listbox"
+                className={cn(
+                  "inline-flex h-9 items-center gap-1.5 rounded-lg border px-3 text-xs font-bold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                  openPop === "sort"
+                    ? "border-brand-navy bg-brand-navy text-white"
+                    : "border-outline-variant/60 bg-surface-container-lowest text-on-surface-variant hover:border-brand-navy/40 hover:text-brand-navy"
+                )}
+              >
+                <ArrowUpDown className="size-3.5" aria-hidden />
+                {SORTS.find((s) => s.k === sort)?.l ?? "Trier"}
+                <ChevronDown className={cn("size-3.5 transition-transform duration-200", openPop === "sort" && "rotate-180")} aria-hidden />
+              </button>
+              <AnimatePresence>
+                {openPop === "sort" && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8, scale: 0.97 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 6, scale: 0.98 }}
+                    transition={{ duration: 0.18 }}
+                    role="listbox"
+                    id="offres-tri-listbox"
+                    aria-label="Trier les offres"
+                    onKeyDown={(e) => { if (e.key === "Escape") setOpenPop(null) }}
+                    className="absolute right-0 top-full z-50 mt-2 w-48 rounded-xl border border-outline-variant/50 bg-surface-container-lowest p-1.5 shadow-hover"
+                  >
+                    {SORTS.map((s) => (
+                      <button
+                        key={s.k}
+                        type="button"
+                        role="option"
+                        aria-selected={sort === s.k}
+                        onClick={() => { setSort(s.k); setOpenPop(null) }}
+                        className="flex w-full items-center justify-between rounded-lg px-2.5 py-2 text-left text-[13px] font-medium transition-colors hover:bg-surface-container-low focus-visible:bg-surface-container-low focus-visible:outline-none"
+                      >
+                        {s.l}
+                        {sort === s.k && <Check className="size-3.5 text-brand-orange" strokeWidth={3} aria-hidden />}
+                      </button>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            <ViewToggle view={view} onChange={setView} />
+          </div>
+        </div>
+
+        {/* ═══ Mobile (déclassement) ═══ */}
+        <div className="flex items-center gap-2 lg:hidden">
+          <SearchField
+            value={queryLocale}
+            onChange={setQueryLocale}
+            className="flex-1"
+            placeholder="Rechercher…"
+          />
+          <button
+            type="button"
+            onClick={() => setDrawerOpen(true)}
+            aria-haspopup="dialog"
+            className={cn(
+              "inline-flex h-10 items-center gap-2 rounded-lg border px-3.5 text-sm font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+              activeCount > 0
+                ? "border-brand-navy bg-brand-navy text-white shadow-soft"
+                : "border-outline-variant/60 bg-surface-container-lowest text-on-surface-variant"
+            )}
+          >
+            <SlidersHorizontal className="size-4" aria-hidden />
+            Filtres
+            {activeCount > 0 && (
+              <span className="grid size-4.5 place-items-center rounded-full bg-brand-orange text-[10px] font-black text-white">
+                <span aria-hidden>{activeCount}</span>
+                <span className="sr-only">filtres actifs</span>
+              </span>
+            )}
+          </button>
+          <ViewToggle view={view} onChange={setView} />
+        </div>
+      </div>
+
+      {/* Tiroir mobile — OffresFilterGroups est autonome (zéro prop) */}
+      <FiltersDrawer
+        open={drawerOpen}
+        onOpenChange={setDrawerOpen}
+        resultCount={feed.offers.length}
+        sort={sort}
+        onSort={setSort}
+        onReset={resetTout}
+      >
+        <OffresFilterGroups />
+      </FiltersDrawer>
+    </div>
+  )
+}
+
+export default FiltersBar
+</file>
+
+<file path="sections/HeroOffres.jsx">
+import { Link } from "react-router-dom"
+import { motion } from "framer-motion"
+import {
+  ArrowRight, Bell, Check, ChevronRight, Clock, Fingerprint,
+  Mail, ShieldCheck, Zap,
+} from "lucide-react"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
+import { Skeleton } from "@/components/ui/skeleton"
+import { cn } from "@/lib/utils"
+import { CountUp, CountdownEnvoi, CtaLink, SourceLogo, Ticker } from "@/components/shared"
+import { HUES, BRAND_HUE } from "@/lib/hues"
+import { todayLong } from "@/lib/dates"
+import { StatSkeleton } from "@/components/shared/SkeletonsOffres"
+import {
+  PIPELINE,
+  useOffresFeedModel,
+  useOfferReferentialsQuery,
+  useOffersOverviewQuery
+} from "@/tools/offres.tools"
+
+/* Variantes définies une seule fois au niveau module */
+const containerVariants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.1, delayChildren: 0.1 } },
+}
+const fadeUp = {
+  hidden: { opacity: 0, y: 22 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } },
+}
+
+/* ─────────────── Ticker ─────────────── */
+export const OffresTicker = () => {
+  const { offers } = useOffresFeedModel()
+  const { data: refs } = useOfferReferentialsQuery()
+  if (offers.length === 0) return null
+  return (
+    <Ticker
+      variant="dark"
+      duration={160}
+      items={offers.slice(0, 24).map((o) => ({
+        key: o.uid,
+        dot: (HUES[refs.filieres.find((f) => f.code === o.filiere)?.hue] ?? BRAND_HUE).dot,
+        titre: o.titre,
+        entreprise: o.entreprise,
+      }))}
+    />
+  )
+}
+
+/* ─────────────── FluxCard ─────────────── */
+const FluxCard = () => {
+  const { data: overview, isPending } = useOffersOverviewQuery()
+  const { abonnees = 0, nouveaux = 0, parSource = [] } = overview ?? {}
+
+  const MAX_VISIBLE = 4
+  const visibleSources = parSource.slice(0, MAX_VISIBLE)
+  const remainingCount = Math.max(0, parSource.length - MAX_VISIBLE)
+  const displayCount = visibleSources.length + (remainingCount > 0 ? 1 : 0)
+
+  const gridColsClass = displayCount === 5 ? "grid-cols-5" : displayCount === 4 ? "grid-cols-4" : "grid-cols-3"
+
+  const step = 320 / (displayCount + 1)
+  const pathXs = Array.from({ length: displayCount }, (_, i) => step * (i + 1))
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 32, rotate: 1.5 }}
+      animate={{ opacity: 1, y: 0, rotate: 0 }}
+      transition={{ duration: 0.7, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+      className="relative w-full min-w-0 max-md:mx-auto max-md:max-w-md"
+    >
+      <div className="absolute -inset-8 rounded-full bg-brand-orange/10 blur-3xl" aria-hidden />
+      <div className="absolute inset-0 translate-x-4 translate-y-5 rotate-2 overflow-hidden rounded-2xl bg-brand-navy" aria-hidden>
+        <div className="absolute inset-0 bg-pattern opacity-20" />
+      </div>
+
+      {/* Badges flottants */}
+      <motion.span
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1, y: [0, -7, 0] }}
+        transition={{ delay: 0.9, opacity: { duration: 0.4 }, scale: { duration: 0.4 }, y: { duration: 4.6, repeat: Infinity, ease: "easeInOut" } }}
+        className="absolute -top-4 left-5 z-20 inline-flex -rotate-3 items-center gap-1.5 rounded-full bg-brand-orange px-3.5 py-1.5 text-[11px] font-bold text-white shadow-lg"
+      >
+        <Zap className="size-3" aria-hidden />
+        +{nouveaux} offres ce matin
+      </motion.span>
+      <motion.span
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 1.05, duration: 0.4 }}
+        className="absolute -top-3 right-6 z-20 inline-flex rotate-2 items-center gap-1.5 rounded-full border border-outline-variant/50 bg-white px-3 py-1.5 text-[11px] font-bold text-emerald-600 shadow-soft"
+      >
+        <Fingerprint className="size-3" aria-hidden />
+        0 doublon
+      </motion.span>
+      <motion.span
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1, y: [0, -6, 0] }}
+        transition={{ delay: 1.2, opacity: { duration: 0.4 }, scale: { duration: 0.4 }, y: { duration: 5.2, repeat: Infinity, ease: "easeInOut", delay: 0.6 } }}
+        className="absolute -bottom-4 right-8 z-20 inline-flex rotate-2 items-center gap-1.5 rounded-full border border-outline-variant/50 bg-white px-3.5 py-1.5 text-[11px] font-bold text-on-surface shadow-hover"
+      >
+        <Mail className="size-3 text-brand-orange" aria-hidden />
+        Envoyé à {abonnees.toLocaleString("fr-FR")} abonnés
+      </motion.span>
+
+      {/* Carte principale */}
+      <div className="relative overflow-hidden rounded-2xl border border-outline-variant/40 bg-white shadow-[0_24px_48px_-16px_rgba(15,45,77,0.22)]">
+        <div className="flex items-center gap-3 border-b border-outline-variant/40 bg-surface-container-low/60 px-5 py-4">
+          <span className="relative flex size-2.5 shrink-0" aria-hidden>
+            <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-60" />
+            <span className="relative inline-flex size-2.5 rounded-full bg-emerald-500" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="font-heading text-sm font-bold text-brand-navy">
+              {parSource.length || 0} source{parSource.length > 1 ? "s" : ""} → 1 flux
+            </p>
+            <p className="text-[11px] text-muted-foreground">Collecte terminée aujourd'hui</p>
+          </div>
+          <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-brand-navy px-2.5 py-1 text-[10px] font-bold text-white">
+            <Clock className="size-3" aria-hidden />
+            08:00
+          </span>
+        </div>
+
+        <div className="px-5 pb-5 pt-4">
+          <div className={cn("grid gap-2", isPending ? "grid-cols-4" : gridColsClass)}>
+            {isPending && parSource.length === 0
+              ? [0, 1, 2, 3].map((i) => <Skeleton key={i} className="h-18 rounded-lg" />)
+              : (
+                <>
+                  {visibleSources.map((s, i) => (
+                    <motion.div
+                      key={s.code}
+                      initial={{ opacity: 0, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.55 + i * 0.1, duration: 0.4 }}
+                    >
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <div className="relative flex cursor-default flex-col items-center gap-1.5 rounded-lg border border-outline-variant/50 bg-surface-container-low/50 px-1 py-2.5 transition-colors hover:border-brand-navy/30 hover:bg-surface-container-low">
+                            <span className="absolute right-1 top-1 grid size-3.5 place-items-center rounded-full bg-emerald-500 text-white" aria-hidden>
+                              <Check className="size-2" strokeWidth={4} />
+                            </span>
+                            <SourceLogo code={s.code} className="size-7 rounded-md text-[9px]" />
+                            <span className="leading-none">
+                              <span className="block font-heading text-[12px] font-extrabold text-brand-navy">+{s.nouveaux}</span>
+                              <span className="mt-0.5 block text-[9px] font-semibold text-muted-foreground">{s.total} au total</span>
+                            </span>
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom">
+                          {s.nouveaux} nouvelle{s.nouveaux > 1 ? "s" : ""} offre{s.nouveaux > 1 ? "s" : ""} via {s.label ?? s.code} · {s.total} active{s.total > 1 ? "s" : ""}
+                        </TooltipContent>
+                      </Tooltip>
+                    </motion.div>
+                  ))}
+
+                  {remainingCount > 0 && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 12 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.55 + visibleSources.length * 0.1, duration: 0.4 }}
+                    >
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <div className="relative flex cursor-default flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-brand-orange/40 bg-brand-orange/5 px-1 py-2.5 transition-colors hover:border-brand-orange/60 hover:bg-brand-orange/10">
+                            <span className="font-heading text-[16px] font-extrabold text-brand-orange">+{remainingCount}</span>
+                            <span className="text-[9px] font-semibold text-muted-foreground text-center leading-tight">autres</span>
+                          </div>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom">
+                          {remainingCount} autre{remainingCount > 1 ? "s" : ""} source{remainingCount > 1 ? "s" : ""}
+                        </TooltipContent>
+                      </Tooltip>
+                    </motion.div>
+                  )}
+                </>
+              )}
+          </div>
+
+          <svg viewBox="0 0 320 40" className="mt-1 w-full" fill="none" aria-hidden>
+            {pathXs.map((x, i) => (
+              <motion.path
+                key={x}
+                d={`M${x} 0 C${x} 22 160 16 160 40`}
+                stroke="#F5A623"
+                strokeOpacity="0.55"
+                strokeWidth="1.5"
+                strokeDasharray="3 5"
+                animate={{ strokeDashoffset: [0, -16] }}
+                transition={{ duration: 1.1, repeat: Infinity, ease: "linear", delay: i * 0.15 }}
+              />
+            ))}
+          </svg>
+
+          {/* Sortie du funnel */}
+          <div className="-mt-1 flex items-center gap-2.5 rounded-lg border border-emerald-500/25 bg-emerald-500/10 px-3.5 py-2.5">
+            <Fingerprint className="size-4 shrink-0 text-emerald-600" aria-hidden />
+            <p className="text-xs font-bold text-emerald-700">{nouveaux} nouvelles offres · 0 doublon</p>
+            <span className="ml-auto font-mono text-[10px] text-emerald-600/70 max-sm:hidden">hash_unique ✓</span>
+          </div>
+
+          {/* Pipeline du matin */}
+          <div className="mt-4 rounded-lg border border-outline-variant/40 bg-surface-container-low/40 px-3.5 py-3">
+            <div className="flex items-center">
+              {PIPELINE.map((s, i) => (
+                <span key={s.t} className="contents">
+                  {i > 0 && (
+                    <span className="relative mx-2 h-px flex-1 overflow-hidden bg-outline-variant/60" aria-hidden>
+                      <motion.span
+                        className="absolute inset-y-0 w-3 rounded-full bg-brand-orange/80"
+                        animate={{ left: ["-15%", "110%"] }}
+                        transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut", delay: i * 0.5 }}
+                      />
+                    </span>
+                  )}
+                  <span className="flex min-w-0 items-center gap-2">
+                    <span className={cn(
+                      "relative grid size-7 shrink-0 place-items-center rounded-full border bg-white",
+                      s.done ? "border-emerald-500/40 text-emerald-600" : "border-brand-orange/50 text-brand-orange"
+                    )}>
+                      <s.icon className="size-3.5" aria-hidden />
+                      {s.done && (
+                        <span className="absolute -right-0.5 -top-0.5 grid size-3 place-items-center rounded-full bg-emerald-500 text-white" aria-hidden>
+                          <Check className="size-2" strokeWidth={4.5} />
+                        </span>
+                      )}
+                    </span>
+                    <span className="min-w-0 leading-tight max-sm:hidden">
+                      <span className="block truncate text-[10px] font-black text-brand-navy">{s.t}</span>
+                      <span className="block truncate text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">{s.l}</span>
+                    </span>
+                  </span>
+                </span>
+              ))}
+            </div>
+          </div>
+          <CountdownEnvoi className="mt-8 py-4" />
+        </div>
+      </div>
+    </motion.div>
+  )
+}
+
+/* ─────────────── Héro ─────────────── */
+const HeroOffres = () => {
+  const { data: overview, isPending } = useOffersOverviewQuery()
+  const { total = 0, nouveaux = 0, parSource = [] } = overview ?? {}
+  const COMPTEURS = [
+    { valeur: total, label: "offres en ligne" },
+    { valeur: nouveaux, label: "nouvelles ce matin" },
+    { valeur: parSource.length, label: "sources scannées" },
+  ]
+
+  return (
+    <section className="relative overflow-hidden hero-gradient">
+      <div className="absolute inset-0 bg-pattern opacity-50" aria-hidden />
+      <div className="absolute -top-32 right-[-10%] size-140 rounded-full bg-brand-orange/8 blur-3xl" aria-hidden />
+      <div className="absolute -bottom-40 -left-40 size-120 rounded-full bg-brand-navy/5 blur-3xl" aria-hidden />
+
+      <div className="relative z-10 mx-auto max-w-7xl px-12 pb-16 pt-10 max-md:px-6 max-md:pb-14 max-md:pt-8">
+        <motion.nav
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+          className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground"
+          aria-label="Fil d'Ariane"
+        >
+          <Link to="/" className="rounded-sm transition-colors hover:text-brand-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+            Accueil
+          </Link>
+          <ChevronRight className="size-3" aria-hidden />
+          <span className="font-semibold text-brand-navy" aria-current="page">Offres d'emploi</span>
+        </motion.nav>
+
+        <div className="mt-8 grid grid-cols-[1.05fr_0.95fr] items-center gap-16 max-lg:grid-cols-1 max-lg:gap-14">
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="flex min-w-0 flex-col items-start gap-5"
+          >
+            {!isPending && (
+              <motion.div variants={fadeUp} className="flex flex-wrap items-center gap-2.5">
+              <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3.5 py-1.5 text-[11px] font-bold text-emerald-700">
+                <span className="relative flex size-1.5" aria-hidden>
+                  <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-500 opacity-70" />
+                  <span className="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
+                </span>
+                Collecte du jour : {todayLong()}
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-outline-variant/50 bg-white/80 px-3.5 py-1.5 text-[11px] font-bold text-on-surface-variant">
+                <ShieldCheck className="size-3 text-brand-orange" aria-hidden />
+                {parSource.length || 0} source{parSource.length > 1 ? "s" : ""} scannée{parSource.length > 1 ? "s" : ""} · 0 doublon en base
+              </span>
+            </motion.div>
+          )}
+
+            <motion.h1
+              variants={fadeUp}
+              className="font-heading text-6xl font-black leading-[1.04] tracking-tight text-brand-navy max-xl:text-5xl max-sm:text-4xl"
+            >
+              Les offres{" "}
+              <span className="relative whitespace-nowrap text-brand-orange">
+                du jour
+                <svg className="absolute -bottom-1.5 left-0 w-full" viewBox="0 0 200 9" fill="none" preserveAspectRatio="none" aria-hidden>
+                  <motion.path
+                    d="M2 6.5C60 2.5 140 2.5 198 6.5"
+                    stroke="#F5A623"
+                    strokeWidth="3.5"
+                    strokeLinecap="round"
+                    initial={{ pathLength: 0, opacity: 0 }}
+                    whileInView={{ pathLength: 1, opacity: 0.85 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 1.6, ease: "easeOut", delay: 0.5 }}
+                  />
+                </svg>
+              </span>
+              ,<br className="max-sm:hidden" /> déjà triées.
+            </motion.h1>
+
+            <motion.p variants={fadeUp} className="max-w-xl text-lg leading-relaxed text-on-surface-variant max-md:text-base">
+              {nouveaux > 0 ? `${nouveaux} nouvelle` : "Aucune"} opportunité{nouveaux > 1 ? "s" : ""} collectée{nouveaux > 1 ? "s" : ""} ce matin sur{" "}
+              {parSource.length ? parSource.map((s) => s.label ?? s.code).slice(0, 4).join(", ") : "nos sources partenaires" }, {parSource.length > 3 && "et autres, "}
+              dé-dupliquées par hash puis taggées par filière. Demain, inutile de
+              revenir : votre sélection arrive par email à{" "}
+              <strong className="font-bold text-brand-navy">8h00 précises</strong>.
+            </motion.p>
+
+            <motion.div variants={fadeUp} className="mt-1 flex gap-3 max-sm:flex-col">
+              <CtaLink to="/inscription" icon={Bell} animateIcon>
+                Créer mon alerte 8h00
+              </CtaLink>
+              <CtaLink to="/comment-ca-marche" variant="secondary" iconRight={ArrowRight}>
+                Comment ça marche
+              </CtaLink>
+            </motion.div>
+
+            <motion.dl variants={fadeUp} className="mt-3 flex flex-wrap items-center gap-x-8 gap-y-4">
+              {COMPTEURS.map((s) => (
+                <div key={s.label}>
+                  <dt className="sr-only">{s.label}</dt>
+                  {isPending ? (
+                    <StatSkeleton />
+                  ) : (
+                    <>
+                      <dd className="font-heading text-3xl font-black text-brand-navy">
+                        <CountUp to={s.valeur} />
+                      </dd>
+                      <dd className="text-xs font-medium text-muted-foreground">{s.label}</dd>
+                    </>
+                  )}
+                </div>
+              ))}
+            </motion.dl>
+          </motion.div>
+
+          <FluxCard />
+        </div>
+      </div>
+    </section>
+  )
+}
+
+export default HeroOffres
+</file>
+
+<file path="sections/OffersFeed.jsx">
+import { memo, useCallback, useMemo, useState } from "react"
+import { AnimatePresence, motion } from "framer-motion"
+import { AlertTriangle, RefreshCw, X } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { useIsMobile } from "@/hooks/use-mobile"
+import { OfferCard } from "@/components/shared"
+import { jourLabel } from "@/lib/dates"
+import { SORTS } from "@/lib/referentiels"
+import { OffersSkeletonList } from "@/components/shared/SkeletonsOffres"
+import {
+  FeedEmptyState, FeedEndState, FeedErrorState, LoadMoreBlock,
+} from "../components/FeedStates"
+import {
+  PAGE_SIZE,
+  buildEntrepriseCounts,
+  buildFeedItems,
+  useActiveChips,
+  useOffresFeedModel,
+  useOfferReferentialsQuery,
+  useOffersOverviewQuery
+} from "@/tools/offres.tools"
+import { useOffresFilters } from "@/contexts/Offres.context"
+
+/* En-tête de jour mémoïsé — jourLabel calculé une seule fois. */
+const DayHeader = memo(function DayHeader({ jours, count }) {
+  const meta = jourLabel(jours)
+  return (
+    <motion.div
+      layout
+      initial={{ opacity: 0, x: -14 }}
+      animate={{ opacity: 1, x: 0 }}
+      className="flex items-center gap-3 pt-5 first:pt-0"
+    >
+      <span className="relative flex size-2" aria-hidden>
+        {meta.ping && (
+          <span className="absolute inline-flex size-full animate-ping rounded-full bg-brand-orange opacity-70" />
+        )}
+        <span className={cn("relative inline-flex size-2 rounded-full", meta.ping ? "bg-brand-orange" : "bg-outline-variant")} />
+      </span>
+      <h3 className="font-heading text-sm font-extrabold uppercase tracking-[0.14em] text-brand-navy">
+        {meta.label}
+      </h3>
+      <span className="text-[11px] font-semibold text-muted-foreground">
+        {count} offre{count > 1 ? "s" : ""}
+        {meta.sub && ` · ${meta.sub}`}
+      </span>
+      <span className="h-px flex-1 bg-outline-variant/50" aria-hidden />
+    </motion.div>
+  )
+})
+
+const OffersFeed = () => {
+  const isMobile = useIsMobile()
+  const { view, sort, activeCount, valeurs, resetTout } = useOffresFilters()
+  const {
+    offers, isLoading, isSwitching, isLoadingMore,
+    error, hasMore, loadMore, reload,
+  } = useOffresFeedModel()
+  const { data: overview } = useOffersOverviewQuery()
+  const { data: refs, isPending: refsPending, refetch: refsReload } = useOfferReferentialsQuery()
+
+  /* Favoris (état purement local) */
+  const [saved, setSaved] = useState(() => new Set())
+  const toggleSave = useCallback((uid) => {
+    setSaved((prev) => {
+      const next = new Set(prev)
+      next.has(uid) ? next.delete(uid) : next.add(uid)
+      return next
+    })
+  }, [])
+
+  /* Dérivés mémoïsés — O(n) partout */
+  const feedItems = useMemo(() => buildFeedItems(offers, sort), [offers, sort])
+  const entrepriseCounts = useMemo(() => buildEntrepriseCounts(offers), [offers])
+  const chips = useActiveChips()
+
+  /* Desktop-first : liste en base, grille en déclassement mobile */
+  const effectiveView = view === "grid" || isMobile ? "grid" : "list"
+  const isDone = !isLoading && !isLoadingMore && !hasMore && offers.length > 0
+  const hasActiveFilters = activeCount > 0 || Boolean(valeurs.query)
+  const isBusy = isLoading || isLoadingMore || isSwitching
+
+  return (
+    <section
+      aria-labelledby="offres-flux-titre"
+      className="border-b border-outline-variant/30 bg-background py-16 max-md:py-12"
+    >
+      <div className="mx-auto max-w-7xl px-12 max-md:px-6">
+        {/* En-tête */}
+        <div className="flex items-end justify-between gap-6 max-md:flex-col max-md:items-start">
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <p className="flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[0.18em] text-brand-orange">
+              <span className="h-px w-6 bg-brand-orange" aria-hidden />
+              Le flux
+            </p>
+            <h2 id="offres-flux-titre" className="mt-3 font-heading text-4xl font-extrabold tracking-tight text-brand-navy max-sm:text-3xl">
+              Les offres <span className="text-brand-orange">du moment</span>
+            </h2>
+            {/* Région vivante : le nombre d'offres est annoncé aux lecteurs d'écran */}
+            <p className="mt-2 text-sm text-muted-foreground" role="status" aria-live="polite">
+              {isLoading ? "Chargement du flux…" : (
+                <>
+                  <strong className="font-heading font-bold text-brand-navy">
+                    {offers.length}{hasMore ? "+" : ""}
+                  </strong> offre{offers.length > 1 ? "s" : ""}
+                  {activeCount > 0 ? ` · ${activeCount} filtre${activeCount > 1 ? "s" : ""} actif${activeCount > 1 ? "s" : ""}` : ""}
+                  {" "} triées par « {(SORTS.find((s) => s.k === sort)?.l ?? "").toLowerCase()} »
+                </>
+              )}
+            </p>
+          </motion.div>
+        </div>
+
+        {/* Référentiels en repli : on prévient sans bloquer */}
+        {refs.isFallback && !refsPending && (
+          <div role="alert" className="mt-6 flex flex-wrap items-center gap-3 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-xs font-semibold text-amber-800">
+            <AlertTriangle className="size-4" aria-hidden />
+            Les listes de filtres n'ont pas pu être chargées — options par défaut affichées.
+            <button
+              type="button"
+              onClick={() => refsReload()}
+              className="inline-flex items-center gap-1 rounded-sm font-bold underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <RefreshCw className="size-3" aria-hidden /> Réessayer
+            </button>
+          </div>
+        )}
+
+        {/* Chips de filtres actifs */}
+        <AnimatePresence>
+          {chips.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="overflow-hidden"
+            >
+              <div className="mt-5 flex flex-wrap items-center gap-2" aria-label="Filtres actifs">
+                {chips.map((c) => (
+                  <button
+                    key={c.key}
+                    type="button"
+                    onClick={c.rm}
+                    aria-label={`Retirer le filtre : ${c.label}`}
+                    className="group inline-flex items-center gap-1.5 rounded-full border border-brand-navy/20 bg-brand-navy/5 px-3 py-1.5 text-xs font-semibold text-brand-navy transition-all hover:border-brand-orange/50 hover:bg-brand-orange/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  >
+                    {c.label}
+                    <X className="size-3 text-muted-foreground transition-colors group-hover:text-brand-orange" aria-hidden />
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  onClick={resetTout}
+                  className="rounded-sm px-1 text-xs font-bold text-brand-orange transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  Tout effacer
+                </button>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* ── Flux : chargement / erreur / vide / contenu ──
+             isSwitching (keepPreviousData) : l'ancienne liste reste visible,
+             légèrement atténuée, pendant le changement de filtres. */}
+        <div
+          aria-busy={isBusy}
+          className={cn("transition-opacity duration-300", isSwitching && "opacity-60")}
+        >
+          {isLoading ? (
+            <>
+              <span className="sr-only" role="status">Chargement des offres…</span>
+              <div aria-hidden="true">
+                <OffersSkeletonList view={effectiveView} count={PAGE_SIZE / 2} className="mt-8" />
+              </div>
+            </>
+          ) : error && offers.length === 0 ? (
+            <FeedErrorState message={error} onRetry={reload} />
+          ) : offers.length === 0 ? (
+            <FeedEmptyState hasActiveFilters={hasActiveFilters} onReset={resetTout} />
+          ) : effectiveView === "list" ? (
+            <div className="mt-8 flex flex-col gap-3">
+              <AnimatePresence mode="popLayout">
+                {feedItems.map((item, i) =>
+                  item.type === "header" ? (
+                    <DayHeader key={`h-${item.jours}`} jours={item.jours} count={item.count} />
+                  ) : (
+                    <OfferCard
+                      key={item.o.uid}
+                      offre={item.o}
+                      index={i}
+                      view="list"
+                      saved={saved.has(item.o.uid)}
+                      onToggleSave={toggleSave}
+                      entrepriseTotal={entrepriseCounts.get(item.o.entreprise) ?? 1}
+                    />
+                  )
+                )}
+              </AnimatePresence>
+            </div>
+          ) : (
+            <div className="mt-8 grid grid-cols-3 gap-4 max-xl:grid-cols-2 max-sm:grid-cols-1">
+              <AnimatePresence mode="popLayout">
+                {feedItems.filter((x) => x.type === "offre").map((item, i) => (
+                  <OfferCard
+                    key={item.o.uid}
+                    offre={item.o}
+                    index={i}
+                    view="grid"
+                    saved={saved.has(item.o.uid)}
+                    onToggleSave={toggleSave}
+                    entrepriseTotal={entrepriseCounts.get(item.o.entreprise) ?? 1}
+                  />
+                ))}
+              </AnimatePresence>
+            </div>
+          )}
+        </div>
+
+        {/* Squelettes pendant « charger plus » */}
+        {isLoadingMore && (
+          <>
+            <span className="sr-only" role="status">Chargement de la page suivante…</span>
+            <div aria-hidden="true">
+              <OffersSkeletonList view={effectiveView} count={3} className="mt-3" />
+            </div>
+          </>
+        )}
+
+        {/* Erreur non bloquante sur une page suivante */}
+        {error && offers.length > 0 && (
+          <div role="alert" className="mt-6 flex flex-wrap items-center justify-center gap-3 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-xs font-semibold text-destructive">
+            <AlertTriangle className="size-4" aria-hidden />
+            {error}
+            <button
+              type="button"
+              onClick={loadMore}
+              className="inline-flex items-center gap-1 rounded-sm font-bold underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <RefreshCw className="size-3" aria-hidden /> Réessayer
+            </button>
+          </div>
+        )}
+
+        {/* Charger plus — par lots de PAGE_SIZE */}
+        {hasMore && !isLoading && (
+          <LoadMoreBlock
+            shown={offers.length}
+            total={overview?.total ?? 0}
+            isLoadingMore={isLoadingMore}
+            disabled={isSwitching}
+            onLoadMore={loadMore}
+          />
+        )}
+
+        {/* Fin du flux */}
+        <AnimatePresence>
+          {isDone && <FeedEndState />}
+        </AnimatePresence>
+
+        <p className="mt-8 flex items-center gap-2 text-xs text-muted-foreground">
+          <span className="size-1.5 rounded-full bg-brand-orange" aria-hidden />
+          Mises à jour chaque matin à 6h00 · lien direct vers l'annonce d'origine
+        </p>
+      </div>
+    </section>
+  )
+}
+
+export default OffersFeed
+</file>
+
+<file path="index.jsx">
+import { useEffect, useState } from "react"
+import { AnimatePresence, motion } from "framer-motion"
+import { ArrowUp } from "lucide-react"
+import Seo from "@/components/seo/Seo"
+import { offresSeo } from "@/lib/seo"
+import { useOffersOverviewQuery, useOffresFeedModel } from "@/tools/offres.tools"
+import { OffresFiltersProvider } from "@/contexts/Offres.context"
+import HeroOffres, { OffresTicker } from "./sections/HeroOffres"
+import FiltersBar from "./sections/FiltersBar"
+import OffersFeed from "./sections/OffersFeed"
+
+/** SEO alimenté par le cache — mêmes clés que les sections, zéro fetch dupliqué. */
+const OffresSeo = () => {
+  const { data: overview } = useOffersOverviewQuery()
+  const { offers } = useOffresFeedModel()
+  return (
+    <Seo
+      {...offresSeo({
+        total: overview?.total ?? 0,
+        nouveaux: overview?.nouveaux ?? 0,
+        parSource: overview?.parSource ?? [],
+        offers,
+      })}
+    />
+  )
+}
+
+const BackToTop = ({ visible }) => (
+  <AnimatePresence>
+    {visible && (
+      <motion.button
+        initial={{ opacity: 0, scale: 0.8, y: 12 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.8, y: 12 }}
+        onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+        aria-label="Retour en haut de page"
+        className="fixed bottom-6 right-6 z-40 grid size-11 place-items-center rounded-full bg-brand-navy text-white shadow-hover transition-colors duration-300 hover:bg-brand-orange focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        <ArrowUp className="size-5" aria-hidden />
+      </motion.button>
+    )}
+  </AnimatePresence>
+)
+
+/**
+ * Orchestrateur pur : aucun fetch, aucune donnée transitée par props.
+ * Tout passe par le cache TanStack Query et le contexte de filtres.
+ */
+const Offres = () => {
+  const [showTop, setShowTop] = useState(false)
+
+  useEffect(() => {
+    const onScroll = () => setShowTop(window.scrollY > 700)
+    window.addEventListener("scroll", onScroll, { passive: true })
+    return () => window.removeEventListener("scroll", onScroll)
+  }, [])
+
+  return (
+    <OffresFiltersProvider>
+      <OffresSeo />
+      <main>
+        <OffresTicker />
+        <HeroOffres />
+        <FiltersBar />
+        <OffersFeed />
+        <BackToTop visible={showTop} />
+      </main>
+    </OffresFiltersProvider>
+  )
+}
+
+export default Offres
+</file>
+
+</files>

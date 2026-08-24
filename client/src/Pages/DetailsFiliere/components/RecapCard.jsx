@@ -1,5 +1,4 @@
-
-import { Fragment } from "react"
+import { Fragment, useMemo } from "react"
 import { motion } from "framer-motion"
 import { Clock, Mail, ShieldCheck, Zap } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -12,8 +11,13 @@ import { useFiliereDetail } from "@/contexts/DetailsFiliere.context"
 const RecapCard = () => {
   const { meta, hue, offresChargees, feedQuery } = useFiliereDetail()
 
-  const preview = [...offresChargees].sort((a, b) => a.jours - b.jours).slice(0, 3)
-  const restants = Math.max(meta.actives - preview.length, 0)
+  const preview = useMemo(() => {
+    return [...(offresChargees || [])]
+      .sort((a, b) => (a?.jours ?? 0) - (b?.jours ?? 0))
+      .slice(0, 3)
+  }, [offresChargees])
+
+  const restants = Math.max((meta?.actives ?? 0) - preview.length, 0)
 
   return (
     <motion.div
@@ -117,7 +121,7 @@ const RecapCard = () => {
             ))
             : preview.map((o, i) => (
               <motion.li
-                key={o.uid}
+                key={o?.uid || i} // Sécurisation de la clé
                 initial={{ opacity: 0, x: -14 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.4, delay: 0.7 + i * 0.14, ease: "easeOut" }}
@@ -125,15 +129,15 @@ const RecapCard = () => {
               >
                 <span className={cn("size-2 shrink-0 rounded-full transition-transform duration-200 group-hover:scale-150", hue.dot)} aria-hidden />
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-[13px] font-semibold text-on-surface">{o.titre}</p>
-                  <p className="truncate text-[11px] text-muted-foreground">{o.entreprise} · {o.ville}</p>
+                  <p className="truncate text-[13px] font-semibold text-on-surface">{o?.titre}</p>
+                  <p className="truncate text-[11px] text-muted-foreground">{o?.entreprise} · {o?.ville}</p>
                 </div>
-                {o.jours === 0 && (
+                {o?.jours === 0 && (
                   <span className="hidden shrink-0 rounded-full bg-brand-orange/15 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-[#B45309] sm:inline">
                     Nouveau
                   </span>
                 )}
-                <ChipSource source={o.source} title={o.sourceLabel} />
+                <ChipSource source={o?.source} title={o?.sourceLabel} />
               </motion.li>
             ))}
         </ul>

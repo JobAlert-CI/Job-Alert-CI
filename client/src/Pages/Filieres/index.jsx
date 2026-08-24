@@ -1,4 +1,4 @@
-
+import { ErrorBoundary } from "react-error-boundary"
 import Seo from "@/components/seo/Seo"
 import { filieresSeo } from "@/lib/seo"
 import { useFilieresAdapted } from "@/tools/filieres.tools"
@@ -7,27 +7,38 @@ import ReferentielFilieres from "./sections/ReferentielFilieres"
 import BandeMechanique from "./sections/BandeMechanique"
 import FilieresTicker from "./components/FilieresTicker"
 
-/** SEO alimenté par le cache — mêmes clés que les sections, zéro fetch dupliqué. */
+const SectionFallback = ({ error, resetErrorBoundary }) => (
+  <div role="alert" className="p-8 text-center bg-destructive/5 border border-destructive/20 rounded-xl m-4">
+    <p className="text-destructive font-bold">Une erreur est survenue dans cette section.</p>
+    <p className="text-sm text-muted-foreground mt-2">{error.message}</p>
+    <button onClick={resetErrorBoundary} className="mt-4 px-4 py-2 bg-brand-navy text-white rounded-lg text-sm font-bold">
+      Réessayer
+    </button>
+  </div>
+)
+
 const FilieresSeo = () => {
   const { filieres } = useFilieresAdapted()
   return <Seo {...filieresSeo(filieres)} />
 }
 
-/**
- * Orchestrateur pur : aucun fetch, aucune prop transmise.
- * Chaque section se sert dans le cache TanStack Query et gère
- * elle-même ses états de chargement / erreur / vide.
- */
 const Filieres = () => (
   <>
     <FilieresSeo />
     <main>      
-      <FilieresTicker />
-      <HeroFilieres />
-      <ReferentielFilieres />
-      <BandeMechanique />
+      <ErrorBoundary FallbackComponent={SectionFallback}>
+        <FilieresTicker />
+        <HeroFilieres />
+      </ErrorBoundary>
+      
+      <ErrorBoundary FallbackComponent={SectionFallback}>
+        <ReferentielFilieres />
+      </ErrorBoundary>
+      
+      <ErrorBoundary FallbackComponent={SectionFallback}>
+        <BandeMechanique />
+      </ErrorBoundary>
     </main>
   </>
 )
-
 export default Filieres

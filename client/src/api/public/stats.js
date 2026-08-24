@@ -3,33 +3,33 @@ import { cleanParams } from "../utils";
 
 const API_URL = "/api/stats"
 
-const getGlobalSats = async () => {
-  const response = await api.get(`${API_URL}/global`)
+const getGlobalSats = async ({ signal } = {}) => {
+  const response = await api.get(`${API_URL}/global`, {signal})
   return response.data
 }
 
-const getPipelineStatus = async () => {
-  const response = await api.get(`${API_URL}/pipeline`)
+const getPipelineStatus = async ({ signal } = {}) => {
+  const response = await api.get(`${API_URL}/pipeline`, {signal})
   return response.data
 }
 
-const getOfferSats = async (params = {}) => {
-  const response = await api.get(`${API_URL}/offers`, { params: cleanParams(params) })
+const getOfferSats = async (params = {}, { signal } = {}) => {
+  const response = await api.get(`${API_URL}/offers`, { params: cleanParams(params), signal })
   return response.data
 }
 
-const getOfferSatsByFiliere = async (params = {}) => {
-  const response = await api.get(`${API_URL}/offers/by-filiere`, { params: cleanParams(params) })
+const getOfferSatsByFiliere = async (params = {}, { signal } = {}) => {
+  const response = await api.get(`${API_URL}/offers/by-filiere`, { params: cleanParams(params), signal })
   return response.data
 }
 
-const getOfferSatsBySource = async (params = {}) => {
-  const response = await api.get(`${API_URL}/offers/by-source`, { params: cleanParams(params) })
+const getOfferSatsBySource = async (params = {}, { signal } = {}) => {
+  const response = await api.get(`${API_URL}/offers/by-source`, { params: cleanParams(params), signal })
   return response.data
 }
 
-const getOfferSatsByContract = async (params = {}) => {
-  const response = await api.get(`${API_URL}/offers/by-contract`, { params: cleanParams(params) })
+const getOfferSatsByContract = async (params = {}, { signal } = {}) => {
+  const response = await api.get(`${API_URL}/offers/by-contract`, { params: cleanParams(params), signal })
   return response.data
 }
 

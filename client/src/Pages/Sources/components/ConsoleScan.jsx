@@ -231,7 +231,7 @@ const ConsoleScan = () => {
               <>
                 {visibleSources.map((s, i) => (
                   <HoverCard key={s.rawCode} openDelay={150}>
-                    <HoverCardTrigger asChild>
+                    <HoverCardTrigger>
                       <motion.li
                         initial={{ opacity: 0, x: -14 }}
                         animate={{ opacity: 1, x: 0 }}

@@ -171,7 +171,10 @@ const OffersFeed = () => {
              légèrement atténuée, pendant le changement de filtres. */}
         <div
           aria-busy={isBusy}
-          className={cn("transition-opacity duration-300", isSwitching && "opacity-60")}
+          className={cn(
+            "transition-opacity duration-300",
+            isSwitching && "opacity-60 pointer-events-none"
+          )}
         >
           {isLoading ? (
             <>
@@ -256,6 +259,7 @@ const OffersFeed = () => {
             isLoadingMore={isLoadingMore}
             disabled={isSwitching}
             onLoadMore={loadMore}
+            hasActiveFilters={hasActiveFilters}
           />
         )}
 

@@ -3,7 +3,7 @@ import { motion } from "framer-motion"
 import { ArrowRight, Bell, TrendingUp } from "lucide-react"
 import { CountUp, CtaLink } from "@/components/shared"
 import { useArticlesQuery, useCategoriesQuery, useDailyTipsQuery } from "@/tools/conseils.tools"
-import { Skel } from "../components/SkeletonsConseils"
+import { Skeleton } from "@/components/ui/skeleton"
 
 /* Compteurs alimentés par le cache — chaque chiffre a son propre squelette. */
 const BandeDonnees = () => {
@@ -14,9 +14,9 @@ const BandeDonnees = () => {
   const dailyCount = Array.isArray(rawDaily) ? rawDaily.length : rawDaily ? 1 : 0
 
   const STATS = [
-    { v: articles.length, l: "conseils analysés" },
+    { v: articles?.length, l: "conseils analysés" },
     { v: dailyCount, l: "conseils du jour" },
-    { v: categories.length, l: "thèmes observés" },
+    { v: categories?.length, l: "thèmes observés" },
   ]
 
   return (
@@ -57,7 +57,7 @@ const BandeDonnees = () => {
               {STATS.map((s) => (
                 <div key={s.l} className="rounded-lg border border-white/10 bg-white/5 px-3 py-4 text-center">
                   {isPending ? (
-                    <Skel className="mx-auto h-9 w-14 bg-white/20" />
+                    <Skeleton className="mx-auto h-9 w-14 bg-white/20" />
                   ) : (
                     <p className="font-heading text-3xl font-black text-brand-orange">
                       <CountUp to={s.v} />

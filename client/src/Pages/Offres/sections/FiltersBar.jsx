@@ -116,13 +116,15 @@ const ContratOptions = memo(function ContratOptions() {
   const { data: refs } = useOfferReferentialsQuery()
   const { data: counts } = useOfferCountsQuery()
   const { filters, toggle } = useOffresFilters()
-  return refs.contrats.map((c) => (
+  const contrats = refs?.contrats ?? []
+  
+  return contrats.map((c) => (
     <CheckRow
       key={c.code}
       checked={filters.contrats.has(c.code)}
       onToggle={() => toggle("contrats", c.code)}
       label={c.label}
-      count={counts.contrats[c.code] ?? 0}
+      count={counts?.contrats?.[c.code] ?? 0}
     />
   ))
 })
@@ -130,7 +132,9 @@ const ContratOptions = memo(function ContratOptions() {
 const ExperienceOptions = memo(function ExperienceOptions() {
   const { data: refs } = useOfferReferentialsQuery()
   const { filters, toggle } = useOffresFilters()
-  return refs.experiences.map((x) => (
+  const experiences = refs?.experiences ?? []
+  
+  return experiences.map((x) => (
     <CheckRow
       key={x.code}
       checked={filters.experiences.has(x.code)}
@@ -143,7 +147,9 @@ const ExperienceOptions = memo(function ExperienceOptions() {
 const NiveauOptions = memo(function NiveauOptions() {
   const { data: refs } = useOfferReferentialsQuery()
   const { filters, toggle } = useOffresFilters()
-  return refs.niveaux.map((n) => (
+  const niveaux = refs?.niveaux ?? []
+  
+  return niveaux.map((n) => (
     <CheckRow
       key={n.code}
       checked={filters.niveaux.has(n.code)}

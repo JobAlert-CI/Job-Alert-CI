@@ -65,7 +65,7 @@ export const FeedEmptyState = memo(function FeedEmptyState({ hasActiveFilters, o
 })
 
 export const LoadMoreBlock = memo(function LoadMoreBlock({
-  shown, total, isLoadingMore, disabled, onLoadMore,
+  shown, total, isLoadingMore, disabled, onLoadMore, hasActiveFilters,
 }) {
   const pct = total > 0 ? Math.min(100, (shown / total) * 100) : 0
   return (
@@ -79,7 +79,7 @@ export const LoadMoreBlock = memo(function LoadMoreBlock({
       <div className="w-full max-w-xs">
         <div className="flex items-center justify-between text-[11px] font-semibold text-muted-foreground" aria-live="polite">
           <span>{shown} affichée{shown > 1 ? "s" : ""}</span>
-          {total > 0 && <span>{total} au total</span>}
+          {total > 0 && !hasActiveFilters && <span>{total} au total</span>}
         </div>
         <div
           className="mt-1.5 h-1 overflow-hidden rounded-full bg-surface-container-high"

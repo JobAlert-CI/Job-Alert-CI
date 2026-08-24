@@ -1,5 +1,4 @@
-
-import { useEffect, useRef, useState } from "react"
+import { useDeferredValue, useEffect, useRef, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import {
   ArrowUpDown, Briefcase, CalendarDays, Check, ChevronDown, GraduationCap,
@@ -28,15 +27,17 @@ const FiltersBar = () => {
   } = useFiliereDetail()
 
   /* Recherche : champ local → URL debouncée */
-  const [queryLocale, setQueryLocale] = useState("")
   const { valeurs, setScalar } = useFiliereDetail()
+
+  const [queryLocale, setQueryLocale] = useState(valeurs.query || "")
+  const deferredQuery = useDeferredValue(queryLocale)
+
   // eslint-disable-next-line react-hooks/set-state-in-effect
-  useEffect(() => { setQueryLocale(valeurs.query) }, [valeurs.query])
+  useEffect(() => { setQueryLocale(valeurs.query || "") }, [valeurs.query])
   useEffect(() => {
-    if (queryLocale === valeurs.query) return
-    const timer = setTimeout(() => setScalar("query", queryLocale), 350)
-    return () => clearTimeout(timer)
-  }, [queryLocale, valeurs.query, setScalar])
+    if (deferredQuery === valeurs.query) return
+    setScalar("query", deferredQuery)
+  }, [deferredQuery, valeurs.query, setScalar])
 
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [openPop, setOpenPop] = useState(null)

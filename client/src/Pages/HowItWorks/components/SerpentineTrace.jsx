@@ -1,16 +1,20 @@
-
+// components/SerpentineTrace.jsx
 import { useRef } from "react"
-import { motion } from "framer-motion"
+import { motion, useReducedMotion } from "framer-motion"
 import { TRACE_PATH, TRACE_VIEWBOX } from "@/tools/ccm.tools"
 
 const SerpentineTrace = ({ progress }) => {
   const pathRef = useRef(null)
+  const shouldReduceMotion = useReducedMotion()
+
+  // Si l'utilisateur préfère réduire les mouvements, on affiche la trace complète statiquement
+  const effectiveProgress = shouldReduceMotion ? 1 : progress
 
   return (
     <div className="pointer-events-none absolute inset-0 z-0" aria-hidden>
-      <svg
-        className="h-full w-full"
-        viewBox={`0 0 ${TRACE_VIEWBOX.width} ${TRACE_VIEWBOX.height}`}
+      <svg 
+        className="h-full w-full" 
+        viewBox={`0 0 ${TRACE_VIEWBOX.width} ${TRACE_VIEWBOX.height}`} 
         preserveAspectRatio="none"
       >
         <path
@@ -23,39 +27,13 @@ const SerpentineTrace = ({ progress }) => {
           strokeLinecap="round"
           vectorEffect="non-scaling-stroke"
         />
-        <motion.path
-          d={TRACE_PATH}
-          fill="none"
-          stroke="var(--color-brand-orange)"
-          strokeOpacity="0.05"
-          strokeWidth="104"
-          strokeLinecap="round"
-          vectorEffect="non-scaling-stroke"
-          style={{ pathLength: progress }}
-        />
-        <motion.path
-          d={TRACE_PATH}
-          fill="none"
-          stroke="var(--color-brand-orange)"
-          strokeOpacity="0.10"
-          strokeWidth="89"
-          strokeLinecap="round"
-          vectorEffect="non-scaling-stroke"
-          style={{ pathLength: progress }}
-        />
-        <motion.path
-          d={TRACE_PATH}
-          fill="none"
-          stroke="var(--color-brand-orange)"
-          strokeOpacity="0.5"
-          strokeWidth="78"
-          strokeLinecap="round"
-          vectorEffect="non-scaling-stroke"
-          style={{ pathLength: progress }}
-        />
+
+        {/* Les 3 paths animés utilisent effectiveProgress */}
+        <motion.path d={TRACE_PATH} fill="none" stroke="var(--color-brand-orange)" strokeOpacity="0.05" strokeWidth="104" strokeLinecap="round" vectorEffect="non-scaling-stroke" style={{ pathLength: effectiveProgress }} />
+        <motion.path d={TRACE_PATH} fill="none" stroke="var(--color-brand-orange)" strokeOpacity="0.10" strokeWidth="89" strokeLinecap="round" vectorEffect="non-scaling-stroke" style={{ pathLength: effectiveProgress }} />
+        <motion.path d={TRACE_PATH} fill="none" stroke="var(--color-brand-orange)" strokeOpacity="0.5" strokeWidth="78" strokeLinecap="round" vectorEffect="non-scaling-stroke" style={{ pathLength: effectiveProgress }} />
       </svg>
     </div>
   )
 }
-
 export default SerpentineTrace

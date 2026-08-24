@@ -11,10 +11,7 @@ const BandChips = () => {
 
   if (isPending) {
     return Array.from({ length: 4 }).map((_, index) => (
-      <div
-        key={index}
-        className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3.5 py-1.5"
-      >
+      <div key={`source-skeleton-${index}`} className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3.5 py-1.5 h-9 w-32">
         <Skeleton className="size-5 shrink-0 rounded-full bg-white/20" />
         <Skeleton className="h-4 w-16 bg-white/20" />
       </div>

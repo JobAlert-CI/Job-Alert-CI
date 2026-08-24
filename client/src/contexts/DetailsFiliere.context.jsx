@@ -1,7 +1,4 @@
-
-import {
-  createContext, useCallback, useContext, useEffect, useMemo, useState,
-} from "react"
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, useDeferredValue } from "react"
 import { useParams } from "react-router-dom"
 import { useUrlFilters } from "@/hooks/use-url-filters"
 import { HUES, BRAND_HUE } from "@/lib/hues"
@@ -11,14 +8,14 @@ import {
   buildEntrepriseCounts, buildFeedItems, getPeriodLabel, getLocationLabel, labelOf,
 } from "@/lib/offres-helpers"
 import { useReferentialsQuery } from "@/lib/referentiels-query"
-import { 
-  CONFIG_FILTRES, 
-  adaptFiliere, 
+import {
+  CONFIG_FILTRES,
+  adaptFiliere,
   adaptFiliereOffers,
-  useFiliereFeedQuery, 
+  useFiliereFeedQuery,
   useFiliereQuery,
-  buildApiParams, 
-  buildScopedCounts, 
+  buildApiParams,
+  buildScopedCounts,
   filterOffers
 } from "@/tools/filiere-detail.tools"
 
@@ -59,14 +56,18 @@ export const FiliereDetailProvider = ({ children }) => {
   const setLocation = useCallback((id) => setScalar("location", id ?? ""), [setScalar])
   const resetTout = useCallback(() => reset(), [reset])
 
-  /* ── Flux paginé + logique de filtrage corrigée ── */
+  // Debounce natif React 18 : L'API ne sera appelée qu'une fois l'utilisateur arrêté
+  const deferredFilters = useDeferredValue(filters)
+  const deferredQuery = useDeferredValue(valeurs.query)
+
   const apiParams = useMemo(
     () => buildApiParams({
-      meta, refs, filters, sort, locationId,
-      query: valeurs.query, period: filters.period,
+      meta, refs, filters: deferredFilters, sort, locationId,
+      query: deferredQuery, period: deferredFilters.period,
     }),
-    [meta, refs, filters, sort, locationId, valeurs.query]
+    [meta, refs, deferredFilters, sort, locationId, deferredQuery]
   )
+
   const feedQuery = useFiliereFeedQuery(slug, apiParams)
 
   /* Pages → offres adaptées (avec code de spécialité) et dé-dupliquées */
@@ -125,9 +126,9 @@ export const FiliereDetailProvider = ({ children }) => {
       saved, toggleSave,
     }),
     [slug, meta, hue, filiereQuery, referentialsQuery, refs, filters, valeurs,
-     toggle, setScalar, setPeriod, reset, sort, view, locationId, setSort,
-     setView, setLocation, resetTout, activeCount, feedQuery, offresChargees,
-     filtered, counts, feedItems, entrepriseCounts, saved, toggleSave]
+      toggle, setScalar, setPeriod, reset, sort, view, locationId, setSort,
+      setView, setLocation, resetTout, activeCount, feedQuery, offresChargees,
+      filtered, counts, feedItems, entrepriseCounts, saved, toggleSave]
   )
 
   return (

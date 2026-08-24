@@ -35,7 +35,7 @@ const HeroHowItWorks = () => (
         >
           <motion.div variants={fadeUp} className="flex max-md:hidden">
             <StatusChip tooltip="Scraping à 6h00, dédoublonnage à 6h15, filtrage à 7h00, envoi à 8h00 chaque jour, week-end compris.">
-              Chaîne quotidienne active · dernier run à 6h00
+              Chaîne quotidienne active · dernier run à 6h02
             </StatusChip>
           </motion.div>
 

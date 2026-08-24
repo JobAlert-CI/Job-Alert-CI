@@ -1,7 +1,7 @@
-
 import { useEffect, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import { ArrowUp } from "lucide-react"
+import { ErrorBoundary } from "react-error-boundary"
 import Seo from "@/components/seo/Seo"
 import { offresSeo } from "@/lib/seo"
 import { useOffersOverviewQuery, useOffresFeedModel } from "@/tools/offres.tools"
@@ -9,6 +9,18 @@ import { OffresFiltersProvider } from "@/contexts/Offres.context"
 import HeroOffres, { OffresTicker } from "./sections/HeroOffres"
 import FiltersBar from "./sections/FiltersBar"
 import OffersFeed from "./sections/OffersFeed"
+
+
+const SectionFallback = ({ error, resetErrorBoundary }) => (
+  <div role="alert" className="p-8 text-center bg-destructive/5 border border-destructive/20 rounded-xl m-4">
+    <p className="text-destructive font-bold">Une erreur est survenue dans cette section.</p>
+    <p className="text-sm text-muted-foreground mt-2">{error.message}</p>
+    <button onClick={resetErrorBoundary} className="mt-4 px-4 py-2 bg-brand-navy text-white rounded-lg text-sm font-bold">
+      Réessayer
+    </button>
+    <a href="/offres" className="mt-2 block text-sm text-brand-navy underline">Recharger la page</a>
+.  </div>
+)
 
 /** SEO alimenté par le cache — mêmes clés que les sections, zéro fetch dupliqué. */
 const OffresSeo = () => {
@@ -49,9 +61,18 @@ const BackToTop = ({ visible }) => (
  */
 const Offres = () => {
   const [showTop, setShowTop] = useState(false)
-
+  
   useEffect(() => {
-    const onScroll = () => setShowTop(window.scrollY > 700)
+    let ticking = false
+    const onScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setShowTop(window.scrollY > 700)
+          ticking = false
+        })
+        ticking = true
+      }
+    }
     window.addEventListener("scroll", onScroll, { passive: true })
     return () => window.removeEventListener("scroll", onScroll)
   }, [])
@@ -60,10 +81,19 @@ const Offres = () => {
     <OffresFiltersProvider>
       <OffresSeo />
       <main>
-        <OffresTicker />
-        <HeroOffres />
-        <FiltersBar />
-        <OffersFeed />
+        <ErrorBoundary FallbackComponent={SectionFallback}>
+          <OffresTicker />
+          <HeroOffres />
+        </ErrorBoundary>
+        
+        <ErrorBoundary FallbackComponent={SectionFallback}>
+          <FiltersBar />
+        </ErrorBoundary>
+        
+        <ErrorBoundary FallbackComponent={SectionFallback}>
+          <OffersFeed />
+        </ErrorBoundary>
+        
         <BackToTop visible={showTop} />
       </main>
     </OffresFiltersProvider>

@@ -6,18 +6,30 @@ import {
   getOfferSats, getOfferSatsByContract, getOfferSatsByFiliere, getOfferSatsBySource, getGlobalSats
 } from "@/api/public/stats"
 import { Radar, Fingerprint, Send, FilterIcon } from "lucide-react"
-import { useMemo} from "react"
+import { useMemo } from "react"
 import { adaptOffers, mergeOffers, toIsoEnd, toIsoStart } from "@/lib/offers-adapter"
 import { settled } from "@/lib/query-helpers"
-import { getLocationLabel } from "./offres.tools"
-import { getPeriodLabel } from "./offres.tools"
-import { labelOf } from "./offres.tools"
-import { useOfferReferentialsQuery } from "./offres.tools"
 
-export { useReferentialsQuery as useOfferReferentialsQuery } from "@/lib/referentiels-query"
-export { labelOf, getPeriodLabel, getLocationLabel, buildEntrepriseCounts, buildFeedItems } from "@/lib/offres-helpers"
+import { labelOf, getPeriodLabel, getLocationLabel, buildEntrepriseCounts, buildFeedItems } from "@/lib/offres-helpers"
+import { useReferentialsQuery } from "@/lib/referentiels-query"
 
-export const ABONNES = 10550
+export { labelOf, getPeriodLabel, getLocationLabel, buildEntrepriseCounts, buildFeedItems }
+
+export const useOfferReferentialsQuery = () => {
+  return useReferentialsQuery({
+    placeholderData: {
+      filieres: [],
+      sources: [],
+      contrats: [],
+      experiences: [],
+      niveaux: [],
+      locations: [],
+      isFallback: false,
+    },
+  })
+}
+
+export const ABONNES = 10550 // TODO: À supprimer quand l'UI utilisera exclusivement getGlobalSats
 export const PAGE_SIZE = 12
 
 /** Pipeline du matin affiché dans la FluxCard (décoratif). */
@@ -59,6 +71,7 @@ export const offresKeys = {
   overview: ["offres", "overview"],
   feed: (params) => ["offres", "feed", params],
 }
+
 
 /* ─────────────── Compteurs par option de filtre ─────────────── */
 const toCountMap = (buckets) =>

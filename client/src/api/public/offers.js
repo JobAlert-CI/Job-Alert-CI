@@ -3,18 +3,18 @@ import { cleanParams } from "../utils";
 
 const API_URL = "/api/offers";
 
-const getOffers = async(params = {}) => {
-  const response = await api.get(`${API_URL}`, { params: cleanParams(params) })
+const getOffers = async(params = {}, { signal } = {}) => {
+  const response = await api.get(`${API_URL}`, { params: cleanParams(params), signal })
   return response.data
 }
 
-const getOfferById = async(id) => {
-  const response = await api.get(`${API_URL}/${id}`)
+const getOfferById = async(id, { signal } = {}) => {
+  const response = await api.get(`${API_URL}/${id}`, {signal})
   return response.data
 }
 
-const getSimilarOffers = async(id, params = {}) => {
-  const response = await api.get(`${API_URL}/${id}/similar`, { params: cleanParams(params) })
+const getSimilarOffers = async(id, params = {}, { signal } = {}) => {
+  const response = await api.get(`${API_URL}/${id}/similar`, { params: cleanParams(params), signal })
   return response.data
 }
 

@@ -6,7 +6,7 @@ import Header from "./components/layouts/Header";
 import Footer from "./components/layouts/Footer";
 import HowItWorks from "./Pages/HowItWorks";
 import { useEffect } from "react";
-import DetailsFiliere from "./Pages/DetailsFiliere/DetailsFiliere";
+import DetailsFiliere from "./Pages/DetailsFiliere";
 import Filieres from "./Pages/Filieres";
 import Offres from "./Pages/Offres";
 import DetailsOffre from "./Pages/DetailsOffre";

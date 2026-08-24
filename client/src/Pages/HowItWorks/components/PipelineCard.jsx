@@ -1,7 +1,6 @@
-
 import { useEffect, useMemo, useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { Check, Clock, MailCheck } from "lucide-react"
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion"
+import { AlertCircle, Check, Clock, MailCheck } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { SourceLogo } from "@/components/shared"
 import chipFloat from "@/lib/chipFloat"
@@ -24,31 +23,34 @@ import {
 const PipelineCard = () => {
   const { data: sources, isPending, isError } = useSources()
   const dateFr = useMemo(formatDateFr, [])
+  const shouldReduceMotion = useReducedMotion() // Hook Framer Motion
   const [tick, setTick] = useState(0)
 
   useEffect(() => {
-    const id = setInterval(
-      () => setTick((t) => (t + 1) % PIPELINE_TICK_COUNT),
-      PIPELINE_TICK_INTERVAL_MS
-    )
+    const id = setInterval(() => setTick((t) => (t + 1) % PIPELINE_TICK_COUNT), PIPELINE_TICK_INTERVAL_MS)
     return () => clearInterval(id)
   }, [])
 
   const delivered = tick >= PIPELINE_DELIVERED_AT
-  const stateOf = (index) =>
-    delivered || tick > index ? "done" : tick === index ? "active" : "pending"
+  const stateOf = (index) => delivered || tick > index ? "done" : tick === index ? "active" : "pending"
 
   const sourcesChips = useMemo(() => sources?.filter((s) => s.status === "active" && s.supports_scraping), [sources])?.slice(0, 3)
 
+  // Fallback élégant en cas d'erreur API
   const chips = useMemo(() => {
+    if (isError) return [{ id: "fallback-error", name: "Sources indisponibles", cls: "bg-destructive/10 text-destructive border-destructive/20", isFallback: true }]
     if (!Array.isArray(sourcesChips)) return []
     return sourcesChips.map((source, index) => ({
       ...source,
       ...CHIP_POSITIONS[index % CHIP_POSITIONS.length],
     }))
-  }, [sourcesChips])
+  }, [sourcesChips, isError])
 
   const activeSourcesCount = sourcesChips?.length
+
+  // Conditionne le flottement à la préférence système
+  const getFloatProps = (delay, dur) => shouldReduceMotion ? {} : chipFloat(delay, dur)
+
 
   return (
     <motion.div
@@ -57,21 +59,20 @@ const PipelineCard = () => {
       transition={{ duration: 0.7, delay: 0.25, ease: "easeOut" }}
       className="relative min-w-0"
     >
-      {!isPending &&
-        !isError &&
-        chips.map((chip) => (
-          <motion.span
-            key={chip.id || chip.code}
-            {...chipFloat(chip.delay, chip.dur)}
-            className={cn(
-              "absolute z-20 flex items-center gap-2 -rotate-3 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold shadow-hover max-md:hidden",
-              chip.cls
-            )}
-          >
-            <SourceLogo code={chip.code || chip.name} />
-            {chip.name}
-          </motion.span>
-        ))}
+      {/* Chips flottants avec fallback et clés sécurisées */}
+      {!isPending && chips.map((chip, index) => (
+        <motion.span
+          key={chip.id || chip.code || `chip-${index}`} // Filet de sécurité pour les clés
+          {...(chip.isFallback ? {} : getFloatProps(chip.delay, chip.dur))}
+          className={cn(
+            "absolute z-20 flex items-center gap-2 -rotate-3 rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold shadow-hover max-md:hidden",
+            chip.cls
+          )}
+        >
+          {chip.isFallback ? <AlertCircle className="size-3.5" /> : <SourceLogo code={chip.code || chip.name} />}
+          {chip.name}
+        </motion.span>
+      ))}
 
       {/* Console « run quotidien » */}
       <div className="overflow-hidden rounded-xl border border-border bg-card shadow-hover">
@@ -79,7 +80,7 @@ const PipelineCard = () => {
         <div className="flex items-center justify-between border-b border-border px-5 py-3.5">
           <div className="flex items-center gap-2.5">
             <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75" />
+              <span className="absolute inline-flex h-full w-full motion-safe:animate-ping rounded-full bg-emerald-500 opacity-75" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
             </span>
             <span className="text-xs font-bold uppercase tracking-wider">
@@ -126,10 +127,7 @@ const PipelineCard = () => {
                     <s.icon className="h-4.5 w-4.5" />
                   )}
                   {st === "active" && (
-                    <span
-                      className="absolute inset-0 animate-ping rounded-full border-2 border-brand-orange opacity-50"
-                      aria-hidden
-                    />
+                    <span className="absolute inset-0 motion-safe:animate-ping rounded-full border-2 border-brand-orange opacity-50" aria-hidden />
                   )}
                 </div>
                 {/* Contenu étape */}
@@ -146,10 +144,7 @@ const PipelineCard = () => {
                       <motion.span
                         animate={{ opacity: st === "active" ? 1 : 0 }}
                         transition={{ duration: 0.25 }}
-                        className={cn(
-                          "animate-pulse text-[10px] font-bold uppercase tracking-wider text-brand-orange",
-                          st !== "active" && "hidden"
-                        )}
+                        className={cn("motion-safe:animate-pulse text-[10px] font-bold uppercase tracking-wider text-brand-orange", st !== "active" && "hidden")}
                         aria-hidden={st !== "active"}
                       >
                         en cours…
@@ -192,7 +187,7 @@ const PipelineCard = () => {
         <div className="border-t border-border bg-muted/40 px-6 py-4 max-sm:px-5">
           {/* Ligne de statut */}
           <div className="flex min-w-0 items-center justify-between gap-3">
-            <div className="flex min-w-0 items-center">
+            <div className="flex h-5 shrink-0 items-center">
               <AnimatePresence mode="wait" initial={false}>
                 {delivered ? (
                   <motion.span
@@ -241,18 +236,9 @@ const PipelineCard = () => {
                     {activeSourcesCount} sources actives
                   </motion.span>
                 ) : (
-                  <motion.span
-                    key="dots"
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                    className="flex items-center gap-1"
-                  >
+                  <motion.span key="dots" exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="flex items-center gap-1">
                     {[0, 1, 2].map((i) => (
-                      <span
-                        key={i}
-                        className="h-1 w-1 animate-bounce rounded-full bg-brand-orange"
-                        style={{ animationDelay: `${i * 0.15}s` }}
-                      />
+                      <span key={i} className="h-1 w-1 motion-safe:animate-bounce rounded-full bg-brand-orange" style={{ animationDelay: `${i * 0.15}s` }} />
                     ))}
                   </motion.span>
                 )}

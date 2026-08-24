@@ -23,9 +23,9 @@ const HeroFilieres = () => {
   const { data: globalStats, isPending: statsPending } = useGlobalStatsQuery()
 
   const COMPTEURS = [
-    { valeur: globalStats.new_today ?? 0, label: "nouvelles ce matin" },
-    { valeur: globalStats.active_offers ?? 0, label: "offres actives" },
-    { valeur: globalStats.subscribers ?? 0, label: "abonnés servis" },
+    { valeur: globalStats?.new_today ?? 0, label: "nouvelles ce matin" },
+    { valeur: globalStats?.active_offers ?? 0, label: "offres actives" },
+    { valeur: globalStats?.subscribers ?? 0, label: "abonnés servis" },
   ]
 
   return (

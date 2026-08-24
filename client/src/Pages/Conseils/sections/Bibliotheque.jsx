@@ -2,8 +2,9 @@
 import { SectionHeading } from "@/components/shared"
 import {
   useArticlesQuery, useCategoriesQuery, useDailyTipsQuery,
-  useFeaturedQuery, usePopularQuery, useSeriesQuery, estErreur404
+  useFeaturedQuery, usePopularQuery, useSeriesQuery
 } from "@/tools/conseils.tools"
+import { isNotFoundError } from "@/lib/query-helpers"
 import { BibliothequeProvider } from "@/contexts/Conseils.context"
 import { BandeauErreurPartielle } from "../components/Etats"
 import BarreFiltres from "./BarreFiltres"
@@ -23,7 +24,7 @@ const Bibliotheque = () => {
   const erreurs = {}
   const blocs = { articles, categories, featured, daily, series, popular }
   Object.entries(blocs).forEach(([cle, q]) => {
-    if (q.isError && !estErreur404(q.error)) erreurs[cle] = q.error
+    if (q.isError && !isNotFoundError(q.error)) erreurs[cle] = q.error
   })
   const rechargerTout = () =>
     Object.values(blocs).forEach((q) => q.isError && q.refetch())

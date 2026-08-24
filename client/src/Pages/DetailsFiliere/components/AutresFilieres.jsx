@@ -1,19 +1,29 @@
-
 import { Link } from "react-router-dom"
 import { motion } from "framer-motion"
 import { ArrowRight, ArrowUpRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Skeleton } from "@/components/ui/skeleton"
 import { HUES, BRAND_HUE } from "@/lib/hues"
-import { useFilieresListeQuery, adaptFiliere } from "@/tools/filiere-detail.tools"
+import { useFilieresListeQuery, adaptFiliere, filiereKeys } from "@/tools/filiere-detail.tools"
 import { useFiliereDetail } from "@/contexts/DetailsFiliere.context"
 import { useMemo } from "react"
+import { useQueryClient } from "@tanstack/react-query"
+import { getFilieresBySlug } from "@/api/public/filieres"
 
 /* Autres filières — clé de cache identique à la page /filieres :
    si la liste est déjà connue, ce bloc s'affiche instantanément. */
 const AutresFilieres = () => {
   const { slug } = useFiliereDetail()
   const { data: rawFilieres, isPending } = useFilieresListeQuery()
+  const queryClient = useQueryClient()
+
+  // Prefetching au survol
+  const handlePrefetch = (code) => {
+    queryClient.prefetchQuery({
+      queryKey: filiereKeys.detail(code),
+      queryFn: ({ signal }) => getFilieresBySlug(code, { signal }),
+    })
+  }
 
   const autres = useMemo(
     () =>
@@ -66,6 +76,7 @@ const AutresFilieres = () => {
                 >
                   <Link
                     to={`/filieres/${f.code}`}
+                    onMouseEnter={() => handlePrefetch(f.code)} // Déclenche le prefetch
                     className="group flex items-center gap-3.5 rounded-xl border border-outline-variant/50 bg-white p-4 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-brand-navy/25 hover:shadow-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
                     <span className={cn("flex size-11 shrink-0 items-center justify-center rounded-lg transition-transform duration-300 group-hover:scale-105", h.tile)}>

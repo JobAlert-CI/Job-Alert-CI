@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom"
 import { AnimatePresence, motion } from "framer-motion"
 import {
@@ -60,6 +59,7 @@ const FluxFiliere = () => {
     fetchNextPage, refetch, hasNextPage,
   } = feedQuery
   const errorMessage = isError ? formatApiError(error) : null
+  
 
   /* Desktop-first : liste en base, grille en repli mobile */
   const effectiveView = view === "grid" || isMobile ? "grid" : "list"
@@ -99,12 +99,13 @@ const FluxFiliere = () => {
                 </strong>{" "}
                 offre{filtered.length > 1 ? "s" : ""}
                 {activeCount > 0 ? ` · ${activeCount} filtre${activeCount > 1 ? "s" : ""} actif${activeCount > 1 ? "s" : ""}` : ""}
-                {" "}triées par « {(SORTS.find((s) => s.k === view === "recent" ? "recent" : view)?.l ?? SORTS.find((s) => s.k === "recent")?.l ?? "").toLowerCase()} » 
+                {" "}triées par « {(SORTS.find((s) => s.k === view === "recent" ? "recent" : view)?.l ?? SORTS.find((s) => s.k === "recent")?.l ?? "").toLowerCase()} »
               </>
             )}
           </p>
         </motion.div>
-                {/* Référentiels en repli : on prévient sans bloquer */}
+
+        {/* Référentiels en repli : on prévient sans bloquer */}
         {refs.isFallback && !referentialsQuery.isPending && (
           <div role="alert" className="mt-6 flex flex-wrap items-center gap-3 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-xs font-semibold text-amber-800">
             <AlertTriangle className="size-4" aria-hidden />
@@ -157,8 +158,8 @@ const FluxFiliere = () => {
              isSwitching (keepPreviousData) : l'ancienne liste reste visible,
              légèrement atténuée, pendant le changement de filtres. */}
         <div
-          aria-busy={isPending || isFetchingNextPage || isSwitching}
-          className={cn("transition-opacity duration-300", isSwitching && "opacity-60")}
+          aria-busy={isPending || isFetchingNextPage}
+          className="transition-opacity duration-300"
         >
           {isPending ? (
             <>

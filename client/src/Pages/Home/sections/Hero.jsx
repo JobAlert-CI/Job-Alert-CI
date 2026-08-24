@@ -1,6 +1,6 @@
 
 import { Link } from "react-router-dom"
-import { motion } from "framer-motion"
+import { motion, useReducedMotion } from "framer-motion"
 import { ArrowRight, BadgeCheck, Bell, Check, Clock, Radar } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
@@ -9,14 +9,13 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { getImgSource } from "@/utils/utilsSource"
-import { CountUp, CtaLink } from "@/components/shared"
+import { CountUp, CtaLink, SourceLogo } from "@/components/shared"
 import { Skeleton } from "@/components/ui/skeleton"
 import { HUES } from "@/lib/hues"
 import chipFloat from "@/lib/chipFloat"
 import { REASSURANCES, JOBS_APERCU } from "@/data/constanteMetier"
 import {
-  containerVariants, 
+  containerVariants,
   fadeUp,
   EMAIL_DELIVERY_TIME,
   MAX_PREVIEW_OFFERS,
@@ -105,6 +104,9 @@ const Hero = () => {
   const sourceCount = stats?.sources ?? 0
   const remainingOffers = Math.max(0, newOffersCount - MAX_PREVIEW_OFFERS)
   const showRemainingBadge = !statsPending && !statsError && remainingOffers > 0
+
+  const shouldReduceMotion = useReducedMotion()
+  const getFloatProps = (delay, dur) => shouldReduceMotion ? {} : chipFloat(delay, dur)
 
   // Bandeau de stats : 0 pendant le chargement ou en cas d'erreur
   const statsUnavailable = statsPending || filPending || statsError || filError
@@ -252,8 +254,8 @@ const Hero = () => {
 
             {/* Chip "8h00" */}
             <motion.span
-              {...chipFloat(0.9, 4.5)}
-              className="absolute -top-4 left-4 z-20 inline-flex -rotate-3 items-center gap-1.5 rounded-full bg-brand-orange px-3.5 py-1.5 text-[11px] font-bold text-white shadow-lg sm:-left-5"
+              {...getFloatProps(0.9, 4.5)}
+              className="absolute -top-4 left-4 z-20 inline-flex -rotate-3 items-center gap-1.5 rounded-full bg-brand-orange px-3.5 py-1.5 text-[11px] font-bold text-white shadow-lg sm:-left-4"
             >
               <Clock className="size-3" aria-hidden />
               Envoyé à {EMAIL_DELIVERY_TIME} pile
@@ -261,7 +263,7 @@ const Hero = () => {
 
             {/* Chip sources */}
             <motion.span
-              {...chipFloat(1.1, 5.2)}
+              {...getFloatProps(1.1, 5.2)}
               className="absolute -right-2 top-1/4 z-20 inline-flex rotate-3 items-center gap-1.5 rounded-full bg-brand-navy px-3.5 py-1.5 text-[11px] font-bold text-white shadow-lg sm:-right-5"
             >
               <Radar className="size-3 text-brand-orange" aria-hidden />
@@ -272,7 +274,7 @@ const Hero = () => {
 
             {/* Chip 0 doublon */}
             <motion.span
-              {...chipFloat(1.3, 4.8)}
+              {...getFloatProps(1.3, 4.8)}
               className="absolute -bottom-4 right-8 z-20 inline-flex rotate-2 items-center gap-1.5 rounded-full border border-outline-variant/50 bg-white px-3.5 py-1.5 text-[11px] font-bold text-on-surface shadow-hover"
             >
               <BadgeCheck className="size-3.5 text-emerald-500" aria-hidden />
@@ -284,11 +286,7 @@ const Hero = () => {
               {/* En-tête email */}
               <div className="flex items-center gap-3 border-b border-outline-variant/40 bg-surface-container-low/60 px-5 py-3.5">
                 <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-transparent font-heading text-[11px] font-black text-white">
-                  <img
-                    src="/logo2.svg"
-                    alt="JobAlert CI"
-                    loading="lazy"
-                  />
+                  <img src="/logo2.svg" alt="JobAlert CI" />
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="text-[13px] font-bold text-on-surface">
@@ -375,14 +373,10 @@ const Hero = () => {
                               variant="outline"
                               className="shrink-0 gap-1 rounded-full border-outline-variant/60 bg-surface-container-low/60 px-2 py-0.5 text-[10px] font-semibold text-on-surface-variant"
                             >
-                              <img
-                                src={getImgSource(
-                                  offer.source?.code || offer.source?.name
-                                )}
-                                alt={offer.source?.name || "Source"}
-                                className="size-8 object-contain"
-                                loading="lazy"
-                              />
+                              <SourceLogo
+                                code={offer.source?.code || offer.source?.name} 
+                                className = "size-8"
+                              />                              
                             </Badge>
                           </TooltipTrigger>
                           <TooltipContent side="top">

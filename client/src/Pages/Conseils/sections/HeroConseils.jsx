@@ -8,7 +8,8 @@ import { CountUp, CtaLink, StatusChip } from "@/components/shared"
 import { moyenneLecture, containerVariants, fadeUp, useArticlesQuery, useCategoriesQuery, useFeaturedQuery, } from "@/tools/conseils.tools"
 import CarteUne from "../components/CarteUne"
 import { EtatErreur } from "../components/Etats"
-import { CompteursSkeleton, Skel } from "../components/SkeletonsConseils"
+import { CompteursSkeleton } from "../components/SkeletonsConseils"
+import { Skeleton } from "@/components/ui/skeleton"
 
 /* Héro autonome : compteurs ← articles, carrousel ← « à la une ».
    Chaque zone gère SON chargement (squelette local, pas de blocage global). */
@@ -20,8 +21,8 @@ const HeroConseils = () => {
   const moyenne = useMemo(() => moyenneLecture(articles), [articles])
 
   const COMPTEURS = [
-    { valeur: articles.length, label: "conseils publiés" },
-    { valeur: categories.length, label: "thèmes couverts" },
+    { valeur: articles?.length, label: "conseils publiés" },
+    { valeur: categories?.length, label: "thèmes couverts" },
     { valeur: moyenne, label: "min de lecture moyenne" },
   ]
 
@@ -125,9 +126,9 @@ const HeroConseils = () => {
 
           {/* À la une — son propre chargement / erreur / vide */}
           <div>
-            {featured.isPending && featured.data.length === 0 ? (
-              <Skel className="h-112 w-full rounded-2xl" />
-            ) : featured.isError && featured.data.length === 0 ? (
+            {featured?.isPending && featured?.data?.length === 0 ? (
+              <Skeleton className="h-112 w-full rounded-2xl" />
+            ) : featured?.isError && featured?.data?.length === 0 ? (
               <EtatErreur
                 compact
                 title="À la une indisponible"
@@ -135,7 +136,7 @@ const HeroConseils = () => {
                 onRetry={() => featured.refetch()}
               />
             ) : (
-              <CarteUne articles={featured.data} />
+              <CarteUne articles={featured?.data} />
             )}
           </div>
         </div>

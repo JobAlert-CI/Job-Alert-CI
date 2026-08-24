@@ -3,38 +3,34 @@ import { motion } from "framer-motion"
 import {
   AlertTriangle, ArrowRight, Inbox, RefreshCw,
 } from "lucide-react"
-import { cn } from "@/lib/utils"
 import { CtaLink } from "@/components/shared"
 import { formatApiError } from "@/api/errors"
+import { Skeleton } from "@/components/ui/skeleton"
 
-/* Brique de base */
-export const Skel = ({ className }) => (
-  <div aria-hidden className={cn("animate-pulse rounded-lg bg-surface-container-high", className)} />
-)
 
 /* ─────────────── Squelette héro (desktop-first) ─────────────── */
 export const HeroSkeleton = () => (
   <section className="relative overflow-hidden hero-gradient" aria-busy="true">
     <span className="sr-only" role="status">Chargement des sources…</span>
     <div className="relative z-10 mx-auto max-w-7xl px-12 pb-14 pt-10 max-md:px-6 max-md:pb-16 max-md:pt-8">
-      <Skel className="h-4 w-40" />
+      <Skeleton className="h-4 w-40" />
       {/* Desktop-first : 2 colonnes en base, empilé en repli */}
       <div className="mt-8 grid items-start gap-14 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16 max-lg:grid-cols-1">
         <div className="space-y-5">
-          <Skel className="h-7 w-64 rounded-full" />
-          <Skel className="h-14 w-full max-w-xl" />
-          <Skel className="h-5 w-full max-w-2xl" />
+          <Skeleton className="h-7 w-64 rounded-full" />
+          <Skeleton className="h-14 w-full max-w-xl" />
+          <Skeleton className="h-5 w-full max-w-2xl" />
           <div className="flex flex-col gap-3 sm:flex-row">
-            <Skel className="h-12 w-64 rounded-full" />
-            <Skel className="h-12 w-52 rounded-full" />
+            <Skeleton className="h-12 w-64 rounded-full" />
+            <Skeleton className="h-12 w-52 rounded-full" />
           </div>
           <div className="flex flex-wrap gap-8">
-            <Skel className="h-14 w-20" />
-            <Skel className="h-14 w-20" />
-            <Skel className="h-14 w-20" />
+            <Skeleton className="h-14 w-20" />
+            <Skeleton className="h-14 w-20" />
+            <Skeleton className="h-14 w-20" />
           </div>
         </div>
-        <Skel className="h-144 w-full rounded-2xl" />
+        <Skeleton className="h-144 w-full rounded-2xl" />
       </div>
     </div>
   </section>
@@ -46,15 +42,15 @@ export const SourcesSkeleton = () => (
     <span className="sr-only" role="status">Chargement des cartes sources…</span>
     <div className="mx-auto max-w-7xl px-12 max-md:px-6">
       <div className="mb-10 space-y-3">
-        <Skel className="h-4 w-32" />
-        <Skel className="h-10 w-full max-w-lg" />
-        <Skel className="h-4 w-full max-w-2xl" />
+        <Skeleton className="h-4 w-32" />
+        <Skeleton className="h-10 w-full max-w-lg" />
+        <Skeleton className="h-4 w-full max-w-2xl" />
       </div>
       {/* Desktop-first : 6 colonnes en base, 2 en tablette, 1 en mobile */}
       <div className="grid gap-4 md:grid-cols-6">
-        <Skel className="h-96 md:col-span-6 rounded-xl" />
+        <Skeleton className="h-96 md:col-span-6 rounded-xl" />
         {Array.from({ length: 3 }).map((_, i) => (
-          <Skel key={i} className="h-96 md:col-span-2 rounded-xl" />
+          <Skeleton key={i} className="h-96 md:col-span-2 rounded-xl" />
         ))}
       </div>
     </div>

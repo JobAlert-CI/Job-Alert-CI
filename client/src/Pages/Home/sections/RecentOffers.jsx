@@ -1,4 +1,4 @@
-
+import { useMemo } from "react"
 import { Link } from "react-router-dom"
 import { motion } from "framer-motion"
 import { ArrowRight, ArrowUpRight } from "lucide-react"
@@ -70,8 +70,12 @@ const RecentOffers = () => {
   const { statsQuery, filieresQuery, countForTitle } = useHomeMetrics()
   const offersQuery = useRecentOffers()
 
-  // Un seul état dérivé pour toute la section : "loading" | "degraded" | "ready"
-  const viewState = getViewState([statsQuery, filieresQuery, offersQuery])
+  // Optimisation : Mémorisation du calcul de l'état de vue
+  const viewState = useMemo(
+    () => getViewState([statsQuery, filieresQuery, offersQuery]),
+    [statsQuery, filieresQuery, offersQuery]
+  )
+
 
   const title =
     viewState === "loading" && countForTitle === null ? (

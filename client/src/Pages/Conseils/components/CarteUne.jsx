@@ -28,14 +28,14 @@ export const CarteUneVide = () => (
 
 const CarrouselUne = ({ articles }) => {
   const { idx, setIdx, progression, pause, reprendre } = useCarrousel({
-    count: articles.length,
+    count: articles?.length,
     duree: DUREE_UNE,
   })
   const { direction, onSelect, propsGlissement } = useGlissement({
-    count: articles.length, idx, setIdx, pause, reprendre,
+    count: articles?.length, idx, setIdx, pause, reprendre,
   })
 
-  const indexSur = ((idx % articles.length) + articles.length) % articles.length
+  const indexSur = ((idx % articles?.length) + articles?.length) % articles?.length
   const a = articles[indexSur]
   if (!a) return <CarteUneVide />
   const hue = HUES[a.category?.hue] || HUES.sky
@@ -99,7 +99,7 @@ const CarrouselUne = ({ articles }) => {
 
         <div className="relative px-6 pt-5">
           <SegmentsProgression
-            count={articles.length}
+            count={articles?.length}
             idx={indexSur}
             progression={progression}
             onSelect={onSelect}
@@ -123,7 +123,7 @@ const CarrouselUne = ({ articles }) => {
                 transition={{ duration: 0.25 }}
                 className="truncate text-[11px] text-white/60"
               >
-                À la une · {dateLabel(joursDepuis(a.published_at))} · {indexSur + 1}/{articles.length}
+                À la une · {dateLabel(joursDepuis(a.published_at))} · {indexSur + 1}/{articles?.length}
               </motion.p>
             </AnimatePresence>
           </div>
@@ -190,6 +190,6 @@ const CarrouselUne = ({ articles }) => {
 }
 
 const CarteUne = ({ articles }) =>
-  articles.length ? <CarrouselUne articles={articles} /> : <CarteUneVide />
+  articles?.length ? <CarrouselUne articles={articles} /> : <CarteUneVide />
 
 export default CarteUne

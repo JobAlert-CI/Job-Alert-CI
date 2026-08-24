@@ -4,7 +4,7 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/h
 
 const CompanyHover = ({ offre, totalOffres }) => (
   <HoverCard openDelay={200}>
-    <HoverCardTrigger asChild>
+    <HoverCardTrigger>
       <button className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground">
         <Building2 className="size-3.5" />
         <span className="font-medium">{offre.entreprise}</span>

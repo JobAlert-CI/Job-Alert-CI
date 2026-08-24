@@ -2,7 +2,7 @@
 import { Skeleton } from "@/components/ui/skeleton"
 
 export const OfferSkeleton = () => (
-  <li className="rounded-xl border border-outline-variant/40 bg-white p-5">
+  <li className="rounded-xl border border-outline-variant/40 bg-white p-5 min-h-26">
     <div className="flex items-start gap-4">
       <Skeleton className="size-12 shrink-0 rounded-lg" />
       <div className="min-w-0 flex-1 space-y-2.5">

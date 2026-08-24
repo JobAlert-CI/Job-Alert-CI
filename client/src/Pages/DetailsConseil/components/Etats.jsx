@@ -3,11 +3,8 @@ import { motion } from "framer-motion"
 import { AlertTriangle, ArrowRight, Inbox, RefreshCw, SearchX } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { CtaLink } from "@/components/shared"
+import { Skeleton } from "@/components/ui/skeleton"
 
-/* Brique de base (locale — ne pas confondre avec le Skeleton shadcn). */
-export const Skel = ({ className }) => (
-  <div aria-hidden className={cn("animate-pulse rounded-lg bg-surface-container-high", className)} />
-)
 
 export const EtatVide = ({
   title = "Aucun contenu pour le moment",
@@ -44,16 +41,16 @@ export const DetailSkeleton = () => (
     <section className="relative overflow-hidden hero-gradient">
       <div className="absolute inset-0 bg-pattern opacity-50" aria-hidden />
       <div className="relative z-10 mx-auto max-w-7xl px-12 pb-16 pt-10 max-md:px-6 max-md:pb-14 max-md:pt-8">
-        <Skel className="h-4 w-72" />
+        <Skeleton className="h-4 w-72" />
         <div className="mt-8 grid grid-cols-[1.05fr_0.95fr] items-start gap-16 max-lg:grid-cols-1 max-lg:gap-14">
           <div className="space-y-5">
-            <Skel className="h-7 w-56 rounded-full" />
-            <Skel className="h-12 w-full max-w-xl" />
-            <Skel className="h-5 w-full max-w-2xl" />
-            <Skel className="h-12 w-full max-w-md" />
-            <Skel className="h-12 w-full max-w-lg" />
+            <Skeleton className="h-7 w-56 rounded-full" />
+            <Skeleton className="h-12 w-full max-w-xl" />
+            <Skeleton className="h-5 w-full max-w-2xl" />
+            <Skeleton className="h-12 w-full max-w-md" />
+            <Skeleton className="h-12 w-full max-w-lg" />
           </div>
-          <Skel className="h-120 w-full rounded-2xl" />
+          <Skeleton className="h-120 w-full rounded-2xl" />
         </div>
       </div>
     </section>
@@ -61,21 +58,21 @@ export const DetailSkeleton = () => (
     <section className="border-b border-outline-variant/30 bg-background py-18 max-md:py-14">
       <div className="mx-auto grid max-w-7xl grid-cols-[minmax(0,1fr)_320px] gap-10 px-12 max-lg:grid-cols-1 max-md:px-6">
         <div className="space-y-6">
-          {[0, 1, 2, 3].map((i) => <Skel key={`corps-skel-${i}`} className="h-24 w-full rounded-xl" />)}
+          {[0, 1, 2, 3].map((i) => <Skeleton key={`corps-Skeleton-${i}`} className="h-24 w-full rounded-xl" />)}
         </div>
         <div className="space-y-6">
-          <Skel className="h-40 rounded-xl" />
-          <Skel className="h-64 rounded-xl" />
-          <Skel className="h-52 rounded-xl" />
+          <Skeleton className="h-40 rounded-xl" />
+          <Skeleton className="h-64 rounded-xl" />
+          <Skeleton className="h-52 rounded-xl" />
         </div>
       </div>
     </section>
 
     <section className="bg-surface-container-lowest py-20 max-md:py-16">
       <div className="mx-auto max-w-7xl px-12 max-md:px-6">
-        <Skel className="h-8 w-72" />
+        <Skeleton className="h-8 w-72" />
         <div className="mt-10 grid grid-cols-3 gap-4 max-xl:grid-cols-2 max-sm:grid-cols-1">
-          {[0, 1, 2].map((i) => <Skel key={`carte-skel-${i}`} className="h-56 rounded-xl" />)}
+          {[0, 1, 2].map((i) => <Skeleton key={`carte-Skeleton-${i}`} className="h-56 rounded-xl" />)}
         </div>
       </div>
     </section>

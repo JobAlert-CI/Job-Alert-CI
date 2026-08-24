@@ -99,9 +99,10 @@ const HeroFiliere = () => {
               <div className="mt-2.5 flex flex-wrap gap-2">
                 {meta.keywords.map((kw) => (
                   <Tooltip key={kw}>
-                    <TooltipTrigger >
+                    <TooltipTrigger>
                       <span
                         tabIndex={0}
+                        role="button"
                         className="cursor-help rounded-full border border-outline-variant/60 bg-white/80 px-3 py-1 text-xs font-medium text-on-surface-variant backdrop-blur-sm transition-colors hover:border-brand-navy/40 hover:text-brand-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                       >
                         {kw}

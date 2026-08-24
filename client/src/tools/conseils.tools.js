@@ -1,5 +1,6 @@
 import { Clock, Flame, Zap } from "lucide-react"
 import { useQuery } from "@tanstack/react-query"
+import { isNotFoundError } from "@/lib/query-helpers"
 import {
   getArticles, getArticleCategories, getArticleFeatured,
   getArticlesDaily, getArticleSeries, getArticlesPopular,
@@ -86,9 +87,6 @@ export const adaptConseilsQuotidiens = (payload, index = []) => {
     }))
 }
 
-export const estErreur404 = (erreur) =>
-  erreur?.response?.status === 404 || erreur?.status === 404
-
 /**
  * Filtrage + tri des articles — fonction pure (testable).
  * Recherche insensible aux accents, étendue au libellé de catégorie.
@@ -161,27 +159,43 @@ const enListe = (data) => (Array.isArray(data) ? data : data ? [data] : [])
  * on recoupe au premier lot court ou en échec — même sémantique.
  */
 const chargerTousArticles = async () => {
+  const fetchLot = async (offset) => {
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        return await getArticles({ limit: LIMIT_ARTICLES, offset, sort: "recent" })
+      } catch (err) {
+        if (attempt === 2) throw err // Échec définitif après 3 tentatives
+        await new Promise((res) => setTimeout(res, 500 * (attempt + 1))) // Backoff exponentiel
+      }
+    }
+  }
+
   const lots = await Promise.allSettled(
-    Array.from({ length: MAX_LOTS_ARTICLES }, (_, i) =>
-      getArticles({ limit: LIMIT_ARTICLES, offset: i * LIMIT_ARTICLES, sort: "recent" })
-    )
+    Array.from({ length: MAX_LOTS_ARTICLES }, (_, i) => fetchLot(i * LIMIT_ARTICLES))
   )
+  
   const articles = []
   for (const lot of lots) {
-    if (lot.status === "rejected") break
+    if (lot.status === "rejected") {
+      // On arrête la pagination si un lot échoue définitivement
+      break
+    }
     const liste = Array.isArray(lot.value) ? lot.value : []
     articles.push(...liste)
-    if (liste.length < LIMIT_ARTICLES) break
+    if (liste.length < LIMIT_ARTICLES) break // Plus de données, on peut s'arrêter
   }
   return articles
 }
+
+const safeRetry = (failureCount, error) => !isNotFoundError(error) && failureCount < 2
 
 export const useArticlesQuery = () =>
   useQuery({
     queryKey: conseilsKeys.articles,
     queryFn: chargerTousArticles,
-    staleTime: 10 * 60 * 1000, // retour depuis un article → liste instantanée
+    staleTime: 10 * 60 * 1000,
     placeholderData: [],
+    retry: safeRetry,
   })
 
 export const useCategoriesQuery = () =>
@@ -190,6 +204,7 @@ export const useCategoriesQuery = () =>
     queryFn: getArticleCategories,
     staleTime: 15 * 60 * 1000,
     placeholderData: [],
+    retry: safeRetry,
   })
 
 export const useFeaturedQuery = () =>
@@ -199,6 +214,7 @@ export const useFeaturedQuery = () =>
     select: enListe,
     staleTime: 10 * 60 * 1000,
     placeholderData: [],
+    retry: safeRetry, // ✅ Ajouté
   })
 
 export const useDailyTipsQuery = () =>
@@ -207,6 +223,7 @@ export const useDailyTipsQuery = () =>
     queryFn: getArticlesDaily,
     staleTime: 10 * 60 * 1000,
     placeholderData: [],
+    retry: safeRetry, // ✅ Ajouté
   })
 
 export const useSeriesQuery = () =>
@@ -216,6 +233,7 @@ export const useSeriesQuery = () =>
     select: enListe,
     staleTime: 15 * 60 * 1000,
     placeholderData: [],
+    retry: safeRetry, // ✅ Ajouté
   })
 
 export const usePopularQuery = () =>
@@ -225,4 +243,5 @@ export const usePopularQuery = () =>
     select: enListe,
     staleTime: 10 * 60 * 1000,
     placeholderData: [],
+    retry: safeRetry, // ✅ Ajouté
   })
