@@ -1,7 +1,6 @@
 
 import { motion } from "framer-motion"
 import { Bell, Zap } from "lucide-react"
-import { cn } from "@/lib/utils"
 import { CountUp, CtaLink } from "@/components/shared"
 import { useHomeMetrics } from "../../../tools/home.tools"
 import { RepartitionSkeleton } from "./Skeletons"
@@ -67,7 +66,8 @@ const PanelContent = ({ isPending, isError, repartition, bigNumber, onRetry }) =
                   delay: 0.3 + index * 0.08,
                   ease: [0.22, 1, 0.36, 1],
                 }}
-                className={cn("h-full rounded-full", item.color)}
+                className="h-full rounded-full"
+                style={{ backgroundColor: item.hex }}
               />
             </div>
           </div>
@@ -87,6 +87,7 @@ export const RepartitionPanel = () => {
       viewport={{ once: true, margin: "-60px" }}
       transition={{ duration: 0.6, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
       className="relative flex flex-col overflow-hidden rounded-xl bg-brand-navy p-6 text-white"
+
     >
       <div
         className="pointer-events-none absolute inset-0 bg-pattern opacity-20"

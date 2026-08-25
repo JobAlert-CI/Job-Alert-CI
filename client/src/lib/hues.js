@@ -14,11 +14,76 @@ export const HUES = {
   red: { dot: "bg-red-500", tile: "bg-red-500/10 text-red-600", tileHover: "group-hover:bg-red-600 group-hover:text-white", solid: "bg-red-600", glow: "bg-red-400/20", accent: "text-red-600", hex: "#ef4444" },
   green: { dot: "bg-green-500", tile: "bg-green-500/10 text-green-600", tileHover: "group-hover:bg-green-600 group-hover:text-white", solid: "bg-green-600", glow: "bg-green-400/20", accent: "text-green-600", hex: "#22c55e" },
   slate: { dot: "bg-slate-500", tile: "bg-slate-500/10 text-slate-600", tileHover: "group-hover:bg-slate-600 group-hover:text-white", solid: "bg-slate-600", glow: "bg-slate-400/20", accent: "text-slate-600", hex: "#64748b" },
-  cyan: { dot: "bg-cyan-500", tile: "bg-cyan-500/10 text-cyan-600", tileHover: "group-hover:bg-cyan-600 group-hover:text-white", solid: "bg-cyan-600", glow: "bg-cyan-400/20", accent: "text-cyan-600", hex: "#06b6d4" },
 }
 
 /* Teinte « marque » pour les éléments transverses (calendrier, etc.) */
 export const BRAND_HUE = {
   dot: "bg-brand-orange", solid: "bg-brand-orange", accent: "text-brand-orange",
   tile: "bg-brand-orange/10 text-brand-orange", glow: "bg-brand-orange/20", hex: "#F5A623",
+}
+
+/* ════════════════════════════════════════════════════════════════════
+   PALETTE DEPUIS COLOR_HEX
+   Le backend renvoie désormais color_hex (ex: "#425f42") sur les
+   filières. Cette fonction construit la même structure que HUES mais
+   avec la couleur exacte au lieu d'une teinte prédéfinie.
+
+   Les classes Tailwind référencent des variables CSS (--palette-*),
+   posées via `style` : c'est ce qui permet des couleurs dynamiques
+   tout en restant compilables par Tailwind (les classes sont littérales).
+   Usage : <span className={p.dot} style={p.style} /> — le `style` peut
+   être posé sur un parent, les variables héritent aux descendants.
+   Hex invalide/manquant → repli sur la palette sky.
+   ════════════════════════════════════════════════════════════════════ */
+
+/** Valide et normalise un hex "#RRGGBB" ; retourne null sinon. */
+const normaliserHex = (hex) => {
+  if (!hex) return null
+  const clean = String(hex).trim().replace("#", "")
+  if (!/^[0-9a-fA-F]{6}$/.test(clean)) return null
+  return `#${clean.toLowerCase()}`
+}
+
+const hexVersRgb = (hex) => ({
+  r: parseInt(hex.slice(1, 3), 16),
+  g: parseInt(hex.slice(3, 5), 16),
+  b: parseInt(hex.slice(5, 7), 16),
+})
+
+/** Assombrit un hex d'un facteur (0-1) — équivalent visuel de la nuance -600. */
+const assombrir = (hex, facteur) => {
+  const { r, g, b } = hexVersRgb(hex)
+  const canal = (v) => Math.max(0, Math.round(v * (1 - facteur)))
+  const to2 = (v) => canal(v).toString(16).padStart(2, "0")
+  return `#${to2(r)}${to2(g)}${to2(b)}`
+}
+
+const avecAlpha = (hex, alpha) => {
+  const { r, g, b } = hexVersRgb(hex)
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`
+}
+
+/**
+ * Palette complète dérivée d'une couleur exacte.
+ * Mêmes clés que HUES : dot, tile, tileHover, solid, glow, accent, hex
+ * (+ style : variables CSS à propager avec les className).
+ */
+export const paletteDepuisHex = (hex) => {
+  const base = normaliserHex(hex) ?? HUES.sky.hex
+  const dark = assombrir(base, 0.25)
+  return {
+    hex: base,
+    style: {
+      "--palette-base": base,
+      "--palette-dark": dark,
+      "--palette-tile": avecAlpha(base, 0.1),
+      "--palette-glow": avecAlpha(base, 0.2),
+    },
+    dot: "bg-[var(--palette-base)]",
+    tile: "bg-[var(--palette-tile)] text-[var(--palette-dark)]",
+    tileHover: "group-hover:bg-[var(--palette-dark)] group-hover:text-white",
+    solid: "bg-[var(--palette-dark)]",
+    glow: "bg-[var(--palette-glow)]",
+    accent: "text-[var(--palette-dark)]",
+  }
 }

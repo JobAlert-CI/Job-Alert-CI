@@ -2,6 +2,7 @@ import {
   ArrowRight, ArrowUpRight, BadgeCheck, Bell, BookOpen,
   ChevronDown, Clock, LayoutGrid, Menu, Radar, Sparkles,
   Zap, X,
+  Briefcase,
 } from "lucide-react"
 import { useEffect, useMemo, useRef, useState } from "react"
 import { Link, useLocation } from "react-router-dom"
@@ -83,23 +84,21 @@ const MegaPanel = ({ children, onEnter, onLeave }) => (
 
 /* Tuile catégorie (filière ou conseil) */
 const MenuTile = ({ item }) => {
-  const hue = HUES[item.hue] ?? HUES.sky
-  const Icon = item.icon
+  const hue = item.palette ?? HUES[item.hue] ?? HUES.sky
+  
   return (
     <motion.div variants={itemVariants}>
       <Link
         to={item.to}
-        className={cn(
-          "group flex items-center gap-3 rounded-lg border border-transparent p-2.5 transition-all duration-200 hover:-translate-y-0.5",
-          `hover:bg-${item.hue}-50 hover:border-${item.hue}-200`
-        )}
+        style={hue.style}
+        className="group flex items-center gap-3 rounded-lg border border-transparent p-2.5 transition-all duration-200 hover:-translate-y-0.5 hover:border-outline-variant/60"
       >
         <span className={cn(
           "flex size-10 shrink-0 items-center justify-center rounded-md transition-colors duration-200",
           hue.tile,
-          `group-hover:${hue.solid} group-hover:text-white`
+          hue.tileHover
         )}>
-          <Icon className="size-5" strokeWidth={2} />
+          <Briefcase className="size-5" strokeWidth={2} />
         </span>
         <span className="min-w-0">
           <span className="block truncate-2 md:truncate text-[13px] font-semibold leading-tight text-on-surface">
@@ -142,20 +141,21 @@ const AllTile = ({ to, icon: Icon, label, count, unit }) => (
 
 /* Tuile conseil — article du top 8, avec badge de rang */
 const ConseilTile = ({ a, rank }) => {
-  const hue = HUES[a.catHue] ?? HUES.sky
-  const Icon = BookOpen // ICON_MAP[a.cat] : Ecrire une fonction
+  const hue = a.catPalette ?? HUES.sky
+  
   return (
     <motion.div variants={itemVariants}>
       <Link
         to={`/conseils/${a.slug}`}
+        style={hue.style}
         className="group flex items-start gap-3 rounded-lg border border-transparent p-2.5 transition-all duration-200 hover:-translate-y-0.5 hover:border-outline-variant/50 hover:bg-surface-container-low/60 hover:shadow-soft"
       >
         <span className={cn(
           "relative flex size-10 shrink-0 items-center justify-center rounded-md transition-colors duration-200",
           hue.tile,
-          `group-hover:${hue.solid} group-hover:text-white`
+          hue.tileHover
         )}>
-          <Icon className="size-5" strokeWidth={2} />
+          <BookOpen className="size-5" strokeWidth={2} />
           <span className="absolute -left-1.5 -top-1.5 grid size-4.5 place-items-center rounded-full bg-brand-navy font-heading text-[9px] font-black text-white ring-2 ring-white">
             {rank}
           </span>

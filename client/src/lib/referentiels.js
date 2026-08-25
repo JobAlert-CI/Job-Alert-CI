@@ -3,7 +3,10 @@ import {
   Building2, Calculator, Code2, GraduationCap, Handshake, HardHat,
   Megaphone, ShieldCheck, Sprout, Stethoscope, Truck, Users, UtensilsCrossed,
 } from "lucide-react"
+import { HUES } from "@/lib/hues"
 
+/* colorHex : couleur exacte par filière (aligne le fallback local sur le
+   champ color_hex renvoyé par l'API). */
 export const FILIERES_META = [
   { code: "tech-dev", label: "Tech & Dev", icon: Code2, hue: "sky", actives: 34, nouvelles: 6, abonnes: 1840,
     tagline: "Développement, data, infra & produit digital",
@@ -70,7 +73,7 @@ export const FILIERES_META = [
     desc: "Entreprises et sites sensibles : des métiers de confiance, en CDI comme en mission.",
     keywords: ["agent de sécurité", "gardiennage", "sûreté", "cynophile"],
     specialites: ["Gardiennage", "Sûreté aéroportuaire", "Cynophile", "Supervision"] },
-]
+].map((f) => ({ ...f, colorHex: HUES[f.hue]?.hex ?? null }))
 
 export const SOURCES = [
   { code: "EmploiDakar CI", bg: "#0F2D4D", short: "ED" },

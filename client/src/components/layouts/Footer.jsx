@@ -9,7 +9,7 @@ import { FaLinkedin } from "react-icons/fa6"
 import { cn } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 import { useNavigationData } from "@/lib/navigation-data"
-import { HUES } from "@/lib/hues"
+import { paletteDepuisHex } from "@/lib/hues"
 import { SourceLogo } from "../shared"
 
 /* ------------------------------------------------------------------ */
@@ -327,11 +327,12 @@ const Footer = () => {
             <FooterHeading>Filières populaires</FooterHeading>
             <ul className="flex flex-col gap-2">
               {filieresPopulaires.map((f) => {
-                const hue = HUES[f.hue] ?? HUES.sky
+                const hue = f.palette ?? paletteDepuisHex(f.colorHex)
                 return (
                   <li key={f.code}>
                     <Link
                       to={f.to}
+                      style={hue.style}
                       className="group inline-flex items-center gap-2.5 text-sm font-medium text-white/65 transition-colors duration-200 hover:text-brand-orange"
                     >
                       <span

@@ -1,6 +1,6 @@
 
 import { Lightbulb } from "lucide-react"
-import { HUES } from "@/lib/hues"
+import { paletteDepuisHex } from "@/lib/hues"
 import { useEffect } from "react"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import {
@@ -15,11 +15,11 @@ export const CATEGORIE_DEFAUT =
   CATEGORIES?.[0] ?? {
     code: "marche",
     label: "Conseils",
-    hue: "sky",
+    colorHex: null,
     icon: Lightbulb,
   }
 
-/** Palette minimale garantie (complète les hues du design system). */
+/** Palette de repli (brand orange) si aucune couleur exploitable. */
 export const HUE_FALLBACK = {
   hex: "#F5A623",
   solid: "bg-brand-orange",
@@ -59,14 +59,8 @@ const slugify = (texte = "") =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "") || "section"
 
-export const normaliserHue = (categorie) => {
-  const hue = HUES?.[categorie?.hue] ?? HUES?.sky ?? HUE_FALLBACK
-  return {
-    ...HUE_FALLBACK,
-    ...hue,
-    glow: hue?.glow || HUE_FALLBACK.glow,
-  }
-}
+export const normaliserHue = (categorie) =>
+  categorie?.palette ?? paletteDepuisHex(categorie?.color_hex) ?? HUE_FALLBACK
 
 /* ─── Catégories : codes API → méta local (icône + palette) ─── */
 const codeLocalDepuisCategorie = (categorieApi) => {
@@ -85,10 +79,8 @@ const adapterCategorieApi = (categorieApi) => {
     ...meta,
     code,
     label: categorieApi?.label?.trim() || meta.label,
-    hue:
-      categorieApi?.hue && HUES?.[categorieApi.hue]
-        ? categorieApi.hue
-        : meta.hue || CATEGORIE_DEFAUT.hue,
+    colorHex: categorieApi?.color_hex ?? null,
+    palette: paletteDepuisHex(categorieApi?.color_hex),
     icon: meta.icon ?? Lightbulb,
   }
 }
@@ -136,9 +128,7 @@ const adapterSections = (sectionsApi = []) => {
 /* ─── Articles ─── */
 export const adaptArticleDetail = (raw) => {
   if (!raw?.slug) return null
-  console.log(raw)
   const category = adapterCategorieApi(raw.category)
-  console.log("category", category)
   return {
     id: raw.id ?? raw.slug,
     slug: raw.slug,

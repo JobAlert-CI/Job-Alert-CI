@@ -5,7 +5,7 @@ import {
   ArrowUpRight, Bookmark, BookmarkCheck, Briefcase, Clock, GraduationCap, MapPin,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { HUES } from "@/lib/hues"
+import { HUES, paletteDepuisHex } from "@/lib/hues"
 import { FILIERES_META } from "@/lib/referentiels"
 import { addDays, publieLabel } from "@/lib/dates"
 import BadgeNouveau from "./BadgeNouveau"
@@ -24,7 +24,9 @@ const OfferCard = ({
   saved = false, onToggleSave, getDetailLink, entrepriseTotal, className,
 }) => {
   const meta = FILIERES_META.find((f) => f.code === offre.filiere)
-  const hue = hueProp ?? (meta ? HUES[meta.hue] : HUES.amber)
+  const hue = hueProp
+    ?? (offre.filiereColorHex ? paletteDepuisHex(offre.filiereColorHex) : null)
+    ?? (meta ? HUES[meta.hue] : HUES.amber)
   const isNew = offre.jours === 0
   const d = addDays(new Date(), -offre.jours)
   const detailLink = getDetailLink ? getDetailLink(offre) : `/offres/${offre.id}`
@@ -106,7 +108,7 @@ const OfferCard = ({
         exit={{ opacity: 0, scale: 0.97 }}
         transition={{ duration: 0.45, delay: (index % 6) * 0.05, ease: [0.22, 1, 0.36, 1] }}
         className={cn("group flex flex-col rounded-xl border border-outline-variant/40 bg-white p-5 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-hover", className)}
-        style={{ borderTop: `3px solid ${hue.hex}` }}
+        style={{ borderTop: `3px solid ${hue.hex}`, ...hue.style }}
       >
         <div className="flex items-center justify-between gap-2">
           <ChipSource source={offre.source} title={offre.sourceLabel}  />
@@ -141,7 +143,7 @@ const OfferCard = ({
       exit={{ opacity: 0, scale: 0.98 }}
       transition={{ duration: 0.45, delay: (index % 8) * 0.04, ease: [0.22, 1, 0.36, 1] }}
       className={cn("group rounded-xl border border-outline-variant/40 bg-white shadow-soft transition-all duration-300 hover:-translate-y-0.5 hover:shadow-hover", className)}
-      style={{ borderLeft: `3px solid ${hue.hex}` }}
+      style={{ borderLeft: `3px solid ${hue.hex}`, ...hue.style }}
     >
       <div className="flex gap-4 p-4 sm:p-5">
         {/* Rail date */}

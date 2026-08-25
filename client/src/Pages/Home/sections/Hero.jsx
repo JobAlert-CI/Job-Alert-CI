@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/tooltip"
 import { CountUp, CtaLink, SourceLogo } from "@/components/shared"
 import { Skeleton } from "@/components/ui/skeleton"
-import { HUES } from "@/lib/hues"
+import { paletteDepuisHex } from "@/lib/hues"
 import chipFloat from "@/lib/chipFloat"
 import { REASSURANCES, JOBS_APERCU } from "@/data/constanteMetier"
 import {
@@ -353,10 +353,8 @@ const Hero = () => {
                         className="group flex items-center gap-3 rounded-lg border border-outline-variant/40 bg-white px-3.5 py-2.5 transition-all duration-200 hover:border-brand-orange/60 hover:shadow-soft"
                       >
                         <span
-                          className={cn(
-                            "size-2 shrink-0 rounded-full",
-                            HUES[offer.primary_filiere?.hue ?? "sky"]?.dot
-                          )}
+                          className={cn("size-2 shrink-0 rounded-full", paletteDepuisHex(offer.primary_filiere?.color_hex).dot)}
+                          style={paletteDepuisHex(offer.primary_filiere?.color_hex).style}
                           aria-hidden
                         />
                         <div className="min-w-0 flex-1">

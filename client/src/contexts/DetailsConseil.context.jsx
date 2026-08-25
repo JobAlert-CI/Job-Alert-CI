@@ -37,6 +37,8 @@ export const ConseilDetailProvider = ({ children }) => {
   )
   const cat = article?.category ?? CATEGORIE_DEFAUT
   const hue = useMemo(() => normaliserHue(cat), [cat])
+  /* Variables CSS de la palette, à poser sur le conteneur de la page. */
+  const paletteStyle = useMemo(() => hue.style ?? {}, [hue])
 
   const similar = useMemo(
     () => adaptArticlesSimilaires(similarQuery.data, article?.cat),
@@ -54,8 +56,8 @@ export const ConseilDetailProvider = ({ children }) => {
   }, [slug])
 
   const value = useMemo(
-    () => ({ slug, article, contenu, cat, hue, similar, articleQuery, similarQuery }),
-    [slug, article, contenu, cat, hue, similar, articleQuery, similarQuery]
+    () => ({ slug, article, contenu, cat, hue, paletteStyle, similar, articleQuery, similarQuery }),
+    [slug, article, contenu, cat, hue, paletteStyle, similar, articleQuery, similarQuery]
   )
 
   return (

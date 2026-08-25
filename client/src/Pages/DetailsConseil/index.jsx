@@ -23,7 +23,7 @@ const ConseilDetailSeo = () => {
 }
 
 const ConseilPage = () => {
-  const { slug, article, contenu, hue, articleQuery } = useConseilDetail()
+  const { slug, article, contenu, hue, paletteStyle, articleQuery } = useConseilDetail()
 
   /* Chargement délégué : seul l'article bloque le rendu ;
      les similaires vivent leur vie dans la sidebar et la grille. */
@@ -71,7 +71,8 @@ const ConseilPage = () => {
     <>
       <ConseilDetailSeo />
       <BarreProgression hex={hue.hex} />
-      <main>
+      {/* Variables CSS de la palette : héritées par toutes les sections. */}
+      <main style={paletteStyle}>
         <EnTeteArticle />
         <CorpsArticle />
         <ContinuerLecture />

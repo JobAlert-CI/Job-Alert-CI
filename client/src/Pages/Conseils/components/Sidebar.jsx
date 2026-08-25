@@ -4,7 +4,7 @@ import { Link } from "react-router-dom"
 import { ArrowRight, Bell, BookOpen, Clock, Flame } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card"
-import { HUES } from "@/lib/hues"
+import { paletteDepuisHex } from "@/lib/hues"
 import { CtaLink, ReassuranceList } from "@/components/shared"
 import { fmtVus } from "@/lib/query-helpers"
 import { dateLabel } from "@/lib/dates"
@@ -40,7 +40,7 @@ export const PlusLus = () => {
       ) : (
         <ol className="mt-4 space-y-1">
           {top?.map((a, i) => {
-            const hue = HUES[a.category?.hue] || HUES.sky
+            const hue = paletteDepuisHex(a.category?.color_hex)
             return (
               <HoverCard key={a.slug ?? a.id} openDelay={200}>
                 <HoverCardTrigger>
@@ -57,7 +57,7 @@ export const PlusLus = () => {
                           {a.title}
                         </p>
                         <p className="mt-0.5 flex items-center gap-2 text-[10px] font-semibold text-muted-foreground">
-                          <span className={cn("size-1.5 rounded-full", hue.dot)} aria-hidden />
+                          <span className={cn("size-1.5 rounded-full", hue.dot)} style={hue.style} aria-hidden />
                           {a.category?.label} · {fmtVus(a.view_count)} lectures
                         </p>
                       </div>
@@ -102,7 +102,7 @@ export const SeriesListe = () => {
       ) : (
         <div className="mt-4 space-y-2.5">
           {series?.map((s) => {
-            const hue = HUES[s.hue] || HUES.sky
+            const hue = paletteDepuisHex(s.color_hex)
             const aProgression =
               typeof s.lus === "number" && typeof s.total === "number" && s.total > 0
             return (
@@ -120,7 +120,7 @@ export const SeriesListe = () => {
                 {aProgression ? (
                   <div className="mt-2.5 flex items-center gap-2">
                     <div className="h-1 flex-1 overflow-hidden rounded-full bg-surface-container">
-                      <div className={cn("h-full rounded-full", hue.solid)} style={{ width: `${(s.lus / s.total) * 100}%` }} />
+                      <div className={cn("h-full rounded-full", hue.solid)} style={{ width: `${(s.lus / s.total) * 100}%`, ...hue.style }} />
                     </div>
                     <span className="text-[10px] font-bold text-muted-foreground">
                       {s.lus}/{s.total}

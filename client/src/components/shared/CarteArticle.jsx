@@ -3,14 +3,14 @@ import { Link } from "react-router-dom"
 import { motion } from "framer-motion"
 import { ArrowUpRight, Clock, Eye } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { HUES } from "@/lib/hues"
+import { paletteDepuisHex } from "@/lib/hues"
 import { dateLabel } from "@/lib/dates"
 import { fmtVus } from "@/lib/query-helpers"
 import BadgeNouveau from "./BadgeNouveau"
 import { joursDepuis } from "@/tools/conseils.tools"
 
 const CarteArticle = ({ a, index = 0, large = false }) => {
-  const hue = HUES[a.category?.hue] || HUES["sky"]
+  const hue = a.category?.palette ?? paletteDepuisHex(a.category?.color_hex)
   // const Icon = a.icon
   return (
     <motion.div
@@ -28,7 +28,7 @@ const CarteArticle = ({ a, index = 0, large = false }) => {
           "group relative flex h-full flex-col overflow-hidden rounded-xl border border-outline-variant/40 bg-white shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-hover",
           large ? "p-5 sm:flex-row sm:items-stretch sm:gap-6 sm:p-6" : "p-5"
         )}
-        style={{ borderTop: `3px solid ${hue.hex}` }}
+        style={{ borderTop: `3px solid ${hue.hex}`, ...hue.style }}
       >
         <div className={cn("pointer-events-none absolute -right-14 -top-14 size-40 rounded-full blur-3xl opacity-0 transition-opacity duration-500 group-hover:opacity-100", hue.glow)} aria-hidden />
         {large && (

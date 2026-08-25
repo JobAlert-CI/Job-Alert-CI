@@ -57,7 +57,7 @@ const BackToTop = ({ visible }) => (
 )
 
 const FilierePage = () => {
-  const { slug, filiereQuery, meta } = useFiliereDetail()
+  const { slug, filiereQuery, meta, paletteStyle } = useFiliereDetail()
   const [showTop, setShowTop] = useState(false)
 
   useEffect(() => {
@@ -79,7 +79,9 @@ const FilierePage = () => {
   return (
     <>
       <FiliereDetailSeo />
-      <main>
+      {/* Variables CSS de la palette filière : héritées par toutes les
+         sections (hue.tile, hue.dot, hue.solid…). */}
+      <main style={paletteStyle}>
         {/* Isolation des erreurs par section */}
         <ErrorBoundary FallbackComponent={ErrorFallback}><HeroFiliere /></ErrorBoundary>
         <ErrorBoundary FallbackComponent={ErrorFallback}><FiltersBar /></ErrorBoundary>

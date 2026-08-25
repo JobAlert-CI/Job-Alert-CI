@@ -39,7 +39,10 @@ export const FiliereDetailProvider = ({ children }) => {
   /* ── Filière ── */
   const filiereQuery = useFiliereQuery(slug)
   const meta = useMemo(() => adaptFiliere(filiereQuery.data), [filiereQuery.data])
-  const hue = meta ? HUES[meta.hue] || BRAND_HUE : BRAND_HUE
+  const hue = meta ? meta.palette || HUES[meta.hue] || BRAND_HUE : BRAND_HUE
+  /* Variables CSS de la palette, à poser une fois sur le conteneur de la
+     page : tous les descendants (hue.tile, hue.dot…) héritent des couleurs. */
+  const paletteStyle = useMemo(() => hue.style ?? {}, [hue])
 
   /* ── Référentiels — cache partagé avec /offres ── */
   const referentialsQuery = useReferentialsQuery()
@@ -115,7 +118,7 @@ export const FiliereDetailProvider = ({ children }) => {
 
   const value = useMemo(
     () => ({
-      slug, meta, hue,
+      slug, meta, hue, paletteStyle,
       filiereQuery, referentialsQuery, refs,
       filters, valeurs, toggle, setScalar, setPeriod, reset,
       sort, view, locationId,
@@ -125,7 +128,7 @@ export const FiliereDetailProvider = ({ children }) => {
       counts, feedItems, entrepriseCounts,
       saved, toggleSave,
     }),
-    [slug, meta, hue, filiereQuery, referentialsQuery, refs, filters, valeurs,
+    [slug, meta, hue, paletteStyle, filiereQuery, referentialsQuery, refs, filters, valeurs,
       toggle, setScalar, setPeriod, reset, sort, view, locationId, setSort,
       setView, setLocation, resetTout, activeCount, feedQuery, offresChargees,
       filtered, counts, feedItems, entrepriseCounts, saved, toggleSave]

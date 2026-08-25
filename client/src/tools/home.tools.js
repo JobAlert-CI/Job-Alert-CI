@@ -4,7 +4,6 @@ import { getOfferSats, getOfferSatsByFiliere, getGlobalSats } from "@/api/public
 import { getOffers } from "@/api/public/offers"
 import { useMemo } from "react"
 import { useQuery } from "@tanstack/react-query"
-import getFiliereTheme from "@/lib/filiere-theme"
 
 export const EMAIL_DELIVERY_TIME = "8h00"
 export const MAX_PREVIEW_OFFERS = 4
@@ -61,6 +60,7 @@ export const useRepartition = () => {
     () => buildRepartition(query.data),
     [query.data]
   )
+  
   return { ...query, repartition }
 }
 
@@ -140,14 +140,13 @@ export const buildRepartition = (statsFil) => {
 
   const items = rows
     .map((row) => {
-      const theme = getFiliereTheme(row?.code)
       const count = hasNewOffers ? row?.new_offers ?? 0 : row?.total_offers ?? 0
       return {
         id: row?.id ?? row?.code ?? row?.label,
         code: row?.code,
         label: row?.label ?? "Filière",
         count,
-        color: theme.bar,
+        hex: row?.color_hex,
       }
     })
     .filter((item) => item.count > 0)

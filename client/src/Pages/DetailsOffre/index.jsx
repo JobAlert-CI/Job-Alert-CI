@@ -18,7 +18,7 @@ const OffreDetailSeo = () => {
 }
 
 const OffrePage = () => {
-  const { id, isPending, notFound, hasError, errorMessage, retry } = useOffreDetail()
+  const { id, isPending, notFound, hasError, errorMessage, retry, paletteStyle } = useOffreDetail()
 
   if (isPending) return <OffreLoading />
 
@@ -54,7 +54,8 @@ const OffrePage = () => {
   return (
     <>
       <OffreDetailSeo />
-      <main>
+      {/* Variables CSS de la palette : héritées par toutes les sections. */}
+      <main style={paletteStyle}>
         <HeroOffre />
         <CorpsOffre />
         <OffresSimilaires />

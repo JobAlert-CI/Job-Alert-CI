@@ -1,4 +1,5 @@
 import { Filter as FilterIcon, Radar, Send, Fingerprint } from "lucide-react"
+import { paletteDepuisHex } from "@/lib/hues"
 import getFiliereTheme from "@/lib/filiere-theme"
 import { adaptOffer } from "@/lib/offers-adapter"
 import { toIsoEnd, toIsoStart } from "@/lib/offers-adapter"
@@ -62,7 +63,8 @@ export const adaptFiliere = (raw) => {
     tagline: raw.tagline || "",
     desc: raw.description || "",
     icon: theme.icon,
-    hue: raw.hue || theme.hue,
+    colorHex: raw.color_hex ?? null,
+    palette: paletteDepuisHex(raw.color_hex),
     actives: Number(stats.active_offers ?? 0),
     nouvelles: Number(stats.new_offers ?? 0),
     abonnes: Number(stats.subscribers ?? 0),

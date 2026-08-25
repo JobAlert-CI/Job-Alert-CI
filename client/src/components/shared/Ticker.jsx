@@ -50,7 +50,7 @@ const Ticker = ({ variant = "light", label, items = [], duration = 48, className
         >
           {[...items, ...items].map((t, i) => (
             <span key={t.key ? `${t.key}-${i}` : i} className="flex items-center gap-2.5 whitespace-nowrap text-[13px]">
-              {t.dot && <span className={cn("size-1.5 shrink-0 rounded-full", t.dot)} />}
+              {t.dot && <span className={cn("size-1.5 shrink-0 rounded-full", t.dot)} style={t.dotStyle} />}
               <strong className={cn("font-semibold", dark ? "text-white" : "text-brand-navy")}>{t.titre}</strong>
               {t.entreprise && <span className={dark ? "text-white/55" : "text-muted-foreground"}>· {t.entreprise}</span>}
               {t.source && <span className={cn("text-[11px]", dark ? "text-white/40" : "text-muted-foreground/70")}>via {t.source}</span>}

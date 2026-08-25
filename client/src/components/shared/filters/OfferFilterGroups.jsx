@@ -1,7 +1,7 @@
 
 import { Briefcase, CalendarDays, GraduationCap, Layers, Sparkles, Zap } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { HUES, BRAND_HUE } from "@/lib/hues"
+import { BRAND_HUE, paletteDepuisHex } from "@/lib/hues"
 import {
   CONTRATS, EXPERIENCES, FILIERES_META, NIVEAUX, SOURCES,
 } from "@/lib/referentiels"
@@ -25,16 +25,19 @@ const OfferFilterGroups = ({
     {groups.includes("filieres") && (
       <FilterGroup title="Filière métier" icon={Sparkles}>
         <div className="max-h-64 overflow-y-auto pr-1">
-          {FILIERES_META.map((f) => (
-            <CheckRow
-              key={f.code}
-              checked={filters.filieres?.has(f.code)}
-              onToggle={() => toggle("filieres", f.code)}
-              label={f.label}
-              count={counts.filieres?.[f.code] || 0}
-              lead={<span className={cn("size-2 shrink-0 rounded-full", HUES[f.hue].dot)} />}
-            />
-          ))}
+          {FILIERES_META.map((f) => {
+            const palette = paletteDepuisHex(f.colorHex)
+            return (
+              <CheckRow
+                key={f.code}
+                checked={filters.filieres?.has(f.code)}
+                onToggle={() => toggle("filieres", f.code)}
+                label={f.label}
+                count={counts.filieres?.[f.code] || 0}
+                lead={<span className={cn("size-2 shrink-0 rounded-full", palette.dot)} style={palette.style} />}
+              />
+            )
+          })}
         </div>
       </FilterGroup>
     )}

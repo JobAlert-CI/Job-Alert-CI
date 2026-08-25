@@ -5,7 +5,7 @@ import {
 } from "lucide-react"
 import { CheckRow, MiniCalendar, SourceLogo } from "@/components/shared"
 import { Skeleton } from "@/components/ui/skeleton"
-import { HUES, BRAND_HUE } from "@/lib/hues"
+import { BRAND_HUE, paletteDepuisHex } from "@/lib/hues"
 import { cn } from "@/lib/utils"
 import { useOfferCountsQuery, useOfferReferentialsQuery } from "@/tools/offres.tools"
 import { useOffresFilters } from "@/contexts/Offres.context"
@@ -45,16 +45,19 @@ const OffresFilterGroups = () => {
   return (
     <div className="flex flex-col">
       <Group icon={Sparkles} title="Filière">
-        {isPending && filieres.length === 0 ? <OptionsSkeleton rows={5} /> : filieres.map((f) => (
-          <CheckRow
-            key={f.code}
-            checked={filters.filieres.has(f.code)}
-            onToggle={() => toggle("filieres", f.code)}
-            label={f.label}
-            count={counts.filieres?.[f.code] ?? 0}
-            lead={<span className={cn("size-2 shrink-0 rounded-full", (HUES[f.hue] ?? BRAND_HUE).dot)} aria-hidden />}
-          />
-        ))}
+        {isPending && filieres.length === 0 ? <OptionsSkeleton rows={5} /> : filieres.map((f) => {
+          const palette = paletteDepuisHex(f.color_hex)
+          return (
+            <CheckRow
+              key={f.code}
+              checked={filters.filieres.has(f.code)}
+              onToggle={() => toggle("filieres", f.code)}
+              label={f.label}
+              count={counts.filieres?.[f.code] ?? 0}
+              lead={<span className={cn("size-2 shrink-0 rounded-full", palette.dot)} style={palette.style} aria-hidden />}
+            />
+          )
+        })}
       </Group>
 
       <Group icon={MapPin} title="Localisation">

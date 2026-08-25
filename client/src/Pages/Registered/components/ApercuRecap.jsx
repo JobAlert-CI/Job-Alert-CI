@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from "framer-motion"
 import { Clock, Fingerprint, Sparkles } from "lucide-react"
 import { FaLinkedin } from "react-icons/fa6"
 import { cn } from "@/lib/utils"
-import { HUES } from "@/lib/hues"
+import { paletteDepuisHex } from "@/lib/hues"
 import { SOURCES } from "@/lib/referentiels"
 import { getImgSource } from "@/utils/utilsSource"
 import { useRegistered } from "@/contexts/Registered.context"
@@ -121,7 +121,7 @@ export const ApercuRecap = () => {
                 {offresApercu.map((o) => {
                   const filiereCode = o.filiere || o.filiere_code || o.primary_filiere?.code
                   const filiereObj = filieres.find((f) => f.code === filiereCode || f.slug === filiereCode)
-                  const hue = HUES[filiereObj?.hue ?? "blue"]
+                  const hue = paletteDepuisHex(filiereObj?.color_hex ?? filiereObj?.colorHex)
                   const sourceCode = o.source?.code || o.source || "EmploiDakar CI"
                   const entrepriseName = o.company?.name || o.entreprise || "Entreprise"
 
@@ -135,7 +135,7 @@ export const ApercuRecap = () => {
                       transition={{ duration: 0.3, ease: "easeOut" }}
                       className="flex items-center gap-2.5 rounded-lg border border-outline-variant/40 bg-white px-3 py-2.5 shadow-xs"
                     >
-                      <span className={cn("size-1.5 shrink-0 rounded-full", hue?.dot || "bg-blue-500")} />
+                      <span className={cn("size-1.5 shrink-0 rounded-full", hue?.dot || "bg-blue-500")} style={hue.style} />
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-[12px] font-semibold text-on-surface">{o.title || o.titre}</p>
                         <p className="truncate text-[10px] text-muted-foreground">{entrepriseName}</p>

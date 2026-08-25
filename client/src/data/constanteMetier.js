@@ -171,14 +171,14 @@ const JOBS_APERCU = [
     title: "Développeur Full-Stack",
     company: { name: "Groupe SIFCA · Abidjan" },
     source: { name: "Novojob", code: "novojob" },
-    primary_filiere: { hue: "sky" },
+    primary_filiere: { color_hex: "#0ea5e9" },
   },
   {
     id: "mock-2",
     title: "Responsable RH",
     company: { name: "Orange Côte d'Ivoire · Abidjan" },
     source: { name: "LinkedIn", code: "linkedin" },
-    primary_filiere: { hue: "violet" },
+    primary_filiere: { color_hex: "#8b5cf6" },
     linkedin: true,
   },
   {
@@ -186,14 +186,14 @@ const JOBS_APERCU = [
     title: "Conducteur de travaux",
     company: { name: "Bouygues CI · Yamoussoukro" },
     source: { name: "GoAfrica", code: "goafrica" },
-    primary_filiere: { hue: "amber" },
+    primary_filiere: { color_hex: "#f59e0b" },
   },
   {
     id: "mock-4",
     title: "Infirmier(ère) diplômé(e)",
     company: { name: "Clinique Farah · Abidjan" },
     source: { name: "EmploiDakar CI", code: "emploidakar" },
-    primary_filiere: { hue: "rose" },
+    primary_filiere: { color_hex: "#f43f5e" },
   },
 ]
 

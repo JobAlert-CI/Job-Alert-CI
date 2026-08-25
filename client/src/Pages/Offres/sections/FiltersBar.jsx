@@ -10,7 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import {
   CheckRow, FilterPopover, FiltersDrawer, MiniCalendar, SourceLogo, ViewToggle,
 } from "@/components/shared"
-import { HUES, BRAND_HUE } from "@/lib/hues"
+import { BRAND_HUE, paletteDepuisHex } from "@/lib/hues"
 import { SORTS } from "@/lib/referentiels"
 import useClickOutside from "@/hooks/use-click-outside"
 import { 
@@ -81,7 +81,13 @@ const FiliereOptions = memo(function FiliereOptions() {
           onToggle={() => toggle("filieres", f.code)}
           label={f.label}
           count={counts.filieres[f.code] ?? 0}
-          lead={<span className={cn("size-2 shrink-0 rounded-full", (HUES[f.hue] ?? BRAND_HUE).dot)} aria-hidden />}
+          lead={
+            <span
+              className={cn("size-2 shrink-0 rounded-full", paletteDepuisHex(f.color_hex).dot)}
+              style={paletteDepuisHex(f.color_hex).style}
+              aria-hidden
+            />
+          }
         />
       ))}
     </div>

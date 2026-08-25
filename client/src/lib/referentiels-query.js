@@ -6,6 +6,7 @@ import {
   getFilieres, getLocations, getSources,
 } from "@/api/public/referentials"
 import { CONTRATS, EXPERIENCES, FILIERES_META, NIVEAUX, SOURCES } from "@/lib/referentiels"
+import { HUES } from "@/lib/hues"
 import { settled } from "@/lib/query-helpers"
 
 /* ═══ SOURCE UNIQUE DE VÉRITÉ pour les référentiels de filtres.
@@ -14,7 +15,7 @@ import { settled } from "@/lib/query-helpers"
 export const referentialsKey = ["offres", "referentials"]
 
 const FALLBACK_REF = {
-  filieres: FILIERES_META.map((f) => ({ code: f.code, label: f.label, hue: f.hue })),
+  filieres: FILIERES_META.map((f) => ({ code: f.code, label: f.label, color_hex: HUES[f.hue]?.hex ?? null })),
   sources: SOURCES.map((s) => ({ code: s.code, label: s.code })),
   contrats: CONTRATS.map((c) => ({ code: c, label: c })),
   experiences: EXPERIENCES.map((x) => ({ code: x, label: x })),
@@ -34,7 +35,7 @@ const loadReferentials = async () => {
   const failed = results.filter((r) => r.status === "rejected")
   return {
     filieres: settled(results[0], FALLBACK_REF.filieres).map((f) => ({
-      code: f.code, label: f.label ?? f.code, hue: f.hue ?? null, id: f.id ?? null,
+      code: f.code, label: f.label ?? f.code, color_hex: f.color_hex ?? null, id: f.id ?? null,
     })),
     sources: settled(results[1], FALLBACK_REF.sources).map((s) => ({
       code: s.code, label: s.name ?? s.code, id: s.id ?? null,

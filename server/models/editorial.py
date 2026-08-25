@@ -25,8 +25,7 @@ class ArticleCategory(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     code: Mapped[str] = mapped_column(String(120), unique=True, index=True, nullable=False)
     label: Mapped[str] = mapped_column(String(160), unique=True, nullable=False)
     slug: Mapped[str] = mapped_column(String(180), unique=True, index=True, nullable=False)
-    hue: Mapped[str | None] = mapped_column(String(40), nullable=True)
-    icon_name: Mapped[str | None] = mapped_column(String(80), nullable=True)
+    color_hex: Mapped[str | None] = mapped_column(String(16), nullable=True)
     sort_order: Mapped[int] = mapped_column(Integer, default=100, nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
@@ -150,7 +149,7 @@ class ArticleSeries(UUIDPrimaryKeyMixin, TimestampMixin, Base):
 
     title: Mapped[str] = mapped_column(String(255), nullable=False)
     slug: Mapped[str] = mapped_column(String(280), unique=True, index=True, nullable=False)
-    hue: Mapped[str | None] = mapped_column(String(40), nullable=True)
+    color_hex: Mapped[str | None] = mapped_column(String(16), nullable=True)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     sort_order: Mapped[int] = mapped_column(Integer, default=100, nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)

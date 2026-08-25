@@ -15,8 +15,7 @@ class ArticleCategoryRead(TimestampRead):
     code: str
     label: str
     slug: str
-    hue: str | None = None
-    icon_name: str | None = None
+    color_hex: str | None = None
     sort_order: int
     is_active: bool
 
@@ -25,8 +24,7 @@ class ArticleCategoryCreate(BaseModel):
     code: str = Field(min_length=2, max_length=120)
     label: str = Field(min_length=2, max_length=160)
     slug: str = Field(min_length=2, max_length=180)
-    hue: str | None = Field(default=None, max_length=40)
-    icon_name: str | None = Field(default=None, max_length=80)
+    color_hex: str | None = Field(default=None, max_length=16)
     sort_order: int = Field(default=100, ge=0)
     is_active: bool = True
 
@@ -34,8 +32,7 @@ class ArticleCategoryCreate(BaseModel):
 class ArticleCategoryUpdate(BaseModel):
     label: str | None = Field(default=None, max_length=160)
     slug: str | None = Field(default=None, max_length=180)
-    hue: str | None = Field(default=None, max_length=40)
-    icon_name: str | None = Field(default=None, max_length=80)
+    color_hex: str | None = Field(default=None, max_length=16)
     sort_order: int | None = Field(default=None, ge=0)
     is_active: bool | None = None
 
@@ -117,7 +114,7 @@ class ArticleSeriesRead(TimestampRead):
     id: str
     title: str
     slug: str
-    hue: str | None = None
+    color_hex: str | None = None
     description: str | None = None
     sort_order: int
     is_active: bool
@@ -126,7 +123,7 @@ class ArticleSeriesRead(TimestampRead):
 class ArticleSeriesCreate(BaseModel):
     title: str = Field(min_length=2, max_length=255)
     slug: str = Field(min_length=2, max_length=280)
-    hue: str | None = Field(default=None, max_length=40)
+    color_hex: str | None = Field(default=None, max_length=16)
     description: str | None = None
     sort_order: int = Field(default=100, ge=0)
     is_active: bool = True
@@ -135,7 +132,7 @@ class ArticleSeriesCreate(BaseModel):
 class ArticleSeriesUpdate(BaseModel):
     title: str | None = Field(default=None, max_length=255)
     slug: str | None = Field(default=None, max_length=280)
-    hue: str | None = Field(default=None, max_length=40)
+    color_hex: str | None = Field(default=None, max_length=16)
     description: str | None = None
     sort_order: int | None = Field(default=None, ge=0)
     is_active: bool | None = None

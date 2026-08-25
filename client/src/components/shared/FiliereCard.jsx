@@ -4,11 +4,11 @@ import { motion } from "framer-motion"
 import { ArrowRight, ArrowUpRight } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
-import { HUES } from "@/lib/hues"
+import { HUES, paletteDepuisHex } from "@/lib/hues"
 import BadgeNouveau from "./BadgeNouveau"
 
 const FiliereLargeCard = ({ f, index, className }) => {
-  const hue = HUES[f.hue] || HUES["sky"]
+  const hue = f.palette ?? paletteDepuisHex(f.colorHex) ?? HUES.sky
   return (
     <motion.div
       layout
@@ -22,7 +22,7 @@ const FiliereLargeCard = ({ f, index, className }) => {
       <Link
         to={`/filieres/${f.code}`}
         className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-outline-variant/50 bg-white p-6 shadow-soft transition-all duration-300 hover:-translate-y-1.5 hover:shadow-hover"
-        style={{ borderTop: `3px solid ${hue.hex}` }}
+        style={{ borderTop: `3px solid ${hue.hex}`, ...hue.style }}
       >
         <div className={cn("pointer-events-none absolute -right-16 -top-16 size-44 rounded-full blur-3xl opacity-0 transition-opacity duration-500 group-hover:opacity-100", hue.glow)} aria-hidden />
         <div className="flex items-start gap-3">
@@ -73,7 +73,7 @@ const FiliereLargeCard = ({ f, index, className }) => {
 }
 
 const FiliereCompactCard = ({ f, index, className }) => {
-  const hue = HUES[f.hue] || HUES["sky"]
+  const hue = f.palette ?? paletteDepuisHex(f.colorHex) ?? HUES.sky
   return (
     <motion.div
       layout
@@ -87,7 +87,7 @@ const FiliereCompactCard = ({ f, index, className }) => {
       <Link
         to={`/filieres/${f.code}`}
         className="group flex items-center gap-4 rounded-xl border border-outline-variant/50 bg-white p-4 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-hover"
-        style={{ borderLeft: `3px solid ${hue.hex}` }}
+        style={{ borderLeft: `3px solid ${hue.hex}`, ...hue.style }}
       >
         <span className={cn("flex size-11 shrink-0 items-center justify-center rounded-lg transition-all duration-400 group-hover:scale-110", hue.tile, hue.tileHover)}>
           <f.icon className="size-5" strokeWidth={2} />

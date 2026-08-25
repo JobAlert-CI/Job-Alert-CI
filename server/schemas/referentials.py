@@ -47,8 +47,7 @@ class FiliereRead(TimestampRead):
     code: str
     label: str
     slug: str
-    hue: str | None = None
-    icon_name: str | None = None
+    color_hex: str | None = None
     tagline: str | None = None
     description: str | None = None
     sort_order: int
@@ -100,8 +99,7 @@ class FiliereCreate(BaseModel):
     code: str = Field(min_length=2, max_length=120)
     label: str = Field(min_length=2, max_length=160)
     slug: str = Field(min_length=2, max_length=180)
-    hue: str | None = Field(default=None, max_length=40)
-    icon_name: str | None = Field(default=None, max_length=80)
+    color_hex: str | None = Field(default=None, max_length=16)
     tagline: str | None = Field(default=None, max_length=255)
     description: str | None = None
     sort_order: int = Field(default=100, ge=0)
@@ -111,8 +109,7 @@ class FiliereCreate(BaseModel):
 class FiliereUpdate(BaseModel):
     label: str | None = Field(default=None, max_length=160)
     slug: str | None = Field(default=None, max_length=180)
-    hue: str | None = Field(default=None, max_length=40)
-    icon_name: str | None = Field(default=None, max_length=80)
+    color_hex: str | None = Field(default=None, max_length=16)
     tagline: str | None = Field(default=None, max_length=255)
     description: str | None = None
     sort_order: int | None = Field(default=None, ge=0)

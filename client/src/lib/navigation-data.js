@@ -1,14 +1,9 @@
 
 import { useQuery } from "@tanstack/react-query"
-import {
-  Building2, Calculator, Code2, FileText, GraduationCap, Handshake,
-  HardHat, Megaphone, ShieldCheck, Sprout, Stethoscope, Truck,
-  Users, UtensilsCrossed,
-} from "lucide-react"
 import { getFilieres } from "@/api/public/filieres"
 import { getArticlesPopular } from "@/api/public/articles"
 import { getGlobalSats, getOfferSatsBySource } from "@/api/public/stats"
-import getFiliereTheme from "@/lib/filiere-theme"
+import { paletteDepuisHex } from "@/lib/hues"
 import { getSources } from "@/api/public/sources"   // ← import à ajouter
 
 
@@ -28,43 +23,19 @@ export const navKeys = {
 }
 
 /* ════════════════════════════════════════════════════════════════════
-   MAP DES ICÔNES LUCIDE ← icon_name (API)
-   Le backend renvoie des strings ("code", "truck", "users"...) ;
-   on les mappe aux composants Lucide déjà importés dans le Header.
-════════════════════════════════════════════════════════════════════ */
-const ICON_MAP = {
-  code: Code2,
-  megaphone: Megaphone,
-  handshake: Handshake,
-  calculator: Calculator,
-  users: Users,
-  "hard-hat": HardHat,
-  truck: Truck,
-  stethoscope: Stethoscope,
-  "building-2": Building2,
-  "graduation-cap": GraduationCap,
-  "utensils-crossed": UtensilsCrossed,
-  sprout: Sprout,
-  "shield-check": ShieldCheck,
-  "file-text": FileText,
-}
-
-const iconFromName = (name) => ICON_MAP[name] ?? FileText
-
-/* ════════════════════════════════════════════════════════════════════
    ADAPTATEURS — API → shape attendue par Header/Footer (purs)
 ════════════════════════════════════════════════════════════════════ */
 export const adaptFiliereNav = (raw) => {
   if (!raw || typeof raw !== "object") return null
-  const theme = getFiliereTheme(raw.code)
+
   const stats = raw.stats || {}
   return {
     code: raw.code,
     slug: raw.slug || raw.code,
     label: raw.label || raw.code,
     to: `/filieres/${raw.code}`,
-    icon: iconFromName(raw.icon_name) ?? theme.icon,
-    hue: raw.hue ?? theme.hue,
+    colorHex: raw.color_hex ?? null,
+    palette: paletteDepuisHex(raw.color_hex),
     count: Number(stats.active_offers ?? 0),
     nouveaux: Number(stats.new_offers ?? 0),
     abonnes: Number(stats.subscribers ?? 0),
@@ -89,7 +60,7 @@ export const adaptArticleNav = (a) => {
     lecture: Math.max(1, Math.round(Number(a.reading_minutes) || 5)),
     cat: a.category?.code || a.category_id || "marche",
     catLabel: a.category?.label || "Conseil",
-    catHue: a.category?.hue || "sky",
+    catPalette: paletteDepuisHex(a.category?.color_hex),
   }
 }
 

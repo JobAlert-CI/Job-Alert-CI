@@ -2,7 +2,7 @@ import { Fragment, useMemo, useState } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import { Check, SlidersHorizontal, Loader2 } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { HUES } from "@/lib/hues"
+import { paletteDepuisHex } from "@/lib/hues"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { useRegistered } from "@/contexts/Registered.context"
 
@@ -86,7 +86,7 @@ export const EtapePreferences = () => {
           {liste.map((f) => {
             const sel = form.filieres.includes(f.code)
             const bloque = plein && !sel
-            const hue = HUES[f.hue] || HUES.blue
+            const hue = f.palette ?? paletteDepuisHex(f.color_hex ?? f.colorHex)
             const Icon = f.icon || SlidersHorizontal
 
             const btn = (
@@ -104,6 +104,7 @@ export const EtapePreferences = () => {
                 )}
               >
                 <span
+                  style={hue.style}
                   className={cn(
                     "flex size-9 items-center justify-center rounded-md transition-colors duration-200",
                     hue?.tile || "bg-blue-500/10 text-blue-600",

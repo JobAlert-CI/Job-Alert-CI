@@ -3,7 +3,7 @@ import { useMemo } from "react"
 import { AnimatePresence, motion } from "framer-motion"
 import { Lightbulb, MoveHorizontal } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { HUES } from "@/lib/hues"
+import { paletteDepuisHex } from "@/lib/hues"
 import useCarrousel from "@/hooks/use-carrousel"
 import { useGlissement } from "@/hooks/use-glissement"
 import { SegmentsProgression } from "@/components/shared"
@@ -42,7 +42,7 @@ const ConseilDuJourCarrousel = ({ tips }) => {
   const indexSur = ((idx % tips.length) + tips.length) % tips.length
   const conseil = tips[indexSur]
   if (!conseil) return <ConseilDuJourVide />
-  const hue = HUES[conseil.cat?.hue] || HUES.sky
+  const hue = paletteDepuisHex(conseil.cat?.color_hex)
 
   return (
     <section
@@ -67,7 +67,7 @@ const ConseilDuJourCarrousel = ({ tips }) => {
           {...propsGlissement}
           className="flex flex-1 cursor-grab select-none flex-row items-center gap-5 py-4 pl-5 active:cursor-grabbing max-sm:flex-col max-sm:items-stretch max-sm:gap-3"
         >
-          <span className={cn("grid size-9 shrink-0 place-items-center rounded-lg transition-colors duration-500", hue.tile)}>
+          <span style={hue.style} className={cn("grid size-9 shrink-0 place-items-center rounded-lg transition-colors duration-500", hue.tile)}>
             <Lightbulb className="size-4.5" aria-hidden />
           </span>
           <div className="min-h-10 flex-1 max-sm:min-h-12">

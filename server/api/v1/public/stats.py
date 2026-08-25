@@ -61,15 +61,15 @@ def get_offer_stats_by_filiere(
         filters.append(JobOffer.source_id == source_id)
         
     stmt = (
-        select(Filiere.id, Filiere.code, Filiere.label, func.count(JobOffer.id), new_expr)
+        select(Filiere.id, Filiere.code, Filiere.label, Filiere.color_hex, func.count(JobOffer.id), new_expr)
         .join(JobOffer, JobOffer.primary_filiere_id == Filiere.id)
         .where(*filters)
-        .group_by(Filiere.id, Filiere.code, Filiere.label, Filiere.sort_order)
+        .group_by(Filiere.id, Filiere.code, Filiere.label, Filiere.color_hex, Filiere.sort_order)
         .order_by(func.count(JobOffer.id).desc(), Filiere.sort_order)
         .limit(limit)
     )
     return [
-        OfferStatsBucketRead(id=row[0], code=row[1], label=row[2], total_offers=row[3], new_offers=row[4])
+        OfferStatsBucketRead(id=row[0], code=row[1], label=row[2], color_hex=row[3], total_offers=row[4], new_offers=row[5])
         for row in db.execute(stmt)
     ]
 

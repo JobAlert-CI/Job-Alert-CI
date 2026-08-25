@@ -8,7 +8,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 import { CountUp, CountdownEnvoi, CtaLink, SourceLogo, Ticker } from "@/components/shared"
-import { HUES, BRAND_HUE } from "@/lib/hues"
+import { paletteDepuisHex } from "@/lib/hues"
 import { todayLong } from "@/lib/dates"
 import { StatSkeleton } from "@/components/shared/SkeletonsOffres"
 import {
@@ -37,12 +37,16 @@ export const OffresTicker = () => {
     <Ticker
       variant="dark"
       duration={160}
-      items={offers.slice(0, 24).map((o) => ({
-        key: o.uid,
-        dot: (HUES[refs.filieres.find((f) => f.code === o.filiere)?.hue] ?? BRAND_HUE).dot,
-        titre: o.titre,
-        entreprise: o.entreprise,
-      }))}
+      items={offers.slice(0, 24).map((o) => {
+        const palette = paletteDepuisHex(refs.filieres.find((f) => f.code === o.filiere)?.color_hex)
+        return {
+          key: o.uid,
+          dot: palette.dot,
+          dotStyle: palette.style,
+          titre: o.titre,
+          entreprise: o.entreprise,
+        }
+      })}
     />
   )
 }

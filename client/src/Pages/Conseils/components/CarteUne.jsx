@@ -3,7 +3,7 @@ import { Link } from "react-router-dom"
 import { AnimatePresence, motion } from "framer-motion"
 import { ArrowUpRight, Clock, MoveHorizontal, Newspaper, TrendingUp } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { HUES } from "@/lib/hues"
+import { paletteDepuisHex } from "@/lib/hues"
 import useCarrousel from "@/hooks/use-carrousel"
 import { useGlissement } from "@/hooks/use-glissement"
 import { CtaLink, SegmentsProgression } from "@/components/shared"
@@ -38,7 +38,7 @@ const CarrouselUne = ({ articles }) => {
   const indexSur = ((idx % articles?.length) + articles?.length) % articles?.length
   const a = articles[indexSur]
   if (!a) return <CarteUneVide />
-  const hue = HUES[a.category?.hue] || HUES.sky
+  const hue = paletteDepuisHex(a.category?.color_hex)
 
   return (
     <motion.div
@@ -153,7 +153,7 @@ const CarrouselUne = ({ articles }) => {
               exit="sortir"
               className="flex flex-1 flex-col px-6 py-6"
             >
-              <span className={cn("inline-flex w-fit items-center gap-2 rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-white", hue.solid)}>
+              <span style={hue.style} className={cn("inline-flex w-fit items-center gap-2 rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-white", hue.solid)}>
                 {a.category?.label}
               </span>
               <Link

@@ -14,3 +14,4 @@ class OfferStatsBucketRead(BaseModel):
     label: str
     total_offers: int
     new_offers: int
+    color_hex: str | None = None

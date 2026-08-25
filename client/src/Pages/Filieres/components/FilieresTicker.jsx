@@ -1,7 +1,7 @@
 
 import { useMemo } from "react"
 import { Ticker } from "@/components/shared"
-import { HUES } from "@/lib/hues"
+import { paletteDepuisHex } from "@/lib/hues"
 import { adaptOffers } from "@/lib/offers-adapter"
 import { useTickerOffersQuery } from "@/tools/filieres.tools"
 
@@ -15,12 +15,16 @@ const FilieresTicker = () => {
     <Ticker
       variant="dark"
       duration={160}
-      items={offres.map((o) => ({
-        key: o.uid ?? o.slug ?? o.id,
-        titre: o.titre,
-        entreprise: o.entreprise,
-        dot: (HUES[o.filiereHue] ?? HUES.sky).dot,
-      }))}
+      items={offres.map((o) => {
+        const palette = paletteDepuisHex(o.filiereColorHex)
+        return {
+          key: o.uid ?? o.slug ?? o.id,
+          titre: o.titre,
+          entreprise: o.entreprise,
+          dot: palette.dot,
+          dotStyle: palette.style,
+        }
+      })}
     />
   )
 }

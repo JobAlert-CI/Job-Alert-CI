@@ -42,7 +42,7 @@ export const adaptOffer = (raw) => {
     sourceLabel: raw.source?.name ?? raw.source?.code ?? "",
     filiere: raw.primary_filiere?.code ?? null,
     filiereLabel: raw.primary_filiere?.label ?? null,
-    filiereHue: raw.primary_filiere?.hue ?? null,
+    filiereColorHex: raw.primary_filiere?.color_hex ?? null,
     specialite: raw.specialty?.label ?? null,
     contrat: raw.contract_type?.label ?? null,
     contratCode: raw.contract_type?.code ?? null,

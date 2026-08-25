@@ -2,7 +2,7 @@ import { Link } from "react-router-dom"
 import { motion } from "framer-motion"
 import { CheckCircle2, Mail, MapPin, SlidersHorizontal, User } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { HUES } from "@/lib/hues"
+import { paletteDepuisHex } from "@/lib/hues"
 import { useRegistered } from "@/contexts/Registered.context"
 
 export const EtapeValidation = () => {
@@ -49,13 +49,14 @@ export const EtapeValidation = () => {
           <div className="mt-2.5 flex flex-wrap gap-2">
             {form.filieres.map((code) => {
               const f = filieres.find((x) => x.code === code || x.slug === code)
-              const hue = HUES[f?.hue] || HUES.blue
+              const hue = f?.palette ?? paletteDepuisHex(f?.color_hex ?? f?.colorHex)
               const Icon = f?.icon || SlidersHorizontal
               const label = f?.label || code
 
               return (
                 <span
                   key={code}
+                  style={hue.style}
                   className={cn("inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[11px] font-bold", hue?.tile || "bg-blue-100 text-blue-800")}
                 >
                   <Icon className="size-3.5" />

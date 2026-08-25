@@ -142,15 +142,13 @@ FILIERES = [
     (
         "tech-dev",
         "Tech & Dev",
-        "sky",
-        "code",
+        "#0ea5e9",
         ["developpeur", "python", "react", "data", "cloud", "full stack", "devops"],
     ),
     (
         "marketing-com",
         "Marketing & Communication",
-        "fuchsia",
-        "megaphone",
+        "#d946ef",
         [
             "marketing",
             "communication",
@@ -163,8 +161,7 @@ FILIERES = [
     (
         "commercial-vente",
         "Commercial & Vente",
-        "orange",
-        "trending-up",
+        "#f97316",
         [
             "commercial",
             "vente",
@@ -176,124 +173,108 @@ FILIERES = [
     (
         "comptabilite-finance",
         "Comptabilité & Finance",
-        "emerald",
-        "calculator",
+        "#10b981",
         ["comptable", "finance", "audit", "contrôle de gestion", "trésorerie"],
     ),
     (
         "ressources-humaines",
         "Ressources Humaines",
-        "violet",
-        "users",
+        "#8b5cf6",
         ["rh", "recrutement", "paie", "formation", "talents"],
     ),
     (
         "btp-genie-civil",
         "BTP & Génie Civil",
-        "amber",
-        "hard-hat",
+        "#f59e0b",
         ["btp", "genie civil", "chantier", "conducteur de travaux", "structure"],
     ),
     (
         "logistique-transport",
         "Logistique & Transport",
-        "cyan",
-        "truck",
+        "#06b6d4",
         ["logistique", "transport", "supply chain", "stock", "entrepôt"],
     ),
     (
         "sante-medical",
         "Santé & Médical",
-        "rose",
-        "stethoscope",
+        "#f43f5e",
         ["sante", "medical", "infirmier", "clinique", "laboratoire"],
     ),
     (
         "administration",
         "Administration",
-        "slate",
-        "briefcase",
+        "#64748b",
         ["assistant", "administratif", "office", "secrétariat", "back office"],
     ),
     (
         "education-formation",
         "Éducation & Formation",
-        "lime",
-        "graduation-cap",
+        "#84cc16",
         ["enseignant", "formation", "pedagogie", "formateur", "éducation"],
     ),
     (
         "hotellerie-restauration",
         "Hôtellerie & Restauration",
-        "red",
-        "chef-hat",
+        "#ef4444",
         ["hotel", "restaurant", "cuisine", "réception", "salle"],
     ),
     (
         "agriculture-agrobusiness",
         "Agriculture & Agrobusiness",
-        "green",
-        "leaf",
+        "#22c55e",
         ["agriculture", "agro", "elevage", "agronome", "exploitation"],
     ),
     (
         "securite-gardiennage",
         "Sécurité & Gardiennage",
-        "zinc",
-        "shield",
+        "#71717a",
         ["securite", "gardiennage", "hse", "sûreté", "prévention"],
     ),
 ]
 
-KEYWORDS_BY_FILIERE = {item[0]: item[4] for item in FILIERES}
+KEYWORDS_BY_FILIERE = {item[0]: item[3] for item in FILIERES}
 
 ARTICLE_CATEGORIES = [
     {
         "code": "cv-lettres",
         "label": "CV & Lettres",
         "slug": "cv-lettres",
-        "hue": "sky",
-        "icon_name": "file-text",
+        "color_hex": "#0ea5e9",
         "sort_order": 1,
     },
     {
         "code": "entretiens",
         "label": "Entretiens",
         "slug": "entretiens",
-        "hue": "orange",
-        "icon_name": "message-circle",
+        "color_hex": "#f97316",
         "sort_order": 2,
     },
     {
         "code": "competences",
         "label": "Compétences",
         "slug": "competences",
-        "hue": "emerald",
-        "icon_name": "award",
+        "color_hex": "#10b981",
         "sort_order": 3,
     },
     {
         "code": "tendances-marche",
         "label": "Marché de l'emploi",
         "slug": "marche-emploi",
-        "hue": "fuchsia",
-        "icon_name": "line-chart",
+        "color_hex": "#d946ef",
         "sort_order": 4,
     },
     {
         "code": "secteurs",
         "label": "Secteurs qui recrutent",
         "slug": "secteurs",
-        "hue": "cyan",
-        "icon_name": "building-2",
+        "color_hex": "#06b6d4",
         "sort_order": 5,
     },
     {
         "code": "outils-numeriques",
         "label": "Outils numériques",
         "slug": "outils-numeriques",
-        "hue": "violet",
-        "icon_name": "laptop",
+        "color_hex": "#8b5cf6",
         "sort_order": 6,
     },
 ]
@@ -951,7 +932,7 @@ ARTICLE_SERIES = [
     {
         "title": "Guides emploi JobAlert CI",
         "slug": "guides-emploi-jobalert-ci",
-        "hue": "sky",
+        "color_hex": "#0ea5e9",
         "description": (
             "Une série de guides pratiques pour améliorer votre CV, réussir vos entretiens "
             "et mieux comprendre le marché de l'emploi en Côte d'Ivoire."
@@ -966,7 +947,7 @@ ARTICLE_SERIES = [
     {
         "title": "Comprendre le marché ivoirien",
         "slug": "comprendre-marche-ivoirien",
-        "hue": "cyan",
+        "color_hex": "#06b6d4",
         "description": (
             "Analyse des tendances, secteurs porteurs et outils pour mieux cibler vos candidatures."
         ),
@@ -1549,8 +1530,7 @@ def seed_editorial(db) -> None:
                 "code": category_data["code"],
                 "label": category_data["label"],
                 "slug": category_data["slug"],
-                "hue": category_data.get("hue"),
-                "icon_name": category_data.get("icon_name"),
+                "color_hex": category_data.get("color_hex"),
                 "sort_order": category_data.get("sort_order", 100),
                 "is_active": True,
             },
@@ -1616,7 +1596,7 @@ def seed_editorial(db) -> None:
             {
                 "title": series_data["title"],
                 "slug": series_data["slug"],
-                "hue": series_data.get("hue"),
+                "color_hex": series_data.get("color_hex"),
                 "description": series_data.get("description"),
                 "sort_order": series_data.get("sort_order", 100),
                 "is_active": True,
@@ -1674,7 +1654,7 @@ def seed() -> None:
         filieres_by_code: dict[str, Filiere] = {}
         specialties_by_filiere: dict[str, list[FiliereSpecialty]] = {}
 
-        for order, (code, label, hue, icon_name, keywords) in enumerate(
+        for order, (code, label, color_hex, keywords) in enumerate(
             FILIERES, start=1
         ):
             filiere = get_or_create(
@@ -1685,8 +1665,7 @@ def seed() -> None:
                     "code": code,
                     "label": label,
                     "slug": slugify(code),
-                    "hue": hue,
-                    "icon_name": icon_name,
+                    "color_hex": color_hex,
                     "tagline": f"Opportunités quotidiennes dans le domaine {label}.",
                     "description": (
                         f"Offres d'emploi, missions et opportunités dans le secteur {label} "

@@ -6,7 +6,7 @@ import { useParams } from "react-router-dom"
 import { formatApiError } from "@/api/errors"
 import { adaptOffer, adaptOffers } from "@/lib/offers-adapter"
 import getFiliereTheme from "@/lib/filiere-theme"
-import { HUES } from "@/lib/hues"
+import { HUES, paletteDepuisHex } from "@/lib/hues"
 import {
   isNotFoundError,
   useOffreDetailQuery,
@@ -48,8 +48,14 @@ export const OffreDetailProvider = ({ children }) => {
     return adapted ? { ...adapted, detail: raw.detail ?? {} } : null
   }, [detailQuery.data])
 
+  console.log(offre)
+
   const meta = useMemo(() => getFiliereTheme(offre?.filiere), [offre?.filiere])
-  const hue = meta ? HUES[meta.hue] : HUES.sky
+  /* Couleur exacte de la filière (color_hex API) si dispo, sinon thème statique. */
+  const hue = offre?.filiereColorHex
+    ? paletteDepuisHex(offre.filiereColorHex)
+    : HUES[meta.hue] ?? HUES.sky
+  const paletteStyle = useMemo(() => hue.style ?? {}, [hue])
   const hash = useMemo(() => (offre ? fakeHash(offre.id) : ""), [offre])
   const similaires = useMemo(
     () => adaptOffers(similairesQuery.data ?? []),
@@ -103,6 +109,7 @@ export const OffreDetailProvider = ({ children }) => {
       offre,
       meta,
       hue,
+      paletteStyle,
       hash,
       detail: offre?.detail ?? {},
       similaires,
@@ -118,7 +125,7 @@ export const OffreDetailProvider = ({ children }) => {
       errorMessage: hasError ? formatApiError(detailQuery.error) : null,
       retry: detailQuery.refetch,
     }),
-    [id, offre, meta, hue, hash, similaires, similairesQuery, saved,
+    [id, offre, meta, hue, paletteStyle, hash, similaires, similairesQuery, saved,
      saveMutation.isPending, toggleSave, copied, copyLink,
      detailQuery.isPending, notFound, hasError,
      detailQuery.error, detailQuery.refetch]

@@ -5,6 +5,7 @@ import { getFilieres } from "@/api/public/filieres"
 import { getOffers } from "@/api/public/offers"
 import { getGlobalSats, getOfferSatsBySource } from "@/api/public/stats"
 import { useUrlFilters } from "@/hooks/use-url-filters"
+import { paletteDepuisHex } from "@/lib/hues"
 import getFiliereTheme from "@/lib/filiere-theme"
 
 export const TICKER_LIMIT = 24
@@ -56,7 +57,8 @@ export const adaptFiliere = (raw) => {
     tagline: raw.tagline || "",
     description: raw.description || "",
     icon: theme.icon,
-    hue: raw.hue,
+    colorHex: raw.color_hex ?? null,
+    palette: paletteDepuisHex(raw.color_hex),
     bar: theme.bar,
     tile: theme.tile,
     tileHover: theme.tileHover,
