@@ -1,9 +1,14 @@
 import { useState } from "react"
+import { useSearchParams } from "react-router-dom"
+import Seo from "@/components/seo/Seo"
 import { AdminAuthProvider, useAdminAuth } from "@/contexts/AdminAuth.context"
-import { ToastProvider } from "./components/AdminToast"
-import { AdminSidebar } from "./components/AdminSidebar"
-import { AdminHeader } from "./components/AdminHeader"
+import { ToastProvider, useToast } from "./components/AdminToast"
+import { HeroAdmin } from "./components/HeroAdmin"
+import { AdminTicker } from "./components/AdminTicker"
+import { AdminTabsBar } from "./components/AdminTabsBar"
+import { AdminConfirmDialog } from "./components/AdminConfirmDialog"
 import { AdminLogin } from "./AdminLogin"
+import { useAdminMutations } from "@/tools/admin.tools"
 
 // Sections
 import { DashboardSection } from "./sections/DashboardSection"
@@ -14,23 +19,51 @@ import { OffersSection } from "./sections/OffersSection"
 import { SourcesSection } from "./sections/SourcesSection"
 import { FilieresSection } from "./sections/FilieresSection"
 
-const AdminDashboardContent = () => {
-  const { isAuthenticated, loading } = useAdminAuth()
+// Registre déclaratif pur des composants (aucun switch utilisé)
+const SECTION_REGISTRY = {
+  dashboard: DashboardSection,
+  logs: LogsSection,
+  scrapers: ScrapersSection,
+  users: UsersSection,
+  offers: OffersSection,
+  sources: SourcesSection,
+  filieres: FilieresSection,
+}
 
-  const [activeSection, setActiveSection] = useState("dashboard")
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
-  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false)
+const AdminPageContent = () => {
+  const { isAuthenticated, loading } = useAdminAuth()
+  const toast = useToast()
+  const { triggerScrapeMutation } = useAdminMutations()
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  const activeTab = searchParams.get("tab") || "dashboard"
+  const [confirmScrapeOpen, setConfirmScrapeOpen] = useState(false)
+
+  const handleSelectTab = (tabId) => {
+    setSearchParams({ tab: tabId })
+  }
+
+  const handleGlobalScrape = async () => {
+    try {
+      await triggerScrapeMutation.mutateAsync({ notes: "Scraping manuel déclenché depuis le Héro" })
+      toast.success("Collecte déclenchée", "Le scraping de toutes les sources actives a démarré.")
+    } catch {
+      toast.error("Erreur", "Impossible d'initier la collecte.")
+    } finally {
+      setConfirmScrapeOpen(false)
+    }
+  }
 
   if (loading) {
     return (
-      <div className="min-h-screen w-full flex items-center justify-center bg-surface">
+      <main className="min-h-[60vh] flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
           <div className="size-8 rounded-full border-2 border-brand-navy border-t-transparent animate-spin" />
           <span className="text-xs font-semibold text-on-surface-variant">
-            Initialisation de l'espace administration...
+            Chargement de la console d'administration...
           </span>
         </div>
-      </div>
+      </main>
     )
   }
 
@@ -38,62 +71,45 @@ const AdminDashboardContent = () => {
     return <AdminLogin />
   }
 
-  const renderSection = () => {
-    switch (activeSection) {
-      case "dashboard":
-        return <DashboardSection onNavigateSection={(sec) => setActiveSection(sec)} />
-      case "logs":
-        return <LogsSection />
-      case "scrapers":
-        return <ScrapersSection />
-      case "users":
-        return <UsersSection />
-      case "offers":
-        return <OffersSection />
-      case "sources":
-        return <SourcesSection />
-      case "filieres":
-        return <FilieresSection />
-      default:
-        return <DashboardSection onNavigateSection={(sec) => setActiveSection(sec)} />
-    }
-  }
+  const ActiveComponent = SECTION_REGISTRY[activeTab] || SECTION_REGISTRY.dashboard
 
   return (
-    <div className="min-h-screen w-full flex bg-surface dark:bg-zinc-950 text-on-surface dark:text-zinc-100 font-sans antialiased">
-      {/* Sidebar */}
-      <AdminSidebar
-        activeSection={activeSection}
-        onSelectSection={(sec) => setActiveSection(sec)}
-        isCollapsed={isSidebarCollapsed}
-        onToggleCollapse={() => setIsSidebarCollapsed((prev) => !prev)}
-        mobileOpen={mobileSidebarOpen}
-        onMobileClose={() => setMobileSidebarOpen(false)}
+    <>
+      <Seo
+        title="JobAlert CI | Console d'Administration"
+        description="Espace d'administration et de supervision des offres, scrapers et abonnements JobAlert CI."
+        path="/admin"
       />
+      <main className="min-h-screen bg-surface dark:bg-zinc-950 pb-20">
+        <AdminTicker />
+        <HeroAdmin onTriggerScrapeClick={() => setConfirmScrapeOpen(true)} />
+        <AdminTabsBar activeTab={activeTab} onSelectTab={handleSelectTab} />
 
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0">
-        <AdminHeader
-          activeSection={activeSection}
-          onMobileOpen={() => setMobileSidebarOpen(true)}
+        <div className="mx-auto max-w-7xl px-6 sm:px-10 lg:px-12 pt-8">
+          <ActiveComponent onNavigateSection={handleSelectTab} />
+        </div>
+
+        <AdminConfirmDialog
+          isOpen={confirmScrapeOpen}
+          onClose={() => setConfirmScrapeOpen(false)}
+          onConfirm={handleGlobalScrape}
+          title="Lancer une collecte manuelle immédiate ?"
+          message="Tous les robots de scraping (Novojob, LinkedIn, EmploiDakar, GoAfrica) vont scanner les annonces fraîches et les intégrer au flux."
+          confirmText="Démarrer la collecte"
+          variant="primary"
+          loading={triggerScrapeMutation.isPending}
         />
-
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto animate-in fade-in duration-200">
-          {renderSection()}
-        </main>
-      </div>
-    </div>
+      </main>
+    </>
   )
 }
 
-const Admin = () => {
-  return (
-    <AdminAuthProvider>
-      <ToastProvider>
-        <AdminDashboardContent />
-      </ToastProvider>
-    </AdminAuthProvider>
-  )
-}
+const Admin = () => (
+  <AdminAuthProvider>
+    <ToastProvider>
+      <AdminPageContent />
+    </ToastProvider>
+  </AdminAuthProvider>
+)
 
 export default Admin

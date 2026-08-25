@@ -66,10 +66,8 @@ const App = () => {
               <Route path="/offres/:id" element={<DetailsOffre />} />
               <Route path="/conseils" element={<Conseils />} />
               <Route path="/conseils/:slug" element={<DetailsConseil />} />
+              <Route path="/admin" element={<Admin />} />
             </Route>
-            {/* Espace Administration */}
-            <Route path="/admin/*" element={<Admin />} />
-            <Route path="/admin" element={<Admin />} />
           </Routes>
       </BrowserRouter>
     </TooltipProvider>

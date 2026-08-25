@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { Play, ArrowRight, CheckCircle2, Clock, AlertTriangle, ShieldAlert } from "lucide-react"
+import SectionHeading from "@/components/shared/SectionHeading"
 import { AdminStatsGrid } from "../components/AdminStatsGrid"
 import { StatusBadge } from "../components/AdminBadgeRole"
 import { AdminConfirmDialog } from "../components/AdminConfirmDialog"
@@ -41,23 +42,21 @@ export const DashboardSection = ({ onNavigateSection }) => {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Top Banner / Greeting */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 rounded-2xl border border-outline-variant/30 bg-gradient-to-r from-brand-navy/5 via-surface-container-low to-brand-orange/5 dark:from-brand-navy/30 dark:to-brand-orange/10">
-        <div>
-          <h2 className="text-lg font-bold text-on-surface dark:text-zinc-100">
-            Tableau de bord de contrôle
-          </h2>
-          <p className="mt-1 text-xs text-on-surface-variant dark:text-zinc-400">
-            Supervision en temps réel des flux d'offres, des collecteurs de données et de la diffusion quotidienne.
-          </p>
-        </div>
+    <div className="space-y-8">
+      {/* Section Header */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <SectionHeading
+          eyebrow="Supervision Globale"
+          title="Tableau de bord de contrôle."
+          sub="Suivi en temps réel des offres collectées, des scrapers de données et des flux d'abonnés."
+        />
+
         {hasPermission("trigger_scrape") && (
           <Button
             type="button"
             onClick={() => setConfirmScrapeOpen(true)}
             disabled={triggerScrapeMutation.isPending}
-            className="bg-brand-orange hover:bg-brand-orange/90 text-white font-semibold shadow-xs shrink-0"
+            className="bg-brand-orange hover:bg-brand-orange/90 text-white font-semibold text-xs px-4 py-2 rounded-xl shadow-xs shrink-0 self-start sm:self-auto"
           >
             <Play className="size-3.5 mr-1.5 fill-current" />
             {triggerScrapeMutation.isPending ? "Collecte en cours..." : "Lancer le scraping"}
@@ -77,40 +76,40 @@ export const DashboardSection = ({ onNavigateSection }) => {
       {/* Grid: Scrapers snapshot & Recent Logs */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left: Scrapers Status */}
-        <div className="rounded-2xl border border-outline-variant/30 bg-surface-container-lowest dark:bg-zinc-900 p-5 shadow-xs flex flex-col justify-between">
+        <div className="rounded-3xl border border-outline-variant/30 bg-surface-container-lowest dark:bg-zinc-900 p-6 shadow-xs flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between pb-3 border-b border-outline-variant/15">
+            <div className="flex items-center justify-between pb-4 border-b border-outline-variant/15">
               <div>
-                <h3 className="text-sm font-semibold text-on-surface dark:text-zinc-100">
+                <h3 className="text-base font-bold font-heading text-brand-navy dark:text-zinc-100">
                   État des 4 sources de scraping
                 </h3>
-                <p className="text-[11px] text-on-surface-variant dark:text-zinc-400">
-                  Fréquence quotidienne & derniers passages
+                <p className="text-xs text-on-surface-variant dark:text-zinc-400">
+                  Planification quotidienne & derniers passages
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => onNavigateSection("scrapers")}
-                className="text-xs font-medium text-brand-navy dark:text-sky-400 hover:underline flex items-center gap-1"
+                className="text-xs font-semibold text-brand-navy dark:text-sky-400 hover:underline flex items-center gap-1"
               >
                 Gérer <ArrowRight className="size-3" />
               </button>
             </div>
 
-            <div className="mt-3.5 space-y-2.5">
+            <div className="mt-4 space-y-3">
               {scrapers.slice(0, 4).map((src) => (
                 <div
                   key={src.code || src.id}
-                  className="flex items-center justify-between p-3 rounded-xl border border-outline-variant/15 bg-surface-container-low/30 dark:bg-zinc-800/30 hover:bg-surface-container-low/60 transition-colors"
+                  className="flex items-center justify-between p-3.5 rounded-2xl border border-outline-variant/15 bg-surface-container-low/40 dark:bg-zinc-800/30 hover:bg-surface-container-low transition-colors"
                 >
                   <div className="flex items-center gap-3">
                     <span className="size-2 rounded-full bg-emerald-500 ring-4 ring-emerald-500/20" />
                     <div>
-                      <h4 className="text-xs font-semibold text-on-surface dark:text-zinc-200">
+                      <h4 className="text-xs font-bold text-on-surface dark:text-zinc-200">
                         {src.name}
                       </h4>
-                      <p className="text-[10px] text-on-surface-variant/80 dark:text-zinc-400">
-                        {src.schedule_label || "Chaque matin"} • {src.offers_found_last || 0} offres lors du dernier passage
+                      <p className="text-[11px] text-on-surface-variant/80 dark:text-zinc-400">
+                        {src.schedule_label || "Chaque matin"} • {src.offers_found_last || 0} offres trouvées
                       </p>
                     </div>
                   </div>
@@ -122,47 +121,47 @@ export const DashboardSection = ({ onNavigateSection }) => {
         </div>
 
         {/* Right: Recent activity / Audit Logs */}
-        <div className="rounded-2xl border border-outline-variant/30 bg-surface-container-lowest dark:bg-zinc-900 p-5 shadow-xs flex flex-col justify-between">
+        <div className="rounded-3xl border border-outline-variant/30 bg-surface-container-lowest dark:bg-zinc-900 p-6 shadow-xs flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between pb-3 border-b border-outline-variant/15">
+            <div className="flex items-center justify-between pb-4 border-b border-outline-variant/15">
               <div>
-                <h3 className="text-sm font-semibold text-on-surface dark:text-zinc-100">
+                <h3 className="text-base font-bold font-heading text-brand-navy dark:text-zinc-100">
                   Dernières activités système & audit
                 </h3>
-                <p className="text-[11px] text-on-surface-variant dark:text-zinc-400">
-                  Actions récentes des administrateurs et des automates
+                <p className="text-xs text-on-surface-variant dark:text-zinc-400">
+                  Actions récentes des administrateurs et des robots
                 </p>
               </div>
               <button
                 type="button"
                 onClick={() => onNavigateSection("logs")}
-                className="text-xs font-medium text-brand-navy dark:text-sky-400 hover:underline flex items-center gap-1"
+                className="text-xs font-semibold text-brand-navy dark:text-sky-400 hover:underline flex items-center gap-1"
               >
                 Tous les logs <ArrowRight className="size-3" />
               </button>
             </div>
 
-            <div className="mt-3.5 space-y-2.5">
+            <div className="mt-4 space-y-3">
               {logs.slice(0, 4).map((log) => (
                 <div
                   key={log.id}
-                  className="flex items-start gap-2.5 p-3 rounded-xl border border-outline-variant/15 bg-surface-container-low/30 dark:bg-zinc-800/30"
+                  className="flex items-start gap-3 p-3.5 rounded-2xl border border-outline-variant/15 bg-surface-container-low/40 dark:bg-zinc-800/30"
                 >
                   <div className="mt-0.5 shrink-0">
                     {log.niveau === "error" ? (
-                      <AlertTriangle className="size-3.5 text-rose-500" />
+                      <AlertTriangle className="size-4 text-rose-500" />
                     ) : log.niveau === "warning" ? (
-                      <Clock className="size-3.5 text-amber-500" />
+                      <Clock className="size-4 text-amber-500" />
                     ) : (
-                      <CheckCircle2 className="size-3.5 text-emerald-500" />
+                      <CheckCircle2 className="size-4 text-emerald-500" />
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between gap-2">
-                      <span className="text-[11px] font-semibold text-on-surface dark:text-zinc-200 truncate">
+                      <span className="text-xs font-bold text-on-surface dark:text-zinc-200 truncate">
                         {log.admin_name || log.module}
                       </span>
-                      <span className="text-[10px] text-on-surface-variant/70 shrink-0">
+                      <span className="text-[10px] text-on-surface-variant/70 shrink-0 font-mono">
                         {new Date(log.created_at).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}
                       </span>
                     </div>
