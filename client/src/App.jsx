@@ -22,6 +22,8 @@ const DetailsConseil = lazy(() => import("./Pages/DetailsConseil"));
 const Sources = lazy(() => import("./Pages/Sources"));
 const Registered = lazy(() => import("./Pages/Registered"));
 const ConfirmationInscription = lazy(() => import("./Pages/ConfirmationInscription"));
+const GestionPreferences = lazy(() => import("./Pages/GestionPreferences"));
+const Desinscription = lazy(() => import("./Pages/Desinscription"));
 const PageIntrouvable = lazy(() => import("./Pages/PageIntrouvable"));
 const Faq = lazy(() => import("./Pages/Support/FAQ"));
 const MentionsLegales = lazy(() => import("./Pages/Support/MentionsLegales"));
@@ -76,6 +78,8 @@ const App = () => (
               <Route path="sources" element={<Sources />} />
               <Route path="inscription" element={<Registered />} />
               <Route path="inscription/confirmation/:token" element={<ConfirmationInscription />} />
+              <Route path="/preferences/:token" element={<GestionPreferences />} />
+              <Route path="/desinscription/:token" element={<Desinscription />} />
               <Route path="/contact" element={<Contact />} />
               <Route path="/faq" element={<Faq />} />
               <Route path="/mentions-legales" element={<MentionsLegales />} />
