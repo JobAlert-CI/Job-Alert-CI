@@ -2,7 +2,8 @@
 import { Link } from "react-router-dom"
 import { motion } from "framer-motion"
 import {
-  ArrowUpRight, Bookmark, BookmarkCheck, Briefcase, Clock, GraduationCap, MapPin,
+  ArrowUpRight, Banknote, Bookmark, BookmarkCheck, Briefcase, CalendarClock,
+  Clock, GraduationCap, MapPin,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { HUES, paletteDepuisHex } from "@/lib/hues"
@@ -32,12 +33,17 @@ const OfferCard = ({
   const detailLink = getDetailLink ? getDetailLink(offre) : `/offres/${offre.id}`
   const saveId = offre.uid ?? offre.id
 
+  /* Salaire (critère n°1 pour un job board ivoirien — Cf. Audit.md Pilier 6).
+     salary_raw est une chaîne libre ("500 000 FCFA"…) → affichée telle quelle. */
+  const deadlineDate = offre.deadline ? new Date(offre.deadline) : null
+  const deadlineValide = deadlineDate && !Number.isNaN(deadlineDate.getTime()) && deadlineDate > new Date()
+
   const bookmark = (
     <motion.button
       whileTap={{ scale: 0.75 }}
       onClick={() => onToggleSave?.(saveId)}
       aria-label="Enregistrer l'offre"
-      className="shrink-0 rounded-lg border border-outline-variant/50 bg-white p-2 text-muted-foreground transition-colors hover:border-brand-orange/50 hover:text-brand-orange"
+      className="shrink-0 rounded-lg border border-outline-variant/50 bg-card p-2 text-muted-foreground transition-colors hover:border-brand-orange/50 hover:text-brand-orange"
     >
       {saved ? <BookmarkCheck className="size-4 text-brand-orange" /> : <Bookmark className="size-4" />}
     </motion.button>
@@ -45,6 +51,17 @@ const OfferCard = ({
 
   const metaChips = (
     <div className="flex flex-wrap items-center gap-1.5">
+      {offre.salaire && (
+        <span className="inline-flex items-center gap-1 rounded-md bg-brand-orange/10 px-2 py-0.5 text-[11px] font-bold text-brand-navy">
+          <Banknote className="size-3 text-brand-orange" />{offre.salaire}
+        </span>
+      )}
+      {deadlineValide && (
+        <span className="inline-flex items-center gap-1 rounded-md bg-surface-container-low px-2 py-0.5 text-[11px] font-semibold text-on-surface-variant">
+          <CalendarClock className="size-3" />
+          Avant le {deadlineDate.toLocaleDateString("fr-FR", { day: "numeric", month: "short" })}
+        </span>
+      )}
       {showFiliereChip && meta && (
         <Link
           to={`/filieres/${meta.code}`}
@@ -107,7 +124,7 @@ const OfferCard = ({
         viewport={{ once: true, margin: "-30px" }}
         exit={{ opacity: 0, scale: 0.97 }}
         transition={{ duration: 0.45, delay: (index % 6) * 0.05, ease: [0.22, 1, 0.36, 1] }}
-        className={cn("group flex flex-col rounded-xl border border-outline-variant/40 bg-white p-5 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-hover", className)}
+        className={cn("group flex flex-col rounded-xl border border-outline-variant/40 bg-card p-5 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-hover", className)}
         style={{ borderTop: `3px solid ${hue.hex}`, ...hue.style }}
       >
         <div className="flex items-center justify-between gap-2">
@@ -142,7 +159,7 @@ const OfferCard = ({
       viewport={{ once: true, margin: "-40px" }}
       exit={{ opacity: 0, scale: 0.98 }}
       transition={{ duration: 0.45, delay: (index % 8) * 0.04, ease: [0.22, 1, 0.36, 1] }}
-      className={cn("group rounded-xl border border-outline-variant/40 bg-white shadow-soft transition-all duration-300 hover:-translate-y-0.5 hover:shadow-hover", className)}
+      className={cn("group rounded-xl border border-outline-variant/40 bg-card shadow-soft transition-all duration-300 hover:-translate-y-0.5 hover:shadow-hover", className)}
       style={{ borderLeft: `3px solid ${hue.hex}`, ...hue.style }}
     >
       <div className="flex gap-4 p-4 sm:p-5">

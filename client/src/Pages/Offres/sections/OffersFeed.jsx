@@ -148,7 +148,7 @@ const OffersFeed = () => {
                     type="button"
                     onClick={c.rm}
                     aria-label={`Retirer le filtre : ${c.label}`}
-                    className="group inline-flex items-center gap-1.5 rounded-full border border-brand-navy/20 bg-brand-navy/5 px-3 py-1.5 text-xs font-semibold text-brand-navy transition-all hover:border-brand-orange/50 hover:bg-brand-orange/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    className="group inline-flex items-center gap-1.5 rounded-full border border-brand-navy/20 bg-brand-navy/5 px-3 py-1.5 text-xs font-semibold text-on-primary transition-all hover:border-brand-orange/50 hover:bg-brand-orange/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
                     {c.label}
                     <X className="size-3 text-muted-foreground transition-colors group-hover:text-brand-orange" aria-hidden />

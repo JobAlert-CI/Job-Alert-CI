@@ -21,7 +21,7 @@ const ChiffresCles = memo(function ChiffresCles({ stats, hue }) {
       {stats.map((s) => (
         <div
           key={`${s.l}-${s.v}`}
-          className="rounded-xl border border-outline-variant/40 bg-white p-4 text-center shadow-soft"
+          className="rounded-xl border border-outline-variant/40 bg-card p-4 text-center shadow-soft"
           style={{ borderTop: `3px solid ${hue.hex}` }}
         >
           <p className="font-heading text-2xl font-black text-brand-navy sm:text-3xl">
@@ -54,7 +54,7 @@ const CorpsArticle = () => {
           <ChiffresCles stats={contenu.stats} hue={hue} />
 
           {contenu.sections.length === 0 ? (
-            <p className="mt-12 rounded-xl border border-dashed border-outline-variant/60 bg-white p-6 text-sm text-muted-foreground" role="status">
+            <p className="mt-12 rounded-xl border border-dashed border-outline-variant/60 bg-card p-6 text-sm text-muted-foreground" role="status">
               Contenu détaillé en cours de rédaction — le résumé est déjà disponible.
             </p>
           ) : (
@@ -133,7 +133,7 @@ const CorpsArticle = () => {
                 {contenu.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="rounded-full border border-outline-variant/60 bg-white px-3 py-1 text-xs font-medium text-on-surface-variant transition-colors hover:border-brand-navy/40 hover:text-brand-navy"
+                    className="rounded-full border border-outline-variant/60 bg-card px-3 py-1 text-xs font-medium text-on-surface-variant transition-colors hover:border-brand-navy/40 hover:text-brand-navy"
                   >
                     {tag}
                   </span>
@@ -143,7 +143,7 @@ const CorpsArticle = () => {
           )}
 
           {/* La rédaction — rangée en base (desktop), colonne en repli */}
-          <div className="mt-8 flex flex-row items-center gap-4 rounded-xl border border-outline-variant/40 bg-white p-6 shadow-soft max-sm:flex-col max-sm:items-start">
+          <div className="mt-8 flex flex-row items-center gap-4 rounded-xl border border-outline-variant/40 bg-card p-6 shadow-soft max-sm:flex-col max-sm:items-start">
             <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-brand-navy font-heading text-[13px] font-black text-white">
               RC
             </span>

@@ -67,7 +67,7 @@ const HeroFiliere = () => {
               <span className={cn("flex size-16 items-center justify-center rounded-xl shadow-soft", hue.tile)}>
                 <meta.icon className="size-8" strokeWidth={1.8} aria-hidden />
               </span>
-              <span className="inline-flex items-center gap-2 rounded-full border border-outline-variant/50 bg-white/80 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-on-surface-variant backdrop-blur-sm">
+              <span className="inline-flex items-center gap-2 rounded-full border border-outline-variant/50 bg-card/80 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-on-surface-variant backdrop-blur-sm">
                 <span className={cn("size-1.5 rounded-full", hue.dot)} aria-hidden />
                 Filière métier
               </span>
@@ -103,7 +103,7 @@ const HeroFiliere = () => {
                       <span
                         tabIndex={0}
                         role="button"
-                        className="cursor-help rounded-full border border-outline-variant/60 bg-white/80 px-3 py-1 text-xs font-medium text-on-surface-variant backdrop-blur-sm transition-colors hover:border-brand-navy/40 hover:text-brand-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        className="cursor-help rounded-full border border-outline-variant/60 bg-card/80 px-3 py-1 text-xs font-medium text-on-surface-variant backdrop-blur-sm transition-colors hover:border-brand-navy/40 hover:text-brand-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                       >
                         {kw}
                       </span>

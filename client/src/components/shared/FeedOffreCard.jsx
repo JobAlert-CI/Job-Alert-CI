@@ -28,7 +28,7 @@ const FeedOffreCard = ({ offre, index = 0, to, className }) => {
       <Link
         to={to ?? `/offres/${offre.id}`}
         className={cn(
-          "relative flex items-center gap-4 overflow-hidden rounded-xl border border-outline-variant/40 bg-white p-4 transition-all duration-300",
+          "relative flex items-center gap-4 overflow-hidden rounded-xl border border-outline-variant/40 bg-card p-4 transition-all duration-300",
           "hover:-translate-y-0.5 hover:border-(--hover-border-color) hover:shadow-hover",
           className
         )}

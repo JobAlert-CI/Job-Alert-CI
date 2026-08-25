@@ -53,7 +53,7 @@ export const EtatVide = ({
     transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
     role="status"
     className={cn(
-      "rounded-xl border border-dashed border-outline-variant/60 bg-white text-center",
+      "rounded-xl border border-dashed border-outline-variant/60 bg-card text-center",
       compact ? "p-6" : "p-12"
     )}
   >

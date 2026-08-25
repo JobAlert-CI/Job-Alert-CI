@@ -24,7 +24,7 @@ const FilterPopover = ({ label, icon: Icon, count = 0, open, onToggle, onClose, 
         {count > 0 && (
           <span className={cn(
             "grid size-4 place-items-center rounded-full text-[10px] font-black",
-            open ? "bg-white text-brand-navy" : "bg-brand-orange text-white"
+            open ? "bg-card text-brand-navy" : "bg-brand-orange text-on-primary"
           )}>
             {count}
           </span>

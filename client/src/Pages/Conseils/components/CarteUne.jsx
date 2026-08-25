@@ -13,7 +13,7 @@ import { DUREE_UNE, joursDepuis, variantsGlissement } from "@/tools/conseils.too
 
 export const CarteUneVide = () => (
   <div className="relative w-full max-md:mx-auto max-md:max-w-md">
-    <div className="rounded-2xl border border-dashed border-outline-variant/60 bg-white p-10 text-center shadow-soft">
+    <div className="rounded-2xl border border-dashed border-outline-variant/60 bg-card p-10 text-center shadow-soft">
       <Newspaper className="mx-auto size-8 text-muted-foreground/50" aria-hidden />
       <p className="mt-4 font-heading text-lg font-bold text-brand-navy">Aucun conseil à la une</p>
       <p className="mt-1 text-sm text-muted-foreground">
@@ -59,7 +59,7 @@ const CarrouselUne = ({ articles }) => {
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1, y: [0, -7, 0] }}
         transition={{ delay: 0.9, opacity: { duration: 0.4 }, scale: { duration: 0.4 }, y: { duration: 4.6, repeat: Infinity, ease: "easeInOut" } }}
-        className="absolute -top-4 left-5 z-20 inline-flex -rotate-3 items-center gap-1.5 rounded-full bg-brand-orange px-3.5 py-1.5 text-[11px] font-bold text-white shadow-lg sm:-left-4"
+        className="absolute -top-4 left-5 z-20 inline-flex -rotate-3 items-center gap-1.5 rounded-full bg-brand-orange px-3.5 py-1.5 text-[11px] font-bold text-on-primary shadow-lg sm:-left-4"
       >
         <Newspaper className="size-3" aria-hidden />
         À la une
@@ -69,7 +69,7 @@ const CarrouselUne = ({ articles }) => {
         initial={{ opacity: 0, scale: 0.85 }}
         animate={{ opacity: 1, scale: 1, y: [0, -6, 0] }}
         transition={{ opacity: { duration: 0.3, delay: 0.1 }, scale: { duration: 0.3, delay: 0.1 }, y: { duration: 5.2, repeat: Infinity, ease: "easeInOut" } }}
-        className="absolute -top-3 right-6 z-20 inline-flex rotate-2 items-center gap-1.5 rounded-full border border-outline-variant/50 bg-white px-3 py-1.5 text-[11px] font-bold text-brand-navy shadow-soft"
+        className="absolute -top-3 right-6 z-20 inline-flex rotate-2 items-center gap-1.5 rounded-full border border-outline-variant/50 bg-card px-3 py-1.5 text-[11px] font-bold text-brand-navy shadow-soft"
       >
         <Clock className="size-3 text-brand-orange" aria-hidden />
         {a.reading_minutes} min de lecture
@@ -79,7 +79,7 @@ const CarrouselUne = ({ articles }) => {
         initial={{ opacity: 0, scale: 0.85 }}
         animate={{ opacity: 1, scale: 1, y: [0, -6, 0] }}
         transition={{ opacity: { duration: 0.3, delay: 0.2 }, scale: { duration: 0.3, delay: 0.2 }, y: { duration: 4.8, repeat: Infinity, ease: "easeInOut", delay: 0.6 } }}
-        className="absolute -bottom-4 right-8 z-20 inline-flex rotate-2 items-center gap-1.5 rounded-full border border-outline-variant/50 bg-white px-3.5 py-1.5 text-[11px] font-bold text-emerald-600 shadow-hover"
+        className="absolute -bottom-4 right-8 z-20 inline-flex rotate-2 items-center gap-1.5 rounded-full border border-outline-variant/50 bg-card px-3.5 py-1.5 text-[11px] font-bold text-emerald-600 shadow-hover"
       >
         <TrendingUp className="size-3" aria-hidden />
         {fmtVus(a.view_count)} lectures
@@ -109,7 +109,7 @@ const CarrouselUne = ({ articles }) => {
         </div>
 
         <div className="relative flex items-center gap-3 border-b border-white/10 px-6 py-4">
-          <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-white font-heading text-[11px] font-black text-white">
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-card font-heading text-[11px] font-black text-white">
             <img src="/logo2.svg" alt="Logo JobAlert CI" loading="lazy" />
           </span>
           <div className="min-w-0 flex-1">
@@ -165,7 +165,7 @@ const CarrouselUne = ({ articles }) => {
               <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-white/70">{a.excerpt}</p>
               <div className="mt-auto flex items-center justify-between gap-3 border-t border-white/10 pt-5">
                 <div className="flex items-center gap-2.5">
-                  <span className="flex size-8 items-center justify-center rounded-full bg-white/10 text-[10px] font-black ring-1 ring-white/20">
+                  <span className="flex size-8 items-center justify-center rounded-full bg-card/10 text-[10px] font-black ring-1 ring-white/20">
                     RC
                   </span>
                   <div>
@@ -175,7 +175,7 @@ const CarrouselUne = ({ articles }) => {
                 </div>
                 <Link
                   to={`/conseils/${a.slug}`}
-                  className="group inline-flex items-center gap-2 rounded-lg bg-brand-orange px-4 py-2.5 text-xs font-bold text-white transition-all duration-300 hover:brightness-110 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
+                  className="group inline-flex items-center gap-2 rounded-lg bg-brand-orange px-4 py-2.5 text-xs font-bold text-on-primary transition-all duration-300 hover:brightness-110 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
                 >
                   Lire l'article
                   <ArrowUpRight className="size-3.5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden />

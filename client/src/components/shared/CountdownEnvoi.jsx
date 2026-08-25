@@ -80,7 +80,7 @@ const Horloge = ({ className, targetHour=8, label }) => {
           {unites.map((u, i) => (
             <span key={u.l} className="flex items-center gap-1.5">
               {i > 0 && <span className="font-heading text-lg font-black text-white/30">:</span>}
-              <span className="grid min-w-11 place-items-center rounded-md bg-white/10 px-2 py-1 font-heading text-xl font-extrabold tabular-nums">
+              <span className="grid min-w-11 place-items-center rounded-md bg-card/10 px-2 py-1 font-heading text-xl font-extrabold tabular-nums">
                 {String(u.v).padStart(2, "0")}
               </span>
               <span className="text-[10px] font-bold uppercase text-white/60">{u.l}</span>

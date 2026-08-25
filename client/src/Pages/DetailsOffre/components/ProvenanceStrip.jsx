@@ -12,7 +12,7 @@ const ProvenanceStrip = () => {
   const steps = buildProvenanceSteps(offre)
 
   return (
-    <div className="rounded-xl border border-outline-variant/40 bg-white/70 px-4 py-3.5 backdrop-blur-sm">
+    <div className="rounded-xl border border-outline-variant/40 bg-card/70 px-4 py-3.5 backdrop-blur-sm">
       {/* Desktop-first : ligne horizontale en base, colonne en repli mobile */}
       <div className="flex flex-row items-center gap-3 max-sm:flex-col max-sm:items-start">
         {steps.map((step, i) => (
@@ -32,7 +32,7 @@ const ProvenanceStrip = () => {
             <span className="flex items-center gap-2.5">
               <span
                 className={cn(
-                  "relative grid size-8 shrink-0 place-items-center rounded-full border bg-white",
+                  "relative grid size-8 shrink-0 place-items-center rounded-full border bg-card",
                   step.done
                     ? "border-emerald-500/40 text-emerald-600"
                     : "border-brand-orange/50 text-brand-orange"

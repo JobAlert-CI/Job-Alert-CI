@@ -1,17 +1,18 @@
 import { AnimatePresence, motion } from "framer-motion"
 import { Clock, Fingerprint, Sparkles } from "lucide-react"
-import { FaLinkedin } from "react-icons/fa6"
+
 import { cn } from "@/lib/utils"
 import { paletteDepuisHex } from "@/lib/hues"
 import { SOURCES } from "@/lib/referentiels"
 import { getImgSource } from "@/utils/utilsSource"
 import { useRegistered } from "@/contexts/Registered.context"
+import { LinkedinIcon } from "@/components/shared"
 
 const LogoSrc = ({ code, className = "size-4" }) => {
   const s = SOURCES.find((x) => x.code === code)
   if (!s) return null
   return s.linkedin ? (
-    <FaLinkedin className={cn(className, "text-[#0A66C2]")} />
+    <LinkedinIcon className={cn(className, "text-[#0A66C2]")} />
   ) : (
     <img src={getImgSource(code)} alt={code} className={cn(className, "object-contain")} />
   )
@@ -43,7 +44,7 @@ export const ApercuRecap = () => {
           scale: { duration: 0.4 },
           y: { duration: 4.6, repeat: Infinity, ease: "easeInOut" },
         }}
-        className="absolute -top-4 left-4 z-20 inline-flex -rotate-3 items-center gap-1.5 rounded-full bg-brand-orange px-3.5 py-1.5 text-[11px] font-bold text-white shadow-lg"
+        className="absolute -top-4 left-4 z-20 inline-flex -rotate-3 items-center gap-1.5 rounded-full bg-brand-orange px-3.5 py-1.5 text-[11px] font-bold text-on-primary shadow-lg"
       >
         <Clock className="size-3" />
         Demain, 8h00 pile
@@ -53,14 +54,14 @@ export const ApercuRecap = () => {
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.8, duration: 0.4 }}
-        className="absolute -bottom-4 right-8 z-20 inline-flex rotate-2 items-center gap-1.5 rounded-full border border-outline-variant/50 bg-white px-3.5 py-1.5 text-[11px] font-bold text-emerald-600 shadow-hover"
+        className="absolute -bottom-4 right-8 z-20 inline-flex rotate-2 items-center gap-1.5 rounded-full border border-outline-variant/50 bg-card px-3.5 py-1.5 text-[11px] font-bold text-emerald-600 shadow-hover"
       >
         <Fingerprint className="size-3" />
         0 doublon
       </motion.span>
 
       {/* Cadre Email principal */}
-      <div className="relative overflow-hidden rounded-2xl border border-outline-variant/40 bg-white shadow-[0_24px_48px_-16px_rgba(15,45,77,0.22)]">
+      <div className="relative overflow-hidden rounded-2xl border border-outline-variant/40 bg-card shadow-[0_24px_48px_-16px_rgba(15,45,77,0.22)]">
         {/* En-tête Client Email */}
         <div className="flex items-center gap-3 border-b border-outline-variant/40 bg-surface-container-low/60 px-5 py-3.5">
           <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-brand-navy font-heading text-[11px] font-black text-white">
@@ -133,7 +134,7 @@ export const ApercuRecap = () => {
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: 14 }}
                       transition={{ duration: 0.3, ease: "easeOut" }}
-                      className="flex items-center gap-2.5 rounded-lg border border-outline-variant/40 bg-white px-3 py-2.5 shadow-xs"
+                      className="flex items-center gap-2.5 rounded-lg border border-outline-variant/40 bg-card px-3 py-2.5 shadow-xs"
                     >
                       <span className={cn("size-1.5 shrink-0 rounded-full", hue?.dot || "bg-blue-500")} style={hue.style} />
                       <div className="min-w-0 flex-1">

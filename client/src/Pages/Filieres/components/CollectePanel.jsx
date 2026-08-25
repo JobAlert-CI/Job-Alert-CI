@@ -39,13 +39,13 @@ const CollectePanel = () => {
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1, y: [0, -6, 0] }}
         transition={{ delay: 1, opacity: { duration: 0.4 }, scale: { duration: 0.4 }, y: { duration: 5, repeat: Infinity, ease: "easeInOut" } }}
-        className="absolute -top-4 right-6 z-20 inline-flex rotate-2 items-center gap-1.5 rounded-full border border-outline-variant/50 bg-white px-3.5 py-1.5 text-[11px] font-bold text-emerald-600 shadow-hover"
+        className="absolute -top-4 right-6 z-20 inline-flex rotate-2 items-center gap-1.5 rounded-full border border-outline-variant/50 bg-card px-3.5 py-1.5 text-[11px] font-bold text-emerald-600 shadow-hover"
       >
         <ShieldCheck className="size-3" aria-hidden />
         0 doublon
       </motion.span>
 
-      <div className="relative overflow-hidden rounded-2xl border border-outline-variant/40 bg-white shadow-[0_24px_48px_-16px_rgba(15,45,77,0.22)]">
+      <div className="relative overflow-hidden rounded-2xl border border-outline-variant/40 bg-card shadow-[0_24px_48px_-16px_rgba(15,45,77,0.22)]">
         <div className="flex items-center gap-3 border-b border-outline-variant/40 bg-surface-container-low/60 px-5 py-4">
           <span className="relative flex size-2.5 shrink-0" aria-hidden>
             <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-60" />

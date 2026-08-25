@@ -62,7 +62,7 @@ const HeroFilieres = () => {
             {/* Badges — chacun n'apparaît que lorsque SA donnée est prête */}
             <motion.div variants={fadeUp} className="flex flex-wrap items-center gap-2.5">
               {!filieresPending && (
-                <span className="inline-flex items-center gap-2 rounded-full border border-outline-variant/50 bg-white/80 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-on-surface-variant backdrop-blur-sm">
+                <span className="inline-flex items-center gap-2 rounded-full border border-outline-variant/50 bg-card/80 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-on-surface-variant backdrop-blur-sm">
                   <LayoutGrid className="size-3 text-brand-orange" aria-hidden />
                   {filieres.length} filière{filieres.length > 1 ? "s" : ""} couverte{filieres.length > 1 ? "s" : ""}
                 </span>

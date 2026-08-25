@@ -23,7 +23,7 @@ export const EtapeValidation = () => {
       </p>
 
       {/* Carte Récapitulative */}
-      <div className="mt-6 divide-y divide-outline-variant/40 overflow-hidden rounded-lg border border-outline-variant/50 bg-white shadow-soft">
+      <div className="mt-6 divide-y divide-outline-variant/40 overflow-hidden rounded-lg border border-outline-variant/50 bg-card shadow-soft">
         {[
           { icon: Mail, label: "Email", value: form.email },
           { icon: User, label: "Nom", value: form.nom.trim() || "—" },

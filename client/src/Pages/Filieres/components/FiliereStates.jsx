@@ -48,7 +48,7 @@ export const FiliereEmptyState = ({ onReset }) => (
     initial={{ opacity: 0, y: 16 }}
     animate={{ opacity: 1, y: 0 }}
     role="status"
-    className="mt-8 rounded-xl border border-dashed border-outline-variant/60 bg-white p-12 text-center"
+    className="mt-8 rounded-xl border border-dashed border-outline-variant/60 bg-card p-12 text-center"
   >
     <SearchX className="mx-auto size-10 text-muted-foreground/50" aria-hidden />
     <h3 className="mt-4 font-heading text-lg font-bold text-brand-navy">Aucune filière trouvée</h3>

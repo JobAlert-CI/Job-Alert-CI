@@ -40,7 +40,7 @@ export const EtapeIdentite = () => {
               onKeyDown={handleKeyDown}
               placeholder="prenom.nom@email.com"
               className={cn(
-                "h-12 w-full rounded-lg border bg-white pl-11 pr-11 text-sm outline-none transition-all placeholder:text-muted-foreground/60",
+                "h-12 w-full rounded-lg border bg-card pl-11 pr-11 text-sm outline-none transition-all placeholder:text-muted-foreground/60",
                 form.email && !emailOk
                   ? "border-red-400 focus:ring-2 focus:ring-red-200"
                   : "border-outline-variant/60 focus:border-brand-navy/50 focus:ring-2 focus:ring-brand-navy/10"
@@ -78,7 +78,7 @@ export const EtapeIdentite = () => {
               onChange={(e) => setField("nom", e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Ex: Awa Diabaté"
-              className="h-12 w-full rounded-lg border border-outline-variant/60 bg-white pl-11 pr-4 text-sm outline-none transition-all placeholder:text-muted-foreground/60 focus:border-brand-navy/50 focus:ring-2 focus:ring-brand-navy/10"
+              className="h-12 w-full rounded-lg border border-outline-variant/60 bg-card pl-11 pr-4 text-sm outline-none transition-all placeholder:text-muted-foreground/60 focus:border-brand-navy/50 focus:ring-2 focus:ring-brand-navy/10"
             />
           </div>
         </div>

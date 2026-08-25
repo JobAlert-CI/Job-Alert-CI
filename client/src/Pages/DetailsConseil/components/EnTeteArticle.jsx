@@ -5,9 +5,9 @@ import { motion } from "framer-motion"
 import {
   BadgeCheck, Bell, Check, ChevronRight, Clock, Eye, Lightbulb, Link2, Sparkles,
 } from "lucide-react"
-import { FaLinkedin } from "react-icons/fa6"
+
 import { cn } from "@/lib/utils"
-import { BadgeNouveau, CtaLink } from "@/components/shared"
+import { BadgeNouveau, CtaLink, LinkedinIcon } from "@/components/shared"
 import { dateLabel } from "@/lib/dates"
 import { fmtVus } from "@/lib/query-helpers"
 import { useConseilDetail } from "@/contexts/DetailsConseil.context"
@@ -39,7 +39,7 @@ const CarteBrief = () => {
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1, y: [0, -7, 0] }}
         transition={{ delay: 0.9, opacity: { duration: 0.4 }, scale: { duration: 0.4 }, y: { duration: 4.6, repeat: Infinity, ease: "easeInOut" } }}
-        className="absolute -top-4 left-5 z-20 inline-flex -rotate-3 items-center gap-1.5 rounded-full bg-brand-orange px-3.5 py-1.5 text-[11px] font-bold text-white shadow-lg sm:-left-4"
+        className="absolute -top-4 left-5 z-20 inline-flex -rotate-3 items-center gap-1.5 rounded-full bg-brand-orange px-3.5 py-1.5 text-[11px] font-bold text-on-primary shadow-lg sm:-left-4"
       >
         <Clock className="size-3" aria-hidden />
         {a.lecture} min de lecture
@@ -48,7 +48,7 @@ const CarteBrief = () => {
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 1.05, duration: 0.4 }}
-        className="absolute -top-3 right-6 z-20 inline-flex rotate-2 items-center gap-1.5 rounded-full border border-outline-variant/50 bg-white px-3 py-1.5 text-[11px] font-bold text-brand-navy shadow-soft"
+        className="absolute -top-3 right-6 z-20 inline-flex rotate-2 items-center gap-1.5 rounded-full border border-outline-variant/50 bg-card px-3 py-1.5 text-[11px] font-bold text-brand-navy shadow-soft"
       >
         <Eye className="size-3 text-brand-orange" aria-hidden />
         {fmtVus(a.vus)} lectures
@@ -57,7 +57,7 @@ const CarteBrief = () => {
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1, y: [0, -6, 0] }}
         transition={{ delay: 1.2, opacity: { duration: 0.4 }, scale: { duration: 0.4 }, y: { duration: 5.2, repeat: Infinity, ease: "easeInOut", delay: 0.6 } }}
-        className="absolute -bottom-4 right-8 z-20 inline-flex rotate-2 items-center gap-1.5 rounded-full border border-outline-variant/50 bg-white px-3.5 py-1.5 text-[11px] font-bold text-emerald-600 shadow-hover"
+        className="absolute -bottom-4 right-8 z-20 inline-flex rotate-2 items-center gap-1.5 rounded-full border border-outline-variant/50 bg-card px-3.5 py-1.5 text-[11px] font-bold text-emerald-600 shadow-hover"
       >
         <Sparkles className="size-3" aria-hidden />
         Nourri par la collecte
@@ -69,7 +69,7 @@ const CarteBrief = () => {
         <Icon className="pointer-events-none absolute -bottom-8 -right-4 size-48 rotate-12 text-white/5" strokeWidth={1} aria-hidden />
 
         <div className="relative flex items-center gap-3 border-b border-white/10 px-6 py-4">
-          <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-brand-orange font-heading text-[11px] font-black text-white">
+          <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-brand-orange font-heading text-[11px] font-black text-on-primary">
             JA
           </span>
           <div className="min-w-0 flex-1">
@@ -186,7 +186,7 @@ const EnTeteArticle = () => {
                 {cat.label}
               </Link>
               {a.jours === 0 && <BadgeNouveau />}
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-outline-variant/50 bg-white/80 px-3.5 py-1.5 text-[11px] font-bold text-on-surface-variant">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-outline-variant/50 bg-card/80 px-3.5 py-1.5 text-[11px] font-bold text-on-surface-variant">
                 <Clock className="size-3 text-brand-orange" aria-hidden />
                 {a.lecture} min de lecture
               </span>
@@ -239,7 +239,7 @@ const EnTeteArticle = () => {
                   "inline-flex h-10 items-center gap-2 rounded-lg border px-4 text-xs font-bold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                   copied
                     ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-700"
-                    : "border-outline-variant/60 bg-white text-on-surface-variant hover:border-brand-navy/40 hover:text-brand-navy"
+                    : "border-outline-variant/60 bg-card text-on-surface-variant hover:border-brand-navy/40 hover:text-brand-navy"
                 )}
               >
                 {copied ? <Check className="size-3.5" aria-hidden /> : <Link2 className="size-3.5" aria-hidden />}
@@ -253,7 +253,7 @@ const EnTeteArticle = () => {
                 rel="noreferrer"
                 className="inline-flex h-10 items-center gap-2 rounded-lg border border-[#0A66C2]/30 bg-[#0A66C2]/5 px-4 text-xs font-bold text-[#0A66C2] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#0A66C2] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
-                <FaLinkedin className="size-3.5" aria-hidden />
+                <LinkedinIcon className="size-3.5" aria-hidden />
                 Partager
               </a>
               <CtaLink to="/inscription" size="md" icon={Bell} animateIcon className="h-10">

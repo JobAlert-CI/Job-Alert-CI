@@ -70,7 +70,7 @@ export const EtapePreferences = () => {
           onChange={(e) => setQ(e.target.value)}
           placeholder="Rechercher un métier, un mot-clé (ex: dev, finance, rh)…"
           aria-label="Rechercher une filière"
-          className="h-11 w-full rounded-lg border border-outline-variant/60 bg-white pl-10 pr-4 text-sm outline-none transition-all placeholder:text-muted-foreground/60 focus:border-brand-navy/50 focus:ring-2 focus:ring-brand-navy/10"
+          className="h-11 w-full rounded-lg border border-outline-variant/60 bg-card pl-10 pr-4 text-sm outline-none transition-all placeholder:text-muted-foreground/60 focus:border-brand-navy/50 focus:ring-2 focus:ring-brand-navy/10"
         />
       </div>
 
@@ -99,7 +99,7 @@ export const EtapePreferences = () => {
                   "group relative flex w-full flex-col items-start gap-2 rounded-lg border p-3 text-left transition-all duration-200 cursor-pointer",
                   sel
                     ? "border-brand-navy bg-brand-navy/3 shadow-soft ring-1 ring-brand-navy/20"
-                    : "border-outline-variant/60 bg-white hover:-translate-y-0.5 hover:border-brand-navy/35 hover:shadow-soft",
+                    : "border-outline-variant/60 bg-card hover:-translate-y-0.5 hover:border-brand-navy/35 hover:shadow-soft",
                   bloque && "cursor-not-allowed opacity-40 hover:translate-y-0 hover:border-outline-variant/60 hover:shadow-none"
                 )}
               >
@@ -128,7 +128,7 @@ export const EtapePreferences = () => {
                       animate={{ scale: 1 }}
                       exit={{ scale: 0 }}
                       transition={{ duration: 0.2 }}
-                      className="absolute right-2 top-2 grid size-5 place-items-center rounded-full bg-brand-orange text-white shadow-soft"
+                      className="absolute right-2 top-2 grid size-5 place-items-center rounded-full bg-brand-orange text-on-primary shadow-soft"
                     >
                       <Check className="size-3" strokeWidth={3.5} />
                     </motion.span>

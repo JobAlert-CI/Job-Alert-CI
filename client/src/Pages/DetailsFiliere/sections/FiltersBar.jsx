@@ -211,7 +211,7 @@ const FiltersBar = () => {
             <SlidersHorizontal className="size-4" aria-hidden />
             Filtres
             {activeCount > 0 && (
-              <span className="grid size-4.5 place-items-center rounded-full bg-brand-orange text-[10px] font-black text-white">
+              <span className="grid size-4.5 place-items-center rounded-full bg-brand-orange text-[10px] font-black text-on-primary">
                 <span aria-hidden>{activeCount}</span>
                 <span className="sr-only">filtres actifs</span>
               </span>

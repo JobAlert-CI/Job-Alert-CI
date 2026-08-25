@@ -57,7 +57,7 @@ const HorlogeAbidjan = () => {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.5, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-      className="flex items-center gap-3.5 rounded-xl border border-outline-variant/50 bg-white/80 px-4 py-3.5 backdrop-blur-sm"
+      className="flex items-center gap-3.5 rounded-xl border border-outline-variant/50 bg-card/80 px-4 py-3.5 backdrop-blur-sm"
     >
       <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-brand-navy text-brand-orange">
         <Clock className="size-5" />
@@ -114,7 +114,7 @@ const FormulaireContact = () => {
 
   const champ = (k) =>
     cn(
-      "w-full rounded-lg border bg-white px-4 text-sm outline-none transition-all placeholder:text-muted-foreground/60",
+      "w-full rounded-lg border bg-card px-4 text-sm outline-none transition-all placeholder:text-muted-foreground/60",
       tentative && erreurs[k]
         ? "border-red-400 focus:ring-2 focus:ring-red-200"
         : "border-outline-variant/60 focus:border-brand-navy/50 focus:ring-2 focus:ring-brand-navy/10"
@@ -137,7 +137,7 @@ const FormulaireContact = () => {
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1, y: [0, -7, 0] }}
         transition={{ delay: 0.9, opacity: { duration: 0.4 }, scale: { duration: 0.4 }, y: { duration: 4.6, repeat: Infinity, ease: "easeInOut" } }}
-        className="absolute -top-4 left-5 z-20 inline-flex -rotate-3 items-center gap-1.5 rounded-full bg-brand-orange px-3.5 py-1.5 text-[11px] font-bold text-white shadow-lg sm:-left-4"
+        className="absolute -top-4 left-5 z-20 inline-flex -rotate-3 items-center gap-1.5 rounded-full bg-brand-orange px-3.5 py-1.5 text-[11px] font-bold text-on-primary shadow-lg sm:-left-4"
       >
         <Clock className="size-3" />
         Réponse en 24 h
@@ -146,13 +146,13 @@ const FormulaireContact = () => {
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 1.05, duration: 0.4 }}
-        className="absolute -bottom-4 right-8 z-20 inline-flex rotate-2 items-center gap-1.5 rounded-full border border-outline-variant/50 bg-white px-3.5 py-1.5 text-[11px] font-bold text-emerald-600 shadow-hover"
+        className="absolute -bottom-4 right-8 z-20 inline-flex rotate-2 items-center gap-1.5 rounded-full border border-outline-variant/50 bg-card px-3.5 py-1.5 text-[11px] font-bold text-emerald-600 shadow-hover"
       >
         <Check className="size-3" strokeWidth={3} />
         Lu par un humain
       </motion.span>
 
-      <div className="relative overflow-hidden rounded-2xl border border-outline-variant/40 bg-white shadow-[0_24px_48px_-16px_rgba(15,45,77,0.22)]">
+      <div className="relative overflow-hidden rounded-2xl border border-outline-variant/40 bg-card shadow-[0_24px_48px_-16px_rgba(15,45,77,0.22)]">
         {/* Chrome « email » — l'objet se met à jour en direct */}
         <div className="flex items-center gap-3 border-b border-outline-variant/40 bg-surface-container-low/60 px-5 py-4">
           <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-brand-navy font-heading text-[11px] font-black text-white">JA</span>
@@ -264,7 +264,7 @@ const FormulaireContact = () => {
                           "inline-flex items-center gap-2 rounded-full border px-3.5 py-2 text-[13px] font-semibold transition-all duration-200",
                           form.sujet === s.id
                             ? "border-brand-navy bg-brand-navy text-white shadow-soft"
-                            : "border-outline-variant/60 bg-white text-on-surface-variant hover:-translate-y-0.5 hover:border-brand-navy/40 hover:text-brand-navy"
+                            : "border-outline-variant/60 bg-card text-on-surface-variant hover:-translate-y-0.5 hover:border-brand-navy/40 hover:text-brand-navy"
                         )}
                       >
                         <s.icon className="size-4" />
@@ -298,7 +298,7 @@ const FormulaireContact = () => {
                 <button
                   type="submit"
                   disabled={sending}
-                  className="group inline-flex h-12 w-full items-center justify-center gap-2.5 rounded-lg bg-brand-orange text-sm font-bold text-white shadow-[0_12px_28px_-8px_rgba(245,166,35,0.5)] transition-all duration-300 hover:-translate-y-0.5 hover:brightness-110 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-60"
+                  className="group inline-flex h-12 w-full items-center justify-center gap-2.5 rounded-lg bg-brand-orange text-sm font-bold text-on-primary shadow-[0_12px_28px_-8px_rgba(245,166,35,0.5)] transition-all duration-300 hover:-translate-y-0.5 hover:brightness-110 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-60"
                 >
                   {sending ? (
                     <>
@@ -351,7 +351,7 @@ const AideRapide = () => (
             <Link
               key={q}
               to="/faq"
-              className="group inline-flex items-center gap-2 rounded-full border border-outline-variant/60 bg-white px-4 py-2 text-[13px] font-semibold text-on-surface-variant shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-brand-orange/50 hover:text-brand-navy"
+              className="group inline-flex items-center gap-2 rounded-full border border-outline-variant/60 bg-card px-4 py-2 text-[13px] font-semibold text-on-surface-variant shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:border-brand-orange/50 hover:text-brand-navy"
             >
               {q}
               <ArrowRight className="size-3.5 text-brand-orange transition-transform duration-200 group-hover:translate-x-0.5" />
@@ -444,7 +444,7 @@ const Contact = () => (
                   { icon: Mail, t: "bonjour@jobalert.ci", d: "Pour tout type de question, réponse sous 24 h" },
                   { icon: MapPin, t: "Abidjan, Côte d'Ivoire", d: "L'équipe est sur le même fuseau que les offres" },
                 ].map((c) => (
-                  <div key={c.t} className="flex items-center gap-3.5 rounded-xl border border-outline-variant/50 bg-white/80 px-4 py-3.5 backdrop-blur-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-brand-navy/30 hover:shadow-soft">
+                  <div key={c.t} className="flex items-center gap-3.5 rounded-xl border border-outline-variant/50 bg-card/80 px-4 py-3.5 backdrop-blur-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-brand-navy/30 hover:shadow-soft">
                     <span className="grid size-10 shrink-0 place-items-center rounded-lg bg-brand-orange/10 text-brand-orange">
                       <c.icon className="size-5" />
                     </span>
@@ -466,7 +466,7 @@ const Contact = () => (
                 <ol className="relative mt-3 space-y-4 border-l border-outline-variant/50 pl-5">
                   {ETAPES_REPONSE.map((e, i) => (
                     <li key={e.t} className="relative">
-                      <span className="absolute -left-6.75 top-0.5 grid size-4 place-items-center rounded-full border-2 border-white bg-brand-orange font-heading text-[9px] font-black text-white shadow-soft">
+                      <span className="absolute -left-6.75 top-0.5 grid size-4 place-items-center rounded-full border-2 border-white bg-brand-orange font-heading text-[9px] font-black text-on-primary shadow-soft">
                         {i + 1}
                       </span>
                       <p className="text-sm font-bold text-brand-navy">{e.t}</p>

@@ -45,7 +45,7 @@ const RecapCard = () => {
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 1.05, duration: 0.4 }}
-        className="absolute -top-3 right-6 z-20 inline-flex rotate-2 items-center gap-1.5 rounded-full border border-outline-variant/50 bg-white px-3 py-1.5 text-[11px] font-bold text-emerald-600 shadow-soft"
+        className="absolute -top-3 right-6 z-20 inline-flex rotate-2 items-center gap-1.5 rounded-full border border-outline-variant/50 bg-card px-3 py-1.5 text-[11px] font-bold text-emerald-600 shadow-soft"
       >
         <ShieldCheck className="size-3" aria-hidden />
         0 doublon
@@ -54,14 +54,14 @@ const RecapCard = () => {
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1, y: [0, -6, 0] }}
         transition={{ delay: 1.2, opacity: { duration: 0.4 }, scale: { duration: 0.4 }, y: { duration: 5.2, repeat: Infinity, ease: "easeInOut", delay: 0.6 } }}
-        className="absolute -bottom-4 right-8 z-20 inline-flex rotate-2 items-center gap-1.5 rounded-full border border-outline-variant/50 bg-white px-3.5 py-1.5 text-[11px] font-bold text-on-surface shadow-hover"
+        className="absolute -bottom-4 right-8 z-20 inline-flex rotate-2 items-center gap-1.5 rounded-full border border-outline-variant/50 bg-card px-3.5 py-1.5 text-[11px] font-bold text-on-surface shadow-hover"
       >
         <Mail className="size-3 text-brand-orange" aria-hidden />
         Envoyé à {meta.abonnes.toLocaleString("fr-FR")} abonnés
       </motion.span>
 
       {/* Carte */}
-      <div className="relative overflow-hidden rounded-2xl border border-outline-variant/40 bg-white shadow-[0_24px_48px_-16px_rgba(15,45,77,0.22)]">
+      <div className="relative overflow-hidden rounded-2xl border border-outline-variant/40 bg-card shadow-[0_24px_48px_-16px_rgba(15,45,77,0.22)]">
         <div className="flex items-center gap-3 border-b border-outline-variant/40 bg-surface-container-low/60 px-5 py-4">
           <span className={cn("flex size-9 shrink-0 items-center justify-center rounded-lg", hue.tile)}>
             <meta.icon className="size-4.5" strokeWidth={2} aria-hidden />
@@ -92,7 +92,7 @@ const RecapCard = () => {
                 )}
                 <span className="flex items-center gap-2">
                   <span className={cn(
-                    "grid size-7 shrink-0 place-items-center rounded-full border bg-white",
+                    "grid size-7 shrink-0 place-items-center rounded-full border bg-card",
                     i === 1 || i === 2 ? "border-brand-orange/50 text-brand-orange" : "border-outline-variant/60 text-muted-foreground"
                   )}>
                     <s.icon className="size-3.5" aria-hidden />

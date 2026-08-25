@@ -34,7 +34,7 @@ const BarreFiltres = () => {
                 onChange={(e) => setQueryLocale(e.target.value)}
                 placeholder="Rechercher un conseil…"
                 aria-label="Rechercher un conseil"
-                className="h-9 w-full rounded-lg border border-outline-variant/60 bg-white pl-9 pr-9 text-[13px] outline-none transition-all placeholder:text-muted-foreground/70 focus:border-brand-navy/50 focus:ring-2 focus:ring-brand-navy/10"
+                className="h-9 w-full rounded-lg border border-outline-variant/60 bg-card pl-9 pr-9 text-[13px] outline-none transition-all placeholder:text-muted-foreground/70 focus:border-brand-navy/50 focus:ring-2 focus:ring-brand-navy/10"
               />
               {queryLocale && (
                 <button
@@ -54,7 +54,7 @@ const BarreFiltres = () => {
                 </strong>{" "}
                 conseil{filtered.length > 1 ? "s" : ""}
               </span>
-              <div className="flex rounded-lg border border-outline-variant/60 bg-white p-0.5 shadow-soft" role="group" aria-label="Trier les conseils">
+              <div className="flex rounded-lg border border-outline-variant/60 bg-card p-0.5 shadow-soft" role="group" aria-label="Trier les conseils">
                 {MODES_TRI.map(({ k, l, I }) => (
                   <button
                     key={k}
@@ -113,7 +113,7 @@ const BarreFiltres = () => {
             <SlidersHorizontal className="size-4" aria-hidden />
             Filtres
             {activeCount > 0 && (
-              <span className="grid size-4.5 place-items-center rounded-full bg-brand-orange text-[10px] font-black text-white">
+              <span className="grid size-4.5 place-items-center rounded-full bg-brand-orange text-[10px] font-black text-on-primary">
                 <span aria-hidden>{activeCount}</span>
                 <span className="sr-only">filtres actifs</span>
               </span>
@@ -153,7 +153,7 @@ const BarreFiltres = () => {
                         "rounded-lg border px-3 py-2.5 text-xs font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                         sort === s.k
                           ? "border-brand-navy bg-brand-navy text-white shadow-soft"
-                          : "border-outline-variant/60 bg-white text-on-surface-variant hover:border-brand-navy/40 hover:text-brand-navy"
+                          : "border-outline-variant/60 bg-card text-on-surface-variant hover:border-brand-navy/40 hover:text-brand-navy"
                       )}
                     >
                       {s.l}
@@ -175,7 +175,7 @@ const BarreFiltres = () => {
               <button
                 type="button"
                 onClick={() => setDrawerOpen(false)}
-                className="flex-1 rounded-lg bg-brand-orange py-3 text-sm font-bold text-white shadow-soft transition-all hover:brightness-110 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="flex-1 rounded-lg bg-brand-orange py-3 text-sm font-bold text-on-primary shadow-soft transition-all hover:brightness-110 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 Voir {filtered.length} conseil{filtered.length > 1 ? "s" : ""}
               </button>

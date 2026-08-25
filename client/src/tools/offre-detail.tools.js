@@ -1,5 +1,5 @@
 import {
-  Briefcase, CalendarDays, Fingerprint, GraduationCap,
+  Banknote, Briefcase, CalendarDays, Fingerprint, GraduationCap,
   Radar, Send, Tag, Zap,
 } from "lucide-react"
 import { addDays } from "@/lib/dates"
@@ -68,6 +68,7 @@ export const OFFRE_META_ROWS = [
         month: "long",
       }),
   },
+  { icon: Banknote, label: "Salaire", value: (offre) => offre.salaire },
   { icon: Briefcase, label: "Contrat", value: (offre) => offre.contrat },
   { icon: GraduationCap, label: "Niveau", value: (offre) => offre.niveau },
   { icon: Zap, label: "Expérience", value: (offre) => offre.experience },

@@ -50,7 +50,7 @@ export const Stepper = () => {
                   "grid size-9 place-items-center rounded-full border-2 font-heading text-sm font-bold transition-all duration-300",
                   done && "border-brand-navy bg-brand-navy text-white group-hover:ring-2 group-hover:ring-brand-navy/30",
                   active && "border-brand-orange bg-brand-orange/10 text-brand-orange ring-4 ring-brand-orange/15 shadow-sm",
-                  !done && !active && "border-outline-variant/60 bg-white text-muted-foreground"
+                  !done && !active && "border-outline-variant/60 bg-card text-muted-foreground"
                 )}
                 title={isClickable ? `Revenir à l'étape ${e.label}` : undefined}
               >

@@ -14,7 +14,7 @@ const SectionDescription = () => {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-60px" }}
       transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-      className="overflow-hidden rounded-xl border border-outline-variant/40 bg-white shadow-soft"
+      className="overflow-hidden rounded-xl border border-outline-variant/40 bg-card shadow-soft"
       style={{ borderTop: `3px solid ${hue.hex}` }}
       aria-labelledby="description-poste"
     >
@@ -91,7 +91,7 @@ const SectionDescription = () => {
             {(detail.tags || []).map((kw) => (
               <Tooltip key={kw}>
                 <TooltipTrigger >
-                  <span className="cursor-help rounded-full border border-outline-variant/60 bg-white px-3 py-1 text-xs font-medium text-on-surface-variant transition-colors hover:border-brand-navy/40 hover:text-brand-navy">
+                  <span className="cursor-help rounded-full border border-outline-variant/60 bg-card px-3 py-1 text-xs font-medium text-on-surface-variant transition-colors hover:border-brand-navy/40 hover:text-brand-navy">
                     {kw}
                   </span>
                 </TooltipTrigger>

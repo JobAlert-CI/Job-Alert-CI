@@ -3,10 +3,10 @@ import { Link } from "react-router-dom"
 import { cn } from "@/lib/utils"
 
 const VARIANTS = {
-  primary:   "bg-brand-orange text-white shadow-[0_12px_28px_-8px_rgba(245,166,35,0.5)] hover:-translate-y-0.5 hover:brightness-110",
-  secondary: "border border-brand-navy/15 bg-white/70 text-brand-navy backdrop-blur-sm hover:border-brand-navy/35 hover:bg-white",
+  primary:   "bg-brand-orange text-on-primary shadow-[0_12px_28px_-8px_rgba(245,166,35,0.5)] hover:-translate-y-0.5 hover:brightness-110",
+  secondary: "border border-brand-navy/15 bg-card/70 text-brand-navy backdrop-blur-sm hover:border-brand-navy/35 hover:bg-card",
   navy:      "border border-brand-navy bg-brand-navy text-white hover:bg-brand-navy/90",
-  outline:   "border border-brand-navy/25 bg-white text-brand-navy shadow-soft hover:-translate-y-0.5 hover:border-brand-navy hover:bg-brand-navy hover:text-white hover:shadow-hover",
+  outline:   "border border-brand-navy/25 bg-card text-brand-navy shadow-soft hover:-translate-y-0.5 hover:border-brand-navy hover:bg-brand-navy hover:text-white hover:shadow-hover",
 }
 const SIZES = {
   lg: "gap-2.5 rounded-lg px-7 py-3.5 text-base",

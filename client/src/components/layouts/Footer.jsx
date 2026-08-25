@@ -5,12 +5,11 @@ import {
   BadgeCheck, Bell, Check, ChevronRight, Clock, Mail, Radar,
 } from "lucide-react"
 import { SiFacebook, SiInstagram, SiX } from "@icons-pack/react-simple-icons"
-import { FaLinkedin } from "react-icons/fa6"
 import { cn } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 import { useNavigationData } from "@/lib/navigation-data"
 import { paletteDepuisHex } from "@/lib/hues"
-import { SourceLogo } from "../shared"
+import { SourceLogo, LinkedinIcon } from "../shared"
 
 /* ------------------------------------------------------------------ */
 /*  Données                                                            */
@@ -33,7 +32,7 @@ const SUPPORT_FOOTER = [
 ]
 
 const socialsLinks = [
-  { label: "LinkedIn", icon: FaLinkedin, color: "hover:bg-blue-600/20 hover:text-blue-500 hover:border-blue-500/50", link: "https://linkedin.com" },
+  { label: "LinkedIn", icon: LinkedinIcon, color: "hover:bg-blue-600/20 hover:text-blue-500 hover:border-blue-500/50", link: "https://linkedin.com" },
   { label: "Facebook", icon: SiFacebook, color: "hover:bg-blue-600/20 hover:text-blue-500 hover:border-blue-500/50", link: "https://facebook.com" },
   { label: "Instagram", icon: SiInstagram, color: "hover:bg-pink-600/20 hover:text-pink-500 hover:border-pink-500/50", link: "https://instagram.com" },
   { label: "X", icon: SiX, color: "hover:bg-slate-900 hover:text-white hover:border-white/30", link: "https://x.com" },
@@ -53,7 +52,7 @@ const SocialLink = ({ social }) => {
       rel="noopener noreferrer"
       whileHover={{ y: -4, scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
-      className={`w-10 h-10 rounded-xl bg-white/5 border border-slate-800 flex items-center justify-center transition-colors duration-300 shadow-md text-slate-400 ${social.color}`}
+      className={`w-10 h-10 rounded-xl bg-card/5 border border-slate-800 flex items-center justify-center transition-colors duration-300 shadow-md text-slate-400 ${social.color}`}
     >
       <Icon className="w-4 h-4 transition-colors" />
     </motion.a>
@@ -167,12 +166,12 @@ const Footer = () => {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="votre@email.com"
                   aria-label="Votre adresse email"
-                  className="h-12 w-full rounded-md border border-white/15 bg-white/10 pl-10 pr-4 text-sm text-white outline-none transition-all duration-300 placeholder:text-white/40 focus:border-brand-orange focus:bg-white/[0.14] focus:ring-2 focus:ring-brand-orange/30"
+                  className="h-12 w-full rounded-md border border-white/15 bg-card/10 pl-10 pr-4 text-sm text-white outline-none transition-all duration-300 placeholder:text-white/40 focus:border-brand-orange focus:bg-card/[0.14] focus:ring-2 focus:ring-brand-orange/30"
                 />
               </div>
               <button
                 type="submit"
-                className="group inline-flex h-12 items-center justify-center gap-2 whitespace-nowrap rounded-md bg-brand-orange px-5 text-sm font-bold text-white shadow-[0_8px_20px_rgba(245,166,35,0.25)] transition-all duration-300 hover:brightness-110 hover:shadow-[0_10px_28px_rgba(245,166,35,0.4)] active:scale-[0.98]"
+                className="group inline-flex h-12 items-center justify-center gap-2 whitespace-nowrap rounded-md bg-brand-orange px-5 text-sm font-bold text-on-primary shadow-[0_8px_20px_rgba(245,166,35,0.25)] transition-all duration-300 hover:brightness-110 hover:shadow-[0_10px_28px_rgba(245,166,35,0.4)] active:scale-[0.98]"
               >
                 <Bell className="size-4 transition-transform duration-300 group-hover:rotate-12" />
                 Créer mon alerte
@@ -198,8 +197,8 @@ const Footer = () => {
             className="relative hidden lg:block"
           >
             <div className="absolute -inset-8 rounded-full bg-brand-orange/10 blur-3xl" aria-hidden />
-            <div className="absolute inset-0 translate-x-4 translate-y-4 rotate-2 rounded-xl border border-white/10 bg-white/4" aria-hidden />
-            <span className="absolute -left-4 -top-3 z-10 inline-flex -rotate-3 items-center gap-1.5 rounded-full bg-brand-orange px-3 py-1.5 text-[11px] font-bold text-white shadow-lg">
+            <div className="absolute inset-0 translate-x-4 translate-y-4 rotate-2 rounded-xl border border-white/10 bg-card/4" aria-hidden />
+            <span className="absolute -left-4 -top-3 z-10 inline-flex -rotate-3 items-center gap-1.5 rounded-full bg-brand-orange px-3 py-1.5 text-[11px] font-bold text-on-primary shadow-lg">
               <Clock className="size-3" />
               Envoyé à 8h00
             </span>
@@ -232,7 +231,7 @@ const Footer = () => {
                       whileInView={{ opacity: 1, x: 0 }}
                       viewport={{ once: true }}
                       transition={{ duration: 0.4, delay: 0.35 + i * 0.12, ease: "easeOut" }}
-                      className="-mx-2 flex items-center gap-3 rounded-md px-2 py-3 transition-colors duration-200 hover:bg-white/5"
+                      className="-mx-2 flex items-center gap-3 rounded-md px-2 py-3 transition-colors duration-200 hover:bg-card/5"
                     >
                       <span className="size-1.5 shrink-0 rounded-full bg-brand-orange" />
                       <div className="min-w-0 flex-1">
@@ -243,7 +242,7 @@ const Footer = () => {
                       </div>
                       <Badge
                         variant="outline"
-                        className="shrink-0 rounded border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-semibold text-white/60"
+                        className="shrink-0 rounded border border-white/10 bg-card/5 px-2 py-0.5 text-[10px] font-semibold text-white/60"
                       >
                         {f.nouveaux > 0 ? `+${f.nouveaux}` : "—"}
                       </Badge>
@@ -276,7 +275,7 @@ const Footer = () => {
             className="flex flex-col gap-4 sm:col-span-2 lg:col-span-4"
           >
             <div className="flex items-center gap-2.5">
-              <div className="size-9 bg-white rounded-full">
+              <div className="size-9 bg-card rounded-full">
                 <img src="/logo2.svg" alt="JobAlert CI" className="h-full w-auto object-contain" loading="eager" />
               </div>
               <div className="flex flex-col">
@@ -375,7 +374,7 @@ const Footer = () => {
                 </FooterLink>
               ))}
             </ul>
-            <div className="mt-2 rounded-lg border border-white/10 bg-white/4 p-3.5">
+            <div className="mt-2 rounded-lg border border-white/10 bg-card/4 p-3.5">
               <p className="text-xs leading-relaxed text-white/55">
                 Une question sur vos alertes ?{" "}
                 <Link to="/faq" className="font-semibold text-brand-orange transition-colors hover:brightness-110">
@@ -397,7 +396,6 @@ const Footer = () => {
             Tous droits réservés.
           </p>
 
-
           {/* APRÈS — liste des sources actives depuis l'API */}
           <p className="hidden items-center gap-2 lg:flex">
             <Radar className="size-3.5 text-brand-orange/70" />
@@ -410,7 +408,7 @@ const Footer = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                     key={source.id || source.code}
-                    className="inline-flex items-center gap-2 px-1.5 py-1.5 text-[0.5rem] font-semibold text-white transition-colors hover:bg-white/20 rounded-full"
+                    className="inline-flex items-center gap-2 px-1.5 py-1.5 text-[0.5rem] font-semibold text-white transition-colors hover:bg-card/20 rounded-full"
                   >
                     <SourceLogo code={source.code || source.name} className="size-4" />
                     {source.name}
@@ -418,7 +416,7 @@ const Footer = () => {
                 ))}
 
                 {sourcesList?.length > 4 && (
-                  <span className="inline-flex items-center gap-2 px-1.5 py-1.5 text-[0.58rem] font-semibold text-white transition-colors hover:bg-white/20 rounded-full">
+                  <span className="inline-flex items-center gap-2 px-1.5 py-1.5 text-[0.58rem] font-semibold text-white transition-colors hover:bg-card/20 rounded-full">
                     + {sourcesList.length - 4}
                   </span>
                 )}
@@ -429,12 +427,12 @@ const Footer = () => {
           </p>
 
           <div className="flex items-center gap-4">
-            <span className="hidden h-3 w-px bg-white/15 md:block" aria-hidden />
+            <span className="hidden h-3 w-px bg-card/15 md:block" aria-hidden />
             <p className="flex items-center gap-2">
               Fait avec passion et ❤ pour la Côte d'Ivoire
               <span className="flex items-end gap-0.75" aria-hidden>
                 <span className="h-3 w-1 rounded-xs bg-[#FF8200]" />
-                <span className="h-3 w-1 rounded-xs bg-white" />
+                <span className="h-3 w-1 rounded-xs bg-card" />
                 <span className="h-3 w-1 rounded-xs bg-[#009A44]" />
               </span>
             </p>

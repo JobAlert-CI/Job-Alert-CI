@@ -255,7 +255,7 @@ const Hero = () => {
             {/* Chip "8h00" */}
             <motion.span
               {...getFloatProps(0.9, 4.5)}
-              className="absolute -top-4 left-4 z-20 inline-flex -rotate-3 items-center gap-1.5 rounded-full bg-brand-orange px-3.5 py-1.5 text-[11px] font-bold text-white shadow-lg sm:-left-4"
+              className="absolute -top-4 left-4 z-20 inline-flex -rotate-3 items-center gap-1.5 rounded-full bg-brand-orange px-3.5 py-1.5 text-[11px] font-bold text-on-primary shadow-lg sm:-left-4"
             >
               <Clock className="size-3" aria-hidden />
               Envoyé à {EMAIL_DELIVERY_TIME} pile
@@ -275,14 +275,14 @@ const Hero = () => {
             {/* Chip 0 doublon */}
             <motion.span
               {...getFloatProps(1.3, 4.8)}
-              className="absolute -bottom-4 right-8 z-20 inline-flex rotate-2 items-center gap-1.5 rounded-full border border-outline-variant/50 bg-white px-3.5 py-1.5 text-[11px] font-bold text-on-surface shadow-hover"
+              className="absolute -bottom-4 right-8 z-20 inline-flex rotate-2 items-center gap-1.5 rounded-full border border-outline-variant/50 bg-card px-3.5 py-1.5 text-[11px] font-bold text-on-surface shadow-hover"
             >
               <BadgeCheck className="size-3.5 text-emerald-500" aria-hidden />
               0 doublon envoyé
             </motion.span>
 
             {/* Carte email */}
-            <div className="relative overflow-hidden rounded-2xl border border-outline-variant/40 bg-white shadow-[0_24px_48px_-16px_rgba(15,45,77,0.22)]">
+            <div className="relative overflow-hidden rounded-2xl border border-outline-variant/40 bg-card shadow-[0_24px_48px_-16px_rgba(15,45,77,0.22)]">
               {/* En-tête email */}
               <div className="flex items-center gap-3 border-b border-outline-variant/40 bg-surface-container-low/60 px-5 py-3.5">
                 <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-transparent font-heading text-[11px] font-black text-white">
@@ -327,7 +327,7 @@ const Hero = () => {
                     Array.from({ length: MAX_PREVIEW_OFFERS }).map((_, index) => (
                       <li
                         key={index}
-                        className="rounded-lg border border-outline-variant/40 bg-white px-3.5 py-2.5"
+                        className="rounded-lg border border-outline-variant/40 bg-card px-3.5 py-2.5"
                       >
                         <div className="flex items-center gap-3">
                           <Skeleton className="size-2 shrink-0 rounded-full" />
@@ -350,7 +350,7 @@ const Hero = () => {
                           duration: 0.4,
                           ease: "easeOut",
                         }}
-                        className="group flex items-center gap-3 rounded-lg border border-outline-variant/40 bg-white px-3.5 py-2.5 transition-all duration-200 hover:border-brand-orange/60 hover:shadow-soft"
+                        className="group flex items-center gap-3 rounded-lg border border-outline-variant/40 bg-card px-3.5 py-2.5 transition-all duration-200 hover:border-brand-orange/60 hover:shadow-soft"
                       >
                         <span
                           className={cn("size-2 shrink-0 rounded-full", paletteDepuisHex(offer.primary_filiere?.color_hex).dot)}

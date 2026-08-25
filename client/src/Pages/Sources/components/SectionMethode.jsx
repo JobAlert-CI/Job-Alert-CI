@@ -25,7 +25,7 @@ const SectionMethode = () => (
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-60px" }}
           transition={{ duration: 0.55, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-          className="mt-8 max-w-md rounded-xl border border-outline-variant/50 bg-white p-6 shadow-soft"
+          className="mt-8 max-w-md rounded-xl border border-outline-variant/50 bg-card p-6 shadow-soft"
         >
           <span className="flex size-11 items-center justify-center rounded-lg bg-brand-orange/10 text-brand-orange">
             <Radar className="size-5" strokeWidth={2} aria-hidden />
@@ -62,10 +62,10 @@ const SectionMethode = () => (
               }}
               className="relative flex gap-5 pl-0"
             >
-              <span className="relative z-10 grid size-12 shrink-0 place-items-center rounded-full border border-brand-orange/40 bg-white font-heading text-sm font-extrabold text-brand-orange shadow-soft">
+              <span className="relative z-10 grid size-12 shrink-0 place-items-center rounded-full border border-brand-orange/40 bg-card font-heading text-sm font-extrabold text-brand-orange shadow-soft">
                 0{i + 1}
               </span>
-              <div className="flex-1 rounded-xl border border-outline-variant/40 bg-white p-5 shadow-soft transition-all duration-300 hover:-translate-y-0.5 hover:shadow-hover">
+              <div className="flex-1 rounded-xl border border-outline-variant/40 bg-card p-5 shadow-soft transition-all duration-300 hover:-translate-y-0.5 hover:shadow-hover">
                 <h3 className="flex items-center gap-2.5 font-heading text-base font-bold text-brand-navy">
                   <p.icon className="size-4.5 text-brand-orange" strokeWidth={2} aria-hidden />
                   {p.titre}

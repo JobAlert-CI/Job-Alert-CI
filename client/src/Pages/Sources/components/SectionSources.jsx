@@ -50,7 +50,7 @@ const SectionSources = () => {
               </button>
             </div>
           ) : sources.length === 0 ? (
-            <p className="rounded-xl border border-dashed border-outline-variant/60 bg-white p-10 text-center text-sm text-muted-foreground">
+            <p className="rounded-xl border border-dashed border-outline-variant/60 bg-card p-10 text-center text-sm text-muted-foreground">
               Aucune source active pour le moment — revenez bientôt.
             </p>
           ) : (

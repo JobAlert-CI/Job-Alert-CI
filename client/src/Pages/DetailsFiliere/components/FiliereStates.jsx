@@ -84,7 +84,7 @@ export const FiliereError = ({ code, message, onRetry }) => (
         </button>
         <Link
           to="/filieres"
-          className="inline-flex items-center gap-2 rounded-lg bg-brand-orange px-6 py-3 text-sm font-bold text-white transition-all duration-300 hover:-translate-y-0.5 hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="inline-flex items-center gap-2 rounded-lg bg-brand-orange px-6 py-3 text-sm font-bold text-on-primary transition-all duration-300 hover:-translate-y-0.5 hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <LayoutGrid className="size-4" aria-hidden />
           Voir toutes les filières
@@ -117,7 +117,7 @@ export const FiliereIntrouvable = ({ code }) => (
       <div className="mt-6 flex justify-center">
         <Link
           to="/filieres"
-          className="inline-flex items-center gap-2 rounded-lg bg-brand-orange px-6 py-3 text-sm font-bold text-white transition-all duration-300 hover:-translate-y-0.5 hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="inline-flex items-center gap-2 rounded-lg bg-brand-orange px-6 py-3 text-sm font-bold text-on-primary transition-all duration-300 hover:-translate-y-0.5 hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <LayoutGrid className="size-4" aria-hidden />
           Voir toutes les filières

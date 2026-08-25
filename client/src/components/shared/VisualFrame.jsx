@@ -10,7 +10,7 @@ const VisualFrame = ({ time, children, className, bodyClassName }) => (
       </span>
     )}
     <div className="absolute inset-0 translate-x-3 translate-y-4 rotate-1 rounded-xl bg-brand-navy/6" aria-hidden />
-    <div className={cn("relative rounded-xl border border-outline-variant/40 bg-white p-5 shadow-[0_20px_40px_-16px_rgba(15,45,77,0.18)]", bodyClassName)}>
+    <div className={cn("relative rounded-xl border border-outline-variant/40 bg-card p-5 shadow-[0_20px_40px_-16px_rgba(15,45,77,0.18)]", bodyClassName)}>
       {children}
     </div>
   </div>

@@ -25,7 +25,7 @@ const CarteArticle = ({ a, index = 0, large = false }) => {
       <Link
         to={`/conseils/${a.slug}`}
         className={cn(
-          "group relative flex h-full flex-col overflow-hidden rounded-xl border border-outline-variant/40 bg-white shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-hover",
+          "group relative flex h-full flex-col overflow-hidden rounded-xl border border-outline-variant/40 bg-card shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-hover",
           large ? "p-5 sm:flex-row sm:items-stretch sm:gap-6 sm:p-6" : "p-5"
         )}
         style={{ borderTop: `3px solid ${hue.hex}`, ...hue.style }}

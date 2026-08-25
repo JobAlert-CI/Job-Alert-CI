@@ -4,7 +4,7 @@ import { motion } from "framer-motion"
 import { ArrowRight, ArrowUpRight } from "lucide-react"
 import { CountUp, SectionHeading } from "@/components/shared"
 import { useHomeMetrics, useRecentOffers, getViewState } from "@/tools/home.tools"
-import { OffersFeed } from "../components/OffersFeed"
+import { RecentOffersFeed } from "../components/RecentOffersFeed"
 import { RepartitionPanel } from "../components/RepartitionPanel"
 
 /* ------------------------------------------------------------------ */
@@ -100,7 +100,7 @@ const RecentOffers = () => {
           />
           <Link
             to="/offres"
-            className="group hidden items-center gap-2 rounded-md border border-brand-navy/15 bg-white px-5 py-3 text-sm font-bold text-brand-navy transition-all duration-300 hover:border-brand-navy/40 hover:shadow-soft md:inline-flex"
+            className="group hidden items-center gap-2 rounded-md border border-brand-navy/15 bg-card px-5 py-3 text-sm font-bold text-brand-navy transition-all duration-300 hover:border-brand-navy/40 hover:shadow-soft md:inline-flex"
           >
             {linkLabel}
             <ArrowUpRight className="size-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
@@ -110,7 +110,7 @@ const RecentOffers = () => {
         <div className="mt-10 grid gap-8 lg:grid-cols-[minmax(0,1fr)_340px]">
           {/* Feed d'offres — autonome (son propre hook) */}
           <div>
-            <OffersFeed />
+            <RecentOffersFeed />
             <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}

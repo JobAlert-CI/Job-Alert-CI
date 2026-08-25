@@ -15,7 +15,7 @@ export const ChipFiltre = ({ code, label, icon: Icon, count, actif, onSelect, cl
         "inline-flex shrink-0 items-center gap-2 rounded-full border px-3.5 py-2 text-xs font-bold transition-all duration-200",
         active
           ? "border-brand-navy bg-brand-navy text-white shadow-soft"
-          : "border-outline-variant/60 bg-white text-on-surface-variant hover:-translate-y-0.5 hover:border-brand-navy/40 hover:text-brand-navy",
+          : "border-outline-variant/60 bg-card text-on-surface-variant hover:-translate-y-0.5 hover:border-brand-navy/40 hover:text-brand-navy",
         className
       )}
     >
@@ -24,7 +24,7 @@ export const ChipFiltre = ({ code, label, icon: Icon, count, actif, onSelect, cl
       {count != null && (
         <span className={cn(
           "grid size-4.5 place-items-center rounded-full text-[10px] font-black",
-          active ? "bg-brand-orange text-white" : "bg-surface-container text-muted-foreground"
+          active ? "bg-brand-orange text-on-primary" : "bg-surface-container text-muted-foreground"
         )}>
           {count}
         </span>

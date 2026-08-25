@@ -30,8 +30,14 @@ const ConfirmSubscribe = async (token) => {
   return response.data
 }
 
+/* Le backend attend `reason` en query param (POST /unsubscribe/{token}?reason=...),
+   pas dans le corps JSON — cf. server/api/v1/public/subscriptions.py. */
 const unsubscribe = async (token, params) => {
-  const response = await api.post(`${API_URL}/unsubscribe/${token}`, { params: cleanParams(params) })
+  const response = await api.post(
+    `${API_URL}/unsubscribe/${token}`,
+    {},
+    { params: cleanParams(params) }
+  )
   return response.data
 }
 

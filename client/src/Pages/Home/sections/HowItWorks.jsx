@@ -80,7 +80,7 @@ const HowItWorks = () => {
             }
             sub="Chaque matin, la même chaîne s'exécute sans intervention humaine entre 6h00 et 8h00. Voici ce qui se passe pendant ce temps."
           />
-          <span className="hidden items-center gap-2 rounded-full border border-outline-variant/50 bg-white px-4 py-2 text-xs font-semibold text-on-surface-variant md:inline-flex">
+          <span className="hidden items-center gap-2 rounded-full border border-outline-variant/50 bg-card px-4 py-2 text-xs font-semibold text-on-surface-variant md:inline-flex">
             <Clock className="size-3.5 text-brand-orange" aria-hidden />
             100 % automatique / 0 action de votre part
           </span>
@@ -128,9 +128,9 @@ const HowItWorks = () => {
                 <div className="relative z-10 shrink-0 lg:mb-6">
                   <span
                     className={cn(
-                      "flex size-14 items-center justify-center rounded-full border-2 bg-white",
+                      "flex size-14 items-center justify-center rounded-full border-2 bg-card",
                       step.highlight
-                        ? "border-brand-orange bg-brand-orange text-white shadow-[0_8px_20px_rgba(245,166,35,0.35)]"
+                        ? "border-brand-orange bg-brand-orange text-on-primary shadow-[0_8px_20px_rgba(245,166,35,0.35)]"
                         : "border-outline-variant/60 text-brand-navy"
                     )}
                   >
@@ -176,7 +176,7 @@ const HowItWorks = () => {
                       className={cn(
                         "mt-3.5 inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-bold",
                         step.highlight
-                          ? "border-white/20 bg-white/10 text-white"
+                          ? "border-white/20 bg-card/10 text-white"
                           : "border-outline-variant/50 bg-surface-container-low/60 text-on-surface-variant"
                       )}
                     >

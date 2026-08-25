@@ -34,8 +34,10 @@ export const adaptOffer = (raw) => {
     /* Contenu */
     titre: raw.title ?? "Offre sans titre",
     entreprise: raw.company?.name ?? "Entreprise non précisée",
+    logoUrl: raw.company?.logo_url ?? null,
     ville: raw.location?.label || raw.location_raw || "",
     lien: raw.canonical_url || raw.source_url || null,
+    salaire: raw.salary_raw ?? null,
 
     /* Référentiels (labels affichés, codes pour les filtres) */
     source: raw.source?.code ?? raw.source?.name ?? "",
@@ -54,6 +56,7 @@ export const adaptOffer = (raw) => {
 
     /* Dates */
     publishedAt,
+    deadline: raw.application_deadline_at ?? null,
     jours: daysSince(publishedAt),
     isNouveau: daysSince(raw.first_seen_at ?? publishedAt) === 0,
   }

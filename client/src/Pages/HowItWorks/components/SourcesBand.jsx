@@ -11,9 +11,9 @@ const BandChips = () => {
 
   if (isPending) {
     return Array.from({ length: 4 }).map((_, index) => (
-      <div key={`source-skeleton-${index}`} className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3.5 py-1.5 h-9 w-32">
-        <Skeleton className="size-5 shrink-0 rounded-full bg-white/20" />
-        <Skeleton className="h-4 w-16 bg-white/20" />
+      <div key={`source-skeleton-${index}`} className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-card/10 px-3.5 py-1.5 h-9 w-32">
+        <Skeleton className="size-5 shrink-0 rounded-full bg-card/20" />
+        <Skeleton className="h-4 w-16 bg-card/20" />
       </div>
     ))
   }
@@ -35,14 +35,14 @@ const BandChips = () => {
           target="_blank"
           rel="noopener noreferrer"
           key={source.id || source.code}
-          className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3.5 py-1.5 text-[13px] font-semibold text-white transition-colors hover:bg-white/20"
+          className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-card/10 px-3.5 py-1.5 text-[13px] font-semibold text-white transition-colors hover:bg-card/20"
         >
           <SourceLogo code={source.code || source.name} className="size-5" />
           {source.name}
         </a>
       ))}
       {sources?.length > 4 && (
-        <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3.5 py-1.5 text-[13px] font-semibold text-white">
+        <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-card/10 px-3.5 py-1.5 text-[13px] font-semibold text-white">
           + {sources.length - 4}
         </span>
       )}

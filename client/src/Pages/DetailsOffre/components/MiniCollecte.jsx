@@ -13,7 +13,7 @@ const MiniCollecte = () => {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-60px" }}
       transition={{ duration: 0.55, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-      className="rounded-xl border border-outline-variant/40 bg-white p-5 shadow-soft"
+      className="rounded-xl border border-outline-variant/40 bg-card p-5 shadow-soft"
     >
       <div className="flex items-center justify-between">
         <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">

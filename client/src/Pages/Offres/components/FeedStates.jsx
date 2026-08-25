@@ -40,7 +40,7 @@ export const FeedEmptyState = memo(function FeedEmptyState({ hasActiveFilters, o
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       role="status"
-      className="mt-10 rounded-xl border border-dashed border-outline-variant/60 bg-white p-12 text-center"
+      className="mt-10 rounded-xl border border-dashed border-outline-variant/60 bg-card p-12 text-center"
     >
       <SearchX className="mx-auto size-10 text-muted-foreground/50" aria-hidden />
       <h3 className="mt-4 font-heading text-lg font-bold text-brand-navy">
@@ -100,7 +100,7 @@ export const LoadMoreBlock = memo(function LoadMoreBlock({
         type="button"
         onClick={onLoadMore}
         disabled={isLoadingMore || disabled}
-        className="group inline-flex h-12 items-center gap-2.5 rounded-lg border border-brand-navy/25 bg-white px-7 text-sm font-bold text-brand-navy shadow-soft transition-all duration-300 hover:-translate-y-0.5 hover:border-brand-navy hover:bg-brand-navy hover:text-white hover:shadow-hover active:scale-[0.98] disabled:pointer-events-none disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="group inline-flex h-12 items-center gap-2.5 rounded-lg border border-brand-navy/25 bg-card px-7 text-sm font-bold text-brand-navy shadow-soft transition-all duration-300 hover:-translate-y-0.5 hover:border-brand-navy hover:bg-brand-navy hover:text-white hover:shadow-hover active:scale-[0.98] disabled:pointer-events-none disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         {isLoadingMore ? (
           <>
@@ -128,7 +128,7 @@ export const FeedEndState = memo(function FeedEndState() {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
       role="status"
-      className="mt-10 overflow-hidden rounded-xl border border-outline-variant/40 bg-white text-center shadow-soft"
+      className="mt-10 overflow-hidden rounded-xl border border-outline-variant/40 bg-card text-center shadow-soft"
     >
       <div className="mx-auto h-1 w-24 rounded-b-full bg-emerald-500" aria-hidden />
       <div className="px-6 py-10">
@@ -145,7 +145,7 @@ export const FeedEndState = memo(function FeedEndState() {
         <div className="mt-6 flex items-center justify-center gap-3 max-sm:flex-col">
           <Link
             to="/inscription"
-            className="group inline-flex items-center gap-2 rounded-lg bg-brand-orange px-6 py-3 text-sm font-bold text-white shadow-soft transition-all duration-300 hover:-translate-y-0.5 hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="group inline-flex items-center gap-2 rounded-lg bg-brand-orange px-6 py-3 text-sm font-bold text-on-primary shadow-soft transition-all duration-300 hover:-translate-y-0.5 hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <Bell className="size-4 transition-transform duration-300 group-hover:rotate-12" aria-hidden />
             Créer mon alerte 8h00

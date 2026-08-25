@@ -30,7 +30,7 @@ const SearchSortBar = ({ search, count }) => (
         onChange={(e) => search.setQueryLocale(e.target.value)}
         placeholder="Rechercher une filière ou un métier…"
         aria-label="Rechercher une filière"
-        className="h-10 w-full rounded-lg border border-outline-variant/60 bg-white pl-9 pr-9 text-sm outline-none transition-all placeholder:text-muted-foreground/70 focus:border-brand-navy/50 focus:ring-2 focus:ring-brand-navy/10"
+        className="h-10 w-full rounded-lg border border-outline-variant/60 bg-card pl-9 pr-9 text-sm outline-none transition-all placeholder:text-muted-foreground/70 focus:border-brand-navy/50 focus:ring-2 focus:ring-brand-navy/10"
       />
       {search.queryLocale && (
         <button
@@ -50,7 +50,7 @@ const SearchSortBar = ({ search, count }) => (
         filière{count > 1 ? "s" : ""}
       </span>
       <div
-        className="flex rounded-lg border border-outline-variant/60 bg-white p-0.5 shadow-soft"
+        className="flex rounded-lg border border-outline-variant/60 bg-card p-0.5 shadow-soft"
         role="group"
         aria-label="Trier les filières"
       >

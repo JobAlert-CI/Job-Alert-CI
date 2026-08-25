@@ -160,7 +160,7 @@ export const ConfirmationInscription = () => {
               <motion.div
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mx-auto max-w-md rounded-2xl border border-outline-variant/40 bg-white/80 p-10 text-center shadow-soft backdrop-blur-md"
+                className="mx-auto max-w-md rounded-2xl border border-outline-variant/40 bg-card/80 p-10 text-center shadow-soft backdrop-blur-md"
               >
                 <div className="relative mx-auto mb-6 flex size-16 items-center justify-center rounded-full bg-brand-orange/10">
                   <Loader2 className="size-8 animate-spin text-brand-orange" />
@@ -263,7 +263,7 @@ export const ConfirmationInscription = () => {
                       initial={{ opacity: 0, y: 16 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.95 + i * 0.1, duration: 0.4 }}
-                      className="rounded-xl border border-outline-variant/40 bg-white/80 p-4 shadow-soft backdrop-blur-sm"
+                      className="rounded-xl border border-outline-variant/40 bg-card/80 p-4 shadow-soft backdrop-blur-sm"
                     >
                       <s.icon className="size-5 text-brand-orange" />
                       <p className="mt-2 font-heading text-sm font-extrabold text-brand-navy">
@@ -298,7 +298,7 @@ export const ConfirmationInscription = () => {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mx-auto max-w-xl rounded-2xl border border-outline-variant/40 bg-white/80 p-8 shadow-soft backdrop-blur-md sm:p-10"
+                className="mx-auto max-w-xl rounded-2xl border border-outline-variant/40 bg-card/80 p-8 shadow-soft backdrop-blur-md sm:p-10"
               >
                 <div className="flex size-16 items-center justify-center rounded-2xl bg-amber-50 text-amber-600 mb-6 mx-auto">
                   <AlertTriangle className="size-8" />
@@ -327,7 +327,7 @@ export const ConfirmationInscription = () => {
                       placeholder="votre.email@exemple.ci"
                       value={resendEmail}
                       onChange={(e) => setResendEmail(e.target.value)}
-                      className="flex-1 rounded-lg border border-outline-variant bg-white px-4 py-2.5 text-sm text-brand-navy placeholder:text-muted-foreground/70 focus:border-brand-orange focus:outline-none focus:ring-2 focus:ring-brand-orange/20 transition-all"
+                      className="flex-1 rounded-lg border border-outline-variant bg-card px-4 py-2.5 text-sm text-brand-navy placeholder:text-muted-foreground/70 focus:border-brand-orange focus:outline-none focus:ring-2 focus:ring-brand-orange/20 transition-all"
                     />
                     <button
                       type="submit"

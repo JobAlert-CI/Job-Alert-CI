@@ -30,7 +30,7 @@ export const CompteReboursScan = () => {
               :
             </span>
           )}
-          <span className="grid min-w-9 place-items-center rounded-md bg-white/10 px-1.5 py-0.5 font-heading text-base font-extrabold tabular-nums">
+          <span className="grid min-w-9 place-items-center rounded-md bg-card/10 px-1.5 py-0.5 font-heading text-base font-extrabold tabular-nums">
             {String(u.v).padStart(2, "0")}
           </span>
           <span className="text-[10px] font-bold uppercase text-white/50">{u.l}</span>

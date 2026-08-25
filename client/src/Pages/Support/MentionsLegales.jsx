@@ -116,7 +116,7 @@ const EnTeteMentions = () => (
       >
         <motion.span
           variants={{ hidden: { opacity: 0, y: 22 }, visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } } }}
-          className="inline-flex items-center gap-2 rounded-full border border-outline-variant/50 bg-white/80 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-on-surface-variant"
+          className="inline-flex items-center gap-2 rounded-full border border-outline-variant/50 bg-card/80 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-on-surface-variant"
         >
           <Scale className="size-3 text-brand-orange" />
           Dernière mise à jour : 28 juillet 2026
@@ -228,7 +228,7 @@ const CorpsMentions = () => (
             </div>
             <div className="flex shrink-0 flex-col gap-2.5 sm:flex-row">
               <CtaLink to="/contact" size="md" iconRight={ChevronRight}>Nous contacter</CtaLink>
-              <CtaLink to="/faq" size="md" className="border border-white/20 bg-white/10 shadow-none hover:bg-white/20 hover:brightness-100">
+              <CtaLink to="/faq" size="md" className="border border-white/20 bg-card/10 shadow-none hover:bg-card/20 hover:brightness-100">
                 Voir la FAQ
               </CtaLink>
             </div>

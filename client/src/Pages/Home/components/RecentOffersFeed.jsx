@@ -4,6 +4,11 @@ import { useRecentOffers } from "../../../tools/home.tools"
 import { OfferSkeleton } from "./Skeletons"
 import { EmptyOffers } from "./EmptyOffers"
 
+/* Liste simple des offres récentes de la home, servie depuis le cache.
+   Ne pas confondre avec le flux filtré/paginé /offres :
+   → Pages/Offres/sections/OffersFeed.jsx (audit Pilier 7 : comparaison
+   faite, aucune logique commune → pas de fusion, noms distincts). */
+
 const FeedList = ({ children }) => (
   <ul className="flex flex-col gap-2.5" role="list">
     {children}
@@ -14,7 +19,7 @@ const FeedList = ({ children }) => (
  * Se sert directement dans le cache (même queryKey que Hero / RecentOffers)
  * → aucune prop transmise. Early returns : un état = un rendu.
  */
-export const OffersFeed = () => {
+export const RecentOffersFeed = () => {
   const { data: offers, isPending, isError, refetch } = useRecentOffers()
 
   if (isPending) {

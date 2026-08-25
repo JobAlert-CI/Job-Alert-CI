@@ -29,7 +29,7 @@ const FaqSection = ({
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-60px" }}
             transition={{ duration: 0.55, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-            className="mt-8 max-w-md rounded-xl border border-outline-variant/50 bg-white p-6 shadow-soft"
+            className="mt-8 max-w-md rounded-xl border border-outline-variant/50 bg-card p-6 shadow-soft"
           >
             <span className="flex size-11 items-center justify-center rounded-lg bg-brand-orange/10 text-brand-orange">
               <aside.icon className="size-5" strokeWidth={2} />

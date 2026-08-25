@@ -10,7 +10,7 @@ const CheckRow = ({ checked, onToggle, label, count, lead }) => (
   >
     <span className={cn(
       "grid size-4.5 shrink-0 place-items-center rounded-[5px] border transition-all duration-200",
-      checked ? "border-brand-navy bg-brand-navy" : "border-outline-variant bg-white"
+      checked ? "border-brand-navy bg-brand-navy" : "border-outline-variant bg-card"
     )}>
       <AnimatePresence>
         {checked && (

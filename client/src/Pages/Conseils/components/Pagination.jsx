@@ -16,7 +16,7 @@ const Pagination = memo(function Pagination({
           onClick={() => onChange(page - 1)}
           disabled={page === 1}
           aria-label="Page précédente"
-          className="grid size-9 place-items-center rounded-lg border border-outline-variant/60 bg-white text-on-surface-variant shadow-soft transition-all duration-200 enabled:hover:-translate-x-0.5 enabled:hover:border-brand-navy/40 enabled:hover:text-brand-navy enabled:active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="grid size-9 place-items-center rounded-lg border border-outline-variant/60 bg-card text-on-surface-variant shadow-soft transition-all duration-200 enabled:hover:-translate-x-0.5 enabled:hover:border-brand-navy/40 enabled:hover:text-brand-navy enabled:active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <ChevronLeft className="size-4" aria-hidden />
         </button>
@@ -36,7 +36,7 @@ const Pagination = memo(function Pagination({
                 "size-9 rounded-lg text-sm font-bold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                 p === page
                   ? "bg-brand-navy text-white shadow-hover"
-                  : "border border-outline-variant/60 bg-white text-on-surface-variant shadow-soft hover:border-brand-navy/40 hover:text-brand-navy active:scale-95"
+                  : "border border-outline-variant/60 bg-card text-on-surface-variant shadow-soft hover:border-brand-navy/40 hover:text-brand-navy active:scale-95"
               )}
             >
               {p}
@@ -48,7 +48,7 @@ const Pagination = memo(function Pagination({
           onClick={() => onChange(page + 1)}
           disabled={page === totalPages}
           aria-label="Page suivante"
-          className="grid size-9 place-items-center rounded-lg border border-outline-variant/60 bg-white text-on-surface-variant shadow-soft transition-all duration-200 enabled:hover:translate-x-0.5 enabled:hover:border-brand-navy/40 enabled:hover:text-brand-navy enabled:active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="grid size-9 place-items-center rounded-lg border border-outline-variant/60 bg-card text-on-surface-variant shadow-soft transition-all duration-200 enabled:hover:translate-x-0.5 enabled:hover:border-brand-navy/40 enabled:hover:text-brand-navy enabled:active:scale-95 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <ChevronRight className="size-4" aria-hidden />
         </button>

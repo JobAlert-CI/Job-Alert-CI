@@ -98,7 +98,7 @@ const RegisteredContent = () => {
                 initial={{ opacity: 0, y: 24 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-                className="scroll-mt-24 rounded-xl border border-outline-variant/40 bg-white p-6 shadow-soft sm:p-8"
+                className="scroll-mt-24 rounded-xl border border-outline-variant/40 bg-card p-6 shadow-soft sm:p-8"
               >
                 <Stepper />
 
@@ -147,7 +147,7 @@ const RegisteredContent = () => {
                       type="button"
                       onClick={goNext}
                       disabled={!canNext}
-                      className="group inline-flex h-11 items-center gap-2 rounded-lg bg-brand-orange px-6 text-sm font-bold text-white shadow-[0_12px_28px_-8px_rgba(245,166,35,0.5)] transition-all duration-300 hover:-translate-y-0.5 hover:brightness-110 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40 disabled:shadow-none cursor-pointer"
+                      className="group inline-flex h-11 items-center gap-2 rounded-lg bg-brand-orange px-6 text-sm font-bold text-on-primary shadow-[0_12px_28px_-8px_rgba(245,166,35,0.5)] transition-all duration-300 hover:-translate-y-0.5 hover:brightness-110 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40 disabled:shadow-none cursor-pointer"
                     >
                       Continuer
                       <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
@@ -157,7 +157,7 @@ const RegisteredContent = () => {
                       type="button"
                       onClick={submitForm}
                       disabled={!consent || sending}
-                      className="group inline-flex h-11 items-center gap-2 rounded-lg bg-brand-orange px-6 text-sm font-bold text-white shadow-[0_12px_28px_-8px_rgba(245,166,35,0.5)] transition-all duration-300 hover:-translate-y-0.5 hover:brightness-110 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40 disabled:shadow-none cursor-pointer"
+                      className="group inline-flex h-11 items-center gap-2 rounded-lg bg-brand-orange px-6 text-sm font-bold text-on-primary shadow-[0_12px_28px_-8px_rgba(245,166,35,0.5)] transition-all duration-300 hover:-translate-y-0.5 hover:brightness-110 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40 disabled:shadow-none cursor-pointer"
                     >
                       {sending ? (
                         <>

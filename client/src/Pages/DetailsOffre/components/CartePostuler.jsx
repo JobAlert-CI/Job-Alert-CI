@@ -3,9 +3,9 @@ import { motion } from "framer-motion"
 import {
   ArrowUpRight, Bookmark, BookmarkCheck, Check, Clock, Link2, ShieldCheck,
 } from "lucide-react"
-import { FaLinkedin } from "react-icons/fa6"
+
 import { cn } from "@/lib/utils"
-import { ChipSource, SourceLogo } from "@/components/shared"
+import { ChipSource, SourceLogo, LinkedinIcon } from "@/components/shared"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { publieLabel } from "@/lib/dates"
 import { OFFRE_META_ROWS } from "@/tools/offre-detail.tools"
@@ -49,14 +49,14 @@ const CartePostuler = () => {
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 1.05, duration: 0.4 }}
-        className="absolute -top-3 right-6 z-20 inline-flex rotate-2 items-center gap-1.5 rounded-full border border-outline-variant/50 bg-white px-3 py-1.5 text-[11px] font-bold text-emerald-600 shadow-soft"
+        className="absolute -top-3 right-6 z-20 inline-flex rotate-2 items-center gap-1.5 rounded-full border border-outline-variant/50 bg-card px-3 py-1.5 text-[11px] font-bold text-emerald-600 shadow-soft"
       >
         <ShieldCheck className="size-3" aria-hidden />
         0 doublon
       </motion.span>
 
       {/* Carte */}
-      <div className="relative overflow-hidden rounded-2xl border border-outline-variant/40 bg-white shadow-[0_24px_48px_-16px_rgba(15,45,77,0.22)]">
+      <div className="relative overflow-hidden rounded-2xl border border-outline-variant/40 bg-card shadow-[0_24px_48px_-16px_rgba(15,45,77,0.22)]">
         <div className="flex items-center gap-3 border-b border-outline-variant/40 bg-surface-container-low/60 px-5 py-4">
           <SourceLogo code={offre.source} className="size-9 rounded-md" />
           <div className="min-w-0 flex-1">
@@ -72,11 +72,11 @@ const CartePostuler = () => {
             target="_blank"
             rel="noopener noreferrer"
             onClick={(e) => (offre.lien ? undefined : e.preventDefault())}
-            className="group flex h-12 items-center justify-center gap-2.5 rounded-lg bg-brand-orange text-[15px] font-bold text-white shadow-[0_12px_28px_-8px_rgba(245,166,35,0.5)] transition-all duration-300 hover:-translate-y-0.5 hover:brightness-110 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+            className="group flex h-12 items-center justify-center gap-2.5 rounded-lg bg-brand-orange text-[15px] font-bold text-on-primary shadow-[0_12px_28px_-8px_rgba(245,166,35,0.5)] transition-all duration-300 hover:-translate-y-0.5 hover:brightness-110 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
             Postuler sur {offre.sourceLabel || offre.source}
             {offre.source === "linkedin"
-              ? <FaLinkedin className="size-4.5 transition-transform duration-300 group-hover:scale-110" aria-hidden />
+              ? <LinkedinIcon className="size-4.5 transition-transform duration-300 group-hover:scale-110" aria-hidden />
               : <ArrowUpRight className="size-5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" aria-hidden />}
           </a>
 
@@ -91,7 +91,7 @@ const CartePostuler = () => {
                 "inline-flex h-10 items-center justify-center gap-2 rounded-lg border text-xs font-bold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60",
                 saved
                   ? "border-brand-orange/50 bg-brand-orange/10 text-brand-orange"
-                  : "border-outline-variant/60 bg-white text-on-surface-variant hover:border-brand-navy/40 hover:text-brand-navy"
+                  : "border-outline-variant/60 bg-card text-on-surface-variant hover:border-brand-navy/40 hover:text-brand-navy"
               )}
             >
               {saved
@@ -108,7 +108,7 @@ const CartePostuler = () => {
                 "inline-flex h-10 items-center justify-center gap-2 rounded-lg border text-xs font-bold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
                 copied
                   ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-700"
-                  : "border-outline-variant/60 bg-white text-on-surface-variant hover:border-brand-navy/40 hover:text-brand-navy"
+                  : "border-outline-variant/60 bg-card text-on-surface-variant hover:border-brand-navy/40 hover:text-brand-navy"
               )}
             >
               {copied
@@ -118,9 +118,13 @@ const CartePostuler = () => {
             </motion.button>
           </div>
 
-          {/* Métadonnées — configuration externalisée */}
+          {/* Métadonnées — configuration externalisée ; les lignes sans
+              donnée (ex : salaire non renseigné) sont masquées. */}
           <dl className="mt-5 space-y-3 border-t border-outline-variant/40 pt-4">
-            {OFFRE_META_ROWS.map(({ icon: Icon, label, value }) => (
+            {OFFRE_META_ROWS
+              .map(({ icon: Icon, label, value }) => ({ icon: Icon, label, value: value(offre) }))
+              .filter(({ value }) => value != null && value !== "")
+              .map(({ icon: Icon, label, value }) => (
               <div key={label} className="flex items-center gap-3">
                 <span className="grid size-8 shrink-0 place-items-center rounded-lg bg-surface-container-low text-on-surface-variant">
                   <Icon className="size-3.5" aria-hidden />
@@ -129,7 +133,7 @@ const CartePostuler = () => {
                   {label}
                 </dt>
                 <dd className="min-w-0 flex-1 truncate text-[13px] font-semibold capitalize text-brand-navy">
-                  {value(offre)}
+                  {value}
                 </dd>
               </div>
             ))}

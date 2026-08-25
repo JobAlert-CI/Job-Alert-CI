@@ -19,7 +19,7 @@ const PanelContent = ({ isPending, isError, repartition, bigNumber, onRetry }) =
           <button
             type="button"
             onClick={onRetry}
-            className="mt-4 w-fit rounded-md border border-white/25 px-3 py-2 text-xs font-bold text-white transition-colors hover:bg-white/10"
+            className="mt-4 w-fit rounded-md border border-white/25 px-3 py-2 text-xs font-bold text-white transition-colors hover:bg-card/10"
           >
             Recharger les statistiques
           </button>
@@ -56,7 +56,7 @@ const PanelContent = ({ isPending, isError, repartition, bigNumber, onRetry }) =
               <span className="truncate text-white/80">{item.label}</span>
               <span className="shrink-0 text-white/50">{item.count}</span>
             </div>
-            <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-white/10">
+            <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-card/10">
               <motion.div
                 initial={{ width: 0 }}
                 whileInView={{ width: `${item.pct}%` }}
@@ -98,7 +98,7 @@ export const RepartitionPanel = () => {
         aria-hidden
       />
       <div className="relative flex flex-1 flex-col">
-        <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white/90">
+        <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-card/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white/90">
           <Zap className="size-3 text-brand-orange" aria-hidden />
           Run du jour · terminé
         </span>

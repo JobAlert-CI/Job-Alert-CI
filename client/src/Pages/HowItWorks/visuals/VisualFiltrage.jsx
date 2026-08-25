@@ -78,7 +78,7 @@ const VisualFiltrage = () => (
       </p>
       <Link
         to="/filieres"
-        className="inline-flex h-8 items-center text-center gap-1 rounded-md px-2.5 text-xs font-bold bg-brand-orange text-white shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:brightness-110 active:scale-[0.98]"
+        className="inline-flex h-8 items-center text-center gap-1 rounded-md px-2.5 text-xs font-bold bg-brand-orange text-on-primary shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:brightness-110 active:scale-[0.98]"
       >
         Voir toutes les filières
       </Link>

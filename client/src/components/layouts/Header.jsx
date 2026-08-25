@@ -76,7 +76,7 @@ const MegaPanel = ({ children, onEnter, onLeave }) => (
     exit="exit"
     onMouseEnter={onEnter}
     onMouseLeave={onLeave}
-    className="absolute inset-x-0 top-full border-b border-outline-variant/40 bg-white shadow-[0_28px_48px_-16px_rgba(15,45,77,0.22)]"
+    className="absolute inset-x-0 top-full border-b border-outline-variant/40 bg-card shadow-[0_28px_48px_-16px_rgba(15,45,77,0.22)]"
   >
     {children}
   </motion.div>
@@ -125,7 +125,7 @@ const AllTile = ({ to, icon: Icon, label, count, unit }) => (
       to={to}
       className="group flex items-center gap-3 rounded-lg border border-dashed border-outline-variant/70 p-2.5 transition-all duration-200 hover:-translate-y-0.5 hover:border-brand-orange hover:bg-orange-50/70"
     >
-      <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-brand-orange/10 text-brand-orange transition-colors duration-200 group-hover:bg-brand-orange group-hover:text-white">
+      <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-brand-orange/10 text-brand-orange transition-colors duration-200 group-hover:bg-brand-orange group-hover:text-on-primary">
         <Icon className="size-5" strokeWidth={2} />
       </span>
       <span className="min-w-0">
@@ -333,7 +333,7 @@ const Header = () => {
       {/* ── Barre principale ───────────────────────────────────────── */}
       <div
         className={cn(
-          "relative border-b border-outline-variant/30 bg-white/85 backdrop-blur-md transition-shadow duration-300",
+          "relative border-b border-outline-variant/30 bg-card/85 backdrop-blur-md transition-shadow duration-300",
           scrolled && "shadow-[0_8px_24px_-8px_rgba(15,45,77,0.12)]"
         )}
       >
@@ -379,7 +379,7 @@ const Header = () => {
             <div className="flex items-center gap-2">
               <Link
                 to="/inscription"
-                className="group inline-flex items-center gap-2 whitespace-nowrap rounded-md bg-brand-orange px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-300 hover:brightness-110 hover:shadow-md active:scale-[0.98]"
+                className="group inline-flex items-center gap-2 whitespace-nowrap rounded-md bg-brand-orange px-4 py-2.5 text-sm font-semibold text-on-primary shadow-sm transition-all duration-300 hover:brightness-110 hover:shadow-md active:scale-[0.98]"
               >
                 <Bell className="size-4 transition-transform duration-300 group-hover:rotate-12" />
                 <span className="hidden sm:inline">Créer une alerte</span>
@@ -429,7 +429,7 @@ const Header = () => {
                   <aside className="relative hidden flex-col overflow-hidden rounded-xl bg-brand-navy p-6 text-white lg:flex">
                     <div className="pointer-events-none absolute inset-0 bg-pattern opacity-30" aria-hidden />
                     <div className="relative flex flex-1 flex-col">
-                      <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white/90">
+                      <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-card/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white/90">
                         <Zap className="size-3 text-brand-orange" />
                         Collecte du jour
                       </span>
@@ -465,7 +465,7 @@ const Header = () => {
                       </ul>
                       <Link
                         to="/offres"
-                        className="group mt-auto inline-flex w-fit items-center gap-2 rounded-md bg-brand-orange px-4 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:brightness-110"
+                        className="group mt-auto inline-flex w-fit items-center gap-2 rounded-md bg-brand-orange px-4 py-2.5 text-sm font-semibold text-on-primary transition-all duration-300 hover:brightness-110"
                       >
                         Voir toutes les offres
                         <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
@@ -525,7 +525,7 @@ const Header = () => {
                   <aside className="relative hidden flex-col overflow-hidden rounded-xl bg-brand-navy p-6 text-white lg:flex">
                     <div className="pointer-events-none absolute inset-0 bg-pattern opacity-30" aria-hidden />
                     <div className="relative flex flex-1 flex-col">
-                      <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white/90">
+                      <span className="inline-flex w-fit items-center gap-1.5 rounded-full bg-card/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white/90">
                         <Sparkles className="size-3 text-brand-orange" />
                         Conseil n°1 cette semaine
                       </span>
@@ -557,7 +557,7 @@ const Header = () => {
                           </div>
                           <Link
                             to={`/conseils/${topConseil.slug}`}
-                            className="group mt-auto inline-flex w-fit items-center gap-2 rounded-md bg-brand-orange px-4 py-2.5 text-sm font-semibold text-white transition-all duration-300 hover:brightness-110"
+                            className="group inline-flex w-fit items-center gap-2 rounded-md bg-brand-orange px-4 py-2.5 text-sm font-semibold text-on-primary mt-2 transition-all duration-300 hover:brightness-110"
                           >
                             Lire l'article
                             <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
@@ -599,7 +599,7 @@ const Header = () => {
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-              className="overflow-hidden border-b border-outline-variant/30 bg-white lg:hidden"
+              className="overflow-hidden border-b border-outline-variant/30 bg-card lg:hidden"
             >
               <div className="max-h-[calc(100vh-4.5rem)] overflow-y-auto px-4 py-5 md:px-8">
                 {/* Liens principaux */}
@@ -627,7 +627,7 @@ const Header = () => {
                       <AccordionContent className="px-2 pb-3 pt-1 [&_a]:no-underline">
                         <Link
                           to="/offres"
-                          className="mb-2 flex items-center justify-between rounded-md bg-brand-navy px-3 py-2.5 text-[13px] font-semibold text-white transition-colors hover:bg-brand-orange hover:text-white!"
+                          className="mb-2 flex items-center justify-between rounded-md bg-brand-navy px-3 py-2.5 text-[13px] font-semibold text-on-primary transition-colors hover:bg-brand-orange hover:text-on-primary!"
                         >
                           Voir toutes les offres
                           <ArrowRight className="size-4" />
@@ -681,7 +681,7 @@ const Header = () => {
                 <div className="mt-4 flex flex-col md:flex-row gap-2 border-t border-outline-variant/30 pt-4">
                   <Link
                     to="/inscription"
-                    className="inline-flex items-center justify-center gap-2 rounded-md bg-brand-orange px-4 py-2.5 text-sm font-semibold  w-full text-white transition-all hover:brightness-110"
+                    className="inline-flex items-center justify-center gap-2 rounded-md bg-brand-orange px-4 py-2.5 text-sm font-semibold  w-full text-on-primary transition-all hover:brightness-110"
                   >
                     <Bell className="size-4" />
                     Créer une alerte

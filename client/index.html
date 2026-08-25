@@ -2,146 +2,22 @@
 <html lang="fr">
 
 <head>
+  <!-- Strict minimum ici : tout le reste (description, OG, Twitter,
+       canonical, JSON-LD) est géré par Seo.jsx via src/lib/seo.js —
+       source unique de vérité (Cf. Audit.md P2-5). -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#0F2D4D" />
   <meta name="color-scheme" content="light" />
   <meta name="format-detection" content="telephone=no" />
-  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
-  <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
-  <meta
-    name="description"
-    content="JobAlert CI collecte les offres d'emploi en Cote d'Ivoire chaque matin et vous envoie a 8h00 un recapitulatif gratuit, filtre par metier, sans doublons."
-  />
-  <meta
-    name="keywords"
-    content="emploi Cote d'Ivoire, offres d'emploi Abidjan, alerte emploi CI, recrutement Cote d'Ivoire, jobs Abidjan, JobAlert CI"
-  />
-  <meta name="author" content="JobAlert CI" />
-  <meta name="application-name" content="JobAlert CI" />
-  <meta name="apple-mobile-web-app-title" content="JobAlert CI" />
 
-  <link rel="canonical" href="https://job-alert-ci.vercel.app/" />
   <link rel="icon" type="image/x-icon" href="/fav2.ico" />
   <link rel="icon" type="image/svg+xml" href="/logo.svg" />
   <link rel="apple-touch-icon" href="/logo2.ico" />
   <link rel="manifest" href="/site.webmanifest" />
   <link rel="sitemap" type="application/xml" href="/sitemap.xml" />
 
-  <meta property="og:site_name" content="JobAlert CI" />
-  <meta property="og:type" content="website" />
-  <meta property="og:locale" content="fr_CI" />
-  <meta property="og:url" content="https://job-alert-ci.vercel.app/" />
-  <meta property="og:title" content="JobAlert CI | Offres d'emploi en Cote d'Ivoire chaque matin" />
-  <meta
-    property="og:description"
-    content="Recevez chaque matin a 8h00 les meilleures offres d'emploi en Cote d'Ivoire, filtrees selon votre metier, dans un seul email gratuit."
-  />
-  <meta property="og:image" content="https://job-alert-ci.vercel.app/screen.png" />
-  <meta property="og:image:secure_url" content="https://job-alert-ci.vercel.app/screen.png" />
-  <meta property="og:image:alt" content="Apercu de JobAlert CI et de son recapitulatif d'offres d'emploi" />
-
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="JobAlert CI | Offres d'emploi en Cote d'Ivoire chaque matin" />
-  <meta
-    name="twitter:description"
-    content="Un seul email quotidien, gratuit, avec les offres d'emploi pertinentes en Cote d'Ivoire. Filtrage par filiere et zero doublon."
-  />
-  <meta name="twitter:image" content="https://job-alert-ci.vercel.app/screen.png" />
-  <meta name="twitter:image:alt" content="Apercu de JobAlert CI et de son recapitulatif d'offres d'emploi" />
-
   <title>JobAlert CI | Offres d'emploi en Cote d'Ivoire chaque matin</title>
-
-  <link href="https://fonts.googleapis.com" rel="preconnect" />
-  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Montserrat:wght@600;700&amp;display=swap"
-    rel="stylesheet" />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
-    rel="stylesheet" />
-  <script type="application/ld+json" id="structured-data">
-    {
-      "@context": "https://schema.org",
-      "@graph": [
-        {
-          "@type": "Organization",
-          "@id": "https://job-alert-ci.vercel.app/#organization",
-          "name": "JobAlert CI",
-          "url": "https://job-alert-ci.vercel.app/",
-          "logo": "https://job-alert-ci.vercel.app/logo2.svg",
-          "email": "bonjour@jobalert.ci",
-          "areaServed": {
-            "@type": "Country",
-            "name": "Cote d'Ivoire"
-          }
-        },
-        {
-          "@type": "WebSite",
-          "@id": "https://job-alert-ci.vercel.app/#website",
-          "name": "JobAlert CI",
-          "url": "https://job-alert-ci.vercel.app/",
-          "inLanguage": "fr-CI",
-          "publisher": {
-            "@id": "https://job-alert-ci.vercel.app/#organization"
-          }
-        },
-        {
-          "@type": "Service",
-          "@id": "https://job-alert-ci.vercel.app/#service",
-          "name": "Alertes emploi quotidiennes en Cote d'Ivoire",
-          "provider": {
-            "@id": "https://job-alert-ci.vercel.app/#organization"
-          },
-          "serviceType": "Alerte emploi par email",
-          "areaServed": {
-            "@type": "Country",
-            "name": "Cote d'Ivoire"
-          },
-          "audience": {
-            "@type": "Audience",
-            "audienceType": "Candidats et chercheurs d'emploi"
-          },
-          "offers": {
-            "@type": "Offer",
-            "price": "0",
-            "priceCurrency": "XOF",
-            "availability": "https://schema.org/InStock"
-          }
-        },
-        {
-          "@type": "FAQPage",
-          "@id": "https://job-alert-ci.vercel.app/#faq",
-          "mainEntity": [
-            {
-              "@type": "Question",
-              "name": "Est-ce vraiment gratuit ?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "Oui, JobAlert CI est gratuit. Aucune carte bancaire n'est demandee pour recevoir les alertes emploi."
-              }
-            },
-            {
-              "@type": "Question",
-              "name": "A quelle heure arrive le recapitulatif ?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "Le recapitulatif arrive chaque jour a 8h00 par email, apres la collecte et le filtrage des offres."
-              }
-            },
-            {
-              "@type": "Question",
-              "name": "D'ou viennent les offres ?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "Les offres sont collectees depuis plusieurs sources emploi, notamment EmploiDakar CI, GoAfrica, Novojob et LinkedIn."
-              }
-            }
-          ]
-        }
-      ]
-    }
-  </script>
 </head>
 
 <body>

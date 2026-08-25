@@ -16,7 +16,7 @@ const BandeCloture = () => {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        className="flex flex-row items-center justify-between gap-5 rounded-xl border border-outline-variant/50 bg-white px-7 py-6 shadow-soft max-sm:flex-col max-sm:items-start"
+        className="flex flex-row items-center justify-between gap-5 rounded-xl border border-outline-variant/50 bg-card px-7 py-6 shadow-soft max-sm:flex-col max-sm:items-start"
       >
         <div>
           <p className="font-heading text-lg font-extrabold text-brand-navy">

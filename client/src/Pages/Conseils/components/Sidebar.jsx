@@ -25,7 +25,7 @@ export const PlusLus = () => {
   }, [popular?.data, articles])
 
   return (
-    <div className="rounded-xl border border-outline-variant/40 bg-white p-5 shadow-soft">
+    <div className="rounded-xl border border-outline-variant/40 bg-card p-5 shadow-soft">
       <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
         <Flame className="size-3.5 text-brand-orange" aria-hidden />
         Les plus lus
@@ -87,7 +87,7 @@ export const SeriesListe = () => {
   const { data: series, isPending } = useSeriesQuery()
 
   return (
-    <div className="rounded-xl border border-outline-variant/40 bg-white p-5 shadow-soft">
+    <div className="rounded-xl border border-outline-variant/40 bg-card p-5 shadow-soft">
       <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
         <BookOpen className="size-3.5 text-brand-orange" aria-hidden />
         Séries à suivre

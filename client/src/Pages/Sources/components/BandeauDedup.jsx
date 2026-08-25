@@ -27,7 +27,7 @@ const BandeauDedup = () => (
         {/* Desktop-first : 2 colonnes en base */}
         <div className="relative grid items-center gap-10 px-6 py-12 sm:px-10 lg:grid-cols-[1.1fr_0.9fr] lg:px-14 lg:py-14 max-lg:grid-cols-1">
           <div>
-            <span className="inline-flex items-center gap-2 rounded-full bg-brand-orange px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-white">
+            <span className="inline-flex items-center gap-2 rounded-full bg-brand-orange px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-on-primary">
               <Fingerprint className="size-3" aria-hidden />
               Dédoublonnage par hash
             </span>
@@ -57,7 +57,7 @@ const BandeauDedup = () => (
             </div>
           </div>
 
-          <div className="min-w-0 rounded-xl bg-white p-5 shadow-hover">
+          <div className="min-w-0 rounded-xl bg-card p-5 shadow-hover">
             <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
               Même annonce, deux sources
             </p>
@@ -69,7 +69,7 @@ const BandeauDedup = () => (
                 transition={{ duration: 0.4, delay: 0.2 }}
                 className="flex items-center gap-3 rounded-lg border border-emerald-500/30 bg-emerald-50/40 p-3"
               >
-                <span className="grid size-9 shrink-0 place-items-center rounded-lg border border-outline-variant/40 bg-white font-heading text-[10px] font-black text-brand-navy">
+                <span className="grid size-9 shrink-0 place-items-center rounded-lg border border-outline-variant/40 bg-card font-heading text-[10px] font-black text-brand-navy">
                   ED
                 </span>
                 <div className="min-w-0 flex-1">
@@ -98,11 +98,11 @@ const BandeauDedup = () => (
                   whileInView={{ scale: 1, opacity: 1, rotate: 6 }}
                   viewport={{ once: true }}
                   transition={{ delay: 0.75, duration: 0.3, ease: "backOut" }}
-                  className="absolute right-2.5 top-2.5 rounded border-2 border-red-500/70 bg-white/80 px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wide text-red-600"
+                  className="absolute right-2.5 top-2.5 rounded border-2 border-red-500/70 bg-card/80 px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wide text-red-600"
                 >
                   Doublon
                 </motion.span>
-                <span className="grid size-9 shrink-0 place-items-center rounded-lg border border-outline-variant/40 bg-white font-heading text-[10px] font-black text-teal-700">
+                <span className="grid size-9 shrink-0 place-items-center rounded-lg border border-outline-variant/40 bg-card font-heading text-[10px] font-black text-teal-700">
                   GA
                 </span>
                 <div className="min-w-0 flex-1">

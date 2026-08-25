@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils"
 const BadgeNouveau = ({ label = "Nouveau", variant = "soft", className }) => {
   if (variant === "solid") {
     return (
-      <span className={cn("hidden shrink-0 rounded-full bg-brand-orange px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white sm:inline", className)}>
+      <span className={cn("hidden shrink-0 rounded-full bg-brand-orange px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-on-primary sm:inline", className)}>
         {label}
       </span>
     )

@@ -40,7 +40,7 @@ const VisualDedup = () => (
           whileInView={{ scale: 1, opacity: 1, rotate: 6 }}
           viewport={{ once: true }}
           transition={{ delay: 0.75, duration: 0.3, ease: "backOut" }}
-          className="absolute right-2.5 top-2.5 rounded border-2 border-red-500/70 bg-white/80 px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wide text-red-600"
+          className="absolute right-2.5 top-2.5 rounded border-2 border-red-500/70 bg-card/80 px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wide text-red-600"
         >
           Doublon
         </motion.span>

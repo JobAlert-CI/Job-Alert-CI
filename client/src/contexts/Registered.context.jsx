@@ -3,21 +3,17 @@ import {
 } from "react"
 import { useSearchParams } from "react-router-dom"
 import subscriptionApi from "@/api/public/subscriptions"
-import { formatApiError } from "@/api/errors"
+import { formatApiError, isCanceledError } from "@/api/errors"
 import {
   DEFAULT_VILLES,
   useRegisteredOffers,
   useRegisteredReferentials,
 } from "@/tools/registered.tools"
 
-export const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-
-export const ETAPES = [
-  { id: "identite", label: "Identité" },
-  { id: "preferences", label: "Préférences" },
-  { id: "profil", label: "Profil", optionnel: true },
-  { id: "validation", label: "Validation" },
-]
+/* Non exportée : utilisée uniquement dans ce contexte (react-refresh
+   exige un fichier à exports 100 % composants/hooks). Les étapes
+   affichées du stepper vivent dans Pages/Registered/components/Stepper.jsx. */
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 /**
  * Initialise le formulaire depuis les query params de l'URL
@@ -177,11 +173,14 @@ export const RegisteredProvider = ({ children }) => {
       setSubmitted(true)
       window.scrollTo({ top: 0, behavior: "smooth" })
     } catch (err) {
-      const formatted = formatApiError(err)
-      if (formatted.status === 409) {
+      /* Une requête annulée n'est pas une erreur à montrer à l'utilisateur. */
+      if (isCanceledError(err)) return
+
+      /* formatApiError renvoie une string : le status HTTP se lit sur la réponse. */
+      if (err?.response?.status === 409) {
         setApiError("Cet email est déjà inscrit à nos alertes quotidiennes.")
       } else {
-        setApiError(formatted.message || "Une erreur est survenue lors de la création de l'alerte. Veuillez réessayer.")
+        setApiError(formatApiError(err) || "Une erreur est survenue lors de la création de l'alerte. Veuillez réessayer.")
       }
     } finally {
       setSending(false)

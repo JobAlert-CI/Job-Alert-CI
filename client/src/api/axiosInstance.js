@@ -1,8 +1,9 @@
 import axios from "axios";
 
+/* Site public sans cookies d'authentification → withCredentials inutile,
+   et contraignant côté CORS si l'API est séparée (Cf. Audit.md P2-12). */
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || "",
-  withCredentials: true,
 });
 
 export default api;

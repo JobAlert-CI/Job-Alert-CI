@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils"
 export const OfferCardSkeleton = ({ view = "list" }) => {
   if (view === "grid") {
     return (
-      <div className="flex flex-col gap-3 rounded-xl border border-outline-variant/40 bg-white p-5 shadow-soft">
+      <div className="flex flex-col gap-3 rounded-xl border border-outline-variant/40 bg-card p-5 shadow-soft">
         <div className="flex items-center justify-between">
           <Skeleton className="h-6 w-28 rounded-full" />
           <Skeleton className="size-8 rounded-lg" />
@@ -25,7 +25,7 @@ export const OfferCardSkeleton = ({ view = "list" }) => {
   }
 
   return (
-    <div className="rounded-xl border border-outline-variant/40 bg-white p-5 shadow-soft">
+    <div className="rounded-xl border border-outline-variant/40 bg-card p-5 shadow-soft">
       <div className="flex gap-4">
         <Skeleton className="hidden size-14 rounded-lg sm:block" />
         <div className="flex-1 space-y-2.5">

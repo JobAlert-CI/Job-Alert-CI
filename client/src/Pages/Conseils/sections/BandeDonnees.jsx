@@ -40,7 +40,7 @@ const BandeDonnees = () => {
           {/* Desktop-first : 2 colonnes en base, empilé en repli */}
           <div className="relative grid grid-cols-[1.1fr_0.9fr] items-center gap-8 max-lg:grid-cols-1">
             <div>
-              <span className="inline-flex items-center gap-2 rounded-full bg-brand-orange px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-white">
+              <span className="inline-flex items-center gap-2 rounded-full bg-brand-orange px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-on-primary">
                 <TrendingUp className="size-3" aria-hidden />
                 Nourri par la collecte
               </span>
@@ -55,9 +55,9 @@ const BandeDonnees = () => {
             </div>
             <div className="grid grid-cols-3 gap-3 max-sm:grid-cols-1">
               {STATS.map((s) => (
-                <div key={s.l} className="rounded-lg border border-white/10 bg-white/5 px-3 py-4 text-center">
+                <div key={s.l} className="rounded-lg border border-white/10 bg-card/5 px-3 py-4 text-center">
                   {isPending ? (
-                    <Skeleton className="mx-auto h-9 w-14 bg-white/20" />
+                    <Skeleton className="mx-auto h-9 w-14 bg-card/20" />
                   ) : (
                     <p className="font-heading text-3xl font-black text-brand-orange">
                       <CountUp to={s.v} />

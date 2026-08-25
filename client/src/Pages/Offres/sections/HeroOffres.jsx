@@ -83,7 +83,7 @@ const FluxCard = () => {
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1, y: [0, -7, 0] }}
         transition={{ delay: 0.9, opacity: { duration: 0.4 }, scale: { duration: 0.4 }, y: { duration: 4.6, repeat: Infinity, ease: "easeInOut" } }}
-        className="absolute -top-4 left-5 z-20 inline-flex -rotate-3 items-center gap-1.5 rounded-full bg-brand-orange px-3.5 py-1.5 text-[11px] font-bold text-white shadow-lg"
+        className="absolute -top-4 left-5 z-20 inline-flex -rotate-3 items-center gap-1.5 rounded-full bg-brand-orange px-3.5 py-1.5 text-[11px] font-bold text-on-primary shadow-lg"
       >
         <Zap className="size-3" aria-hidden />
         +{nouveaux} offres ce matin
@@ -92,7 +92,7 @@ const FluxCard = () => {
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 1.05, duration: 0.4 }}
-        className="absolute -top-3 right-6 z-20 inline-flex rotate-2 items-center gap-1.5 rounded-full border border-outline-variant/50 bg-white px-3 py-1.5 text-[11px] font-bold text-emerald-600 shadow-soft"
+        className="absolute -top-3 right-6 z-20 inline-flex rotate-2 items-center gap-1.5 rounded-full border border-outline-variant/50 bg-card px-3 py-1.5 text-[11px] font-bold text-emerald-600 shadow-soft"
       >
         <Fingerprint className="size-3" aria-hidden />
         0 doublon
@@ -101,14 +101,14 @@ const FluxCard = () => {
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1, y: [0, -6, 0] }}
         transition={{ delay: 1.2, opacity: { duration: 0.4 }, scale: { duration: 0.4 }, y: { duration: 5.2, repeat: Infinity, ease: "easeInOut", delay: 0.6 } }}
-        className="absolute -bottom-4 right-8 z-20 inline-flex rotate-2 items-center gap-1.5 rounded-full border border-outline-variant/50 bg-white px-3.5 py-1.5 text-[11px] font-bold text-on-surface shadow-hover"
+        className="absolute -bottom-4 right-8 z-20 inline-flex rotate-2 items-center gap-1.5 rounded-full border border-outline-variant/50 bg-card px-3.5 py-1.5 text-[11px] font-bold text-on-surface shadow-hover"
       >
         <Mail className="size-3 text-brand-orange" aria-hidden />
         Envoyé à {abonnees.toLocaleString("fr-FR")} abonnés
       </motion.span>
 
       {/* Carte principale */}
-      <div className="relative overflow-hidden rounded-2xl border border-outline-variant/40 bg-white shadow-[0_24px_48px_-16px_rgba(15,45,77,0.22)]">
+      <div className="relative overflow-hidden rounded-2xl border border-outline-variant/40 bg-card shadow-[0_24px_48px_-16px_rgba(15,45,77,0.22)]">
         <div className="flex items-center gap-3 border-b border-outline-variant/40 bg-surface-container-low/60 px-5 py-4">
           <span className="relative flex size-2.5 shrink-0" aria-hidden>
             <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-60" />
@@ -220,7 +220,7 @@ const FluxCard = () => {
                   )}
                   <span className="flex min-w-0 items-center gap-2">
                     <span className={cn(
-                      "relative grid size-7 shrink-0 place-items-center rounded-full border bg-white",
+                      "relative grid size-7 shrink-0 place-items-center rounded-full border bg-card",
                       s.done ? "border-emerald-500/40 text-emerald-600" : "border-brand-orange/50 text-brand-orange"
                     )}>
                       <s.icon className="size-3.5" aria-hidden />
@@ -293,7 +293,7 @@ const HeroOffres = () => {
                 </span>
                 Collecte du jour : {todayLong()}
               </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-outline-variant/50 bg-white/80 px-3.5 py-1.5 text-[11px] font-bold text-on-surface-variant">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-outline-variant/50 bg-card/80 px-3.5 py-1.5 text-[11px] font-bold text-on-surface-variant">
                 <ShieldCheck className="size-3 text-brand-orange" aria-hidden />
                 {parSource.length || 0} source{parSource.length > 1 ? "s" : ""} scannée{parSource.length > 1 ? "s" : ""} · 0 doublon en base
               </span>

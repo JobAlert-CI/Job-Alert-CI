@@ -68,7 +68,7 @@ export const EcranSucces = () => {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.7 + i * 0.1, duration: 0.4 }}
-            className="rounded-xl border border-outline-variant/50 bg-white p-4 shadow-soft"
+            className="rounded-xl border border-outline-variant/50 bg-card p-4 shadow-soft"
           >
             <s.icon className="mx-auto size-5 text-brand-orange" />
             <p className="mt-2 font-heading text-sm font-extrabold text-brand-navy">{s.t}</p>

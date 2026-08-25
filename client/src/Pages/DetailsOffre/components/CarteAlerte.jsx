@@ -49,7 +49,7 @@ const CarteAlerte = () => {
               placeholder="votre@email.com"
               aria-label="Votre adresse email"
               autoComplete="email"
-              className="h-11 w-full rounded-md border border-white/15 bg-white/10 pl-10 pr-3.5 text-sm text-white outline-none transition-all duration-300 placeholder:text-white/40 focus:border-brand-orange focus:bg-white/[0.14] focus:ring-2 focus:ring-brand-orange/30"
+              className="h-11 w-full rounded-md border border-white/15 bg-card/10 pl-10 pr-3.5 text-sm text-white outline-none transition-all duration-300 placeholder:text-white/40 focus:border-brand-orange focus:bg-card/[0.14] focus:ring-2 focus:ring-brand-orange/30"
             />
           </div>
           <button

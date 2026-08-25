@@ -18,7 +18,7 @@ const SegmentsProgression = ({ count, idx, progression, onSelect, labels, tone =
       >
         <span className={cn(
           "block h-1 w-full overflow-hidden rounded-full transition-colors duration-300",
-          tone === "dark" ? "bg-white/15 hover:bg-white/30" : "bg-outline-variant/50 hover:bg-outline-variant"
+          tone === "dark" ? "bg-card/15 hover:bg-card/30" : "bg-outline-variant/50 hover:bg-outline-variant"
         )}>
           {i === idx && (
             <motion.span className="block h-full origin-left rounded-full bg-brand-orange" style={{ scaleX: progression }} />

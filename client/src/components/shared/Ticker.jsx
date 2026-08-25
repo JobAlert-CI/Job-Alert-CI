@@ -19,13 +19,13 @@ const Ticker = ({ variant = "light", label, items = [], duration = 48, className
     )}>
       <div className={cn(
         "z-10 flex shrink-0 items-center gap-2.5 px-4 py-3 sm:px-6",
-        dark ? "bg-brand-orange text-white" : "border-r border-outline-variant/40 bg-surface-container-lowest"
+        dark ? "bg-brand-orange text-on-primary" : "border-r border-outline-variant/40 bg-surface-container-lowest"
       )}>
         {dark ? (
           <>
             <span className="relative hidden md:flex size-1.5">
-              <span className="absolute inline-flex size-full animate-ping rounded-full bg-white opacity-70" />
-              <span className="relative inline-flex size-1.5 rounded-full bg-white" />
+              <span className="absolute inline-flex size-full animate-ping rounded-full bg-card opacity-70" />
+              <span className="relative inline-flex size-1.5 rounded-full bg-card" />
             </span>
             <Radio className="size-3 hidden md:flex" />
           </>

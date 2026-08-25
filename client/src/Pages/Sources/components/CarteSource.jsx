@@ -53,7 +53,7 @@ const CarteSource = ({ s, index, featured = false, className }) => {
         ease: [0.22, 1, 0.36, 1],
       }}
       className={cn(
-        "group relative overflow-hidden rounded-xl border border-outline-variant/40 bg-white shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-hover",
+        "group relative overflow-hidden rounded-xl border border-outline-variant/40 bg-card shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-hover",
         className
       )}
       style={{ borderTop: `3px solid ${s.hex}` }}

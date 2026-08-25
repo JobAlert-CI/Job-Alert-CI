@@ -14,7 +14,7 @@ export const EmptyOffers = ({ onRetryOffers }) => (
     <div className="flex items-center justify-center-safe gap-3">
       <Link
         to="/inscription"
-        className="mt-5 inline-flex items-center gap-2 rounded-md bg-brand-orange px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-brand-orange/90"
+        className="mt-5 inline-flex items-center gap-2 rounded-md bg-brand-orange px-4 py-2.5 text-sm font-bold text-on-primary transition-colors hover:bg-brand-orange/90"
       >
         <Bell className="size-4" aria-hidden />
         Créer mon alerte gratuite
@@ -23,7 +23,7 @@ export const EmptyOffers = ({ onRetryOffers }) => (
         <button
           type="button"
           onClick={onRetryOffers}
-          className="mt-5 inline-flex items-center gap-2 rounded-md border border-amber-300 bg-white px-3 py-1.5 font-bold text-amber-900 transition-colors hover:bg-amber-100"
+          className="mt-5 inline-flex items-center gap-2 rounded-md border border-amber-300 bg-card px-3 py-1.5 font-bold text-amber-900 transition-colors hover:bg-amber-100"
         >
           Réessayer
         </button>

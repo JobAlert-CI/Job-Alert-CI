@@ -28,7 +28,7 @@ const SommaireFlottant = ({ sections, lecture }) => {
             transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
             className="absolute bottom-full right-0 z-50 mb-3 w-75"
           >
-            <div className="max-h-[62vh] overflow-y-auto rounded-xl border border-outline-variant/50 bg-white shadow-hover">
+            <div className="max-h-[62vh] overflow-y-auto rounded-xl border border-outline-variant/50 bg-card shadow-hover">
               <div className="h-1 w-full bg-brand-orange" aria-hidden />
               <Sommaire
                 sections={sections}
@@ -39,7 +39,7 @@ const SommaireFlottant = ({ sections, lecture }) => {
             </div>
             {/* Caret pointant vers le bouton */}
             <span
-              className="absolute -bottom-1.5 left-6 size-3 rotate-45 border-b border-r border-outline-variant/50 bg-white"
+              className="absolute -bottom-1.5 left-6 size-3 rotate-45 border-b border-r border-outline-variant/50 bg-card"
               aria-hidden
             />
           </motion.div>

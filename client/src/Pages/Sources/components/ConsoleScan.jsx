@@ -62,7 +62,7 @@ const ConsoleScan = () => {
           scale: { duration: 0.4 },
           y: { duration: 4.6, repeat: Infinity, ease: "easeInOut" },
         }}
-        className="absolute -top-4 left-5 z-20 inline-flex -rotate-3 items-center gap-1.5 rounded-full bg-brand-orange px-3.5 py-1.5 text-[11px] font-bold text-white shadow-lg sm:-left-4"
+        className="absolute -top-4 left-5 z-20 inline-flex -rotate-3 items-center gap-1.5 rounded-full bg-brand-orange px-3.5 py-1.5 text-[11px] font-bold text-on-primary shadow-lg sm:-left-4"
       >
         <Radar className="size-3" aria-hidden />
         {sources.length > 0
@@ -74,13 +74,13 @@ const ConsoleScan = () => {
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 1.05, duration: 0.4 }}
-        className="absolute -top-3 right-6 z-20 inline-flex rotate-2 items-center gap-1.5 rounded-full border border-outline-variant/50 bg-white px-3 py-1.5 text-[11px] font-bold text-emerald-600 shadow-soft"
+        className="absolute -top-3 right-6 z-20 inline-flex rotate-2 items-center gap-1.5 rounded-full border border-outline-variant/50 bg-card px-3 py-1.5 text-[11px] font-bold text-emerald-600 shadow-soft"
       >
         <ShieldCheck className="size-3" aria-hidden />
         0 doublon
       </motion.span>
 
-      <div className="relative overflow-hidden rounded-2xl border border-outline-variant/40 bg-white shadow-[0_24px_48px_-16px_rgba(15,45,77,0.22)]">
+      <div className="relative overflow-hidden rounded-2xl border border-outline-variant/40 bg-card shadow-[0_24px_48px_-16px_rgba(15,45,77,0.22)]">
         {/* En-tête */}
         <div className="flex items-center gap-3 border-b border-outline-variant/40 bg-surface-container-low/60 px-5 py-4">
           <span className="relative flex size-2.5 shrink-0" aria-hidden>
@@ -116,7 +116,7 @@ const ConsoleScan = () => {
                     top: `${POSITIONS_RADAR[i].y}%`,
                   }}
                 >
-                  <Skeleton className="size-4 rounded-full bg-white/20" />
+                  <Skeleton className="size-4 rounded-full bg-card/20" />
                 </span>
               ))}
             </div>
@@ -129,7 +129,7 @@ const ConsoleScan = () => {
             <button
               type="button"
               onClick={() => statsQuery.refetch()}
-              className="mt-4 inline-flex items-center gap-2 rounded-md border border-white/25 px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-white/10"
+              className="mt-4 inline-flex items-center gap-2 rounded-md border border-white/25 px-3 py-1.5 text-xs font-bold text-white transition-colors hover:bg-card/10"
             >
               Recharger
             </button>
@@ -141,8 +141,8 @@ const ConsoleScan = () => {
               <div className="absolute inset-0 rounded-full border border-white/12" />
               <div className="absolute inset-[17%] rounded-full border border-white/10" />
               <div className="absolute inset-[34%] rounded-full border border-white/8" />
-              <div className="absolute left-1/2 top-0 h-full w-px bg-white/6" aria-hidden />
-              <div className="absolute top-1/2 left-0 h-px w-full bg-white/6" aria-hidden />
+              <div className="absolute left-1/2 top-0 h-full w-px bg-card/6" aria-hidden />
+              <div className="absolute top-1/2 left-0 h-px w-full bg-card/6" aria-hidden />
               <motion.div
                 className="absolute inset-0 rounded-full"
                 style={{

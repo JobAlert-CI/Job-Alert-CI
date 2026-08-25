@@ -140,7 +140,7 @@ const HeroFaq = ({ query, setQuery, nbResultats }) => (
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Tapez votre question : « gratuit », « 8h00 », « désinscrire »…"
                 aria-label="Rechercher dans la FAQ"
-                className="h-14 w-full rounded-xl border border-outline-variant/60 bg-white pl-12 pr-12 text-[15px] shadow-soft outline-none transition-all placeholder:text-muted-foreground/60 focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/25"
+                className="h-14 w-full rounded-xl border border-outline-variant/60 bg-card pl-12 pr-12 text-[15px] shadow-soft outline-none transition-all placeholder:text-muted-foreground/60 focus:border-brand-orange focus:ring-2 focus:ring-brand-orange/25"
               />
               {query && (
                 <button
@@ -180,7 +180,7 @@ const HeroFaq = ({ query, setQuery, nbResultats }) => (
           <motion.span
             initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1, y: [0, -7, 0] }}
             transition={{ delay: 0.9, opacity: { duration: 0.4 }, scale: { duration: 0.4 }, y: { duration: 4.6, repeat: Infinity, ease: "easeInOut" } }}
-            className="absolute -top-4 left-5 z-20 inline-flex -rotate-3 items-center gap-1.5 rounded-full bg-brand-orange px-3.5 py-1.5 text-[11px] font-bold text-white shadow-lg sm:-left-4"
+            className="absolute -top-4 left-5 z-20 inline-flex -rotate-3 items-center gap-1.5 rounded-full bg-brand-orange px-3.5 py-1.5 text-[11px] font-bold text-on-primary shadow-lg sm:-left-4"
           >
             <Clock className="size-3" />
             Réponse en moins de 24 h
@@ -190,7 +190,7 @@ const HeroFaq = ({ query, setQuery, nbResultats }) => (
             <div className="pointer-events-none absolute inset-0 bg-pattern opacity-20" aria-hidden />
             <div className="pointer-events-none absolute -right-20 -top-20 size-72 rounded-full bg-brand-orange/15 blur-3xl" aria-hidden />
             <div className="relative">
-              <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white/90">
+              <span className="inline-flex items-center gap-2 rounded-full bg-card/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-white/90">
                 <MessageCircleQuestion className="size-3 text-brand-orange" />
                 Question précise ?
               </span>
@@ -205,7 +205,7 @@ const HeroFaq = ({ query, setQuery, nbResultats }) => (
                 <CtaLink to="/contact" size="md" iconRight={ArrowRight} className="w-full">
                   Poser ma question
                 </CtaLink>
-                <CtaLink to="/comment-ca-marche" size="md" className="w-full border border-white/20 bg-white/10 shadow-none hover:bg-white/20 hover:brightness-100">
+                <CtaLink to="/comment-ca-marche" size="md" className="w-full border border-white/20 bg-card/10 shadow-none hover:bg-card/20 hover:brightness-100">
                   Voir le fonctionnement
                 </CtaLink>
               </div>
@@ -276,7 +276,7 @@ const CorpsFaq = ({ groupes, query, activeCat, setActiveCat }) => {
           {groupes.length === 0 && (
             <motion.div
               initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
-              className="rounded-xl border border-dashed border-outline-variant/60 bg-white p-12 text-center"
+              className="rounded-xl border border-dashed border-outline-variant/60 bg-card p-12 text-center"
             >
               <SearchX className="mx-auto size-10 text-muted-foreground/50" />
               <h3 className="mt-4 font-heading text-lg font-bold text-brand-navy">Aucune réponse trouvée</h3>
@@ -310,7 +310,7 @@ const CorpsFaq = ({ groupes, query, activeCat, setActiveCat }) => {
                     <AccordionItem
                       key={item.id}
                       value={item.id}
-                      className="group mb-2.5 overflow-hidden rounded-xl border border-outline-variant/40 bg-white px-5 shadow-soft transition-all duration-300 hover:border-brand-navy/25 hover:shadow-hover group-data-open:border-brand-orange/40"
+                      className="group mb-2.5 overflow-hidden rounded-xl border border-outline-variant/40 bg-card px-5 shadow-soft transition-all duration-300 hover:border-brand-navy/25 hover:shadow-hover group-data-open:border-brand-orange/40"
                     >
                       <AccordionTrigger className="py-4 text-left font-heading text-[15px] font-bold text-brand-navy transition-colors duration-200 hover:no-underline group-data-open:text-brand-orange [&>svg]:text-brand-orange">
                         {item.q}
@@ -339,7 +339,7 @@ const CtaFaq = () => (
       <motion.div
         initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }} transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-        className="flex flex-col items-start justify-between gap-5 rounded-xl border border-outline-variant/50 bg-white px-7 py-6 shadow-soft sm:flex-row sm:items-center"
+        className="flex flex-col items-start justify-between gap-5 rounded-xl border border-outline-variant/50 bg-card px-7 py-6 shadow-soft sm:flex-row sm:items-center"
       >
         <div>
           <p className="font-heading text-lg font-extrabold text-brand-navy">

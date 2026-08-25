@@ -8,7 +8,7 @@ const CarteVedette = ({ t, className }) => (
     <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(245,166,35,0.16),transparent_55%)]" aria-hidden />
     <div className="relative flex items-center justify-between gap-3">
       <Quote className="size-8 text-brand-orange" strokeWidth={1.5} aria-hidden />
-      <span className="rounded-full border border-white/15 bg-white/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white/80">
+      <span className="rounded-full border border-white/15 bg-card/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-white/80">
         {t.secteur}
       </span>
     </div>
@@ -37,7 +37,7 @@ const CarteVedette = ({ t, className }) => (
 )
 
 const CarteStandard = ({ t, className }) => (
-  <figure className={cn("flex w-72.5 shrink-0 flex-col rounded-xl border border-outline-variant/40 bg-white p-6 shadow-soft transition-all duration-300 hover:-translate-y-1.5 hover:border-brand-orange/40 hover:shadow-hover sm:w-87.5", className)}>
+  <figure className={cn("flex w-72.5 shrink-0 flex-col rounded-xl border border-outline-variant/40 bg-card p-6 shadow-soft transition-all duration-300 hover:-translate-y-1.5 hover:border-brand-orange/40 hover:shadow-hover sm:w-87.5", className)}>
     <div className="flex items-center justify-between gap-3">
       <Quote className="size-6 text-brand-orange/40" strokeWidth={1.5} aria-hidden />
       <span className="rounded-full bg-surface-container-low px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-on-surface-variant">

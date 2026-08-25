@@ -58,7 +58,7 @@ const HeroSources = () => {
                 </span>
                 Collecte terminée · {nbSources}/{nbSources} sources · 06h00
               </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-outline-variant/50 bg-white/80 px-3.5 py-1.5 text-[11px] font-bold text-on-surface-variant">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-outline-variant/50 bg-card/80 px-3.5 py-1.5 text-[11px] font-bold text-on-surface-variant">
                 <ShieldCheck className="size-3 text-brand-orange" aria-hidden />
                 Lecture respectueuse, zéro doublon
               </span>

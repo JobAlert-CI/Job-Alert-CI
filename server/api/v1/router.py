@@ -4,6 +4,7 @@ from fastapi import APIRouter
 
 from api.v1 import ingestion, internal_ai
 from api.v1.public import articles, contact, filieres, offers, referentials, sources, stats, subscriptions, webhooks_resend
+from api.v1.public import sitemap
 from api.v1.admin import (
     ai as admin_ai,
     admins,
@@ -31,6 +32,7 @@ api_router.include_router(subscriptions.router)
 api_router.include_router(contact.router)
 api_router.include_router(webhooks_resend.router)
 api_router.include_router(stats.router)
+api_router.include_router(sitemap.router)
 api_router.include_router(ingestion.router)
 api_router.include_router(internal_ai.router)
 

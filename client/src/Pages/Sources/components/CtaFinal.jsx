@@ -11,7 +11,7 @@ const CtaFinal = () => (
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-        className="relative overflow-hidden rounded-xl border border-outline-variant/50 bg-white px-6 py-10 shadow-soft sm:px-10"
+        className="relative overflow-hidden rounded-xl border border-outline-variant/50 bg-card px-6 py-10 shadow-soft sm:px-10"
       >
         <div
           className="pointer-events-none absolute -right-20 -top-20 size-80 rounded-full bg-brand-orange/10 blur-3xl"

@@ -42,7 +42,7 @@ const BandeMechanique = () => (
               transition={{ duration: 0.45, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] }}
               className="flex flex-1 items-start gap-3.5"
             >
-              <span className="grid size-10 shrink-0 place-items-center rounded-lg border border-brand-orange/40 bg-white font-heading text-sm font-extrabold text-brand-orange shadow-soft">
+              <span className="grid size-10 shrink-0 place-items-center rounded-lg border border-brand-orange/40 bg-card font-heading text-sm font-extrabold text-brand-orange shadow-soft">
                 0{i + 1}
               </span>
               <div>
@@ -58,7 +58,7 @@ const BandeMechanique = () => (
       </ol>
       <Link
         to="/comment-ca-marche"
-        className="group inline-flex shrink-0 items-center gap-2 rounded-lg border border-brand-navy/20 bg-white px-5 py-2.5 text-sm font-bold text-brand-navy shadow-soft transition-all duration-300 hover:border-brand-navy hover:bg-brand-navy hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring max-md:self-center"
+        className="group inline-flex shrink-0 items-center gap-2 rounded-lg border border-brand-navy/20 bg-card px-5 py-2.5 text-sm font-bold text-brand-navy shadow-soft transition-all duration-300 hover:border-brand-navy hover:bg-brand-navy hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring max-md:self-center"
       >
         Voir le détail
         <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" aria-hidden />

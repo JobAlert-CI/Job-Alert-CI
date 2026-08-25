@@ -65,23 +65,22 @@ export const fetchRegisteredReferentials = async () => {
     : FALLBACK_REFERENTIALS.experiences
 
   const rawLocations = settled(locationsRes, null)
-  let locations = []
-  let villes = []
+  const hasLocations = rawLocations && Array.isArray(rawLocations) && rawLocations.length > 0
 
-  if (rawLocations && Array.isArray(rawLocations) && rawLocations.length > 0) {
-    locations = rawLocations
-      .filter((l) => l.is_active !== false)
-      .map((l) => ({
-        id: l.id,
-        code: l.code || l.city || l.label,
-        label: l.label || l.city,
-        city: l.city || l.label,
-      }))
-    villes = Array.from(new Set(locations.map((l) => l.label || l.city).filter(Boolean)))
-  } else {
-    locations = FALLBACK_REFERENTIALS.locations
-    villes = FALLBACK_REFERENTIALS.villes
-  }
+  const locations = hasLocations
+    ? rawLocations
+        .filter((l) => l.is_active !== false)
+        .map((l) => ({
+          id: l.id,
+          code: l.code || l.city || l.label,
+          label: l.label || l.city,
+          city: l.city || l.label,
+        }))
+    : FALLBACK_REFERENTIALS.locations
+
+  const villes = hasLocations
+    ? Array.from(new Set(locations.map((l) => l.label || l.city).filter(Boolean)))
+    : FALLBACK_REFERENTIALS.villes
 
   return {
     filieres: filieres.length > 0 ? filieres : FALLBACK_REFERENTIALS.filieres,

@@ -21,7 +21,7 @@ const FiliereLargeCard = ({ f, index, className }) => {
     >
       <Link
         to={`/filieres/${f.code}`}
-        className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-outline-variant/50 bg-white p-6 shadow-soft transition-all duration-300 hover:-translate-y-1.5 hover:shadow-hover"
+        className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-outline-variant/50 bg-card p-6 shadow-soft transition-all duration-300 hover:-translate-y-1.5 hover:shadow-hover"
         style={{ borderTop: `3px solid ${hue.hex}`, ...hue.style }}
       >
         <div className={cn("pointer-events-none absolute -right-16 -top-16 size-44 rounded-full blur-3xl opacity-0 transition-opacity duration-500 group-hover:opacity-100", hue.glow)} aria-hidden />
@@ -86,7 +86,7 @@ const FiliereCompactCard = ({ f, index, className }) => {
     >
       <Link
         to={`/filieres/${f.code}`}
-        className="group flex items-center gap-4 rounded-xl border border-outline-variant/50 bg-white p-4 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-hover"
+        className="group flex items-center gap-4 rounded-xl border border-outline-variant/50 bg-card p-4 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-hover"
         style={{ borderLeft: `3px solid ${hue.hex}`, ...hue.style }}
       >
         <span className={cn("flex size-11 shrink-0 items-center justify-center rounded-lg transition-all duration-400 group-hover:scale-110", hue.tile, hue.tileHover)}>

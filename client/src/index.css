@@ -4,8 +4,6 @@
 @import "@fontsource-variable/montserrat";
 @import "@fontsource-variable/inter";
 
-@custom-variant dark (&:is(.dark *));
-
 @theme inline {
   --color-surface: #f7fafc;
   --color-surface-dim: #d7dadc;
@@ -167,7 +165,8 @@
 
   /* Primary = the CTA orange ("Apply Now" / "Post a Job") */
   --primary: #f5a623;
-  --primary-foreground: #ffffff;
+  /* Navy sur orange : ratio ≈ 6.3:1 (AA) — le blanc plafonnait à ≈ 2.1:1 (cf. Audit.md P0-6) */
+  --primary-foreground: #0f2d4d;
 
   /* Secondary = muted navy tint, used for filled secondary surfaces & chips */
   --secondary: #e7ecf1;
@@ -205,48 +204,6 @@
   --sidebar-ring: #f5a623;
 }
 
-.dark {
-  --background: #101418;
-  --foreground: #eef1f3;
-  --card: #181c1e;
-  --card-foreground: #eef1f3;
-  --popover: #181c1e;
-  --popover-foreground: #eef1f3;
-
-  --primary: #ffb955;
-  --primary-foreground: #291800;
-
-  --secondary: #1e2a36;
-  --secondary-foreground: #aec8f0;
-
-  --muted: #1c2124;
-  --muted-foreground: #a2a7ad;
-
-  --accent: #1e2a36;
-  --accent-foreground: #aec8f0;
-
-  --destructive: #ffb4ab;
-
-  --border: rgba(255, 255, 255, 0.1);
-  --input: rgba(255, 255, 255, 0.15);
-  --ring: #aec8f0;
-
-  --chart-1: #ffb955;
-  --chart-2: #aec8f0;
-  --chart-3: #4ae183;
-  --chart-4: #7b95bb;
-  --chart-5: #466083;
-
-  --sidebar: #0a1826;
-  --sidebar-foreground: #eef1f3;
-  --sidebar-primary: #ffb955;
-  --sidebar-primary-foreground: #291800;
-  --sidebar-accent: #16283c;
-  --sidebar-accent-foreground: #eef1f3;
-  --sidebar-border: rgba(255, 255, 255, 0.1);
-  --sidebar-ring: #ffb955;
-}
-
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -268,6 +225,20 @@
   button:not(:disabled),
   [role="button"]:not(:disabled) {
     cursor: pointer;
+  }
+
+  /* Accessibilité : anneau de focus visible et cohérent sur tout élément interactif
+     (clavier uniquement — ne pollue pas le clic souris). Cf. Audit.md P2-9. */
+  a:focus-visible,
+  button:focus-visible,
+  [role="button"]:focus-visible,
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible,
+  [tabindex]:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--background), 0 0 0 4px var(--ring);
+    border-radius: var(--radius-md);
   }
 
   html {
@@ -306,6 +277,20 @@
 }
 
 @layer utilities {
+  /* Reduced motion : coupe les animations décoratives non couvertes par
+     <MotionConfig reducedMotion="user"> (marquee, transitions CSS). Cf. Audit.md P1-8. */
+  @media (prefers-reduced-motion: reduce) {
+    .hero-gradient,
+    .bg-pattern {
+      animation: none !important;
+      transition: none !important;
+    }
+
+    .animate-marquee {
+      animation: none !important;
+    }
+  }
+
   .shadow-soft {
     box-shadow: 0px 4px 12px rgba(15, 45, 77, 0.05);
   }

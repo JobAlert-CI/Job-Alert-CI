@@ -40,7 +40,7 @@ const FiltersDrawer = ({
                       "rounded-lg border px-3 py-2.5 text-xs font-bold transition-all",
                       sort === s.k
                         ? "border-brand-navy bg-brand-navy text-white shadow-soft"
-                        : "border-outline-variant/60 bg-white text-on-surface-variant hover:border-brand-navy/40 hover:text-brand-navy"
+                        : "border-outline-variant/60 bg-card text-on-surface-variant hover:border-brand-navy/40 hover:text-brand-navy"
                     )}
                   >
                     {s.l}

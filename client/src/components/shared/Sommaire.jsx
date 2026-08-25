@@ -36,7 +36,7 @@ const Sommaire = ({ sections, lecture, className, onNavigate }) => {
   }
 
   return (
-    <nav className={cn("rounded-xl border border-outline-variant/40 bg-white p-5 shadow-soft", className)} aria-label="Sommaire de l'article">
+    <nav className={cn("rounded-xl border border-outline-variant/40 bg-card p-5 shadow-soft", className)} aria-label="Sommaire de l'article">
       <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
         <List className="size-3.5 text-brand-orange" />
         Sommaire
@@ -57,7 +57,7 @@ const Sommaire = ({ sections, lecture, className, onNavigate }) => {
               className={cn(
                 "block rounded-r-lg py-2 pl-3.5 pr-2 text-[13px] leading-snug transition-colors duration-200",
                 actif === s.id
-                  ? "bg-brand-orange/8 font-bold text-brand-navy"
+                  ? "bg-brand-orange/8 font-bold text-on-primary"
                   : "font-medium text-muted-foreground hover:bg-surface-container-low hover:text-brand-navy"
               )}
             >
