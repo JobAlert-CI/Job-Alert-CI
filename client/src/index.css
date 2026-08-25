@@ -53,6 +53,9 @@
   --color-on-background: #181c1e;
   --color-surface-variant: #e0e3e5;
   --color-brand-navy: #0F2D4D;
+  /* #F5A623 = 2.03:1 sur blanc → réservé aux fonds navy et aux aplats (bg-*).
+     Texte orange sur surface claire : utiliser text-[#B45309] (5.02:1, AA)
+     ou text-[#D97706] pour du gros texte (3.19:1, AA large). Cf. Audit Lot 2. */
   --color-brand-orange: #F5A623;
 
   /* ---- Typography ---- */
@@ -156,6 +159,13 @@
 }
 
 :root {
+  /* ════════════════════════════════════════════════════════════════
+     DÉCISION DESIGN : thème LIGHT-ONLY (Audit Lot 2).
+     Pas de bloc .dark, pas de toggle : <meta name="color-scheme"
+     content="light"> dans index.html fige l'intention. Les usages
+     « dark » du code (tone="dark", variant="dark") désignent des
+     surfaces navy de la marque, pas un mode sombre système.
+     ════════════════════════════════════════════════════════════════ */
   --background: #f4f7f9;
   --foreground: #181c1e;
   --card: #ffffff;

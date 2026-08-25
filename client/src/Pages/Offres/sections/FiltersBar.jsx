@@ -19,7 +19,7 @@ import {
   getPeriodLabel,
   useOfferCountsQuery, 
   useOfferReferentialsQuery
-} from "@/tools/offres.tools"
+} from "@/features/offres.tools"
 import { useOffresFilters } from "@/contexts/Offres.context"
 import LocationPicker from "@/components/shared/filters/LocationPicker"
 import OffresFilterGroups from "../components/OffresFilterGroups"

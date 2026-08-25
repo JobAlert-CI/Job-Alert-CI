@@ -7,7 +7,7 @@ export const fmtDay = (d) => d.toLocaleDateString("fr-FR", { day: "numeric", mon
 export const publieLabel = (jours) =>
   jours === 0 ? "Aujourd'hui" : jours === 1 ? "Hier" : `Il y a ${jours} j`
 export const jourLabel = (jours) => {
-  if (jours === 0) return { label: "Aujourd'hui", sub: "collectées à 06:02", ping: true }
+  if (jours === 0) return { label: "Aujourd'hui", sub: "collectées à 06:00", ping: true }
   if (jours === 1) return { label: "Hier", sub: "", ping: false }
   const d = addDays(new Date(), -jours)
   const s = d.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" })

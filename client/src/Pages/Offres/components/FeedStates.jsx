@@ -5,7 +5,7 @@ import { motion } from "framer-motion"
 import {
   AlertTriangle, Bell, CheckCircle2, ChevronDown, Loader2, RefreshCw, SearchX,
 } from "lucide-react"
-import { PAGE_SIZE } from "@/tools/offres.tools"
+import { PAGE_SIZE } from "@/features/offres.tools"
 
 /* États du flux — composants présentationnels mémoïsés (props simples,
    un seul niveau : pas de drilling). */

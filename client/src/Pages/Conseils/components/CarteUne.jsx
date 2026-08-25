@@ -9,7 +9,7 @@ import { useGlissement } from "@/hooks/use-glissement"
 import { CtaLink, SegmentsProgression } from "@/components/shared"
 import { dateLabel } from "@/lib/dates"
 import { fmtVus } from "@/lib/query-helpers"
-import { DUREE_UNE, joursDepuis, variantsGlissement } from "@/tools/conseils.tools"
+import { DUREE_UNE, joursDepuis, variantsGlissement } from "@/features/conseils.tools"
 
 export const CarteUneVide = () => (
   <div className="relative w-full max-md:mx-auto max-md:max-w-md">

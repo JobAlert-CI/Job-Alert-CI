@@ -3,7 +3,7 @@ import { useMemo } from "react"
 import { Ticker } from "@/components/shared"
 import { paletteDepuisHex } from "@/lib/hues"
 import { adaptOffers } from "@/lib/offers-adapter"
-import { useTickerOffersQuery } from "@/tools/filieres.tools"
+import { useTickerOffersQuery } from "@/features/filieres.tools"
 
 /* Ticker autonome — clé d'itération stable (uid), jamais l'index. */
 const FilieresTicker = () => {

@@ -13,7 +13,7 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { SectionHeading } from "@/components/shared"
-import { useHomeStats } from "@/tools/home.tools"
+import { useHomeStats } from "@/features/home.tools"
 
 const HowItWorks = () => {  
   const { data: stats } = useHomeStats()

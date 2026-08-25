@@ -3,7 +3,7 @@ import {
 } from "react"
 import { useUrlFilters } from "@/hooks/use-url-filters"
 import { SORTS } from "@/lib/referentiels"
-import { CONFIG_FILTRES } from "@/tools/offres.tools"
+import { CONFIG_FILTRES } from "@/features/offres.tools"
 
 
 const OffresContext = createContext(null)

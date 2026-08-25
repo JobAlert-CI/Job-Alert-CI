@@ -10,7 +10,7 @@ import {
   Tooltip, TooltipContent, TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { Skeleton } from "@/components/ui/skeleton"
-import { POSITIONS_RADAR } from "@/tools/sources.tools"
+import { POSITIONS_RADAR } from "@/features/sources.tools"
 import { CompteReboursScan } from "./CompteReboursScan"
 import { SourceLogo } from "@/components/shared"
 import { useSourcesContext } from "@/contexts/Sources.context"
@@ -90,7 +90,7 @@ const ConsoleScan = () => {
           <div className="min-w-0 flex-1">
             <p className="font-heading text-sm font-bold text-brand-navy">Radar de collecte</p>
             <p className="text-[11px] text-muted-foreground">
-              {dateFr} · dernier passage 06h00
+              {dateFr}
             </p>
           </div>
           <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-brand-navy px-2.5 py-1 text-[10px] font-bold text-white">

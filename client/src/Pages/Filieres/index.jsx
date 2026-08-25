@@ -1,7 +1,7 @@
 import { ErrorBoundary } from "react-error-boundary"
 import Seo from "@/components/seo/Seo"
 import { filieresSeo } from "@/lib/seo"
-import { useFilieresAdapted } from "@/tools/filieres.tools"
+import { useFilieresAdapted } from "@/features/filieres.tools"
 import HeroFilieres from "./sections/HeroFilieres"
 import ReferentielFilieres from "./sections/ReferentielFilieres"
 import BandeMechanique from "./sections/BandeMechanique"

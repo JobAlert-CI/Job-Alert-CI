@@ -4,7 +4,7 @@ import { conseilSeo } from "@/lib/seo"
 import { formatApiError } from "@/api/errors"
 import { BarreProgression, SommaireFlottant } from "@/components/shared"
 import { ConseilDetailProvider, useConseilDetail } from "@/contexts/DetailsConseil.context"
-import { estErreur404 } from "@/tools/conseil-detail.tools"
+import { estErreur404 } from "@/features/conseil-detail.tools"
 import {
   ConseilIntrouvable, DetailSkeleton, ErreurDetail,
 } from "./components/Etats"

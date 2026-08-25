@@ -8,7 +8,7 @@ import {
 import { cn } from "@/lib/utils"
 import { BadgeNouveau, CompanyHover, CtaLink, LinkedinIcon } from "@/components/shared"
 import { publieLabel } from "@/lib/dates"
-import { ENTREPRISE_TOTAL_FALLBACK } from "@/tools/offre-detail.tools"
+import { ENTREPRISE_TOTAL_FALLBACK } from "@/features/offre-detail.tools"
 import { useOffreDetail } from "@/contexts/DetailsOffre.context"
 import ProvenanceStrip from "../components/ProvenanceStrip"
 import CartePostuler from "../components/CartePostuler"

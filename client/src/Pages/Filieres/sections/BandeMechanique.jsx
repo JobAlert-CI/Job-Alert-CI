@@ -3,7 +3,7 @@ import { Fragment } from "react"
 import { Link } from "react-router-dom"
 import { motion } from "framer-motion"
 import { ArrowRight, ChevronRight } from "lucide-react"
-import { ETAPES_MECHANIQUE } from "@/tools/filieres.tools"
+import { ETAPES_MECHANIQUE } from "@/features/filieres.tools"
 
 /* La mécanique — contenu statique, layout desktop-first. */
 const BandeMechanique = () => (

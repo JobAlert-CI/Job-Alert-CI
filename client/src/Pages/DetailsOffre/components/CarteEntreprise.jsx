@@ -2,7 +2,7 @@
 import { motion } from "framer-motion"
 import { Building2, MapPin } from "lucide-react"
 import { useOffreDetail } from "@/contexts/DetailsOffre.context"
-import { ENTREPRISE_TOTAL_FALLBACK } from "@/tools/offre-detail.tools"
+import { ENTREPRISE_TOTAL_FALLBACK } from "@/features/offre-detail.tools"
 import { LogoEntreprise } from "@/components/shared"
 
 const CarteEntreprise = () => {

@@ -10,7 +10,7 @@ import { jourLabel } from "@/lib/dates"
 import { SORTS } from "@/lib/referentiels"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { OffersSkeletonList } from "@/components/shared/SkeletonsOffres"
-import { PAGE_SIZE } from "@/tools/filiere-detail.tools"
+import { PAGE_SIZE } from "@/features/filiere-detail.tools"
 import { useFiliereActiveChips, useFiliereDetail } from "@/contexts/DetailsFiliere.context"
 
 /* En-tête de jour mémoïsable — jourLabel calculé une seule fois. */

@@ -14,6 +14,14 @@ const SIZES = {
   sm: "gap-1.5 rounded-md px-4 py-2 text-[13px]",
 }
 
+/**
+ * Orange « lisible sur fond clair » — #B45309 (amber-700), ratio WCAG 5.02:1 (AA)
+ * contre 2.03:1 pour le brand-orange brut (#F5A623) sur blanc. Cf. Audit.md P0-6.
+ * Usage : texte/icônes orange sur les surfaces claires (bg-card, background).
+ * Sur fond navy, text-brand-orange reste correct (ratio 6.89:1).
+ */
+export const ORANGE_LISIBLE = "text-[#B45309]"
+
 /** to → route ("/inscription") ou ancre ("#chaine"). */
 const CtaLink = ({ to, variant = "primary", size = "lg", icon: Icon, iconRight: IconRight, animateIcon = false, iconRightClassName, children, className, ...rest }) => {
   const isAnchor = typeof to === "string" && to.startsWith("#")

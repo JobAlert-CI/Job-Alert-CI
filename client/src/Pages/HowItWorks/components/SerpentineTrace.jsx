@@ -1,7 +1,7 @@
 // components/SerpentineTrace.jsx
 import { useRef } from "react"
 import { motion, useReducedMotion } from "framer-motion"
-import { TRACE_PATH, TRACE_VIEWBOX } from "@/tools/ccm.tools"
+import { TRACE_PATH, TRACE_VIEWBOX } from "@/features/ccm.tools"
 
 const SerpentineTrace = ({ progress }) => {
   const pathRef = useRef(null)

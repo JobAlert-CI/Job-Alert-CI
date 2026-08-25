@@ -2,7 +2,7 @@
 import { memo } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { pagesAvecEllipses } from "@/tools/conseils.tools"
+import { pagesAvecEllipses } from "@/features/conseils.tools"
 
 const Pagination = memo(function Pagination({
   page, totalPages, depart, nbVisibles, total, onChange,

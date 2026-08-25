@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom"
 import {
   CATEGORIE_DEFAUT, useArticleQuery, useArticlesSimilarQuery, useTrackArticleView,
   adaptArticleDetail, adaptArticlesSimilaires, adaptContenu, normaliserHue,
-} from "@/tools/conseil-detail.tools"
+} from "@/features/conseil-detail.tools"
 
 /* ════════════════════════════════════════════════════════════════════
    CONTEXTE DE PAGE — chaque bloc lit l'article, le contenu, la

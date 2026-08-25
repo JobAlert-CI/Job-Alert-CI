@@ -9,7 +9,7 @@ import { CtaLink, ReassuranceList } from "@/components/shared"
 import { fmtVus } from "@/lib/query-helpers"
 import { dateLabel } from "@/lib/dates"
 import { REASSURANCES } from "@/data/constanteMetier"
-import { joursDepuis, useArticlesQuery, usePopularQuery, useSeriesQuery } from "@/tools/conseils.tools"
+import { joursDepuis, useArticlesQuery, usePopularQuery, useSeriesQuery } from "@/features/conseils.tools"
 import { ListeSkeleton } from "./SkeletonsConseils"
 
 /* ─────────────── Les plus lus — autonome, avec repli sur la liste complète ─────────────── */

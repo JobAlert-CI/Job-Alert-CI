@@ -14,7 +14,7 @@ import {
   useSaveOffreMutation,
   useTrackOffreView,
   fakeHash
-} from "@/tools/offre-detail.tools"
+} from "@/features/offre-detail.tools"
 
 /* ════════════════════════════════════════════════════════════════════
    CONTEXTE DE PAGE — chaque section lit l'offre, la filière et les

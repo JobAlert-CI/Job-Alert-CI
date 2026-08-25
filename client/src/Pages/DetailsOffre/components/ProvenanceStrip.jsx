@@ -3,7 +3,7 @@ import { Fragment } from "react"
 import { motion } from "framer-motion"
 import { Check } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { buildProvenanceSteps } from "@/tools/offre-detail.tools"
+import { buildProvenanceSteps } from "@/features/offre-detail.tools"
 import { useOffreDetail } from "@/contexts/DetailsOffre.context"
 
 /* La chaîne de provenance — l'ADN veille, dès l'ouverture. */

@@ -4,7 +4,7 @@ import { AlertTriangle, ArrowDownAZ, ArrowDownWideNarrow, RefreshCw, Search, X }
 import { cn } from "@/lib/utils"
 import { formatApiError } from "@/api/errors"
 import { FiliereCard } from "@/components/shared"
-import { useFilieresAdapted, useFilieresSearch, computeTop3, splitLargeCompact } from "@/tools/filieres.tools"
+import { useFilieresAdapted, useFilieresSearch, computeTop3, splitLargeCompact } from "@/features/filieres.tools"
 import {
   FiliereEmptyState, FiliereErrorState, FiliereGridSkeleton,
 } from "../components/FiliereStates"

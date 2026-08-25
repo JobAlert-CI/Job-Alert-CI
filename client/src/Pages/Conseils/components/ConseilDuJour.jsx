@@ -7,7 +7,7 @@ import { paletteDepuisHex } from "@/lib/hues"
 import useCarrousel from "@/hooks/use-carrousel"
 import { useGlissement } from "@/hooks/use-glissement"
 import { SegmentsProgression } from "@/components/shared"
-import { DUREE_CONSEIL, variantsGlissementDoux, adaptConseilsQuotidiens, useDailyTipsQuery, useCategoriesQuery } from "@/tools/conseils.tools"
+import { DUREE_CONSEIL, variantsGlissementDoux, adaptConseilsQuotidiens, useDailyTipsQuery, useCategoriesQuery } from "@/features/conseils.tools"
 import { ConseilDuJourSkeleton } from "./SkeletonsConseils"
 
 const ConseilDuJourVide = () => (

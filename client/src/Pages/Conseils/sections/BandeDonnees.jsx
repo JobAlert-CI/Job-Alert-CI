@@ -2,7 +2,7 @@
 import { motion } from "framer-motion"
 import { ArrowRight, Bell, TrendingUp } from "lucide-react"
 import { CountUp, CtaLink } from "@/components/shared"
-import { useArticlesQuery, useCategoriesQuery, useDailyTipsQuery } from "@/tools/conseils.tools"
+import { useArticlesQuery, useCategoriesQuery, useDailyTipsQuery } from "@/features/conseils.tools"
 import { Skeleton } from "@/components/ui/skeleton"
 
 /* Compteurs alimentés par le cache — chaque chiffre a son propre squelette. */

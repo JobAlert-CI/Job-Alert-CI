@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { cn } from "@/lib/utils"
-import { getInitials } from "@/tools/offre-detail.tools"
+import { getInitials } from "@/features/offre-detail.tools"
 
 /* Logo de l'entreprise avec fallback sur les initiales navy
    si l'image est absente ou en erreur (Cf. Audit.md — Pilier 6). */

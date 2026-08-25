@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils"
 import { ChipSource, SourceLogo, LinkedinIcon } from "@/components/shared"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { publieLabel } from "@/lib/dates"
-import { OFFRE_META_ROWS } from "@/tools/offre-detail.tools"
+import { OFFRE_META_ROWS } from "@/features/offre-detail.tools"
 import { useOffreDetail } from "@/contexts/DetailsOffre.context"
 
 /* Panneau postuler — carte blanche sur décalé navy (signature du site).

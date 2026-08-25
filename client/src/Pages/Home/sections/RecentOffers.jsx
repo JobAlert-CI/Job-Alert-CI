@@ -3,7 +3,7 @@ import { Link } from "react-router-dom"
 import { motion } from "framer-motion"
 import { ArrowRight, ArrowUpRight } from "lucide-react"
 import { CountUp, SectionHeading } from "@/components/shared"
-import { useHomeMetrics, useRecentOffers, getViewState } from "@/tools/home.tools"
+import { useHomeMetrics, useRecentOffers, getViewState } from "@/features/home.tools"
 import { RecentOffersFeed } from "../components/RecentOffersFeed"
 import { RepartitionPanel } from "../components/RepartitionPanel"
 

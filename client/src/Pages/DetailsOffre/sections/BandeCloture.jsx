@@ -2,7 +2,7 @@
 import { motion } from "framer-motion"
 import { ArrowRight, Bell } from "lucide-react"
 import { CtaLink } from "@/components/shared"
-import { useCollecteJourQuery } from "@/tools/offre-detail.tools"
+import { useCollecteJourQuery } from "@/features/offre-detail.tools"
 
 /* Chute — dernier appel à l'alerte. Desktop-first : rangée en base. */
 const BandeCloture = () => {

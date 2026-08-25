@@ -10,7 +10,7 @@ import {
   getActiveSources,
   getSourceStatus,
   getTotalNewOffers,
-} from "@/tools/ccm.tools"
+} from "@/features/ccm.tools"
 
 const SkeletonRow = () => (
   <li className="flex items-center gap-3 rounded-lg border border-outline-variant/40 bg-surface-container-lowest px-3.5 py-2.5 h-11">

@@ -8,7 +8,7 @@ import {
   DEFAULT_VILLES,
   useRegisteredOffers,
   useRegisteredReferentials,
-} from "@/tools/registered.tools"
+} from "@/features/registered.data"
 
 /* Non exportée : utilisée uniquement dans ce contexte (react-refresh
    exige un fichier à exports 100 % composants/hooks). Les étapes

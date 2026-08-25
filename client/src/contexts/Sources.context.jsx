@@ -7,7 +7,7 @@ import {
   useGlobalStatsQuery,
   useSourcesListQuery,
   useSourcesStatsQuery,
-} from "@/tools/sources.tools"
+} from "@/features/sources.tools"
 
 const SourcesContext = createContext(null)
 

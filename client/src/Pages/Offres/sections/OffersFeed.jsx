@@ -19,7 +19,7 @@ import {
   useOffresFeedModel,
   useOfferReferentialsQuery,
   useOffersOverviewQuery
-} from "@/tools/offres.tools"
+} from "@/features/offres.tools"
 import { useOffresFilters } from "@/contexts/Offres.context"
 
 /* En-tête de jour mémoïsé — jourLabel calculé une seule fois. */
@@ -95,12 +95,12 @@ const OffersFeed = () => {
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
           >
-            <p className="flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[0.18em] text-brand-orange">
+            <p className="flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[0.18em] text-[#B45309]">
               <span className="h-px w-6 bg-brand-orange" aria-hidden />
               Le flux
             </p>
             <h2 id="offres-flux-titre" className="mt-3 font-heading text-4xl font-extrabold tracking-tight text-brand-navy max-sm:text-3xl">
-              Les offres <span className="text-brand-orange">du moment</span>
+              Les offres <span className="text-[#D97706]">du moment</span>
             </h2>
             {/* Région vivante : le nombre d'offres est annoncé aux lecteurs d'écran */}
             <p className="mt-2 text-sm text-muted-foreground" role="status" aria-live="polite">
@@ -157,7 +157,7 @@ const OffersFeed = () => {
                 <button
                   type="button"
                   onClick={resetTout}
-                  className="rounded-sm px-1 text-xs font-bold text-brand-orange transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="rounded-sm px-1 text-xs font-bold text-[#B45309] transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   Tout effacer
                 </button>

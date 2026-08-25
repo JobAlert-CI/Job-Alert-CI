@@ -18,5 +18,10 @@ export default defineConfig([
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
   },
+  {
+    // Fonctions edge Vercel : runtime node/edge, pas browser
+    files: ['middleware.js', 'api/**/*.js'],
+    languageOptions: { globals: { ...globals.node, process: 'readonly' } },
+  },
   // 'react/prop-types': 0,
 ])

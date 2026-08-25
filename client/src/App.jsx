@@ -26,8 +26,8 @@ const PageIntrouvable = lazy(() => import("./Pages/PageIntrouvable"));
 const Faq = lazy(() => import("./Pages/Support/FAQ"));
 const MentionsLegales = lazy(() => import("./Pages/Support/MentionsLegales"));
 const Contact = lazy(() => import("./Pages/Support/Contact"));
-import { prefetchHome } from "./tools/home.tools";
-import { prefetchHowItWorks } from "./tools/ccm.tools";
+import { prefetchHome } from "./features/home.tools";
+import { prefetchHowItWorks } from "./features/ccm.tools";
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();

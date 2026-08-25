@@ -828,6 +828,9 @@ export const confirmationSeo = () => ({
   keywords: "confirmation email, validation alerte emploi, JobAlert CI",
   type: "website",
   locale: "fr_CI",
+  /* Page à usage unique liée à un token : aucune valeur pour l'index
+     et risque de soft-404 une fois le lien expiré. Cf. Audit Lot 5. */
+  noindex: true,
   structuredData: {
     "@context": "https://schema.org",
     "@graph": [

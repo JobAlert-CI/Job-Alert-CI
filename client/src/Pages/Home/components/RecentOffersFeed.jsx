@@ -1,6 +1,6 @@
 
 import { FeedOffreCard } from "@/components/shared"
-import { useRecentOffers } from "../../../tools/home.tools"
+import { useRecentOffers } from "../../../features/home.tools"
 import { OfferSkeleton } from "./Skeletons"
 import { EmptyOffers } from "./EmptyOffers"
 

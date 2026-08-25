@@ -250,7 +250,7 @@ const EnTeteArticle = () => {
                   typeof window !== "undefined" ? window.location.href : ""
                 )}`}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="inline-flex h-10 items-center gap-2 rounded-lg border border-[#0A66C2]/30 bg-[#0A66C2]/5 px-4 text-xs font-bold text-[#0A66C2] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#0A66C2] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 <LinkedinIcon className="size-3.5" aria-hidden />

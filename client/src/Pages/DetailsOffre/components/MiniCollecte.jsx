@@ -1,7 +1,7 @@
 
 import { motion } from "framer-motion"
 import { SourceLogo } from "@/components/shared"
-import { useCollecteJourQuery } from "@/tools/offre-detail.tools"
+import { useCollecteJourQuery } from "@/features/offre-detail.tools"
 
 const MiniCollecte = () => {
   /* Une seule requête groupée (avant : 2 useFetchData séparés). */

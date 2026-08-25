@@ -17,7 +17,7 @@ import {
   buildApiParams,
   buildScopedCounts,
   filterOffers
-} from "@/tools/filiere-detail.tools"
+} from "@/features/filiere-detail.tools"
 
 /* ════════════════════════════════════════════════════════════════════
    CONTEXTE DE PAGE — chaque section lit la filière, les filtres et le

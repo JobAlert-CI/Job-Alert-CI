@@ -13,7 +13,7 @@ import {
   SEND_TIME_LABEL,
   formatDateFr,
   useSources,
-} from "@/tools/ccm.tools"
+} from "@/features/ccm.tools"
 
 /**
  * Console "run quotidien" — s'alimente seule depuis le cache (useSources).

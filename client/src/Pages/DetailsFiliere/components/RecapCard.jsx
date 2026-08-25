@@ -4,7 +4,7 @@ import { Clock, Mail, ShieldCheck, Zap } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Skeleton } from "@/components/ui/skeleton"
 import { ChipSource } from "@/components/shared"
-import { AVATARS_ABONNES, PIPELINE_RECAP } from "@/tools/filiere-detail.tools"
+import { AVATARS_ABONNES, PIPELINE_RECAP } from "@/features/filiere-detail.tools"
 import { useFiliereDetail } from "@/contexts/DetailsFiliere.context"
 
 /* Récap du jour — autonome : lit le flux chargé depuis le contexte. */

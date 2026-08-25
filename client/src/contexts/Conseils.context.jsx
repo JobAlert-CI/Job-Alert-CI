@@ -9,7 +9,7 @@ import {
   CONFIG_FILTRES, MODES_TRI, PAR_PAGE,
   filtrerEtTrierArticles, normaliser,
   useArticlesQuery, useCategoriesQuery
-} from "@/tools/conseils.tools"
+} from "@/features/conseils.tools"
 
 /* ════════════════════════════════════════════════════════════════════
    ÉTAT DE LA BIBLIOTHÈQUE — filtres URL + recherche + pagination.

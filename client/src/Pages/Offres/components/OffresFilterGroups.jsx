@@ -7,7 +7,7 @@ import { CheckRow, MiniCalendar, SourceLogo } from "@/components/shared"
 import { Skeleton } from "@/components/ui/skeleton"
 import { BRAND_HUE, paletteDepuisHex } from "@/lib/hues"
 import { cn } from "@/lib/utils"
-import { useOfferCountsQuery, useOfferReferentialsQuery } from "@/tools/offres.tools"
+import { useOfferCountsQuery, useOfferReferentialsQuery } from "@/features/offres.tools"
 import { useOffresFilters } from "@/contexts/Offres.context"
 import LocationPicker from "@/components/shared/filters/LocationPicker"
 

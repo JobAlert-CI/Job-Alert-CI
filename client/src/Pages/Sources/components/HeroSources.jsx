@@ -5,7 +5,7 @@ import {
   ArrowRight, Bell, ChevronRight, ShieldCheck,
 } from "lucide-react"
 import { CountUp, CtaLink } from "@/components/shared"
-import { containerVariants, fadeUp } from "@/tools/sources.tools"
+import { containerVariants, fadeUp } from "@/features/sources.tools"
 import { useSourcesContext } from "@/contexts/Sources.context"
 import ConsoleScan from "./ConsoleScan"
 

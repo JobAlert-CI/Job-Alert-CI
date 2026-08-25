@@ -2,7 +2,7 @@
 import { motion } from "framer-motion"
 import { Bell, Zap } from "lucide-react"
 import { CountUp, CtaLink } from "@/components/shared"
-import { useHomeMetrics } from "../../../tools/home.tools"
+import { useHomeMetrics } from "../../../features/home.tools"
 import { RepartitionSkeleton } from "./Skeletons"
 
 /** Contenu du panneau : early returns au lieu de ternaires imbriqués. */

@@ -3,7 +3,7 @@ import { SectionHeading } from "@/components/shared"
 import {
   useArticlesQuery, useCategoriesQuery, useDailyTipsQuery,
   useFeaturedQuery, usePopularQuery, useSeriesQuery
-} from "@/tools/conseils.tools"
+} from "@/features/conseils.tools"
 import { isNotFoundError } from "@/lib/query-helpers"
 import { BibliothequeProvider } from "@/contexts/Conseils.context"
 import { BandeauErreurPartielle } from "../components/Etats"

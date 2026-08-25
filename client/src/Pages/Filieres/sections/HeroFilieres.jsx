@@ -4,7 +4,7 @@ import { motion } from "framer-motion"
 import { ArrowRight, Bell, ChevronRight, LayoutGrid } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
 import { CountUp, CtaLink } from "@/components/shared"
-import { useFilieresAdapted, useGlobalStatsQuery } from "@/tools/filieres.tools"
+import { useFilieresAdapted, useGlobalStatsQuery } from "@/features/filieres.tools"
 import CollectePanel from "../components/CollectePanel"
 
 const containerVariants = {

@@ -8,7 +8,7 @@ import {
   Drawer, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle,
 } from "@/components/ui/drawer"
 import { useState } from "react"
-import { MODES_TRI, TRI_DRAWER } from "@/tools/conseils.tools"
+import { MODES_TRI, TRI_DRAWER } from "@/features/conseils.tools"
 import { useBibliotheque } from "@/contexts/Conseils.context"
 
 /* Barre sticky — consomme le contexte. Desktop-first : la barre complète

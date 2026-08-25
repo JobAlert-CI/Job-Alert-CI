@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom"
 import { Bell, Mail } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { ReassuranceList } from "@/components/shared"
-import { ALERTE_REASSURANCES } from "@/tools/offre-detail.tools"
+import { ALERTE_REASSURANCES } from "@/features/offre-detail.tools"
 import { useOffreDetail } from "@/contexts/DetailsOffre.context"
 
 const CarteAlerte = () => {

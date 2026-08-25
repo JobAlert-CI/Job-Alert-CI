@@ -6,7 +6,7 @@ import {
 } from "@/components/ui/hover-card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { CountUp, CountdownEnvoi, SourceLogo } from "@/components/shared"
-import { useStatsParSourceQuery, adaptSourceStats } from "@/tools/filieres.tools"
+import { useStatsParSourceQuery, adaptSourceStats } from "@/features/filieres.tools"
 
 /* Panneau de collecte — se sert dans le cache et gère LUI-MÊME son
 chargement : le héro n'attend plus ses données. */

@@ -5,7 +5,7 @@ import { isNotFoundError } from "@/lib/query-helpers"
 import { ErrorBoundary } from "react-error-boundary"
 import {
   useArticlesQuery, useCategoriesQuery, useFeaturedQuery
-} from "@/tools/conseils.tools"
+} from "@/features/conseils.tools"
 import { PageErreur } from "./components/Etats"
 import HeroConseils from "./sections/HeroConseils"
 import ConseilDuJour from "./components/ConseilDuJour"

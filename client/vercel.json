@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/sitemap.xml",
-      "destination": "https://nexora-g7kg.onrender.com/sitemap.xml"
+      "destination": "https://job-alert-ci-i6ur.onrender.com/sitemap.xml"
     },
     {
       "source": "/(.*)",

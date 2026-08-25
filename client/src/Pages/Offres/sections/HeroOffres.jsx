@@ -16,7 +16,7 @@ import {
   useOffresFeedModel,
   useOfferReferentialsQuery,
   useOffersOverviewQuery
-} from "@/tools/offres.tools"
+} from "@/features/offres.tools"
 
 /* Variantes définies une seule fois au niveau module */
 const containerVariants = {
@@ -103,7 +103,7 @@ const FluxCard = () => {
         transition={{ delay: 1.2, opacity: { duration: 0.4 }, scale: { duration: 0.4 }, y: { duration: 5.2, repeat: Infinity, ease: "easeInOut", delay: 0.6 } }}
         className="absolute -bottom-4 right-8 z-20 inline-flex rotate-2 items-center gap-1.5 rounded-full border border-outline-variant/50 bg-card px-3.5 py-1.5 text-[11px] font-bold text-on-surface shadow-hover"
       >
-        <Mail className="size-3 text-brand-orange" aria-hidden />
+        <Mail className="size-3 text-[#B45309]" aria-hidden />
         Envoyé à {abonnees.toLocaleString("fr-FR")} abonnés
       </motion.span>
 
@@ -168,7 +168,7 @@ const FluxCard = () => {
                       <Tooltip>
                         <TooltipTrigger>
                           <div className="relative flex cursor-default flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-brand-orange/40 bg-brand-orange/5 px-1 py-2.5 transition-colors hover:border-brand-orange/60 hover:bg-brand-orange/10">
-                            <span className="font-heading text-[16px] font-extrabold text-brand-orange">+{remainingCount}</span>
+                            <span className="font-heading text-[16px] font-extrabold text-[#B45309]">+{remainingCount}</span>
                             <span className="text-[9px] font-semibold text-muted-foreground text-center leading-tight">autres</span>
                           </div>
                         </TooltipTrigger>
@@ -221,7 +221,7 @@ const FluxCard = () => {
                   <span className="flex min-w-0 items-center gap-2">
                     <span className={cn(
                       "relative grid size-7 shrink-0 place-items-center rounded-full border bg-card",
-                      s.done ? "border-emerald-500/40 text-emerald-600" : "border-brand-orange/50 text-brand-orange"
+                      s.done ? "border-emerald-500/40 text-emerald-600" : "border-brand-orange/50 text-[#B45309]"
                     )}>
                       <s.icon className="size-3.5" aria-hidden />
                       {s.done && (
@@ -294,7 +294,7 @@ const HeroOffres = () => {
                 Collecte du jour : {todayLong()}
               </span>
               <span className="inline-flex items-center gap-1.5 rounded-full border border-outline-variant/50 bg-card/80 px-3.5 py-1.5 text-[11px] font-bold text-on-surface-variant">
-                <ShieldCheck className="size-3 text-brand-orange" aria-hidden />
+                <ShieldCheck className="size-3 text-[#B45309]" aria-hidden />
                 {parSource.length || 0} source{parSource.length > 1 ? "s" : ""} scannée{parSource.length > 1 ? "s" : ""} · 0 doublon en base
               </span>
             </motion.div>
@@ -305,7 +305,7 @@ const HeroOffres = () => {
               className="font-heading text-6xl font-black leading-[1.04] tracking-tight text-brand-navy max-xl:text-5xl max-sm:text-4xl"
             >
               Les offres{" "}
-              <span className="relative whitespace-nowrap text-brand-orange">
+              <span className="relative whitespace-nowrap text-[#D97706]">
                 du jour
                 <svg className="absolute -bottom-1.5 left-0 w-full" viewBox="0 0 200 9" fill="none" preserveAspectRatio="none" aria-hidden>
                   <motion.path

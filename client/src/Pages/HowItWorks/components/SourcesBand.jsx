@@ -3,7 +3,7 @@ import { Link } from "react-router-dom"
 import { AlertCircle, ArrowRight } from "lucide-react"
 import { SourceLogo } from "@/components/shared"
 import { Skeleton } from "@/components/ui/skeleton"
-import { useSources } from "@/tools/ccm.tools"
+import { useSources } from "@/features/ccm.tools"
 
 /* Early returns : un état = un rendu. */
 const BandChips = () => {

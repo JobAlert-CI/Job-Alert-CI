@@ -7,10 +7,9 @@ import {
 } from "@/api/public/referentials"
 import { getOffers } from "@/api/public/offers"
 import { settled } from "@/lib/query-helpers"
-import { adaptFilieres } from "@/tools/filieres.tools"
+import { adaptFilieres } from "@/features/filieres.tools"
 import { adaptOffers } from "@/lib/offers-adapter"
 import { CONTRATS, EXPERIENCES, FILIERES_META } from "@/lib/referentiels"
-import { ALL_OFFRES } from "@/data/offres"
 
 export const DEFAULT_VILLES = [
   "Abidjan",
@@ -104,21 +103,18 @@ export const useRegisteredReferentials = () =>
   })
 
 /**
- * Hook TanStack Query pour les offres du récapitulatif
+ * Hook TanStack Query pour les offres du récapitulatif.
+ * Pas de mock de secours : en cas d'échec ou de liste vide, le contexte
+ * affiche l'état vide (« aucune offre ne correspond encore ») plutôt que
+ * de fausses offres de démonstration. Cf. Audit Lot 6.
  */
 export const useRegisteredOffers = () =>
   useQuery({
     queryKey: registeredKeys.offers,
     queryFn: async ({ signal }) => {
-      try {
-        const raw = await getOffers({ limit: 100, sort: "recent" }, { signal })
-        const adapted = adaptOffers(raw)
-        return adapted && adapted.length > 0 ? adapted : ALL_OFFRES
-      } catch {
-        return ALL_OFFRES
-      }
+      const raw = await getOffers({ limit: 100, sort: "recent" }, { signal })
+      return adaptOffers(raw)
     },
     staleTime: 10 * 60 * 1000,
     gcTime: 30 * 60 * 1000,
-    placeholderData: ALL_OFFRES,
   })

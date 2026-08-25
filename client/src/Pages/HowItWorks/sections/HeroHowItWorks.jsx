@@ -8,7 +8,7 @@ import {
   StatusChip,
 } from "@/components/shared"
 import { REASSURANCES } from "@/data/constanteMetier"
-import { containerVariants, fadeUp } from "@/tools/ccm.tools"
+import { containerVariants, fadeUp } from "@/features/ccm.tools"
 import PipelineCard from "../components/PipelineCard"
 
 /* Desktop-first : la grille, les paddings et la typo desktop sont la base ;
@@ -35,7 +35,7 @@ const HeroHowItWorks = () => (
         >
           <motion.div variants={fadeUp} className="flex max-md:hidden">
             <StatusChip tooltip="Scraping à 6h00, dédoublonnage à 6h15, filtrage à 7h00, envoi à 8h00 chaque jour, week-end compris.">
-              Chaîne quotidienne active · dernier run à 6h02
+              Chaîne quotidienne active
             </StatusChip>
           </motion.div>
 

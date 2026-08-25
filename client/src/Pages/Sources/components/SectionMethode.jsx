@@ -3,7 +3,7 @@ import { Link } from "react-router-dom"
 import { motion } from "framer-motion"
 import { ArrowRight, Radar } from "lucide-react"
 import { SectionHeading } from "@/components/shared"
-import { PRINCIPES } from "@/tools/sources.tools"
+import { PRINCIPES } from "@/features/sources.tools"
 
 const SectionMethode = () => (
   <section className="border-y border-outline-variant/30 bg-surface-container-lowest py-16 md:py-20">

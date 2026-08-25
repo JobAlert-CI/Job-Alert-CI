@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom"
 import { motion } from "framer-motion"
 import { Bell, Check, Mail } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { ALERTE_REASSURANCES } from "@/tools/filiere-detail.tools"
+import { ALERTE_REASSURANCES } from "@/features/filiere-detail.tools"
 import { useFiliereDetail } from "@/contexts/DetailsFiliere.context"
 
 /* Bandeau alerte — autonome (meta + hue depuis le contexte). */

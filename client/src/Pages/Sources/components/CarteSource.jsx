@@ -141,7 +141,7 @@ const CarteSource = ({ s, index, featured = false, className }) => {
                 <a
                   href={s.url}
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                   className="inline-flex h-9 items-center gap-1.5 rounded-md border border-outline-variant/60 px-4 text-xs font-bold text-on-surface-variant transition-all duration-200 hover:border-brand-navy/40 hover:text-brand-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   Visiter le site
@@ -209,7 +209,7 @@ const CarteSource = ({ s, index, featured = false, className }) => {
               <a
                 href={s.url}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="inline-flex h-9 items-center gap-1.5 rounded-md border border-outline-variant/60 px-4 text-xs font-bold text-on-surface-variant transition-all duration-200 hover:border-brand-navy/40 hover:text-brand-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 Visiter le site

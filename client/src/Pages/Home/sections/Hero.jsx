@@ -22,7 +22,7 @@ import {
   useHomeStats,
   useFiliereStats,
   useRecentOffers
-} from "@/tools/home.tools"
+} from "@/features/home.tools"
 
 /* ------------------------------------------------------------------ */
 /*  Badge d'état de la collecte — early returns, plus de doubles blocs */

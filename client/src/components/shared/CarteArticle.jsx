@@ -7,7 +7,7 @@ import { paletteDepuisHex } from "@/lib/hues"
 import { dateLabel } from "@/lib/dates"
 import { fmtVus } from "@/lib/query-helpers"
 import BadgeNouveau from "./BadgeNouveau"
-import { joursDepuis } from "@/tools/conseils.tools"
+import { joursDepuis } from "@/features/conseils.tools"
 
 const CarteArticle = ({ a, index = 0, large = false }) => {
   const hue = a.category?.palette ?? paletteDepuisHex(a.category?.color_hex)
