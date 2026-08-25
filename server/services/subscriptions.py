@@ -32,6 +32,67 @@ def _lookup_by_code_or_label(db: Session, model, value: str | None):
     return db.scalar(stmt)
 
 
+def replace_subscriber_filieres(
+    db: Session,
+    *,
+    subscriber: Subscriber,
+    filiere_ids_with_priority: list[tuple[str, int]],
+) -> None:
+    """Remplace les filieres d'un abonne SANS violer les contraintes UNIQUE.
+
+    Bug connu (cahier des charges): clear() + append() dans le meme flush fait
+    partir les INSERT avant les DELETE et viole uq(subscriber_id, priority) /
+    uq(subscriber_id, filiere_id). Strategie sure:
+    1. suppression EXPLICITE des lignes (pas via la collection) ;
+    2. flush pour envoyer les DELETE ;
+    3. expiration de la collection pour eviter toute ligne fantome en memoire ;
+    4. insertion des nouvelles lignes ;
+    5. flush final.
+    """
+
+    if not 1 <= len(filiere_ids_with_priority) <= 3:
+        raise ValueError("Selectionnez entre 1 et 3 filieres")
+    priorities = [priority for _filiere_id, priority in filiere_ids_with_priority]
+    if len(set(priorities)) != len(priorities) or any(priority not in (1, 2, 3) for priority in priorities):
+        raise ValueError("Les priorites de filieres doivent etre uniques et comprises entre 1 et 3")
+
+    # 1-2. Suppression explicite + flush: les DELETE partent en premier.
+    db.query(SubscriberFiliere).filter(SubscriberFiliere.subscriber_id == subscriber.id).delete(
+        synchronize_session=False
+    )
+    db.flush()
+
+    # 3. La collection ORM ne doit plus reference les lignes supprimees.
+    db.expire(subscriber, ["filiere_links"])
+
+    # 4. Insertion des nouvelles lignes.
+    for filiere_id, priority in filiere_ids_with_priority:
+        db.add(SubscriberFiliere(subscriber_id=subscriber.id, filiere_id=filiere_id, priority=priority))
+
+    # 5. Flush: les INSERT partent APRES les DELETE, contraintes respectees.
+    db.flush()
+
+
+def replace_subscriber_contract_preferences(
+    db: Session,
+    *,
+    subscriber: Subscriber,
+    contract_type_ids: list[str],
+) -> None:
+    """Meme logique que replace_subscriber_filieres pour les contrats."""
+
+    unique_contract_type_ids = list(dict.fromkeys(contract_type_ids))
+
+    db.query(SubscriberContractPreference).filter(
+        SubscriberContractPreference.subscriber_id == subscriber.id
+    ).delete(synchronize_session=False)
+    db.flush()
+    db.expire(subscriber, ["contract_preferences"])
+    for contract_type_id in unique_contract_type_ids:
+        db.add(SubscriberContractPreference(subscriber_id=subscriber.id, contract_type_id=contract_type_id))
+    db.flush()
+
+
 def create_subscriber(
     db: Session,
     payload: SubscriberCreate,
@@ -97,26 +158,28 @@ def create_subscriber(
     experience = _lookup_by_code_or_label(db, ExperienceLevel, payload.experience)
     subscriber.experience_level_id = experience.id if experience else None
 
-    subscriber.filiere_links.clear()
-    subscriber.contract_preferences.clear()
-    # Les suppressions doivent partir en base AVANT les nouvelles lignes, sinon
-    # SQLAlchemy insere d'abord et viole uq(subscriber_id, priority).
-    db.flush()
-
     unique_filieres = list(dict.fromkeys(payload.filieres))[:3]
     if not unique_filieres:
         raise ValueError("Selectionnez au moins une filiere")
 
+    filiere_ids_with_priority: list[tuple[str, int]] = []
     for index, filiere_code in enumerate(unique_filieres, start=1):
         filiere = _lookup_by_code_or_label(db, Filiere, filiere_code)
         if filiere is None:
             raise ValueError(f"Filiere inconnue: {filiere_code}")
-        subscriber.filiere_links.append(SubscriberFiliere(filiere_id=filiere.id, priority=index))
+        filiere_ids_with_priority.append((filiere.id, index))
 
+    # Remplacement sur (delete -> flush -> insert): aucune violation possible
+    # des contraintes UNIQUE(subscriber_id, priority) et UNIQUE(subscriber_id,
+    # filiere_id), meme quand les memes filieres sont re-soumises.
+    replace_subscriber_filieres(db, subscriber=subscriber, filiere_ids_with_priority=filiere_ids_with_priority)
+
+    contract_type_ids: list[str] = []
     for contract_value in dict.fromkeys(payload.contract_types):
         contract_type = _lookup_by_code_or_label(db, ContractType, contract_value)
         if contract_type is not None:
-            subscriber.contract_preferences.append(SubscriberContractPreference(contract_type_id=contract_type.id))
+            contract_type_ids.append(contract_type.id)
+    replace_subscriber_contract_preferences(db, subscriber=subscriber, contract_type_ids=contract_type_ids)
 
     # Token de gestion des preferences: un seul actif par abonne.
     existing_purposes = {token.purpose for token in subscriber.tokens if token.revoked_at is None}

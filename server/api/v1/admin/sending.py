@@ -24,6 +24,90 @@ router = APIRouter(
 )
 
 
+@router.post("/prepare", status_code=202)
+async def trigger_preparation(
+    payload: SendTrigger,
+    db: Session = Depends(get_db),
+    admin: Administrator = Depends(get_current_admin),
+):
+    """Déclenche manuellement la phase de préparation des digests (phase 1).
+
+    Réutilise la tâche Celery `prepare_daily_digests` avec les mêmes verrous
+    Redis et marqueurs que le run planifié de 07h30.
+    """
+    from tasks.digests import prepare_daily_digests
+
+    date_override = payload.date_override.isoformat() if payload.date_override else None
+    try:
+        result = prepare_daily_digests.apply_async(
+            kwargs={"date_override": date_override, "force": True},
+            queue="emails",
+        )
+    except Exception as exc:
+        raise HTTPException(status_code=503, detail="Broker Celery injoignable") from exc
+    log_admin_action(
+        db, admin_id=admin.id, action=AdminAction.SEND, target_table="email_digests",
+        details={"action": "prepare", "date_override": date_override, "task_id": result.id},
+    )
+    db.commit()
+    return {"status": "dispatched", "phase": "prepare", "digest_date": date_override, "task_id": result.id}
+
+
+@router.post("/send", status_code=202)
+async def trigger_envoi(
+    payload: SendTrigger,
+    db: Session = Depends(get_db),
+    admin: Administrator = Depends(get_current_admin),
+):
+    """Déclenche manuellement la phase d'envoi des digests `queued` (phase 2)."""
+    from tasks.digests import send_daily_digests
+
+    date_override = payload.date_override.isoformat() if payload.date_override else None
+    try:
+        result = send_daily_digests.apply_async(kwargs={"date_override": date_override}, queue="emails")
+    except Exception as exc:
+        raise HTTPException(status_code=503, detail="Broker Celery injoignable") from exc
+    log_admin_action(
+        db, admin_id=admin.id, action=AdminAction.SEND, target_table="email_digests",
+        details={"action": "send", "date_override": date_override, "task_id": result.id},
+    )
+    db.commit()
+    return {"status": "dispatched", "phase": "send", "digest_date": date_override, "task_id": result.id}
+
+
+@router.post("/run", status_code=202)
+async def trigger_pipeline(
+    payload: SendTrigger,
+    db: Session = Depends(get_db),
+    admin: Administrator = Depends(get_current_admin),
+):
+    """Déclenche les deux phases à la suite: préparation puis envoi.
+
+    L'envoi est publié après la préparation; les verrous Redis distincts et le
+    marqueur de préparation garantissent qu'aucun digest n'est envoyé avant la
+    fin du calcul (sauf SEND_IF_PREPARATION_INCOMPLETE=true).
+    """
+    from celery import chain
+
+    from tasks.digests import prepare_daily_digests, send_daily_digests
+
+    date_override = payload.date_override.isoformat() if payload.date_override else None
+    try:
+        pipeline = chain(
+            prepare_daily_digests.signature(kwargs={"date_override": date_override, "force": True}, queue="emails"),
+            send_daily_digests.signature(kwargs={"date_override": date_override}, queue="emails"),
+        )
+        result = pipeline.apply_async()
+    except Exception as exc:
+        raise HTTPException(status_code=503, detail="Broker Celery injoignable") from exc
+    log_admin_action(
+        db, admin_id=admin.id, action=AdminAction.SEND, target_table="email_digests",
+        details={"action": "run", "date_override": date_override, "task_id": result.id},
+    )
+    db.commit()
+    return {"status": "dispatched", "phases": ["prepare", "send"], "digest_date": date_override, "task_id": result.id}
+
+
 @router.get("/sends", response_model=list[EmailDigestRead])
 async def list_sends(
     db: Session = Depends(get_db),

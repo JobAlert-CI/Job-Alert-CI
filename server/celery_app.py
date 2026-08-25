@@ -11,7 +11,7 @@ celery_app = Celery(
     "jobalert_ci",
     broker=settings.celery_broker_url,
     backend=settings.celery_result_backend,
-    include=["tasks.ai_processing", "tasks.scrapers", "tasks.emails"],
+    include=["tasks.ai_processing", "tasks.scrapers", "tasks.emails", "tasks.digests"],
 )
 
 celery_app.conf.update(
@@ -27,6 +27,13 @@ celery_app.conf.update(
         "tasks.emails.send_confirmation_email_task": {"queue": "emails"},
         "tasks.scrapers.run_source_scraper": {"queue": "ingestion"},
         "tasks.scrapers.run_active_scrapers": {"queue": "ingestion"},
+        "tasks.digests.prepare_daily_digests": {"queue": "emails"},
+        "tasks.digests.build_and_queue_digest": {"queue": "emails"},
+        "tasks.digests.mark_preparation_completed": {"queue": "emails"},
+        "tasks.digests.send_daily_digests": {"queue": "emails"},
+        "tasks.digests.send_digest": {"queue": "emails"},
+        "tasks.digests.mark_sending_completed": {"queue": "emails"},
+        "tasks.digests.retry_failed_digests": {"queue": "emails"},
     },
     beat_schedule={
         "ai-process-raw-offers-sweep": {
@@ -51,6 +58,29 @@ celery_app.conf.update(
             "schedule": crontab(hour=6, minute=10),
             "args": ("educarriere",),
             "options": {"queue": "ingestion"},
+        },
+        # ─── Digest quotidien en 2 phases ─────────────────────────────────
+        # Crontabs exprimees en heure locale du worker (timezone = settings.timezone,
+        # Africa/Abidjan par defaut). Phase 1 a 07h30: fige la selection des offres.
+        "digest-prepare-0730": {
+            "task": "tasks.digests.prepare_daily_digests",
+            "schedule": crontab(
+                hour=settings.daily_digest_prepare_hour,
+                minute=settings.daily_digest_prepare_minute,
+                timezone=settings.digest_timezone,
+            ),
+            "options": {"queue": "emails"},
+        },
+        # Phase 2 a 08h00. Les offres arrivees entre 07h30 et 08h00 seront
+        # incluses dans le digest du lendemain (comportement attendu).
+        "digest-build-0800": {
+            "task": "tasks.digests.build_and_queue_digest",
+            "schedule": crontab(
+                hour=settings.daily_digest_build_hour,
+                minute=settings.daily_digest_build_minute,   
+                timezone=settings.digest_timezone,             
+            ),
+            "options": {"queue": "emails"},
         },
     },
 )

@@ -125,13 +125,45 @@ def resend_confirmation_email(
 
 @router.post("/unsubscribe/{token}")
 def unsubscribe(token: str, reason: str | None = None, db: Session = Depends(get_db)):
-    """Désinscription en 1 clic (lien unique dans chaque email)."""
-    token_obj, subscriber = _get_subscriber_by_token(db, token, TokenPurpose.MANAGE_ALERT)
+    """Désinscription en 1 clic via un token `unsubscribe` à usage unique.
+
+    Idempotent: si l'abonné est déjà désinscrit, on renvoie une réponse
+    apaisée au lieu d'une erreur. Le token est marqué utilisé après contrôle.
+    """
+    from services.token_service import (
+        TokenAlreadyUsedError,
+        TokenExpiredError,
+        validate_token,
+    )
+
+    try:
+        token_obj = validate_token(db, token, purpose=TokenPurpose.UNSUBSCRIBE)
+    except TokenAlreadyUsedError as exc:
+        # Usage unique déjà consommé: réponse idempotente.
+        subscriber = db.scalar(select(Subscriber).where(Subscriber.id == exc.token.subscriber_id))
+        if subscriber is not None and subscriber.status == SubscriberStatus.UNSUBSCRIBED:
+            return {"message": "Désinscription déjà enregistrée"}
+        raise HTTPException(status_code=410, detail="Lien de désinscription déjà utilisé") from exc
+    except TokenExpiredError as exc:
+        raise HTTPException(status_code=410, detail="Lien de désinscription expiré") from exc
+    except Exception as exc:
+        raise HTTPException(status_code=404, detail="Lien invalide ou expiré") from exc
+
+    subscriber = db.scalar(
+        select(Subscriber).where(Subscriber.id == token_obj.subscriber_id, Subscriber.deleted_at.is_(None))
+    )
+    if subscriber is None:
+        raise HTTPException(status_code=404, detail="Abonné introuvable")
+
     now = datetime.now(timezone.utc)
-    subscriber.status = SubscriberStatus.UNSUBSCRIBED
-    subscriber.unsubscribed_at = now
-    subscriber.unsubscribe_reason = reason
-    db.add(UnsubscribeEvent(subscriber_id=subscriber.id, reason=reason, source="email_link"))
+    already_unsubscribed = subscriber.status == SubscriberStatus.UNSUBSCRIBED
+    if not already_unsubscribed:
+        subscriber.status = SubscriberStatus.UNSUBSCRIBED
+        subscriber.unsubscribed_at = now
+        subscriber.unsubscribe_reason = reason
+        db.add(UnsubscribeEvent(subscriber_id=subscriber.id, reason=reason, source="email_link"))
+    # Usage unique: le token ne servira plus.
+    token_obj.used_at = now
     db.commit()
     return {"message": "Désinscription enregistrée"}
 
@@ -145,27 +177,44 @@ def get_preferences(token: str, db: Session = Depends(get_db)):
 
 @router.put("/preferences/{token}", response_model=SubscriberRead)
 def update_preferences(token: str, payload: SubscriberPreferencesUpdate, db: Session = Depends(get_db)):
-    """Modifie les filières / contrats choisis."""
+    """Modifie les filières / contrats choisis via un token `manage_alert`.
+
+    Le remplacement des filières passe par `replace_subscriber_filieres`
+    (delete -> flush -> insert) pour ne jamais violer les contraintes
+    UNIQUE(subscriber_id, priority) et UNIQUE(subscriber_id, filiere_id).
+    """
+    from services.subscriptions import (
+        replace_subscriber_contract_preferences,
+        replace_subscriber_filieres,
+    )
+
     _, subscriber = _get_subscriber_by_token(db, token, TokenPurpose.MANAGE_ALERT)
 
-    # Mettre à jour les filières
-    subscriber.filiere_links.clear()
-    subscriber.contract_preferences.clear()
-    # Flush des suppressions avant les insertions (contraintes d'unicite).
-    db.flush()
+    unique_filieres = list(dict.fromkeys(payload.filieres))
+    if not 1 <= len(unique_filieres) <= 3:
+        raise HTTPException(status_code=400, detail="Sélectionnez entre 1 et 3 filières")
 
-    unique_filieres = list(dict.fromkeys(payload.filieres))[:3]
-    for index, code in enumerate(unique_filieres, start=1):
-        filiere = db.scalar(select(Filiere).where((Filiere.code == code) | (Filiere.slug == code)))
-        if filiere is None:
-            raise HTTPException(status_code=400, detail=f"Filière inconnue: {code}")
-        subscriber.filiere_links.append(SubscriberFiliere(filiere_id=filiere.id, priority=index))
+    try:
+        filiere_ids_with_priority: list[tuple[str, int]] = []
+        for index, code in enumerate(unique_filieres, start=1):
+            filiere = db.scalar(select(Filiere).where((Filiere.code == code) | (Filiere.slug == code)))
+            if filiere is None:
+                raise HTTPException(status_code=400, detail=f"Filière inconnue: {code}")
+            filiere_ids_with_priority.append((filiere.id, index))
 
-    # Mettre à jour les contrats
-    for ct_code in dict.fromkeys(payload.contract_types):
-        ct = db.scalar(select(ContractType).where(ContractType.code == ct_code))
-        if ct is not None:
-            subscriber.contract_preferences.append(SubscriberContractPreference(contract_type_id=ct.id))
+        replace_subscriber_filieres(
+            db, subscriber=subscriber, filiere_ids_with_priority=filiere_ids_with_priority
+        )
+
+        contract_type_ids: list[str] = []
+        for ct_code in dict.fromkeys(payload.contract_types):
+            ct = db.scalar(select(ContractType).where(ContractType.code == ct_code))
+            if ct is not None:
+                contract_type_ids.append(ct.id)
+        replace_subscriber_contract_preferences(db, subscriber=subscriber, contract_type_ids=contract_type_ids)
+    except ValueError as exc:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
 
     subscriber.wants_career_tips = payload.wants_career_tips
     db.commit()

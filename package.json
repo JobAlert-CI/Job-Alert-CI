@@ -9,7 +9,7 @@
     "dev:run": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
     "dev:worker:ingestion": "cd ./server && .\\.venv\\Scripts\\python.exe -m celery -A celery_app.celery_app worker -Q ingestion --loglevel=info --pool=solo",
     "dev:worker:ai": "cd ./server && .\\.venv\\Scripts\\python.exe -m celery -A celery_app.celery_app worker -Q ai --loglevel=info --pool=solo",
-    "dev:worker:emails": "cd ./server && .\\.venv\\Scripts\\python.exe -m celery -A celery_app.celery_app worker -Q emails --loglevel=info --pool=solo",
+    "dev:worker:emails": "cd ./server && .\\.venv\\Scripts\\python.exe -m celery -A celery_app.celery_app worker -Q emails --loglevel=info --pool=solo",    
     "dev:beat": "cd ./server && .\\.venv\\Scripts\\python.exe -m celery -A celery_app.celery_app beat --loglevel=info",
     "scrape:goafrica": "cd ./server && .\\.venv\\Scripts\\python.exe -m celery -A celery_app.celery_app call tasks.scrapers.run_source_scraper --args='[\"goafrica\"]'",
     "scrape:jobivoire": "cd ./server && .\\.venv\\Scripts\\python.exe -m celery -A celery_app.celery_app call tasks.scrapers.run_source_scraper --args='[\"jobivoire\"]'",

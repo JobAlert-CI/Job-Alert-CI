@@ -135,6 +135,40 @@ class Settings:
     resend_webhook_secret: str | None = field(default_factory=lambda: getenv("RESEND_WEBHOOK_SECRET") or None)
     email_bounce_threshold: int = field(default_factory=lambda: _int_env("EMAIL_BOUNCE_THRESHOLD", 2))
     daily_digest_hour: int = field(default_factory=lambda: _int_env("DAILY_DIGEST_HOUR", 8))
+    # ─── Digest quotidien en 2 phases (prompt_send_offres_email.md) ──────
+    # Phase 1 preparation a 07h30, phase 2 envoi a 08h00, Africa/Abidjan.
+    daily_digest_prepare_hour: int = field(default_factory=lambda: _int_env("DAILY_DIGEST_PREPARE_HOUR", 7))
+    daily_digest_prepare_minute: int = field(default_factory=lambda: _int_env("DAILY_DIGEST_PREPARE_MINUTE", 30))
+    daily_digest_send_hour: int = field(default_factory=lambda: _int_env("DAILY_DIGEST_SEND_HOUR", 8))
+    daily_digest_send_minute: int = field(default_factory=lambda: _int_env("DAILY_DIGEST_SEND_MINUTE", 0))
+    digest_timezone: str = field(default_factory=lambda: _str_env("DIGEST_TIMEZONE", "Africa/Abidjan"))
+    digest_max_offers: int = field(default_factory=lambda: _int_env("DIGEST_MAX_OFFERS", 3))
+    digest_min_offers: int = field(default_factory=lambda: _int_env("DIGEST_MIN_OFFERS", 1))
+    digest_send_if_below_min: bool = field(default_factory=lambda: _bool_env("DIGEST_SEND_IF_BELOW_MIN", True))
+    digest_include_no_contract_offers: bool = field(
+        default_factory=lambda: _bool_env("DIGEST_INCLUDE_NO_CONTRACT_OFFERS", False)
+    )
+    digest_include_no_location_offers: bool = field(
+        default_factory=lambda: _bool_env("DIGEST_INCLUDE_NO_LOCATION_OFFERS", True)
+    )
+    experience_match_mode: str = field(default_factory=lambda: _str_env("EXPERIENCE_MATCH_MODE", "compatible"))
+    experience_match_tolerance_years: int = field(
+        default_factory=lambda: _int_env("EXPERIENCE_MATCH_TOLERANCE_YEARS", 1)
+    )
+    city_match_mode: str = field(default_factory=lambda: _str_env("CITY_MATCH_MODE", "normalized_exact"))
+    include_remote_offers: bool = field(default_factory=lambda: _bool_env("INCLUDE_REMOTE_OFFERS", True))
+    include_remote_offers_for_unmatched_city: bool = field(
+        default_factory=lambda: _bool_env("INCLUDE_REMOTE_OFFERS_FOR_UNMATCHED_CITY", True)
+    )
+    digest_city_mode: str = field(default_factory=lambda: _str_env("DIGEST_CITY_MODE", "prefer_city"))
+    digest_prepare_lock_ttl_seconds: int = field(
+        default_factory=lambda: _int_env("DIGEST_PREPARE_LOCK_TTL_SECONDS", 7200)
+    )
+    digest_send_lock_ttl_seconds: int = field(default_factory=lambda: _int_env("DIGEST_SEND_LOCK_TTL_SECONDS", 7200))
+    send_if_preparation_incomplete: bool = field(
+        default_factory=lambda: _bool_env("SEND_IF_PREPARATION_INCOMPLETE", False)
+    )
+    retry_failed_digests_enabled: bool = field(default_factory=lambda: _bool_env("RETRY_FAILED_DIGESTS_ENABLED", False))
     scraper_api_token: str | None = field(default_factory=lambda: getenv("SCRAPER_API_TOKEN") or None)
     ingestion_batch_size_max: int = field(default_factory=lambda: _int_env("INGESTION_BATCH_SIZE_MAX", 500))
     ai_enabled: bool = field(default_factory=lambda: _bool_env("AI_ENABLED", False))

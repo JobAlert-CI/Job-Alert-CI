@@ -1,1 +1,552 @@
-[]
+[
+    {
+        "title": "GESTIONNAIRE ESPACE HOTELIER",
+        "source_url": "https://www.goafricaonline.com/ci/emploi/job-21838-gestionnaire-espace-hotelier",
+        "canonical_url": "https://www.goafricaonline.com/ci/emploi/job-21838-gestionnaire-espace-hotelier",
+        "location_raw": "Abidjan - Côte d’Ivoire",
+        "salary_raw": null,
+        "published_at": "2026-08-24T00:00:00.000Z",
+        "collected_at": "2026-08-25T21:20:15.309Z",
+        "first_seen_at": "2026-08-25T21:20:15.309Z",
+        "last_seen_at": "2026-08-25T21:20:15.309Z",
+        "expires_at": null,
+        "application_deadline_at": null,
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": null,
+            "label": "Abidjan - Côte d’Ivoire"
+        },
+        "contract_type": {
+            "code": "CDD",
+            "label": "CDD"
+        },
+        "experience_level": {
+            "code": "JUNIOR",
+            "label": "de 2 ans à 5 ans d’expérience",
+            "min_years": 2,
+            "max_years": 5
+        },
+        "education_level": {
+            "code": "BAC_PLUS_1",
+            "label": "BAC+1",
+            "rank": 1
+        },
+        "description": "Le/la Gestionnaire d’Espace Hôtelier assure la gestion quotidienne de l’établissement, le développement des ventes et la promotion des services. Il/elle veille à la satisfaction des clients, au développement de la clientèle et à la présence digitale de l’établissement sur le marché de Bongouanou et ses environs. Responsabilités principales * Superviser le fonctionnement quotidien de l’établissement, notamment l’accueil, l’hébergement et la restauration. * Veiller à la qualité des prestations et à la satisfaction des clients. * Suivre les réservations, arrivées, départs et taux d’occupation. * Gérer les incidents, réclamations et demandes particulières. * Développer le chiffre d’affaires grâce à des actions commerciales ciblées. * Prospecter les entreprises, administrations, associations, ONG et particuliers de Bongouanou et environs. * Commercialiser les chambres, salles, espaces de restauration et autres services. * Mettre en place des offres promotionnelles, forfaits et packages. * Développer et fidéliser un portefeuille de clients et partenaires. * Gérer les réseaux sociaux de l’établissement : Facebook, Instagram, TikTok, etc. * Créer et publier des contenus : photos, vidéos, offres, événements et témoignages clients. * Assurer la gestion commerciale via WhatsApp Business. * Répondre aux demandes et messages des prospects et clients. * Développer la visibilité de l’établissement sur Google et les plateformes de réservation. * Élaborer et mettre en œuvre un plan marketing local. * Organiser des campagnes promotionnelles et des événements commerciaux. * Mettre en place des actions de fidélisation et de parrainage. * Suivre les résultats des actions marketing et proposer des améliorations. * Suivre les ventes, réservations, recettes et principaux indicateurs de performance. * Élaborer des rapports périodiques sur les activités commerciales et opérationnelles. * Assurer une veille concurrentielle sur les établissements hôteliers de la zone. * Proposer des solutions pour améliorer la rentabilité et la qualité des services. Profil recherché * Bonne capacité d’organisation et de gestion. * Sens commercial et orientation résultats. * Bon relationnel et sens de l’accueil. * Maîtrise des réseaux sociaux et des outils de communication digitale. * Capacité à prospecter et à développer une clientèle locale. * Aptitude à gérer plusieurs activités simultanément. * Dynamisme, autonomie, créativité et esprit d’initiative. * Bonne capacité de reporting et de suivi des indicateurs. Conditions proposées * 2 mois d’essai à 75 000 FCFA/mois. * 100 000 FCFA/mois à partir du 3ᵉ mois si la période d’essai est concluante. * Logement ou prime de logement. * Prime de communication de 10 000 FCFA/mois. Pour postuler, cliquer sur le bouton « Postuler ».",
+        "company": {
+            "name": "MOZAR GROUP",
+            "website_url": "https://www.goafricaonline.com/ci/787207-mozar-group-formation-professionnelle-abidjan-cote-ivoire",
+            "type": "Formation professionnelle > Formation en comptabilité, droit et finance",
+            "description": "Entreprise spécialisée dans la communication digitale, la Comptabilité et la Formation professionnelle."
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": "Sans télétravail",
+        "raw_fields": {
+            "contract_raw": "CDD",
+            "experience_raw": "de 2 ans à 5 ans d’expérience",
+            "education_raw": "Bac+1",
+            "published_raw": "Posté le 24 août 2026",
+            "expires_raw": null
+        },
+        "télétravail": "Sans télétravail",
+        "is_télétravail": false,
+        "active": "2026-08-24T00:00:00.000Z"
+    },
+    {
+        "title": "SECRETAIRE STAGIAIRE - AGBOVILLE",
+        "source_url": "https://www.goafricaonline.com/ci/emploi/job-21839-secretaire-stagiaire-agboville",
+        "canonical_url": "https://www.goafricaonline.com/ci/emploi/job-21839-secretaire-stagiaire-agboville",
+        "location_raw": "Agboville - Côte d’Ivoire",
+        "salary_raw": null,
+        "published_at": "2026-08-24T00:00:00.000Z",
+        "collected_at": "2026-08-25T21:20:23.413Z",
+        "first_seen_at": "2026-08-25T21:20:23.413Z",
+        "last_seen_at": "2026-08-25T21:20:23.413Z",
+        "expires_at": null,
+        "application_deadline_at": null,
+        "location": {
+            "country_code": null,
+            "city": null,
+            "district": null,
+            "label": "Agboville - Côte d’Ivoire"
+        },
+        "contract_type": {
+            "code": "STAGE",
+            "label": "Stage"
+        },
+        "experience_level": {
+            "code": "JUNIOR",
+            "label": "- de 2 ans d’expérience",
+            "min_years": null,
+            "max_years": 2
+        },
+        "education_level": {
+            "code": "BAC_PLUS_2",
+            "label": "BAC+2",
+            "rank": 2
+        },
+        "description": "Felkon Connect SARL, spécialisée dans l’innovation agricole et la gestion de projets durables, recherche un(e) stagiaire de qualification pour assister la Direction dans la gestion quotidienne et administrative de l’entreprise. Missions principales * Assister la Direction dans la gestion quotidienne des activités. * Rédiger, classer et assurer le suivi de la correspondance administrative. * Organiser les rendez-vous et gérer l’agenda du gérant. * Préparer les réunions et assurer le suivi des actions décidées. * Contribuer au bon fonctionnement administratif de l’entreprise. Profil recherché * Être titulaire au minimum d’un Bac+2, notamment en Assistant(e) de Direction ou équivalent. * Aucune expérience professionnelle exigée. * Résider obligatoirement à Agboville. * Avoir un bon sens de l’organisation et de l’autonomie. * Faire preuve de discrétion et respecter la confidentialité. * Maîtriser les outils informatiques, notamment Word, Excel et Internet. Lieu du stage Agboville. La résidence à Agboville est obligatoire. Pour postuler, cliquer sur le bouton « Postuler ».",
+        "company": {
+            "name": "FELKON CONNECT SARL",
+            "website_url": "https://www.goafricaonline.com/ci/1366711-felkon-connect-materiels-equipements-agricoles-agboville-cote-ivoire",
+            "type": "Agroalimentaire > Matériels et équipements agricoles",
+            "description": null
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": "Sans télétravail",
+        "raw_fields": {
+            "contract_raw": "Stage",
+            "experience_raw": "- de 2 ans d’expérience",
+            "education_raw": "Bac+2",
+            "published_raw": "Posté le 24 août 2026",
+            "expires_raw": null
+        },
+        "télétravail": "Sans télétravail",
+        "is_télétravail": false,
+        "active": "2026-08-24T00:00:00.000Z"
+    },
+    {
+        "title": "VENDEUSE SUR STAND",
+        "source_url": "https://www.goafricaonline.com/ci/emploi/job-21840-vendeuse-sur-stand",
+        "canonical_url": "https://www.goafricaonline.com/ci/emploi/job-21840-vendeuse-sur-stand",
+        "location_raw": "Abidjan - Côte d’Ivoire",
+        "salary_raw": null,
+        "published_at": "2026-08-24T00:00:00.000Z",
+        "collected_at": "2026-08-25T21:20:31.472Z",
+        "first_seen_at": "2026-08-25T21:20:31.472Z",
+        "last_seen_at": "2026-08-25T21:20:31.472Z",
+        "expires_at": null,
+        "application_deadline_at": null,
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": null,
+            "label": "Abidjan - Côte d’Ivoire"
+        },
+        "contract_type": {
+            "code": "CDD",
+            "label": "CDD"
+        },
+        "experience_level": {
+            "code": "JUNIOR",
+            "label": "de 2 ans à 5 ans d’expérience",
+            "min_years": 2,
+            "max_years": 5
+        },
+        "education_level": {
+            "code": null,
+            "label": null,
+            "rank": null
+        },
+        "description": "Assurer la vente et la promotion des produits Lait et Dêguê sur stand afin d’atteindre les objectifs commerciaux et de renforcer la notoriété de la marque. Missions principales * Accueillir, informer et conseiller les clients sur les produits. * Installer et maintenir le stand propre, attractif et bien approvisionné. * Mettre en valeur les produits et supports publicitaires. * Réceptionner les produits et contrôler les quantités. * Assurer le réassort et prévenir les ruptures de stock. * Encaisser les ventes et effectuer le point de caisse quotidien. * Produire un rapport des ventes et recueillir les retours des clients. * Respecter strictement les règles d’hygiène alimentaire et de conservation au frais. * Représenter positivement l’image de la marque auprès des clients. Profil recherché * Savoir lire et écrire. * Une expérience en vente directe ou en grande distribution (GMS) serait un atout. * Bonne présentation et aisance relationnelle. * Goût pour la vente et capacité à convaincre. * Être dynamique, souriante et professionnelle. * Honnêteté, rigueur et ponctualité. * Bonne résistance au stress. * Sens du contact et orientation client. Pour postuler, cliquer sur le bouton « Postuler ».",
+        "company": {
+            "name": "EMIYA INTÉRIM & CONSEILS",
+            "website_url": "https://www.goafricaonline.com/ci/1198703-emiya-interim-conseils-gestion-ressources-humaines-abidjan-cote-ivoire",
+            "type": "Comptabilité, juridique et conseil > Gestion des ressources humaines",
+            "description": "Nos différentes activités sont: Recrutement Gestion Ressource humaine Externalisation RH Externalisation de la paie Solution RH Formation"
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": "Sans télétravail",
+        "raw_fields": {
+            "contract_raw": "CDD",
+            "experience_raw": "de 2 ans à 5 ans d’expérience",
+            "education_raw": null,
+            "published_raw": "Posté le 24 août 2026",
+            "expires_raw": null
+        },
+        "télétravail": "Sans télétravail",
+        "is_télétravail": false,
+        "active": "2026-08-24T00:00:00.000Z"
+    },
+    {
+        "title": "Commercial à moto",
+        "source_url": "https://www.goafricaonline.com/ci/emploi/job-21841-commercial-a-moto",
+        "canonical_url": "https://www.goafricaonline.com/ci/emploi/job-21841-commercial-a-moto",
+        "location_raw": "Abidjan - Côte d’Ivoire",
+        "salary_raw": null,
+        "published_at": "2026-08-24T00:00:00.000Z",
+        "collected_at": "2026-08-25T21:20:42.299Z",
+        "first_seen_at": "2026-08-25T21:20:42.299Z",
+        "last_seen_at": "2026-08-25T21:20:42.299Z",
+        "expires_at": null,
+        "application_deadline_at": null,
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": null,
+            "label": "Abidjan - Côte d’Ivoire"
+        },
+        "contract_type": {
+            "code": "CDD",
+            "label": "CDD"
+        },
+        "experience_level": {
+            "code": "JUNIOR",
+            "label": "- de 2 ans d’expérience",
+            "min_years": null,
+            "max_years": 2
+        },
+        "education_level": {
+            "code": null,
+            "label": null,
+            "rank": null
+        },
+        "description": "Développer et fidéliser un portefeuille clients pour la vente et la distribution des produits, prospecter de nouveaux points de vente et assurer le suivi commercial sur le terrain. Missions principales * Visiter quotidiennement les boutiques, maquis, alimentations, marchés et supermarchés de proximité. * Prospecter de nouveaux clients et présenter les produits. * Enregistrer les commandes et assurer leur suivi. * Relancer les clients et veiller à la bonne rotation des stocks. * Effectuer ou coordonner les livraisons. * Assurer le recouvrement des factures clients dans les délais. * Mettre en valeur les produits dans les vitrines, linéaires et espaces de vente. * Vérifier les dates limites de consommation et l’état des produits chez les clients. * Produire un rapport journalier des visites, ventes, stocks et retours du marché. * Respecter le code de la route, entretenir la moto et appliquer les consignes de sécurité. Profil recherché * Niveau BEPC minimum. * Expérience obligatoire en vente terrain et prospection. * Permis A obligatoire. * Bonne maîtrise de la conduite d’une moto. * Bonne connaissance du terrain d’Abidjan. * Dynamisme, persévérance et autonomie. * Bonnes capacités de négociation. * Honnêteté, organisation et sens du service client. * Être à l’aise avec les objectifs commerciaux chiffrés. Avantages * Salaire fixe : 100 000 FCFA/mois. * Assurance tous risques pour la moto et le commercial pendant les heures de travail. * Primes sur objectifs de vente et de recouvrement. * Carburant : 15 000 FCFA/semaine. * Crédit de communication fourni. Conditions de travail * Horaires : du lundi au samedi. * Déplacements quotidiens sur le terrain. * Zone d’intervention : secteur attribué par le Responsable Commercial. Pour postuler, cliquer sur le bouton « Postuler ».",
+        "company": {
+            "name": "EMIYA INTÉRIM & CONSEILS",
+            "website_url": "https://www.goafricaonline.com/ci/1198703-emiya-interim-conseils-gestion-ressources-humaines-abidjan-cote-ivoire",
+            "type": "Comptabilité, juridique et conseil > Gestion des ressources humaines",
+            "description": "Nos différentes activités sont: Recrutement Gestion Ressource humaine Externalisation RH Externalisation de la paie Solution RH Formation"
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": "Sans télétravail",
+        "raw_fields": {
+            "contract_raw": "CDD",
+            "experience_raw": "- de 2 ans d’expérience",
+            "education_raw": null,
+            "published_raw": "Posté le 24 août 2026",
+            "expires_raw": null
+        },
+        "télétravail": "Sans télétravail",
+        "is_télétravail": false,
+        "active": "2026-08-24T00:00:00.000Z"
+    },
+    {
+        "title": "COMMERCIAL (E) EN INFORMATIQUE",
+        "source_url": "https://www.goafricaonline.com/ci/emploi/job-21842-commercial-e-en-informatique",
+        "canonical_url": "https://www.goafricaonline.com/ci/emploi/job-21842-commercial-e-en-informatique",
+        "location_raw": "Abidjan - Côte d’Ivoire",
+        "salary_raw": null,
+        "published_at": "2026-08-24T00:00:00.000Z",
+        "collected_at": "2026-08-25T21:20:52.921Z",
+        "first_seen_at": "2026-08-25T21:20:52.921Z",
+        "last_seen_at": "2026-08-25T21:20:52.921Z",
+        "expires_at": null,
+        "application_deadline_at": null,
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": null,
+            "label": "Abidjan - Côte d’Ivoire"
+        },
+        "contract_type": {
+            "code": "CDI",
+            "label": "CDI"
+        },
+        "experience_level": {
+            "code": "JUNIOR",
+            "label": "- de 2 ans d’expérience",
+            "min_years": null,
+            "max_years": 2
+        },
+        "education_level": {
+            "code": "BAC_PLUS_2",
+            "label": "BAC+2",
+            "rank": 2
+        },
+        "description": "Promouvoir et commercialiser des solutions informatiques auprès d’une clientèle professionnelle, développer le portefeuille clients et contribuer à l’atteinte des objectifs commerciaux. Missions principales * Prospecter de nouveaux clients : entreprises, PME et institutions. * Identifier les besoins des clients et proposer des solutions informatiques adaptées. * Présenter et commercialiser les logiciels, matériels et services IT. * Négocier les offres et conclure les ventes. * Assurer le suivi commercial et fidéliser les clients existants. * Participer à l’élaboration et à la mise en œuvre de la stratégie commerciale avec la Direction Générale. * Contribuer à la définition des objectifs commerciaux. * Identifier de nouvelles opportunités de marché et proposer des plans d’action. * Assurer un reporting régulier des activités commerciales à la Direction Générale. Profil recherché * Bac+2/3 en Commerce, Gestion commerciale, Informatique ou diplôme équivalent. * Minimum 1 an d’expérience dans la vente de solutions informatiques/IT. * Excellentes compétences en communication, vente et négociation. * Bonne capacité d’organisation et autonomie. * Esprit d’équipe et sens du relationnel. * Dynamisme, rigueur et ouverture aux nouvelles technologies. * Forte orientation résultats. * L’anglais constitue un atout. Pour postuler, cliquer sur le bouton « Postuler ».",
+        "company": {
+            "name": "VARIANCE GRH",
+            "website_url": "https://www.goafricaonline.com/ci/87712-variance-grh-agences-recrutement-abidjan-cote-ivoire",
+            "type": "Emploi > Agences de recrutement",
+            "description": "Recrutement, formation, intérim, conseil GRH, courrier express (variance express)"
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": "Sans télétravail",
+        "raw_fields": {
+            "contract_raw": "CDI",
+            "experience_raw": "- de 2 ans d’expérience",
+            "education_raw": "Bac+2",
+            "published_raw": "Posté le 24 août 2026",
+            "expires_raw": null
+        },
+        "télétravail": "Sans télétravail",
+        "is_télétravail": false,
+        "active": "2026-08-24T00:00:00.000Z"
+    },
+    {
+        "title": "DIRECTEUR GÉNÉRAL (H/F)",
+        "source_url": "https://www.goafricaonline.com/ci/emploi/job-21843-directeur-general-hf",
+        "canonical_url": "https://www.goafricaonline.com/ci/emploi/job-21843-directeur-general-hf",
+        "location_raw": "Abidjan - Côte d’Ivoire",
+        "salary_raw": "200 k/300 k F CFA / mois",
+        "published_at": "2026-08-24T00:00:00.000Z",
+        "collected_at": "2026-08-25T21:21:02.806Z",
+        "first_seen_at": "2026-08-25T21:21:02.806Z",
+        "last_seen_at": "2026-08-25T21:21:02.806Z",
+        "expires_at": null,
+        "application_deadline_at": null,
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": null,
+            "label": "Abidjan - Côte d’Ivoire"
+        },
+        "contract_type": {
+            "code": "CDD",
+            "label": "CDD"
+        },
+        "experience_level": {
+            "code": "SENIOR",
+            "label": "+ de 5 ans d’expérience",
+            "min_years": 5,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_5",
+            "label": "BAC+5",
+            "rank": 5
+        },
+        "description": "Sous l’autorité du Conseil d’Administration, le/la Directeur(trice) Général(e) définit et met en œuvre la stratégie de DJOGANA PAY SA, assure son développement et sa rentabilité, et veille au respect des exigences légales, réglementaires et prudentielles applicables aux établissements de monnaie électronique dans l’espace UEMOA. Principales responsabilités * Définir et déployer la stratégie de développement de l’entreprise. * Piloter les performances commerciales, financières et opérationnelles. * Développer le portefeuille clients, le réseau de distribution et les partenariats stratégiques. * Superviser l’ensemble des directions et services. * Maîtriser les charges et améliorer la rentabilité. * Développer les relations avec les banques, institutions financières et acteurs de l’écosystème des paiements. * Superviser le développement et la commercialisation des produits et services de monnaie électronique. * Garantir le respect des réglementations applicables dans l’espace UEMOA et des exigences de la BCEAO. * Superviser les dispositifs de conformité, contrôle interne, gestion des risques et lutte contre le blanchiment de capitaux et le financement du terrorisme. * Assurer les relations avec la BCEAO, la Commission Bancaire de l’UMOA et les autres autorités compétentes. * Représenter la société auprès des partenaires et parties prenantes. * Présenter au Conseil d’Administration les résultats, indicateurs de performance et orientations stratégiques. * Promouvoir une culture de performance, d’innovation, de responsabilité et de conformité. Profil recherché * Bac+5 minimum en Banque, Finance, Économie, Gestion, Droit, Management ou domaine équivalent. * Au moins 15 ans d’expérience dans le secteur bancaire, financier, des paiements ou de la monnaie électronique. * Expérience significative en direction générale, direction exécutive ou management stratégique. * Excellente connaissance de l’environnement bancaire et financier de l’UEMOA. * Maîtrise des règlements, instructions et circulaires de la BCEAO relatifs à la monnaie électronique et aux services de paiement. * Solide maîtrise des exigences en matière de conformité, contrôle interne, gestion des risques et LBC/FT. * Expérience confirmée dans le pilotage d’équipes et d’organisations complexes. * Excellentes compétences en gestion financière, développement commercial et gouvernance. * Forte capacité de décision, de négociation et de représentation institutionnelle. * Leadership affirmé, vision stratégique et forte orientation résultats. * Intégrité, rigueur, discrétion et sens élevé des responsabilités. Pour postuler, cliquer sur le bouton « Postuler ».",
+        "company": {
+            "name": "Djogana Holding",
+            "website_url": "https://www.goafricaonline.com/ci/786020-djogana-holding",
+            "type": "Bâtiment et construction > Construction",
+            "description": "Djoganan Holding"
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": "Sans télétravail",
+        "raw_fields": {
+            "contract_raw": "CDD",
+            "experience_raw": "+ de 5 ans d’expérience",
+            "education_raw": "Bac+5 et plus",
+            "published_raw": "Posté le 24 août 2026",
+            "expires_raw": null
+        },
+        "télétravail": "Sans télétravail",
+        "is_télétravail": false,
+        "active": "2026-08-24T00:00:00.000Z"
+    },
+    {
+        "title": "STAGIAIRE – ASSISTANT(E) ACHATS",
+        "source_url": "https://www.goafricaonline.com/ci/emploi/job-21844-stagiaire-assistante-achats",
+        "canonical_url": "https://www.goafricaonline.com/ci/emploi/job-21844-stagiaire-assistante-achats",
+        "location_raw": "Abidjan - Côte d’Ivoire",
+        "salary_raw": null,
+        "published_at": "2026-08-24T00:00:00.000Z",
+        "collected_at": "2026-08-25T21:21:12.346Z",
+        "first_seen_at": "2026-08-25T21:21:12.346Z",
+        "last_seen_at": "2026-08-25T21:21:12.346Z",
+        "expires_at": "2030-10-09T00:00:00.000Z",
+        "application_deadline_at": "2030-10-09T00:00:00.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": null,
+            "label": "Abidjan - Côte d’Ivoire"
+        },
+        "contract_type": {
+            "code": "STAGE",
+            "label": "Stage"
+        },
+        "experience_level": {
+            "code": "JUNIOR",
+            "label": "- de 2 ans d’expérience",
+            "min_years": null,
+            "max_years": 2
+        },
+        "education_level": {
+            "code": "BAC_PLUS_2",
+            "label": "BAC+2",
+            "rank": 2
+        },
+        "description": "Dans le cadre du renforcement de son équipe, ELEMEC recherche un(e) Stagiaire Assistant(e) Achats pour développer ses compétences dans les domaines des achats, de l’approvisionnement et de la logistique. Missions principales * Participer à la gestion et au suivi des approvisionnements. * Assurer le suivi des commandes, des délais et des livraisons. * Participer à la gestion des relations avec les fournisseurs. * Contribuer au suivi des stocks et à la disponibilité des produits. * Mettre à jour les documents et outils de suivi des achats. * Classer, organiser et archiver les documents liés aux achats et à la logistique. * Apporter un appui administratif à l’équipe Achats dans ses activités quotidiennes. Profil recherché * Être étudiant(e) en Achats, Logistique, Supply Chain, Gestion des Approvisionnements ou domaine similaire. * Une première expérience ou des connaissances en achats constituent un atout. * Bonne maîtrise de Microsoft Excel et Word. * Rigueur, organisation et esprit d’analyse. * Capacité à gérer plusieurs tâches simultanément. * Bon relationnel et esprit d’équipe. * Curiosité, dynamisme et capacité d’adaptation. * Sens des responsabilités et volonté d’apprendre. Pour postuler, cliquer sur le bouton « Postuler ».",
+        "company": {
+            "name": "ELEMEC",
+            "website_url": "https://www.goafricaonline.com/ci/785968-elemec",
+            "type": "Industries > Matériels et équipements industriels",
+            "description": null
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": "Sans télétravail",
+        "raw_fields": {
+            "contract_raw": "Stage",
+            "experience_raw": "- de 2 ans d’expérience",
+            "education_raw": "Bac+2",
+            "published_raw": "Posté le 24 août 2026",
+            "expires_raw": "mercredi 9 octobre 2030 à 00:00"
+        },
+        "télétravail": "Sans télétravail",
+        "is_télétravail": false,
+        "active": "2026-08-24T00:00:00.000Z"
+    },
+    {
+        "title": "STAGIAIRE RH",
+        "source_url": "https://www.goafricaonline.com/ci/emploi/job-21845-stagiaire-rh",
+        "canonical_url": "https://www.goafricaonline.com/ci/emploi/job-21845-stagiaire-rh",
+        "location_raw": "Zone Industrielle Abidjan - Côte d’Ivoire",
+        "salary_raw": null,
+        "published_at": "2026-08-24T00:00:00.000Z",
+        "collected_at": "2026-08-25T21:21:22.830Z",
+        "first_seen_at": "2026-08-25T21:21:22.830Z",
+        "last_seen_at": "2026-08-25T21:21:22.830Z",
+        "expires_at": null,
+        "application_deadline_at": null,
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": null,
+            "label": "Zone Industrielle Abidjan - Côte d’Ivoire"
+        },
+        "contract_type": {
+            "code": "STAGE",
+            "label": "Stage"
+        },
+        "experience_level": {
+            "code": "JUNIOR",
+            "label": "- de 2 ans d’expérience",
+            "min_years": null,
+            "max_years": 2
+        },
+        "education_level": {
+            "code": "BAC_PLUS_2",
+            "label": "BAC+2",
+            "rank": 2
+        },
+        "description": "Administration RH * Rédiger les notes et documents RH : comptes rendus, notes d’information et notes de service. * Préparer les attestations de congés, de reprise et les certificats d’aptitude. * Tenir à jour le registre des équipements de protection individuelle (EPI). Gestion du temps de travail * Traiter et suivre les absences du personnel. * Planifier les congés annuels et organiser les intérims aux différents postes. * Veiller à la conformité des plannings de travail. * Assurer le suivi des entrées et sorties du personnel via le système biométrique. * Maintenir à jour les informations relatives aux travailleurs. Gestion des contrats de travail * Élaborer les contrats de travail des différentes catégories de personnel, hors cadres. * Préparer les documents d’embauche et constituer les dossiers individuels. * Suivre les échéances des contrats et alerter la hiérarchie. * Préparer et notifier les documents de départ dans les délais légaux. Gestion disciplinaire * Rédiger les demandes d’explication en collaboration avec les responsables hiérarchiques. * Assurer le suivi des procédures disciplinaires. * Veiller au respect des délais de notification des sanctions. * S’assurer du respect du règlement intérieur, des notes de service et des instructions de travail. CNPS, assurance et mutuelle * Assurer l’immatriculation des travailleurs auprès de l’IPS-CNPS et de l’IPS-CNAM. * Veiller à l’affiliation des nouvelles recrues auprès de l’assureur et de la mutuelle. Reporting RH * Élaborer les tableaux de bord sociaux relatifs au personnel, notamment sur l’absentéisme et les congés. * Assurer le suivi et la mise à jour des données RH. Système d’information RH * Tenir à jour les dossiers administratifs individuels des salariés. * Veiller à l’actualisation régulière des informations dans le système d’information des ressources humaines. Pour postuler, cliquer sur le bouton « Postuler ».",
+        "company": {
+            "name": "COPACI (COSMETIQUE ET PARFUMS DE COTE D'IVOIRE)",
+            "website_url": "https://www.goafricaonline.com/ci/48185-copaci-hygiene-corporelle-abidjan-cote-ivoire",
+            "type": "Hygiène > Hygiène corporelle",
+            "description": null
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": "Sans télétravail",
+        "raw_fields": {
+            "contract_raw": "Stage",
+            "experience_raw": "- de 2 ans d’expérience",
+            "education_raw": "Bac+2",
+            "published_raw": "Posté le 24 août 2026",
+            "expires_raw": null
+        },
+        "télétravail": "Sans télétravail",
+        "is_télétravail": false,
+        "active": "2026-08-24T00:00:00.000Z"
+    },
+    {
+        "title": "Assistante Administrative et Ressources Humaines",
+        "source_url": "https://www.goafricaonline.com/ci/emploi/job-21846-assistante-administrative-et-ressources-humaines",
+        "canonical_url": "https://www.goafricaonline.com/ci/emploi/job-21846-assistante-administrative-et-ressources-humaines",
+        "location_raw": "Abidjan - Côte d’Ivoire",
+        "salary_raw": "250 k/500 k F CFA / mois",
+        "published_at": "2026-08-24T00:00:00.000Z",
+        "collected_at": "2026-08-25T21:21:31.817Z",
+        "first_seen_at": "2026-08-25T21:21:31.817Z",
+        "last_seen_at": "2026-08-25T21:21:31.817Z",
+        "expires_at": null,
+        "application_deadline_at": null,
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": null,
+            "label": "Abidjan - Côte d’Ivoire"
+        },
+        "contract_type": {
+            "code": "STAGE",
+            "label": "Stage"
+        },
+        "experience_level": {
+            "code": "JUNIOR",
+            "label": "de 2 ans à 5 ans d’expérience",
+            "min_years": 2,
+            "max_years": 5
+        },
+        "education_level": {
+            "code": "BAC_PLUS_2",
+            "label": "BAC+2",
+            "rank": 2
+        },
+        "description": "MG Home Services, opérant sous licence de la marque O2, propose des services à domicile à Abidjan, notamment le ménage, la cuisine, la garde d’enfants, l’accompagnement des personnes âgées et le repassage. Dans le cadre du développement de ses activités, l’entreprise recherche un(e) Assistant(e) RH pour renforcer sa gestion administrative et des ressources humaines. Missions principales * Diffuser les offres d’emploi et présélectionner les candidatures. * Réaliser les entretiens de premier niveau et vérifier les références des candidats. * Constituer et maintenir un vivier de candidats disponibles. * Organiser l’intégration des nouveaux collaborateurs. * Présenter les procédures internes et les règles de conduite. * Assurer le suivi des contrats : rédaction, renouvellement et avenants. * Tenir à jour les dossiers individuels : pointage, absences, avertissements et évaluations. * Suivre quotidiennement la présence des intervenants et signaler les anomalies. * Préparer les éléments variables de paie : heures travaillées, primes et majorations. * Suivre les régularisations CNPS et les échéances de cotisations sociales. * Veiller au respect de la réglementation ivoirienne du travail. * Gérer les absences et réclamations selon les procédures internes. * Préparer les courriers disciplinaires avec la Direction. * Contribuer à la fidélisation des collaborateurs et au maintien d’un bon climat social. Profil recherché * Bac+2 minimum en Gestion des Ressources Humaines, Administration d’Entreprise ou domaine équivalent. * Minimum 2 ans d’expérience dans une fonction similaire. * Une expérience dans les services à la personne, l’intérim ou les prestations de services est un atout. * Maîtrise de Word, Excel, PowerPoint et Google Sheets. * Bonne maîtrise des outils numériques de gestion. * Connaissance du droit du travail ivoirien et du régime CNPS. * La maîtrise d’outils d’IA comme ChatGPT ou Claude constitue un plus. Qualités recherchées * Rigueur et sens de l’organisation. * Excellente gestion des priorités. * Aisance relationnelle et diplomatie. * Autonomie et discrétion. * Loyauté et sens des responsabilités. * Capacité à gérer des situations humaines sensibles. * Esprit d’équipe et orientation résultats. * Adhésion aux valeurs de respect, d’excellence, d’attitude positive et d’esprit d’équipe. Pour postuler, cliquer sur le bouton « Postuler ».",
+        "company": {
+            "name": "MG HOME SERVICES",
+            "website_url": "https://www.goafricaonline.com/ci/1190207-mg-home-prestation-service-services-abidjan-cote-ivoire",
+            "type": "Marketing & marketing digital > Prestation de service",
+            "description": null
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": "Sans télétravail",
+        "raw_fields": {
+            "contract_raw": "Stage",
+            "experience_raw": "de 2 ans à 5 ans d’expérience",
+            "education_raw": "Bac+2",
+            "published_raw": "Posté le 24 août 2026",
+            "expires_raw": null
+        },
+        "télétravail": "Sans télétravail",
+        "is_télétravail": false,
+        "active": "2026-08-24T00:00:00.000Z"
+    },
+    {
+        "title": "Chauffeurs",
+        "source_url": "https://www.goafricaonline.com/ci/emploi/job-21847-chauffeurs",
+        "canonical_url": "https://www.goafricaonline.com/ci/emploi/job-21847-chauffeurs",
+        "location_raw": "Abidjan - Côte d’Ivoire",
+        "salary_raw": null,
+        "published_at": "2026-08-24T00:00:00.000Z",
+        "collected_at": "2026-08-25T21:21:39.187Z",
+        "first_seen_at": "2026-08-25T21:21:39.187Z",
+        "last_seen_at": "2026-08-25T21:21:39.187Z",
+        "expires_at": null,
+        "application_deadline_at": null,
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": null,
+            "label": "Abidjan - Côte d’Ivoire"
+        },
+        "contract_type": {
+            "code": "INCONNU",
+            "label": null
+        },
+        "experience_level": {
+            "code": "JUNIOR",
+            "label": "de 2 ans à 5 ans d’expérience",
+            "min_years": 2,
+            "max_years": 5
+        },
+        "education_level": {
+            "code": "BAC",
+            "label": "BAC",
+            "rank": 0
+        },
+        "description": "Poste proposé : Chauffeur – Cocody Angré Mission principale Assurer la conduite sur différents trajets, effectuer les courses et missions confiées, tout en veillant à l’entretien, à la propreté et au bon état du véhicule. Missions principales * Assurer les déplacements et trajets professionnels. * Effectuer les courses, commissions et missions confiées. * Veiller à la propreté et au bon état du véhicule. * Effectuer les contrôles de base : huile, eau, liquide de frein et pression des pneus. * Savoir effectuer des opérations simples comme le changement d’une roue. * Planifier les vidanges, visites techniques, assurances et petits dépannages. * Adopter une conduite éco-responsable afin d’optimiser la consommation de carburant. * Maîtriser les manœuvres en milieu urbain : stationnement, créneau et marche arrière. * Maîtriser les principaux itinéraires d’Abidjan. Qualités recherchées * Ponctualité et respect strict des horaires. * Réactivité et disponibilité face aux imprévus. * Discrétion et respect de la confidentialité. * Courtoisie, bonne présentation et politesse. * Vigilance et respect du code de la route. * Bonne maîtrise de la conduite défensive. Exigences du poste * Être titulaire d’un permis de conduire toutes catégories. * Résider obligatoirement à Cocody Angré. Pour postuler, cliquer sur le bouton « Postuler ».",
+        "company": {
+            "name": "ARIANE",
+            "website_url": "https://www.goafricaonline.com/ci/95368-ariane-produits-chimiques-abidjan-cote-ivoire",
+            "type": "Industries > Produits chimiques",
+            "description": null
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": "Sans télétravail",
+        "raw_fields": {
+            "contract_raw": null,
+            "experience_raw": "de 2 ans à 5 ans d’expérience",
+            "education_raw": "Bac",
+            "published_raw": "Posté le 24 août 2026",
+            "expires_raw": null
+        },
+        "télétravail": "Sans télétravail",
+        "is_télétravail": false,
+        "active": "2026-08-24T00:00:00.000Z"
+    }
+]

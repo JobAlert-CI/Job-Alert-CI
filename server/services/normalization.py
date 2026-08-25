@@ -30,3 +30,29 @@ def hash_offer(*parts: str | None) -> str:
 
 def token_hash(token: str) -> str:
     return hashlib.sha256(token.encode("utf-8")).hexdigest()
+
+
+# Mots parasites retires d'une ville saisie en texte libre (pays, codes pays).
+_CITY_PARASITE_PHRASES = ("cote d ivoire", "cote divoire", "ivory coast")
+_CITY_PARASITE_TOKENS = {"ivoire", "ci", "republique"}
+
+
+def normalize_city(value: str | None) -> str:
+    """Normalise une ville libre en etendant normalize_text().
+
+    Gere le format Ville - Quartier (on garde la partie ville), puis retire
+    les mentions du pays. Le resultat doit rester comparable avec
+    Location.normalized_label construit via normalize_text().
+    """
+
+    raw = (value or "").strip()
+    if not raw:
+        return ""
+    # Format Ville - Quartier : seule la premiere partie est la ville.
+    if "-" in raw:
+        raw = raw.split("-", 1)[0]
+    text = normalize_text(raw)
+    for phrase in _CITY_PARASITE_PHRASES:
+        text = text.replace(phrase, " ")
+    tokens = [token for token in text.split() if token not in _CITY_PARASITE_TOKENS]
+    return " ".join(tokens).strip()
