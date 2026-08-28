@@ -4,7 +4,7 @@ import { Link } from "react-router-dom"
 import { motion } from "framer-motion"
 import { Bell, ChevronDown, ChevronRight } from "lucide-react"
 import { formatApiError } from "@/api/errors"
-import { CountUp, CtaLink, StatusChip } from "@/components/shared"
+import { CountUp, CtaLink } from "@/components/shared"
 import { moyenneLecture, containerVariants, fadeUp, useArticlesQuery, useCategoriesQuery, useFeaturedQuery, } from "@/features/conseils.tools"
 import CarteUne from "../components/CarteUne"
 import { EtatErreur } from "../components/Etats"
@@ -56,12 +56,6 @@ const HeroConseils = () => {
             animate="visible"
             className="flex flex-col items-start gap-5"
           >
-            <motion.div variants={fadeUp}>
-              <StatusChip tooltip="Un nouveau conseil publié chaque mardi à 8h00, en même temps que la collecte des 4 sources.">
-                Nouveau conseil chaque mardi · 8h00
-              </StatusChip>
-            </motion.div>
-
             <motion.h1
               variants={fadeUp}
               className="font-heading text-6xl font-black leading-[1.06] tracking-tight text-brand-navy max-xl:text-5xl max-sm:text-4xl"

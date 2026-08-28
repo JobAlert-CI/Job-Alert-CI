@@ -106,7 +106,7 @@ const OfferCard = ({
         target="_blank"
         rel="noopener noreferrer"
         onClick={(e) => offre.lien ? undefined : e.preventDefault()}
-        className="inline-flex h-8 items-center gap-1 px-2.5 font-heading text-xs font-bold text-[#B45309] transition-colors hover:underline"
+        className="inline-flex h-8 items-center gap-1 px-2.5 font-heading text-xs font-bold text-brand-orange transition-colors hover:underline"
       >
         Postuler
         <ArrowUpRight className="size-3.5 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />

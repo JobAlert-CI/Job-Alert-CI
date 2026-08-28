@@ -408,9 +408,9 @@ const Footer = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                     key={source.id || source.code}
-                    className="inline-flex items-center gap-2 px-1.5 py-1.5 text-[0.5rem] font-semibold text-white transition-colors hover:bg-card/20 rounded-full"
+                    className="inline-flex items-center gap-0.5 px-1.5 py-1.5 text-[0.5rem] font-semibold text-white transition-colors hover:bg-card/20 rounded-full"
                   >
-                    <SourceLogo code={source.code || source.name} className="size-4" />
+                    <SourceLogo code={source.code || source.name} className="size-4 text-[6px] bg-card text-brand-navy" />
                     {source.name}
                   </a>
                 ))}

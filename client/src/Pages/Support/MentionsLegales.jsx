@@ -190,7 +190,7 @@ const CorpsMentions = () => (
 
               {/* Résumé en clair */}
               <div className="mt-4 rounded-xl border-l-4 border-brand-orange bg-brand-orange/5 p-5">
-                <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-[#B45309]">
+                <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-brand-orange">
                   <Sparkles className="size-3.5" />
                   En clair
                 </p>

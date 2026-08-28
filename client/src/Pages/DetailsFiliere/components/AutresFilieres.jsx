@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom"
 import { motion } from "framer-motion"
-import { ArrowRight, ArrowUpRight } from "lucide-react"
+import { ArrowRight, ArrowUpRight, Briefcase } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Skeleton } from "@/components/ui/skeleton"
 import { BRAND_HUE } from "@/lib/hues"
@@ -80,8 +80,8 @@ const AutresFilieres = () => {
                     style={h.style}
                     className="group flex items-center gap-3.5 rounded-xl border border-outline-variant/50 bg-card p-4 shadow-soft transition-all duration-300 hover:-translate-y-1 hover:border-brand-navy/25 hover:shadow-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
-                    <span className={cn("flex size-11 shrink-0 items-center justify-center rounded-lg transition-transform duration-300 group-hover:scale-105", h.tile)}>
-                      <f.icon className="size-5" strokeWidth={2} aria-hidden />
+                    <span className={cn("flex size-11 shrink-0 items-center justify-center rounded-lg transition-colors duration-200 group-hover:scale-105", h.tile, h.tileHover)}>
+                      <Briefcase className="size-5" strokeWidth={2} />
                     </span>
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-heading text-sm font-bold text-brand-navy">{f.label}</p>

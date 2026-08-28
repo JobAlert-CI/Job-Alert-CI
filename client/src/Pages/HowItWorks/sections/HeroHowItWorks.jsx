@@ -5,7 +5,6 @@ import {
   CountdownEnvoi,
   CtaLink,
   ReassuranceList,
-  StatusChip,
 } from "@/components/shared"
 import { REASSURANCES } from "@/data/constanteMetier"
 import { containerVariants, fadeUp } from "@/features/ccm.tools"
@@ -33,12 +32,6 @@ const HeroHowItWorks = () => (
           animate="visible"
           className="flex flex-col items-start gap-5"
         >
-          <motion.div variants={fadeUp} className="flex max-md:hidden">
-            <StatusChip tooltip="Scraping à 6h00, dédoublonnage à 6h15, filtrage à 7h00, envoi à 8h00 chaque jour, week-end compris.">
-              Chaîne quotidienne active
-            </StatusChip>
-          </motion.div>
-
           <motion.h1
             variants={fadeUp}
             className="font-heading text-6xl font-black leading-[1.06] tracking-tight text-brand-navy max-sm:text-4xl max-xl:text-5xl"

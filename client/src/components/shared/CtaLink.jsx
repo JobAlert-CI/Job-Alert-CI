@@ -20,7 +20,7 @@ const SIZES = {
  * Usage : texte/icônes orange sur les surfaces claires (bg-card, background).
  * Sur fond navy, text-brand-orange reste correct (ratio 6.89:1).
  */
-export const ORANGE_LISIBLE = "text-[#B45309]"
+export const ORANGE_LISIBLE = "text-brand-orange"
 
 /** to → route ("/inscription") ou ancre ("#chaine"). */
 const CtaLink = ({ to, variant = "primary", size = "lg", icon: Icon, iconRight: IconRight, animateIcon = false, iconRightClassName, children, className, ...rest }) => {

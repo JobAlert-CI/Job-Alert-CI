@@ -63,16 +63,6 @@ const HeroFiliere = () => {
             animate="visible"
             className="flex flex-col items-start gap-5"
           >
-            <motion.div variants={fadeUp} className="flex items-center gap-3.5">
-              <span className={cn("flex size-16 items-center justify-center rounded-xl shadow-soft", hue.tile)}>
-                <meta.icon className="size-8" strokeWidth={1.8} aria-hidden />
-              </span>
-              <span className="inline-flex items-center gap-2 rounded-full border border-outline-variant/50 bg-card/80 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-on-surface-variant backdrop-blur-sm">
-                <span className={cn("size-1.5 rounded-full", hue.dot)} aria-hidden />
-                Filière métier
-              </span>
-            </motion.div>
-
             <motion.h1
               variants={fadeUp}
               className="font-heading text-6xl font-black leading-[1.05] tracking-tight text-brand-navy max-xl:text-5xl max-sm:text-4xl"

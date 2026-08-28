@@ -5,8 +5,11 @@ import { cn } from "@/lib/utils"
 import FilterPopover from "./filters/FilterPopover"
 
 /** Chip unitaire — état actif navy, badge compteur orange. */
-export const ChipFiltre = ({ code, label, icon: Icon, count, actif, onSelect, className }) => {
+export const ChipFiltre = ({ code, label, color_hex, count, actif, onSelect, className }) => {
   const active = actif === code
+
+  const style = {'--border-color': color_hex, '--background-color': color_hex};
+  
   return (
     <button
       onClick={() => onSelect?.(code)}
@@ -14,12 +17,12 @@ export const ChipFiltre = ({ code, label, icon: Icon, count, actif, onSelect, cl
       className={cn(
         "inline-flex shrink-0 items-center gap-2 rounded-full border px-3.5 py-2 text-xs font-bold transition-all duration-200",
         active
-          ? "border-brand-navy bg-brand-navy text-white shadow-soft"
+          ? "border-[var(--border-color)] bg-[var(--background-color)] text-white shadow-soft"
           : "border-outline-variant/60 bg-card text-on-surface-variant hover:-translate-y-0.5 hover:border-brand-navy/40 hover:text-brand-navy",
         className
       )}
+      style={style}
     >
-      {Icon && <Icon className="size-3.5" />}
       {label}
       {count != null && (
         <span className={cn(
@@ -44,6 +47,8 @@ const ChipsFiltres = ({ chips, actif, onSelect, max = 6, className }) => {
   const visibles = deborde ? chips.slice(0, max) : chips
   const cachees = deborde ? chips.slice(max) : []
   const nbActivesCachees = cachees.filter((c) => c.code === actif).length
+
+  console.log(visibles)
 
   return (
     <div className={cn("flex flex-wrap items-center gap-2", className)}>

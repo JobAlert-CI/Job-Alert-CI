@@ -28,7 +28,7 @@ const formatDateFr = () => {
 
 /* ═══ Panneau radar — gère ses propres états ═══ */
 const ConsoleScan = () => {
-  const { sources, nbSourcesActives, sourcesQuery, statsQuery } = useSourcesContext()
+  const { sources, sourcesQuery, statsQuery } = useSourcesContext()
   const dateFr = useMemo(() => formatDateFr(), [])
 
   const isLoading = (sourcesQuery.isPending || statsQuery.isPending) && sources.length === 0
@@ -66,7 +66,7 @@ const ConsoleScan = () => {
       >
         <Radar className="size-3" aria-hidden />
         {sources.length > 0
-          ? `${nbSourcesActives}/${sources.length} sources actives`
+          ? `${sources.length} sources actives`
           : isLoading ? "Chargement…" : "Aucune source"}
       </motion.span>
 

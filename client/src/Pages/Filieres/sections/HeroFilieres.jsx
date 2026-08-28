@@ -1,7 +1,7 @@
 
 import { Link } from "react-router-dom"
 import { motion } from "framer-motion"
-import { ArrowRight, Bell, ChevronRight, LayoutGrid } from "lucide-react"
+import { ArrowRight, Bell, ChevronRight } from "lucide-react"
 import { Skeleton } from "@/components/ui/skeleton"
 import { CountUp, CtaLink } from "@/components/shared"
 import { useFilieresAdapted, useGlobalStatsQuery } from "@/features/filieres.tools"
@@ -59,25 +59,6 @@ const HeroFilieres = () => {
             animate="visible"
             className="flex flex-col items-start gap-5"
           >
-            {/* Badges — chacun n'apparaît que lorsque SA donnée est prête */}
-            <motion.div variants={fadeUp} className="flex flex-wrap items-center gap-2.5">
-              {!filieresPending && (
-                <span className="inline-flex items-center gap-2 rounded-full border border-outline-variant/50 bg-card/80 px-3.5 py-1.5 text-[11px] font-bold uppercase tracking-[0.14em] text-on-surface-variant backdrop-blur-sm">
-                  <LayoutGrid className="size-3 text-brand-orange" aria-hidden />
-                  {filieres.length} filière{filieres.length > 1 ? "s" : ""} couverte{filieres.length > 1 ? "s" : ""}
-                </span>
-              )}
-              {!statsPending && (
-                <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-3.5 py-1.5 text-[11px] font-bold text-emerald-700">
-                  <span className="relative flex size-1.5" aria-hidden>
-                    <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-500 opacity-70" />
-                    <span className="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
-                  </span>
-                  Collecte terminée
-                </span>
-              )}
-            </motion.div>
-
             <motion.h1
               variants={fadeUp}
               className="font-heading text-6xl font-black leading-[1.04] tracking-tight text-brand-navy max-xl:text-5xl max-sm:text-4xl"

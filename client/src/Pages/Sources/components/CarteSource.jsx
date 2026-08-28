@@ -77,14 +77,14 @@ const CarteSource = ({ s, index, featured = false, className }) => {
         <div className="grid gap-6 p-6 sm:p-7 lg:grid-cols-[1.2fr_0.8fr] max-lg:grid-cols-1">
           <div>
             <div className="flex flex-wrap items-center gap-3">
-              <SourceLogo code={s.code} className="size-16" />
+              <SourceLogo code={s.code} className="size-16 text-3xl font-black" />
               <div>
                 <div className="flex flex-wrap items-center gap-2">
                   <h3 className="font-heading text-xl font-extrabold tracking-tight text-brand-navy">
                     {s.code}
                   </h3>
                   {s.principal && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-brand-orange/15 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-[#B45309]">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-brand-orange/15 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-brand-orange">
                       <Crown className="size-3" aria-hidden />
                       Source principale
                     </span>
@@ -155,7 +155,7 @@ const CarteSource = ({ s, index, featured = false, className }) => {
         /* ═══ Carte compacte ═══ */
         <div className="flex h-full flex-col p-6">
           <div className="flex items-center gap-3">
-            <SourceLogo code={s.code} />
+            <SourceLogo code={s.code} className="size-11 text-xl font-black" />
             <div className="min-w-0">
               <h3 className="truncate font-heading text-lg font-extrabold tracking-tight text-brand-navy">
                 {s.code}

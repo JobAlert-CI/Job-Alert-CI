@@ -125,7 +125,7 @@ const AllTile = ({ to, icon: Icon, label, count, unit }) => (
       to={to}
       className="group flex items-center gap-3 rounded-lg border border-dashed border-outline-variant/70 p-2.5 transition-all duration-200 hover:-translate-y-0.5 hover:border-brand-orange hover:bg-orange-50/70"
     >
-      <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-brand-orange/10 text-[#B45309] transition-colors duration-200 group-hover:bg-brand-orange group-hover:text-on-primary">
+      <span className="flex size-10 shrink-0 items-center justify-center rounded-md bg-brand-orange/10 text-brand-orange transition-colors duration-200 group-hover:bg-brand-orange group-hover:text-on-primary">
         <Icon className="size-5" strokeWidth={2} />
       </span>
       <span className="min-w-0">
@@ -134,7 +134,7 @@ const AllTile = ({ to, icon: Icon, label, count, unit }) => (
           {count} {unit}
         </span>
       </span>
-      <ArrowUpRight className="ml-auto size-3.5 shrink-0 -translate-x-1 text-[#B45309] opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100" />
+      <ArrowUpRight className="ml-auto size-3.5 shrink-0 -translate-x-1 text-brand-orange opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100" />
     </Link>
   </motion.div>
 )
@@ -161,7 +161,7 @@ const ConseilTile = ({ a, rank }) => {
           </span>
         </span>
         <span className="min-w-0">
-          <span className="block truncate-2 text-[13px] font-semibold leading-tight text-on-surface transition-colors duration-200 group-hover:text-[#B45309]">
+          <span className="block truncate-2 text-[13px] font-semibold leading-tight text-on-surface transition-colors duration-200 group-hover:text-brand-orange">
             {a.titre}
           </span>
           <span className="mt-1 flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground">
@@ -281,7 +281,7 @@ const Header = () => {
       <ChevronDown
         className={cn(
           "size-3.5 transition-transform duration-300",
-          openMenu === name ? "rotate-180 text-[#B45309]" : "text-muted-foreground"
+          openMenu === name ? "rotate-180 text-brand-orange" : "text-muted-foreground"
         )}
       />
     </Link>
@@ -476,12 +476,12 @@ const Header = () => {
                 {/* Bandeau bas — inchangé */}
                 <div className="flex flex-col items-start justify-between gap-3 border-t border-outline-variant/40 bg-surface-container-low/60 px-5 py-4 sm:flex-row sm:items-center md:px-8 lg:px-12">
                   <p className="flex items-center gap-2 text-[13px] text-on-surface-variant">
-                    <Bell className="size-4 shrink-0 text-[#B45309]" />
+                    <Bell className="size-4 shrink-0 text-brand-orange" />
                     Recevez uniquement les offres de vos filières, chaque matin à 8h00 dans votre boîte mail.
                   </p>
                   <Link
                     to="/inscription"
-                    className="group inline-flex items-center gap-1.5 text-[13px] font-bold text-brand-navy transition-colors hover:text-[#B45309]"
+                    className="group inline-flex items-center gap-1.5 text-[13px] font-bold text-brand-navy transition-colors hover:text-brand-orange"
                   >
                     Créer mon alerte gratuite
                     <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
@@ -574,12 +574,12 @@ const Header = () => {
                 {/* Bandeau bas */}
                 <div className="flex flex-col items-start justify-between gap-3 border-t border-outline-variant/40 bg-surface-container-low/60 px-5 py-4 sm:flex-row sm:items-center md:px-8 lg:px-12">
                   <p className="flex items-center gap-2 text-[13px] text-on-surface-variant">
-                    <BookOpen className="size-4 shrink-0 text-[#B45309]" />
+                    <BookOpen className="size-4 shrink-0 text-brand-orange" />
                     Un conseil pratique glissé dans chaque récapitulatif quotidien, envoyé à 8h00.
                   </p>
                   <Link
                     to="/inscription"
-                    className="group inline-flex items-center gap-1.5 text-[13px] font-bold text-brand-navy transition-colors hover:text-[#B45309]"
+                    className="group inline-flex items-center gap-1.5 text-[13px] font-bold text-brand-navy transition-colors hover:text-brand-orange"
                   >
                     Créer mon alerte gratuite
                     <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />

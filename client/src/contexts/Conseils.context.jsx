@@ -68,7 +68,7 @@ export const BibliothequeProvider = ({ children }) => {
 
   const chipsDefs = useMemo(
     () => [
-      { code: "tous", label: "Tous", icon: null, count: articles.length },
+      { code: "tous", label: "Tous", icon: null, color_hex: "#0F2D4D", count: articles.length },
       ...categoriesPourFiltres.map((c) => ({
         ...c,
         count: articles.filter((a) => a.category?.code === c.code).length,

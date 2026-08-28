@@ -1,7 +1,7 @@
 
 import { Link } from "react-router-dom"
 import { motion } from "framer-motion"
-import { ArrowRight, ArrowUpRight } from "lucide-react"
+import { ArrowRight, ArrowUpRight, Briefcase } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { cn } from "@/lib/utils"
 import { HUES, paletteDepuisHex } from "@/lib/hues"
@@ -27,7 +27,7 @@ const FiliereLargeCard = ({ f, index, className }) => {
         <div className={cn("pointer-events-none absolute -right-16 -top-16 size-44 rounded-full blur-3xl opacity-0 transition-opacity duration-500 group-hover:opacity-100", hue.glow)} aria-hidden />
         <div className="flex items-start gap-3">
           <span className={cn("flex size-12 shrink-0 items-center justify-center rounded-lg transition-all duration-400 group-hover:scale-110 group-hover:-rotate-3", hue.tile, hue.tileHover)}>
-            <f.icon className="size-6" strokeWidth={1.9} />
+            <Briefcase className="size-6" strokeWidth={1.9} />
           </span>
           <div className="ml-auto flex items-center gap-2">
             {f.nouvelles > 0 && <BadgeNouveau label={`+${f.nouvelles} ce matin`} />}
@@ -90,7 +90,7 @@ const FiliereCompactCard = ({ f, index, className }) => {
         style={{ borderLeft: `3px solid ${hue.hex}`, ...hue.style }}
       >
         <span className={cn("flex size-11 shrink-0 items-center justify-center rounded-lg transition-all duration-400 group-hover:scale-110", hue.tile, hue.tileHover)}>
-          <f.icon className="size-5" strokeWidth={2} />
+          <Briefcase className="size-5" strokeWidth={2} />
         </span>
         <div className="min-w-0 flex-1">
           <p className="truncate-2 font-heading text-[15px] font-bold text-brand-navy transition-colors duration-300 group-hover:text-brand-orange">
@@ -103,7 +103,7 @@ const FiliereCompactCard = ({ f, index, className }) => {
           <p className="mt-0.5 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">offres</p>
         </div>
         {f.nouvelles > 0 && (
-          <span className="shrink-0 rounded-full bg-brand-orange/15 px-2 py-0.5 text-[10px] font-bold text-[#B45309]">+{f.nouvelles}</span>
+          <span className="shrink-0 rounded-full bg-brand-orange/15 px-2 py-0.5 text-[10px] font-bold text-brand-orange">+{f.nouvelles}</span>
         )}
         <ArrowUpRight className="size-4 shrink-0 text-outline-variant transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-brand-orange" />
       </Link>

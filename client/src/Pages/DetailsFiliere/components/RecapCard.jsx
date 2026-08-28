@@ -3,9 +3,9 @@ import { motion } from "framer-motion"
 import { Clock, Mail, ShieldCheck, Zap } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Skeleton } from "@/components/ui/skeleton"
-import { ChipSource } from "@/components/shared"
 import { AVATARS_ABONNES, PIPELINE_RECAP } from "@/features/filiere-detail.tools"
 import { useFiliereDetail } from "@/contexts/DetailsFiliere.context"
+import { ChipSource } from "@/components/shared"
 
 /* Récap du jour — autonome : lit le flux chargé depuis le contexte. */
 const RecapCard = () => {
@@ -63,8 +63,8 @@ const RecapCard = () => {
       {/* Carte */}
       <div className="relative overflow-hidden rounded-2xl border border-outline-variant/40 bg-card shadow-[0_24px_48px_-16px_rgba(15,45,77,0.22)]">
         <div className="flex items-center gap-3 border-b border-outline-variant/40 bg-surface-container-low/60 px-5 py-4">
-          <span className={cn("flex size-9 shrink-0 items-center justify-center rounded-lg", hue.tile)}>
-            <meta.icon className="size-4.5" strokeWidth={2} aria-hidden />
+          <span className="size-7.5 bg-card rounded-full">
+            <img src="/logo2.svg" alt="JobAlert CI" className="h-full w-auto object-contain" loading="eager" />
           </span>
           <div className="min-w-0 flex-1">
             <p className="truncate font-heading text-sm font-bold text-brand-navy">Récap du jour · {meta.label}</p>
@@ -133,7 +133,7 @@ const RecapCard = () => {
                   <p className="truncate text-[11px] text-muted-foreground">{o?.entreprise} · {o?.ville}</p>
                 </div>
                 {o?.jours === 0 && (
-                  <span className="hidden shrink-0 rounded-full bg-brand-orange/15 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-[#B45309] sm:inline">
+                  <span className="hidden shrink-0 rounded-full bg-brand-orange/15 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-brand-orange sm:inline">
                     Nouveau
                   </span>
                 )}

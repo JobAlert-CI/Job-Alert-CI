@@ -4,7 +4,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 
 const TONES = {
   emerald: "border-emerald-500/25 bg-emerald-500/10 text-emerald-700",
-  orange:  "border-brand-orange/30 bg-brand-orange/10 text-[#B45309]",
+  orange:  "border-brand-orange/30 bg-brand-orange/10 text-brand-orange",
   navy:    "border-brand-navy/20 bg-brand-navy/5 text-brand-navy",
 }
 const DOTS = { emerald: "bg-emerald-500", orange: "bg-brand-orange", navy: "bg-brand-navy" }

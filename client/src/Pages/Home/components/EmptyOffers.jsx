@@ -8,7 +8,7 @@ export const EmptyOffers = ({ onRetryOffers }) => (
       Aucune nouvelle offre pour le moment.
     </p>
     <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
-      La prochaine collecte arrive à 6h00. Inscrivez-vous pour recevoir votre
+      La prochaine collecte est en cours de collecte. Inscrivez-vous pour recevoir votre
       récapitulatif personnalisé à 8h00.
     </p>
     <div className="flex items-center justify-center-safe gap-3">

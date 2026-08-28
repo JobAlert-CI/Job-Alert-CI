@@ -13,11 +13,11 @@ import {
 import { BRAND_HUE, paletteDepuisHex } from "@/lib/hues"
 import { SORTS } from "@/lib/referentiels"
 import useClickOutside from "@/hooks/use-click-outside"
-import { 
+import {
   useOffresFeedModel,
-  getLocationLabel, 
+  getLocationLabel,
   getPeriodLabel,
-  useOfferCountsQuery, 
+  useOfferCountsQuery,
   useOfferReferentialsQuery
 } from "@/features/offres.tools"
 import { useOffresFilters } from "@/contexts/Offres.context"
@@ -99,6 +99,8 @@ const SourceOptions = memo(function SourceOptions() {
   const { data: counts } = useOfferCountsQuery()
   const { filters, toggle } = useOffresFilters()
 
+  console.log(refs)
+
   if (isPending && refs.sources.length === 0) {
     return (
       <div aria-hidden="true">
@@ -123,7 +125,7 @@ const ContratOptions = memo(function ContratOptions() {
   const { data: counts } = useOfferCountsQuery()
   const { filters, toggle } = useOffresFilters()
   const contrats = refs?.contrats ?? []
-  
+
   return contrats.map((c) => (
     <CheckRow
       key={c.code}
@@ -139,7 +141,7 @@ const ExperienceOptions = memo(function ExperienceOptions() {
   const { data: refs } = useOfferReferentialsQuery()
   const { filters, toggle } = useOffresFilters()
   const experiences = refs?.experiences ?? []
-  
+
   return experiences.map((x) => (
     <CheckRow
       key={x.code}
@@ -154,7 +156,7 @@ const NiveauOptions = memo(function NiveauOptions() {
   const { data: refs } = useOfferReferentialsQuery()
   const { filters, toggle } = useOffresFilters()
   const niveaux = refs?.niveaux ?? []
-  
+
   return niveaux.map((n) => (
     <CheckRow
       key={n.code}

@@ -91,6 +91,7 @@ const App = () => (
               <Route path="/conseils" element={<Conseils />} />
               <Route path="/conseils/:slug" element={<DetailsConseil />} />
 
+              <Route path="/test" element={<FallbackPage />} />
               {/* Toute URL inconnue → page 404 explicite (noindex). */}
               <Route path="*" element={<PageIntrouvable />} />
             </Route>

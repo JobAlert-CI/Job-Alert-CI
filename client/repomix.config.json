@@ -28,14 +28,8 @@
       "includeLogsCount": 50
     }
   },
-  "include": [
-    "src/lib/query-helpers.js",
-    "src/api/errors.js",
-    "src/api/public/articles.js",
-    "src/hooks/use-url-filters.js",
-    "src/contexts/Conseils.context.jsx",
-    "src/tools/conseils.tools.js",
-    "src/Pages/Conseils/**/*"
+  "include": [    
+    "src/Pages/DetailsOffre/**/*"
   ],
   "ignore": {
     "useGitignore": true,

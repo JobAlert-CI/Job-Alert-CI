@@ -39,7 +39,7 @@ export const EtapePreferences = () => {
           className={cn(
             "shrink-0 rounded-full px-3.5 py-1.5 font-heading text-sm font-extrabold transition-colors",
             form.filieres.length > 0
-              ? "bg-brand-orange/15 text-[#B45309]"
+              ? "bg-brand-orange/15 text-brand-orange"
               : "bg-surface-container text-muted-foreground"
           )}
         >

@@ -1,11 +1,10 @@
-import { cn } from "@/lib/utils"
+import { cn, getInitials } from "@/lib/utils"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
-import { getImgSource } from "@/utils/utilsSource"
 
-export const SourceLogo = ({ code, className = "size-6" }) => {
+export const SourceLogo = ({ code, className = "size-7" }) => {
   return (
-    <span className={cn("grid shrink-0 place-items-center overflow-hidden rounded", className)}>
-      <img src={getImgSource(code)} alt={code} className="size-full object-contain" />
+    <span className={cn("flex items-center justify-center rounded-md bg-brand-navy/10 font-heading text-[11px] font-extrabold text-brand-navy", className)}>
+      {getInitials(code)}
     </span>
   )
 }

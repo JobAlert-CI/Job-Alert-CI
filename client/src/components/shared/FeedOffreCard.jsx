@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom"
 import { motion } from "framer-motion"
-import { ArrowUpRight, MapPin, Building2, Briefcase } from "lucide-react"
+import { ArrowUpRight, MapPin, Building2, Briefcase, Banknote } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { ChipSource } from "./SourceBadge"
 import { paletteDepuisHex } from "@/lib/hues"
+import { ChipSource } from "."
 
 /** 
  * offre : { id, title, company, location, location_raw, contract_type, source, primary_filiere } 
@@ -50,7 +50,7 @@ const FeedOffreCard = ({ offre, index = 0, to, className }) => {
           </span>
 
           {/* Titre */}
-          <h3 className="truncate font-heading text-[15px] font-bold text-brand-navy transition-colors duration-300 group-hover/card:text-brand-orange">
+          <h3 className="truncate font-heading text-[15px] font-bold text-brand-navy transition-colors duration-300 group-hover:text-brand-orange">
             {offre.title}
           </h3>
 
@@ -69,6 +69,10 @@ const FeedOffreCard = ({ offre, index = 0, to, className }) => {
             <span className="inline-flex items-center gap-1.5">
               <MapPin className="size-3.5 text-outline" strokeWidth={2} />
               {offre?.location_raw ?? offre.location?.city ?? "N/A"}
+            </span>
+
+            <span className="inline-flex items-center gap-1.5 rounded-md bg-brand-orange/10 px-2 py-0.5 text-[11px] font-bold text-brand-navy">
+              <Banknote className="size-3 text-brand-orange" />{offre.salary_raw ?? "N/A"}
             </span>
 
             {/* Séparateur visuel subtil */}
@@ -93,7 +97,7 @@ const FeedOffreCard = ({ offre, index = 0, to, className }) => {
 
           <div className={cn(
             "flex size-8 items-center justify-center rounded-lg transition-all duration-300",
-            "bg-surface-container-low text-outline-variant group-hover/card:bg-brand-orange/10 group-hover/card:text-brand-orange group-hover/card:translate-x-0.5 group-hover/card:-translate-y-0.5"
+            "bg-surface-container-low text-outline-variant group-hover:bg-brand-orange/10 group-hover:text-brand-orange group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
           )}>
             <ArrowUpRight className="size-4" strokeWidth={2.5} />
           </div>

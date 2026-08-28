@@ -3,13 +3,7 @@ import { Link } from "react-router-dom"
 import { motion, useReducedMotion } from "framer-motion"
 import { ArrowRight, BadgeCheck, Bell, Check, Clock, Radar } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { Badge } from "@/components/ui/badge"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
-import { CountUp, CtaLink, SourceLogo } from "@/components/shared"
+import { ChipSource, CountUp, CtaLink } from "@/components/shared"
 import { Skeleton } from "@/components/ui/skeleton"
 import { paletteDepuisHex } from "@/lib/hues"
 import chipFloat from "@/lib/chipFloat"
@@ -24,54 +18,6 @@ import {
   useRecentOffers
 } from "@/features/home.tools"
 
-/* ------------------------------------------------------------------ */
-/*  Badge d'état de la collecte — early returns, plus de doubles blocs */
-/* ------------------------------------------------------------------ */
-const PulseDot = ({ color }) => (
-  <span className="relative flex size-2">
-    <span
-      className={cn(
-        "absolute inline-flex size-full animate-ping rounded-full opacity-75",
-        color
-      )}
-    />
-    <span className={cn("relative inline-flex size-2 rounded-full", color)} />
-  </span>
-)
-
-const CollecteBadge = ({ isPending, isError, count }) => {
-  if (isPending) return null
-
-  if (isError) {
-    return (
-      <motion.div variants={fadeUp}>
-        <span className="inline-flex items-center gap-2.5 rounded-full border border-amber-500/25 bg-amber-500/10 py-1.5 pl-2.5 pr-4 text-xs font-semibold text-amber-700">
-          <PulseDot color="bg-amber-500" />
-          Collecte du jour en cours de vérification
-        </span>
-      </motion.div>
-    )
-  }
-
-  return (
-    <motion.div variants={fadeUp}>
-      <Tooltip>
-        <TooltipTrigger>
-          <span className="inline-flex cursor-default items-center gap-2.5 rounded-full border border-emerald-500/25 bg-emerald-500/10 py-1.5 pl-2.5 pr-4 text-xs font-semibold text-emerald-700">
-            <PulseDot color="bg-emerald-500" />
-            {count > 0
-              ? `Collecte terminée · ${count} offre${count !== 1 ? "s" : ""} collectées`
-              : `Collecte terminée`}
-          </span>
-        </TooltipTrigger>
-        <TooltipContent side="bottom" className="max-w-62.5 text-center">
-          Nos scrapers analysent les sources chaque matin. Votre récapitulatif
-          part à {EMAIL_DELIVERY_TIME}.
-        </TooltipContent>
-      </Tooltip>
-    </motion.div>
-  )
-}
 
 /* ------------------------------------------------------------------ */
 /*  Hero — consomme le cache directement, aucune prop reçue            */
@@ -121,16 +67,9 @@ const Hero = () => {
 
   return (
     <section className="relative overflow-hidden hero-gradient">
-      {/* Fonds décoratifs */}
       <div className="absolute inset-0 bg-pattern opacity-50" aria-hidden />
-      <div
-        className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(245,166,35,0.10),transparent_50%)]"
-        aria-hidden
-      />
-      <div
-        className="absolute -bottom-40 -left-40 size-120 rounded-full bg-brand-navy/4 blur-3xl"
-        aria-hidden
-      />
+      <div className="absolute -top-32 right-[-10%] size-140 rounded-full bg-brand-orange/8 blur-3xl" aria-hidden />
+      <div className="absolute -bottom-40 -left-40 size-120 rounded-full bg-brand-navy/5 blur-3xl" aria-hidden />
 
       <div className="relative z-10 mx-auto md:max-w-7xl px-4 pb-16 pt-8 md:px-12 md:pb-20 lg:pt-10">
         <div className="grid items-center gap-14 lg:grid-cols-2 lg:gap-16">
@@ -141,12 +80,6 @@ const Hero = () => {
             animate="visible"
             className="flex flex-col items-start gap-5"
           >
-            <CollecteBadge
-              isPending={statsPending}
-              isError={statsError}
-              count={newOffersCount}
-            />
-
             {/* Titre principal */}
             <motion.h1
               variants={fadeUp}
@@ -316,10 +249,10 @@ const Hero = () => {
                 <p className="text-sm text-on-surface-variant">Bonjour 👋</p>
                 <p className="mt-1 text-sm text-on-surface-variant">
                   <strong className="font-semibold text-on-surface">
-                    {statsPending || statsError ? "Plusieurs" : newOffersCount}{" "}
-                    {newOffersCount !== 1 ? "nouvelles offres" : "nouvelle offre"}
+                    {statsPending || statsError ? "Plusieurs" : newOffersCount > 0 ? newOffersCount : activeOffersCount}{" "}
+                    {newOffersCount <= 0 ? "offres active" : newOffersCount !== 1 ? "nouvelles offres" : "nouvelle offre"}
                   </strong>{" "}
-                  correspondent à vos filières :
+                  {newOffersCount > 0 ? "correspondent à vos filières :" : "collectées sur nos sources partenaires :"}
                 </p>
 
                 <ul className="mt-3 space-y-2" role="list">
@@ -365,22 +298,11 @@ const Hero = () => {
                             {offer.company?.name || "Entreprise"}
                           </p>
                         </div>
-                        <Tooltip>
-                          <TooltipTrigger >
-                            <Badge
-                              variant="outline"
-                              className="shrink-0 gap-1 rounded-full border-outline-variant/60 bg-surface-container-low/60 px-2 py-0.5 text-[10px] font-semibold text-on-surface-variant"
-                            >
-                              <SourceLogo
-                                code={offer.source?.code || offer.source?.name} 
-                                className = "size-8"
-                              />                              
-                            </Badge>
-                          </TooltipTrigger>
-                          <TooltipContent side="top">
-                            Collectée sur {offer.source?.name || "source partenaire"}
-                          </TooltipContent>
-                        </Tooltip>
+                        <ChipSource
+                          source={offer.source.code}
+                          title={offer.source.name}
+                          tooltip={`Collectée sur ${offer.source.name}`}
+                        />
                       </motion.li>
                     ))
                   )}
@@ -442,8 +364,8 @@ const Hero = () => {
             </div>
           ))}
         </motion.div>
-      </div>
-    </section>
+      </div >
+    </section >
   )
 }
 

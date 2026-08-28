@@ -96,7 +96,7 @@ const RecentOffers = () => {
           <SectionHeading
             eyebrow="Collecte du jour"
             title={title}
-            sub={SUBTITLES[viewState]}
+            sub={SUBTITLES[viewState]} // "loading" | "degraded" | "ready"
           />
           <Link
             to="/offres"
@@ -107,7 +107,7 @@ const RecentOffers = () => {
           </Link>
         </div>
 
-        <div className="mt-10 grid gap-8 lg:grid-cols-[minmax(0,1fr)_340px]">
+        <div className="mt-10 grid gap-8 lg:grid-cols-[minmax(0,1fr)_340px] items-start">
           {/* Feed d'offres — autonome (son propre hook) */}
           <div>
             <RecentOffersFeed />

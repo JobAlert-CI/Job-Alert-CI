@@ -275,7 +275,7 @@ export const GestionPreferences = () => {
                     className={cn(
                       "shrink-0 rounded-full px-3 py-1 font-heading text-xs font-extrabold transition-colors",
                       selectedFilieres.length > 0
-                        ? "bg-brand-orange/15 text-[#B45309]"
+                        ? "bg-brand-orange/15 text-brand-orange"
                         : "bg-surface-container text-muted-foreground",
                     )}
                   >

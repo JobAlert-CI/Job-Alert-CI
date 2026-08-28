@@ -20,7 +20,6 @@ const SourcesPage = () => {
     statut, nbSources, erreur, erreurs, retry,
   } = useSourcesContext()
 
-  /* 1️⃣ Chargement — TOUJOURS testé en premier */
   if (statut === "loading") {
     return (
       <>
@@ -33,7 +32,6 @@ const SourcesPage = () => {
     )
   }
 
-  /* 2️⃣ Erreur réelle et définitive */
   if (statut === "error") {
     return (
       <>
@@ -48,7 +46,6 @@ const SourcesPage = () => {
     )
   }
 
-  /* 3️⃣ API répond mais aucune source active */
   if (statut === "empty") {
     return (
       <>
@@ -59,9 +56,7 @@ const SourcesPage = () => {
       </>
     )
   }
-
-  /* 4️⃣ Prêt — les erreurs partielles (stats, global) sont signalées
-        par un bandeau sans bloquer l'affichage. */
+  
   return (
     <>
       <Seo {...sourcesSeo({ total: nbSources })} />

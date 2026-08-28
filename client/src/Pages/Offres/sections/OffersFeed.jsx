@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from "framer-motion"
 import { AlertTriangle, RefreshCw, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useIsMobile } from "@/hooks/use-mobile"
-import { OfferCard } from "@/components/shared"
+import { OfferCard, SectionHeading } from "@/components/shared"
 import { jourLabel } from "@/lib/dates"
 import { SORTS } from "@/lib/referentiels"
 import { OffersSkeletonList } from "@/components/shared/SkeletonsOffres"
@@ -95,16 +95,14 @@ const OffersFeed = () => {
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
           >
-            <p className="flex items-center gap-2.5 text-[11px] font-bold uppercase tracking-[0.18em] text-[#B45309]">
-              <span className="h-px w-6 bg-brand-orange" aria-hidden />
-              Le flux
-            </p>
-            <h2 id="offres-flux-titre" className="mt-3 font-heading text-4xl font-extrabold tracking-tight text-brand-navy max-sm:text-3xl">
-              Les offres <span className="text-[#D97706]">du moment</span>
-            </h2>
-            {/* Région vivante : le nombre d'offres est annoncé aux lecteurs d'écran */}
-            <p className="mt-2 text-sm text-muted-foreground" role="status" aria-live="polite">
-              {isLoading ? "Chargement du flux…" : (
+            <SectionHeading
+              eyebrow="Le flux"
+              title={
+                <>
+                  Les offres <span className="text-brand-orange">du moment</span>
+                </>
+              }
+              sub={isLoading ? "Chargement du flux…" : (
                 <>
                   <strong className="font-heading font-bold text-brand-navy">
                     {offers.length}{hasMore ? "+" : ""}
@@ -113,7 +111,7 @@ const OffersFeed = () => {
                   {" "} triées par « {(SORTS.find((s) => s.k === sort)?.l ?? "").toLowerCase()} »
                 </>
               )}
-            </p>
+            />
           </motion.div>
         </div>
 
@@ -148,7 +146,7 @@ const OffersFeed = () => {
                     type="button"
                     onClick={c.rm}
                     aria-label={`Retirer le filtre : ${c.label}`}
-                    className="group inline-flex items-center gap-1.5 rounded-full border border-brand-navy/20 bg-brand-navy/5 px-3 py-1.5 text-xs font-semibold text-on-primary transition-all hover:border-brand-orange/50 hover:bg-brand-orange/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    className="group inline-flex items-center gap-1.5 rounded-full border border-brand-navy/20 bg-brand-navy/5 px-3 py-1.5 text-xs font-semibold text-brand-navy transition-all hover:border-brand-orange/50 hover:bg-brand-orange/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   >
                     {c.label}
                     <X className="size-3 text-muted-foreground transition-colors group-hover:text-brand-orange" aria-hidden />
@@ -157,7 +155,7 @@ const OffersFeed = () => {
                 <button
                   type="button"
                   onClick={resetTout}
-                  className="rounded-sm px-1 text-xs font-bold text-[#B45309] transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="rounded-sm px-1 text-xs font-bold text-brand-orange transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   Tout effacer
                 </button>

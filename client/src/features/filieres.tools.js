@@ -30,7 +30,7 @@ export const ETAPES_MECHANIQUE = [
   {
     icon: Radar,
     titre: "On scanne 4 sources chaque nuit",
-    texte: "EmploiDakar CI, GoAfrica, Novojob et LinkedIn, dédoublonnées par hash.",
+    texte: "Des offres dédoublonnées par hash.",
   },
   {
     icon: Mail,

@@ -37,7 +37,7 @@ const BandChips = () => {
           key={source.id || source.code}
           className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-card/10 px-3.5 py-1.5 text-[13px] font-semibold text-white transition-colors hover:bg-card/20"
         >
-          <SourceLogo code={source.code || source.name} className="size-5" />
+          <SourceLogo code={source.code || source.name} className="size-6 bg-card text-brand-navy" />
           {source.name}
         </a>
       ))}

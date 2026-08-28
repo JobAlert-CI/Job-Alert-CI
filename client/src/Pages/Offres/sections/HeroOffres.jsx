@@ -1,15 +1,13 @@
 import { Link } from "react-router-dom"
 import { motion } from "framer-motion"
 import {
-  ArrowRight, Bell, Check, ChevronRight, Clock, Fingerprint,
-  Mail, ShieldCheck, Zap,
+  ArrowRight, Bell, Check, ChevronRight, Clock, Fingerprint, Mail, Zap,
 } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { Skeleton } from "@/components/ui/skeleton"
 import { cn } from "@/lib/utils"
 import { CountUp, CountdownEnvoi, CtaLink, SourceLogo, Ticker } from "@/components/shared"
 import { paletteDepuisHex } from "@/lib/hues"
-import { todayLong } from "@/lib/dates"
 import { StatSkeleton } from "@/components/shared/SkeletonsOffres"
 import {
   PIPELINE,
@@ -32,22 +30,31 @@ const fadeUp = {
 export const OffresTicker = () => {
   const { offers } = useOffresFeedModel()
   const { data: refs } = useOfferReferentialsQuery()
+
   if (offers.length === 0) return null
+
   return (
-    <Ticker
-      variant="dark"
-      duration={160}
-      items={offers.slice(0, 24).map((o) => {
-        const palette = paletteDepuisHex(refs.filieres.find((f) => f.code === o.filiere)?.color_hex)
-        return {
-          key: o.uid,
-          dot: palette.dot,
-          dotStyle: palette.style,
-          titre: o.titre,
-          entreprise: o.entreprise,
-        }
-      })}
-    />
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
+      className="w-full"
+    >
+      <Ticker
+        variant="dark"
+        duration={160}
+        items={offers.slice(0, 24).map((o) => {
+          const palette = paletteDepuisHex(refs.filieres.find((f) => f.code === o.filiere)?.color_hex)
+          return {
+            key: o.uid,
+            dot: palette.dot,
+            dotStyle: palette.style,
+            titre: o.titre,
+            entreprise: o.entreprise,
+          }
+        })}
+      />
+    </motion.div>
   )
 }
 
@@ -65,6 +72,7 @@ const FluxCard = () => {
 
   const step = 320 / (displayCount + 1)
   const pathXs = Array.from({ length: displayCount }, (_, i) => step * (i + 1))
+
 
   return (
     <motion.div
@@ -103,7 +111,7 @@ const FluxCard = () => {
         transition={{ delay: 1.2, opacity: { duration: 0.4 }, scale: { duration: 0.4 }, y: { duration: 5.2, repeat: Infinity, ease: "easeInOut", delay: 0.6 } }}
         className="absolute -bottom-4 right-8 z-20 inline-flex rotate-2 items-center gap-1.5 rounded-full border border-outline-variant/50 bg-card px-3.5 py-1.5 text-[11px] font-bold text-on-surface shadow-hover"
       >
-        <Mail className="size-3 text-[#B45309]" aria-hidden />
+        <Mail className="size-3 text-brand-orange" aria-hidden />
         Envoyé à {abonnees.toLocaleString("fr-FR")} abonnés
       </motion.span>
 
@@ -167,8 +175,8 @@ const FluxCard = () => {
                     >
                       <Tooltip>
                         <TooltipTrigger>
-                          <div className="relative flex cursor-default flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-brand-orange/40 bg-brand-orange/5 px-1 py-2.5 transition-colors hover:border-brand-orange/60 hover:bg-brand-orange/10">
-                            <span className="font-heading text-[16px] font-extrabold text-[#B45309]">+{remainingCount}</span>
+                          <div className="relative flex cursor-default flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-brand-orange/40 bg-brand-orange/5 px-3 py-4.5 transition-colors hover:border-brand-orange/60 hover:bg-brand-orange/10">
+                            <span className="font-heading text-[16px] font-extrabold text-brand-orange">+{remainingCount}</span>
                             <span className="text-[9px] font-semibold text-muted-foreground text-center leading-tight">autres</span>
                           </div>
                         </TooltipTrigger>
@@ -221,7 +229,7 @@ const FluxCard = () => {
                   <span className="flex min-w-0 items-center gap-2">
                     <span className={cn(
                       "relative grid size-7 shrink-0 place-items-center rounded-full border bg-card",
-                      s.done ? "border-emerald-500/40 text-emerald-600" : "border-brand-orange/50 text-[#B45309]"
+                      s.done ? "border-emerald-500/40 text-emerald-600" : "border-brand-orange/50 text-brand-orange"
                     )}>
                       <s.icon className="size-3.5" aria-hidden />
                       {s.done && (
@@ -284,30 +292,20 @@ const HeroOffres = () => {
             animate="visible"
             className="flex min-w-0 flex-col items-start gap-5"
           >
-            {!isPending && (
-              <motion.div variants={fadeUp} className="flex flex-wrap items-center gap-2.5">
-              <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3.5 py-1.5 text-[11px] font-bold text-emerald-700">
-                <span className="relative flex size-1.5" aria-hidden>
-                  <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-500 opacity-70" />
-                  <span className="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
-                </span>
-                Collecte du jour : {todayLong()}
-              </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-outline-variant/50 bg-card/80 px-3.5 py-1.5 text-[11px] font-bold text-on-surface-variant">
-                <ShieldCheck className="size-3 text-[#B45309]" aria-hidden />
-                {parSource.length || 0} source{parSource.length > 1 ? "s" : ""} scannée{parSource.length > 1 ? "s" : ""} · 0 doublon en base
-              </span>
-            </motion.div>
-          )}
-
             <motion.h1
               variants={fadeUp}
-              className="font-heading text-6xl font-black leading-[1.04] tracking-tight text-brand-navy max-xl:text-5xl max-sm:text-4xl"
+              className="font-heading text-4xl font-black leading-[1.06] tracking-tight text-brand-navy sm:text-5xl xl:text-6xl"
             >
               Les offres{" "}
-              <span className="relative whitespace-nowrap text-[#D97706]">
+              <span className="relative whitespace-nowrap text-brand-orange">
                 du jour
-                <svg className="absolute -bottom-1.5 left-0 w-full" viewBox="0 0 200 9" fill="none" preserveAspectRatio="none" aria-hidden>
+                <svg
+                  className="absolute -bottom-1.5 left-0 w-full"
+                  viewBox="0 0 200 9"
+                  fill="none"
+                  preserveAspectRatio="none"
+                  aria-hidden
+                >
                   <motion.path
                     d="M2 6.5C60 2.5 140 2.5 198 6.5"
                     stroke="#F5A623"
@@ -316,7 +314,7 @@ const HeroOffres = () => {
                     initial={{ pathLength: 0, opacity: 0 }}
                     whileInView={{ pathLength: 1, opacity: 0.85 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 1.6, ease: "easeOut", delay: 0.5 }}
+                    transition={{ duration: 0.94, ease: "easeOut", delay: 0.5 }}
                   />
                 </svg>
               </span>
@@ -325,7 +323,7 @@ const HeroOffres = () => {
 
             <motion.p variants={fadeUp} className="max-w-xl text-lg leading-relaxed text-on-surface-variant max-md:text-base">
               {nouveaux > 0 ? `${nouveaux} nouvelle` : "Aucune"} opportunité{nouveaux > 1 ? "s" : ""} collectée{nouveaux > 1 ? "s" : ""} ce matin sur{" "}
-              {parSource.length ? parSource.map((s) => s.label ?? s.code).slice(0, 4).join(", ") : "nos sources partenaires" }, {parSource.length > 3 && "et autres, "}
+              {parSource.length ? parSource.map((s) => s.label ?? s.code).slice(0, 4).join(", ") : "nos sources partenaires"}, {parSource.length > 3 && "et autres, "}
               dé-dupliquées par hash puis taggées par filière. Demain, inutile de
               revenir : votre sélection arrive par email à{" "}
               <strong className="font-bold text-brand-navy">8h00 précises</strong>.

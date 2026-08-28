@@ -2,7 +2,7 @@
 import { Link } from "react-router-dom"
 import { motion } from "framer-motion"
 import {
-  ArrowRight, Bell, ChevronRight, ShieldCheck,
+  ArrowRight, Bell, ChevronRight,
 } from "lucide-react"
 import { CountUp, CtaLink } from "@/components/shared"
 import { containerVariants, fadeUp } from "@/features/sources.tools"
@@ -14,18 +14,19 @@ const HeroSources = () => {
 
   return (
     <section className="relative overflow-hidden hero-gradient">
+      {/* Fonds décoratifs */}
       <div className="absolute inset-0 bg-pattern opacity-50" aria-hidden />
       <div
-        className="absolute -top-32 right-[-10%] size-140 rounded-full bg-brand-orange/8 blur-3xl"
+        className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(245,166,35,0.10),transparent_50%)]"
         aria-hidden
       />
       <div
-        className="absolute -bottom-40 -left-40 size-120 rounded-full bg-brand-navy/5 blur-3xl"
+        className="absolute -bottom-40 -left-40 size-120 rounded-full bg-brand-navy/4 blur-3xl"
         aria-hidden
       />
 
       {/* Desktop-first : paddings desktop en base, repli max-md */}
-      <div className="relative z-10 mx-auto max-w-7xl px-12 pb-14 pt-10 max-md:px-6 max-md:pb-16 max-md:pt-8">
+      <div className="relative z-10 mx-auto max-w-7xl px-12 pb-16 pt-10 max-md:px-6 max-md:pb-14 max-md:pt-8">
         <motion.nav
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
@@ -33,7 +34,7 @@ const HeroSources = () => {
           className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground"
           aria-label="Fil d'Ariane"
         >
-          <Link to="/" className="transition-colors hover:text-brand-navy">
+          <Link to="/" className="rounded-sm transition-colors hover:text-brand-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
             Accueil
           </Link>
           <ChevronRight className="size-3" aria-hidden />
@@ -43,31 +44,17 @@ const HeroSources = () => {
         </motion.nav>
 
         {/* Desktop-first : 2 colonnes en base, empilé en repli */}
-        <div className="mt-8 grid items-center gap-14 lg:grid-cols-[1.05fr_0.95fr] lg:gap-16 max-lg:grid-cols-1">
+        <div className="mt-8 grid grid-cols-[1.05fr_0.95fr] items-center gap-16 max-lg:grid-cols-1 max-lg:gap-14">
           <motion.div
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className="flex flex-col items-start gap-5"
+            className="flex min-w-0 flex-col items-start gap-5"
           >
-            <motion.div variants={fadeUp} className="flex flex-wrap items-center gap-2.5">
-              <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/25 bg-emerald-500/10 px-3.5 py-1.5 text-[11px] font-bold text-emerald-700">
-                <span className="relative flex size-1.5" aria-hidden>
-                  <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-500 opacity-70" />
-                  <span className="relative inline-flex size-1.5 rounded-full bg-emerald-500" />
-                </span>
-                Collecte terminée · {nbSources}/{nbSources} sources · 06h00
-              </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-outline-variant/50 bg-card/80 px-3.5 py-1.5 text-[11px] font-bold text-on-surface-variant">
-                <ShieldCheck className="size-3 text-brand-orange" aria-hidden />
-                Lecture respectueuse, zéro doublon
-              </span>
-            </motion.div>
-
             {/* Desktop-first : 6xl en base, 5xl, 4xl */}
             <motion.h1
               variants={fadeUp}
-              className="font-heading text-4xl font-black leading-[1.04] tracking-tight text-brand-navy sm:text-5xl xl:text-6xl"
+              className="font-heading text-4xl font-black leading-[1.06] tracking-tight text-brand-navy sm:text-5xl xl:text-6xl"
             >
               {nbSources} sources scannées.
               <br />

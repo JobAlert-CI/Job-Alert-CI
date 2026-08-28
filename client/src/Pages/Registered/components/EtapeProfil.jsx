@@ -79,8 +79,8 @@ export const EtapeProfil = () => {
                   className={cn(
                     "rounded-full border px-4 py-2 text-[13px] font-semibold transition-all duration-200 cursor-pointer",
                     isSelected
-                      ? "border-brand-orange bg-brand-orange/15 text-[#B45309] ring-1 ring-brand-orange/30 font-bold"
-                      : "border-outline-variant/60 bg-card text-on-surface-variant hover:-translate-y-0.5 hover:border-brand-orange/50 hover:text-[#B45309]"
+                      ? "border-brand-orange bg-brand-orange/15 text-brand-orange ring-1 ring-brand-orange/30 font-bold"
+                      : "border-outline-variant/60 bg-card text-on-surface-variant hover:-translate-y-0.5 hover:border-brand-orange/50 hover:text-brand-orange"
                   )}
                 >
                   {label}

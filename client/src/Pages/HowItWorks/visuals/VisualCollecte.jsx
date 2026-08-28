@@ -3,7 +3,7 @@ import { Link } from "react-router-dom"
 import { motion } from "framer-motion"
 import { Database, ShieldAlert } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { SourceLogo, VisualFrame } from "@/components/shared"
+import { VisualFrame } from "@/components/shared"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
   useSources,
@@ -85,7 +85,6 @@ const VisualCollecte = () => {
                 <span className="flex-1 truncate text-[13px] font-semibold text-on-surface">
                   {s.name}
                 </span>
-                <SourceLogo code={s.code || s.name} />
                 <span className="text-[11px] font-medium text-muted-foreground">
                   {s.stats?.new_offers ?? 0} nouvelles
                 </span>
