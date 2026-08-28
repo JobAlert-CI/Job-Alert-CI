@@ -183,3 +183,172 @@ Une offre ingérée/validée à 07h45 attend le run du lendemain ; un admin peut
 cependant relancer une préparation en `force` avant 08h00 via
 `POST /api/admin/sending/prepare` pour l'inclure — seuls les digests non
 encore envoyés sont alors recalculés.
+
+## 11. Cascade de matching T0-T5
+
+Le matching T0 strict (filtres durs seuls) laisse des abonnés sans
+digest pertinent. Pour **maximiser le nombre d'offres envoyees** tout en
+respectant la séparation filtres/scoring, on applique une cascade
+cumulative de relaxations. Les invariants produit ne sont JAMAIS
+relâchés (cf. règle §4) — seuls les critères de pertinence le sont.
+
+### 11.1 Paliers et risques
+
+| Palier | Filtre relâché | Effet SQL | Risque utilisateur |
+|---|---|---|---|
+| **T0** | — | Filtres durs stricts (1-7) | Le plus pertinent |
+| **T1** | Filière | Matche aussi via `offer_filieres` (filière secondaire) | Faible : filière respectée |
+| **T2** | Contrat | Ignore `SubscriberContractPreference` | Modéré : peut recevoir un type de contrat différent |
+| **T3** | Fraîcheur | Élargit `window_start` à `today - DIGEST_CASCADE_FRESHNESS_DAYS` (défaut 14j) | Faible : la dédup NOT EXISTS empêche le renvoi |
+| **T4** | Expérience | Double `EXPERIENCE_MATCH_TOLERANCE_YEARS` | Modéré |
+| **T5** | Ville (uniquement si non résolue) | Ajoute les offres de `DIGEST_CASCADE_FALLBACK_CITY` (défaut Abidjan) | Modéré |
+
+### 11.2 Algorithme
+
+Le sélecteur teste d'abord T0 ; si `len(ranked) >= digest_min_offers`
+(défaut 2), il s'arrête. Sinon il accumule les paliers T1→T5 jusqu'à
+obtenir assez d'offres. Chaque palier utilise le **scoring canonique**
+comme seule autorité de classement — une offre de repli ne remonte que
+si elle le mérite par son score de filière/contrat/expérience/ville/fraîcheur.
+
+Si aucun palier ne produit `digest_min_offers` offres, le digest est
+marqué `skipped_empty` et un email transactionnel "no offer" est envoyé
+(voir §12).
+
+### 11.3 Traçabilité
+
+Deux colonnes ajoutées (cf. migrations 0007 et 0008) :
+
+- `email_digests.match_tier` (T0..T5 ou T5_INSUFFICIENT) : palier final
+  atteint pour le digest.
+- `email_digest_offers.match_kind` (primary/secondary/fallback_*) :
+  comment chaque offre a été obtenue.
+
+Ces colonnes permettent :
+
+- l'audit (combien de digests basculent en T2+ par jour),
+- le tableau de bord admin `/api/admin/sending/tier-stats`,
+- la **distinction visuelle** dans l'email entre "Sélectionnées pour
+  vous" (match_kind=primary) et "Pourrait aussi vous intéresser" (repli),
+  avec un badge explicatif (type de contrat différent, etc.).
+
+### 11.4 Variables d'env
+
+| Variable | Défaut | Rôle |
+|---|---|---|
+| `DIGEST_CASCADE_ENABLED` | true | Master switch (false = comportement strict hérité) |
+| `DIGEST_CASCADE_MAX_TIER` | T5 | Plafond (ex. T2 pour ne jamais aller à T3+) |
+| `DIGEST_CASCADE_FRESHNESS_DAYS` | 14 | Lookback du palier T3 |
+| `DIGEST_CASCADE_FALLBACK_CITY` | Abidjan | Ville de repli T5 |
+| `DIGEST_MIN_OFFERS` | 2 | Seuil minimum pour arrêter la cascade |
+
+## 12. Email transactionnel "no offer"
+
+Quand la cascade T0-T5 ne produit aucune offre, on envoie un email
+distinct du digest quotidien (pas de `EmailDigest`, pas d'`EmailDigestOffer`)
+pour ne pas laisser l'abonné sans nouvelles.
+
+### 12.1 Comportement
+
+- **Skip si** : `SEND_NO_OFFER_EMAIL=false`, abonné non éligible, ou
+  rate limit 7j glissants non écoulé.
+- **Une seule tentative** : pas de retry auto (un no-offer qui rate est
+  un no-offer qui rate, ce n'est pas critique).
+- **Traçabilité** :
+  - `no_offer_email_logs` (subscriber_id, digest_date, sent_at) pour
+    le rate limit futur.
+  - `email_delivery_attempts` lié à un `EmailDigest` `skipped_empty`
+    (FK respectée) pour la cohérence avec le reste du pipeline.
+- `Subscriber.last_email_sent_at` est mis à jour (cohérence : l'abonné
+  a "reçu quelque chose" aujourd'hui).
+
+### 12.2 Orchestration
+
+La phase 2.5 envoie les no-offer à **08h15** (juste après la phase 2
+principale à 08h00) via la tâche `tasks.digests.send_no_offer_emails`,
+verrou Redis `lock:digest:no_offer:{date}` séparé, queue `emails`.
+
+```python
+celery_app.conf.beat_schedule["digest-send-no-offer"] = {
+    "task": "tasks.digests.send_no_offer_emails",
+    "schedule": crontab(hour=8, minute=15),
+    "options": {"queue": "emails"},
+}
+```
+
+### 12.3 Variables d'env
+
+| Variable | Défaut | Rôle |
+|---|---|---|
+| `SEND_NO_OFFER_EMAIL` | true | Active l'envoi (false = silencieux) |
+| `NO_OFFER_EMAIL_MIN_INTERVAL_DAYS` | 7 | Fenêtre glissante du rate limit |
+
+## 13. Endpoint admin : stats par tier
+
+`GET /api/admin/sending/tier-stats?period_days=7` (JWT super_admin /
+gestionnaire_utilisateurs) renvoie la distribution des paliers de
+matching par jour et par tier/match_kind.
+
+**Réponse** :
+
+```json
+{
+  "period_days": 7,
+  "since": "2026-08-22",
+  "until": "2026-08-28",
+  "tier_distribution": {
+    "by_day": {
+      "2026-08-28": {
+        "tiers": [
+          {"tier": "T0", "count": 120},
+          {"tier": "T1", "count": 5}
+        ],
+        "skipped_empty": 8,
+        "total": 133
+      }
+    },
+    "global": {
+      "tiers": [{"tier": "T0", "count": 800}, {"tier": "T1", "count": 30}],
+      "skipped_empty": 50,
+      "total": 880
+    }
+  },
+  "match_kind_distribution": {
+    "by_day": {
+      "2026-08-28": {
+        "kinds": {"primary": 360, "secondary": 15},
+        "total": 375
+      }
+    },
+    "global": {
+      "kinds": {"primary": 2400, "secondary": 90},
+      "total": 2490
+    }
+  }
+}
+```
+
+**Cas d'usage ops** :
+
+- Si > 30% des digests basculent en T2+ sur 7j glissants → signal de
+  tagging trop strict sur les filières/contrats.
+- Si `skipped_empty` augmente fortement → envisager d'élargir le
+  `DIGEST_CASCADE_MAX_TIER` ou d'auditer le référentiel `Location`.
+
+## 14. Tests
+
+`server/tests/test_digest_pipeline.py` (10 tests, comportement historique
+intact) et `server/tests/test_digest_cascade.py` (~30 tests, cascade
+T0-T5 + email no-offer + 2 sections + stats admin) couvrent l'ensemble.
+Couverture :
+
+- Filtres durs T0 stricts (anti-régression).
+- Cascade T0→T5 (chaque palier + cas d'arrêt).
+- Persistance `match_tier` / `match_kind` par digest et par offre.
+- Email no-offer (template, rate limit 7j, désactivation, échec provider).
+- Template 2 sections (badges, section vide, split primary/secondary).
+- Endpoint admin `tier-stats` (réponse, structure).
+
+```bash
+server\.venv\Scripts\python.exe -m pytest server/tests/test_digest_pipeline.py server/tests/test_digest_cascade.py -q
+```

@@ -18,7 +18,7 @@ from models.editorial import (
     DailyTip,
     SeriesArticle,
 )
-from models.emails import EmailDeliveryAttempt, EmailDigest, EmailDigestOffer, TransactionalEmailEvent
+from models.emails import EmailDeliveryAttempt, EmailDigest, EmailDigestOffer, NoOfferEmailLog, TransactionalEmailEvent
 from models.enums import (
     AdminAction,
     AdminRole,
@@ -125,6 +125,7 @@ __all__ = [
     "JobOfferStatus",
     "Location",
     "NotificationChannel",
+    "NoOfferEmailLog",
     "OfferFiliere",
     "OfferIngestionEvent",
     "SavedOffer",

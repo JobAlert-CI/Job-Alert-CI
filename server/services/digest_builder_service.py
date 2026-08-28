@@ -346,17 +346,33 @@ def select_candidate_offers(
     return ranked, resolution
 
 
-def _replace_digest_offers(db: Session, digest: EmailDigest, offers: list[object]) -> None:
+def _replace_digest_offers(
+    db: Session,
+    digest: EmailDigest,
+    offers: list[object],
+    *,
+    match_kinds: dict[str, str] | None = None,
+) -> None:
     """Remplace les lignes EmailDigestOffer en respectant les contraintes UNIQUE.
 
     Suppression explicite + flush AVANT les inserts: evite tout conflit entre
     DELETE et INSERT dans le meme flush.
+
+    `match_kinds` (offre_id -> 'primary'/'secondary'/...) est persiste sur
+    chaque ligne pour permettre a l'email de distinguer la section
+    "Selectionnees pour vous" de "Pourrait aussi vous interesser".
     """
 
     db.query(EmailDigestOffer).filter(EmailDigestOffer.digest_id == digest.id).delete(synchronize_session=False)
     db.flush()
     for position, offer in enumerate(offers, start=1):
-        db.add(EmailDigestOffer(digest_id=digest.id, offer_id=offer.id, position=position))
+        kind = (match_kinds or {}).get(offer.id, "primary")
+        db.add(EmailDigestOffer(
+            digest_id=digest.id,
+            offer_id=offer.id,
+            position=position,
+            match_kind=kind,
+        ))
 
 
 def build_and_queue_digest_sync(
@@ -420,6 +436,33 @@ def build_and_queue_digest_sync(
     digest.scheduled_for = scheduled_send_time(digest_day, settings=resolved_settings)
     digest.template_version = "v1"
 
+    # Cascade T0-T5 (defaut active, peut etre desactivee via setting
+    # digest_cascade_enabled si on veut revenir au comportement strict seul).
+    cascade_enabled = getattr(resolved_settings, "digest_cascade_enabled", True)
+    if cascade_enabled and len(selected) < resolved_settings.digest_min_offers:
+        from services.digest_cascade_selector import select_with_cascade
+
+        outcome = select_with_cascade(db, subscriber=subscriber, settings=resolved_settings)
+        if not outcome.insufficient and outcome.selected_offers:
+            ranked = outcome.selected_offers
+            selected = ranked[: resolved_settings.digest_max_offers]
+            digest.match_tier = outcome.tier
+            # On garde la trace des match_kinds pour les persister sur les liens.
+            digest._pending_match_kinds = dict(zip(
+                [o.id for o in outcome.selected_offers],
+                outcome.match_kinds,
+            ))
+            # On reaffecte aussi le resolution pour la trace.
+            if not subscriber_has_reliable_city(resolution):
+                logger.info(
+                    "digest_cascade_relached",
+                    extra={
+                        "subscriber_id": subscriber_id,
+                        "tier": outcome.tier,
+                        "match_kinds": outcome.match_kinds,
+                    },
+                )
+
     if not selected:
         digest.status = DigestStatus.SKIPPED_EMPTY
         digest.offer_count = 0
@@ -437,7 +480,7 @@ def build_and_queue_digest_sync(
     digest.payload_preview = {
         "titles": [getattr(offer, "title", "") for offer in selected],
     }
-    _replace_digest_offers(db, digest, selected)
+    _replace_digest_offers(db, digest, selected, match_kinds=getattr(digest, "_pending_match_kinds", None))
     db.flush()
     return DigestBuildResult(subscriber_id=subscriber_id, digest_id=digest.id, status=DigestStatus.QUEUED.value, offer_count=len(selected))
 

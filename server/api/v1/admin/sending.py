@@ -212,3 +212,39 @@ async def get_sending_stats(db: Session = Depends(get_db), period_days: int = Qu
         total_skipped=total_skipped,
         success_rate=success_rate,
     )
+
+
+@router.get("/tier-stats")
+async def get_tier_stats(
+    db: Session = Depends(get_db),
+    period_days: int = Query(7, ge=1, le=365),
+):
+    """Distribution des paliers de matching T0-T5 par jour (cascade).
+
+    Permet a l'equipe ops de suivre la qualite du matching et d'identifier
+    quand trop de digests basculent en T2+ (signe que le tagging de filiere
+    ou le referentiel de villes est trop strict, cf. cahier des charges).
+
+    Retourne:
+    - `tier_distribution` : comptage par tier au niveau digest (par date + global)
+    - `match_kind_distribution` : comptage par match_kind au niveau offre
+    """
+    from services.tier_stats_service import (
+        compute_tier_stats,
+        compute_match_kind_stats,
+    )
+
+    today = datetime.now(timezone.utc).date()
+    since = today - timedelta(days=period_days - 1)  # inclusif
+    until = today
+
+    tier_stats = compute_tier_stats(db, since=since, until=until)
+    match_kind_stats = compute_match_kind_stats(db, since=since, until=until)
+
+    return {
+        "period_days": period_days,
+        "since": since.isoformat(),
+        "until": until.isoformat(),
+        "tier_distribution": tier_stats,
+        "match_kind_distribution": match_kind_stats,
+    }

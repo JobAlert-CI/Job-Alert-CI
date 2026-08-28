@@ -89,6 +89,8 @@ def _build_offer_view(digest_offer_link: object, *, public_base_url: str) -> Dig
         # Lien canonique vers la fiche publique; fallback vers la source.
         offer_url=f"{base_url}/offres/{offer_id}",
         source_url=source_url,
+        # Tracabilite cascade T0-T5 (cf. tranche 4.2).
+        match_kind=getattr(digest_offer_link, "match_kind", "primary") or "primary",
     )
 
 
@@ -193,6 +195,14 @@ def send_digest_now(
         for link in digest.offer_links
     ]
 
+    # Split primary / secondary pour le template 2 sections (tranche 4.2).
+    # Le scoring canonique a deja classe les offres par pertinence, donc on
+    # preserve l'ordre dans chaque split. Si tout est primary (T0 strict),
+    # la liste secondary est vide et la section "Pourrait aussi vous
+    # interesser" n'est pas affichee (cf. digest_template.render_digest_email).
+    primary_offers = [v for v in offers if v.match_kind == "primary"]
+    secondary_offers = [v for v in offers if v.match_kind != "primary"]
+
     # Liens signes: tokens generes/haches via services.token_service (jamais
     # stockes en clair). manage_alert reste reutilisable tant qu'il n'est pas
     # revoque; unsubscribe est a usage unique (marque used a la desinscription).
@@ -215,7 +225,9 @@ def send_digest_now(
         full_name=subscriber.full_name,
         email=subscriber.email,
         digest_date_str=digest.digest_date.strftime("%d/%m/%Y"),
-        offers=offers,
+        offers=offers,  # retrocompat: liste complete
+        primary_offers=primary_offers,
+        secondary_offers=secondary_offers,
         manage_preferences_url=f"{manage_base}/preferences/{manage_raw_token}",
         unsubscribe_url=f"{manage_base}/desinscription/{unsubscribe_raw_token}",
         support_email=resolved_settings.support_email,

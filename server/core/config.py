@@ -143,13 +143,25 @@ class Settings:
     daily_digest_send_minute: int = field(default_factory=lambda: _int_env("DAILY_DIGEST_SEND_MINUTE", 0))
     digest_timezone: str = field(default_factory=lambda: _str_env("DIGEST_TIMEZONE", "Africa/Abidjan"))
     digest_max_offers: int = field(default_factory=lambda: _int_env("DIGEST_MAX_OFFERS", 3))
-    digest_min_offers: int = field(default_factory=lambda: _int_env("DIGEST_MIN_OFFERS", 1))
     digest_send_if_below_min: bool = field(default_factory=lambda: _bool_env("DIGEST_SEND_IF_BELOW_MIN", True))
     digest_include_no_contract_offers: bool = field(
         default_factory=lambda: _bool_env("DIGEST_INCLUDE_NO_CONTRACT_OFFERS", False)
     )
     digest_include_no_location_offers: bool = field(
         default_factory=lambda: _bool_env("DIGEST_INCLUDE_NO_LOCATION_OFFERS", True)
+    )
+    digest_min_offers: int = field(default_factory=lambda: _int_env("DIGEST_MIN_OFFERS", 2))
+    digest_cascade_max_tier: str = field(default_factory=lambda: _str_env("DIGEST_CASCADE_MAX_TIER", "T5"))
+    digest_cascade_freshness_days: int = field(
+        default_factory=lambda: _int_env("DIGEST_CASCADE_FRESHNESS_DAYS", 14)
+    )
+    digest_cascade_fallback_city: str = field(
+        default_factory=lambda: _str_env("DIGEST_CASCADE_FALLBACK_CITY", "Abidjan")
+    )
+    digest_cascade_enabled: bool = field(default_factory=lambda: _bool_env("DIGEST_CASCADE_ENABLED", True))
+    send_no_offer_email: bool = field(default_factory=lambda: _bool_env("SEND_NO_OFFER_EMAIL", True))
+    no_offer_email_min_interval_days: int = field(
+        default_factory=lambda: _int_env("NO_OFFER_EMAIL_MIN_INTERVAL_DAYS", 7)
     )
     experience_match_mode: str = field(default_factory=lambda: _str_env("EXPERIENCE_MATCH_MODE", "compatible"))
     experience_match_tolerance_years: int = field(

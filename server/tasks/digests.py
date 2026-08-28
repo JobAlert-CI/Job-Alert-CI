@@ -375,6 +375,64 @@ def mark_sending_completed(results, digest_date: str) -> dict:
     }
 
 
+# ─── Phase 2.5 — envoi des emails 'no offer' pour les skipped_empty ────
+
+
+@celery_app.task(name="tasks.digests.send_no_offer_emails")
+def send_no_offer_emails(date_override: str | None = None) -> dict:
+    """Orchestrateur de la phase 2.5: envoie les emails 'no offer' pour
+    les EmailDigest skipped_empty du jour.
+
+    Tourne apres `send_daily_digests` (phase 2 principale) pour eviter
+    de melanger les retries: les digests queued partent d'abord, puis
+    les no-offer partent en fin de phase.
+
+    Verrou Redis separe (lock:digest:no_offer:{date}) pour ne pas
+    interferer avec la phase 2 en cas de reexecution.
+    """
+    settings = get_settings()
+    if date_override:
+        digest_day = datetime.strptime(date_override, "%Y-%m-%d").date()
+    else:
+        digest_day = _today()
+
+    day_key = digest_day.isoformat()
+    client = _redis()
+
+    with redis_lock(
+        f"lock:digest:no_offer:{day_key}",
+        ttl_seconds=settings.digest_prepare_lock_ttl_seconds,
+    ) as acquired:
+        if not acquired:
+            logger.warning("Envoi no-offer deja en cours pour %s (verrou actif)", day_key)
+            return {"status": "already_running", "digest_date": day_key}
+
+        try:
+            provider = get_email_provider()
+            with session_scope() as db:
+                from services.no_offer_email_service import dispatch_no_offer_emails
+
+                summary = dispatch_no_offer_emails(
+                    db, digest_day=digest_day, provider=provider, settings=settings
+                )
+            logger.info(
+                "Envoi no-offer termine (%s): total=%s sent=%s skipped=%s failed=%s",
+                day_key,
+                summary["total"],
+                summary["sent"],
+                summary["skipped"],
+                summary["failed"],
+            )
+            return {
+                "status": "completed",
+                "digest_date": day_key,
+                **summary,
+            }
+        except Exception:
+            logger.exception("Envoi no-offer echoue pour %s", day_key)
+            return {"status": "failed", "digest_date": day_key}
+
+
 # ─── Rattrapage encadre (desactive par defaut) ────────────────────────────
 
 
@@ -437,4 +495,5 @@ __all__ = [
     "retry_failed_digests",
     "send_daily_digests",
     "send_digest",
+    "send_no_offer_emails",
 ]

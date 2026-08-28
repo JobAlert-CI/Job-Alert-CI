@@ -36,6 +36,8 @@ class EmailDigest(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     sent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     template_version: Mapped[str] = mapped_column(String(40), default="v1", nullable=False)
     payload_preview: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    # Palier de matching atteint par la cascade T0-T5 (defaut T0 = selection stricte).
+    match_tier: Mapped[str] = mapped_column(String(8), default="T0", index=True, nullable=False)
 
     subscriber: Mapped["Subscriber"] = relationship(back_populates="digests")
     scrape_run: Mapped["ScrapeRun | None"] = relationship(back_populates="digests")
@@ -58,6 +60,10 @@ class EmailDigestOffer(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     digest_id: Mapped[str] = mapped_column(ForeignKey("email_digests.id", ondelete="CASCADE"), index=True, nullable=False)
     offer_id: Mapped[str] = mapped_column(ForeignKey("job_offers.id", ondelete="CASCADE"), index=True, nullable=False)
     position: Mapped[int] = mapped_column(Integer, nullable=False)
+    # Comment l'offre a ete recuperee: 'primary' (filiere principale stricte),
+    # 'secondary' (T1), 'fallback_contract' (T2), 'fallback_freshness' (T3),
+    # 'fallback_experience' (T4), 'fallback_city' (T5).
+    match_kind: Mapped[str] = mapped_column(String(32), default="primary", nullable=False)
 
     digest: Mapped["EmailDigest"] = relationship(back_populates="offer_links")
     offer: Mapped["JobOffer"] = relationship(back_populates="digest_links")
@@ -125,3 +131,27 @@ class TransactionalEmailEvent(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     subscriber: Mapped["Subscriber | None"] = relationship()
 
     __table_args__ = (CheckConstraint("attempts >= 0", name="attempts_positive"),)
+
+
+class NoOfferEmailLog(UUIDPrimaryKeyMixin, TimestampMixin, Base):
+    """Trace les emails 'no offer' envoyes aux abonnes.
+
+    Utilise pour appliquer le rate limit (NO_OFFER_EMAIL_MIN_INTERVAL_DAYS) :
+    on ne renvoie pas l'email 'no offer' a un abonne qui en a deja recu un
+    dans la fenetre glissante (defaut 7 jours).
+
+    Distinct de EmailDigest : un 'no offer' n'est pas un digest (pas
+    d'offres selectionnees, pas de EmailDigestOffer lies). C'est un email
+    transactionnel avec sa propre table de logs pour ne pas polluer
+    EmailDigest qui sert aux metriques de la prod quotidienne.
+    """
+
+    __tablename__ = "no_offer_email_logs"
+
+    subscriber_id: Mapped[str] = mapped_column(
+        ForeignKey("subscribers.id", ondelete="CASCADE"), index=True, nullable=False
+    )
+    digest_date: Mapped[date] = mapped_column(Date, index=True, nullable=False)
+    sent_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True, nullable=False)
+
+    subscriber: Mapped["Subscriber"] = relationship()
