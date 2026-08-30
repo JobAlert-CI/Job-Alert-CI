@@ -1,188 +1,93 @@
 import adminApi from "./adminAxios"
-import { INITIAL_FILIERES, INITIAL_SOURCES } from "./mockData"
-import { addMockLog } from "./adminLogs.api"
 
-let localSources = [...INITIAL_SOURCES]
-let localFilieres = [...INITIAL_FILIERES]
+/**
+ * API référentiels secondaires (super_admin) — onglets génériques :
+ * contract-types · experience-levels · education-levels · locations.
+ * Même composant CRUD réutilisé 4× côté UI.
+ */
 
-/* ─── Sources de Scraping ─── */
-export const fetchAdminSources = async () => {
-  try {
-    const res = await adminApi.get("/api/admin/referentials/sources")
-    return res.data
-  } catch {
-    return localSources
-  }
+const delay = (ms = 150) => new Promise((r) => setTimeout(r, ms))
+
+export const REFERENTIAL_TABS = [
+  { key: "contract-types", label: "Types de contrat" },
+  { key: "experience-levels", label: "Niveaux d'expérience" },
+  { key: "education-levels", label: "Niveaux d'études" },
+  { key: "locations", label: "Localisations" },
+]
+
+const MOCK_REFERENTIALS = {
+  "contract-types": [
+    { id: "ct-1", code: "CDI", label: "CDI", sort_order: 1, is_active: true },
+    { id: "ct-2", code: "CDD", label: "CDD", sort_order: 2, is_active: true },
+    { id: "ct-3", code: "stage", label: "Stage", sort_order: 3, is_active: true },
+    { id: "ct-4", code: "freelance", label: "Freelance", sort_order: 4, is_active: true },
+    { id: "ct-5", code: "interim", label: "Intérim", sort_order: 5, is_active: false },
+  ],
+  "experience-levels": [
+    { id: "xl-1", code: "junior", label: "Junior (0-2 ans)", min_years: 0, max_years: 2, sort_order: 1, is_active: true },
+    { id: "xl-2", code: "confirme", label: "Confirmé (3-5 ans)", min_years: 3, max_years: 5, sort_order: 2, is_active: true },
+    { id: "xl-3", code: "senior", label: "Senior (6-9 ans)", min_years: 6, max_years: 9, sort_order: 3, is_active: true },
+    { id: "xl-4", code: "expert", label: "Expert (10+ ans)", min_years: 10, max_years: null, sort_order: 4, is_active: true },
+  ],
+  "education-levels": [
+    { id: "el-1", code: "bac", label: "Bac", rank: 1, sort_order: 1, is_active: true },
+    { id: "el-2", code: "bac+2", label: "Bac+2 (BTS / DUT)", rank: 2, sort_order: 2, is_active: true },
+    { id: "el-3", code: "licence", label: "Licence (Bac+3)", rank: 3, sort_order: 3, is_active: true },
+    { id: "el-4", code: "maitrise", label: "Maîtrise (Bac+4)", rank: 4, sort_order: 4, is_active: true },
+    { id: "el-5", code: "master", label: "Master / Ingénieur (Bac+5)", rank: 5, sort_order: 5, is_active: true },
+  ],
+  locations: [
+    { id: "loc-1", country_code: "CI", city: "Abidjan", district: null, label: "Abidjan", normalized_label: "abidjan", is_remote: false, is_active: true },
+    { id: "loc-2", country_code: "CI", city: "Yamoussoukro", district: null, label: "Yamoussoukro", normalized_label: "yamoussoukro", is_remote: false, is_active: true },
+    { id: "loc-3", country_code: "CI", city: "Bouaké", district: null, label: "Bouaké", normalized_label: "bouake", is_remote: false, is_active: true },
+    { id: "loc-4", country_code: "CI", city: "San-Pédro", district: null, label: "San-Pédro", normalized_label: "san-pedro", is_remote: false, is_active: true },
+    { id: "loc-5", country_code: "CI", city: "Télétravail", district: null, label: "Télétravail", normalized_label: "teletravail", is_remote: true, is_active: true },
+  ],
 }
 
-export const createSource = async (data) => {
-  try {
-    const res = await adminApi.post("/api/admin/referentials/sources", data)
-    return res.data
-  } catch {
-    const newSource = {
-      id: `src-${Date.now()}`,
-      status: "active",
-      total_offers: 0,
-      created_at: new Date().toISOString(),
-      logo: "/LogoSource/novojob.svg",
-      ...data,
+const buildResource = (resource) => ({
+  fetchAll: async () => {
+    try {
+      const { data } = await adminApi.get(`/referentials/${resource}`)
+      return data
+    } catch (error) {
+      if (error?.response) throw error
+      await delay()
+      return [...(MOCK_REFERENTIALS[resource] || [])]
     }
-    localSources = [...localSources, newSource]
-    addMockLog({
-      module: "sources",
-      type: "audit",
-      niveau: "info",
-      action: "creation",
-      message: `Création de la source : ${newSource.name}`,
-      details: { id: newSource.id, name: newSource.name },
-    })
-    return newSource
+  },
+  create: async (payload) => {
+    const { data } = await adminApi.post(`/referentials/${resource}`, payload)
+    return data
+  },
+  update: async (itemId, payload) => {
+    const { data } = await adminApi.put(`/referentials/${resource}/${itemId}`, payload)
+    return data
+  },
+  remove: async (itemId) => {
+    await adminApi.delete(`/referentials/${resource}/${itemId}`)
+  },
+})
+
+/* Instances réutilisées par l'onglet générique */
+export const contractTypesApi = buildResource("contract-types")
+export const experienceLevelsApi = buildResource("experience-levels")
+export const educationLevelsApi = buildResource("education-levels")
+export const locationsApi = buildResource("locations")
+
+/** Résout l'instance CRUD d'un onglet référentiel par sa clé. */
+export const resolveReferentialApi = (resource) => {
+  switch (resource) {
+    case "contract-types":
+      return contractTypesApi
+    case "experience-levels":
+      return experienceLevelsApi
+    case "education-levels":
+      return educationLevelsApi
+    case "locations":
+      return locationsApi
+    default:
+      throw new Error(`Référentiel inconnu : ${resource}`)
   }
 }
 
-export const updateSource = async (id, data) => {
-  try {
-    const res = await adminApi.put(`/api/admin/referentials/sources/${id}`, data)
-    return res.data
-  } catch {
-    localSources = localSources.map((s) => (s.id === id ? { ...s, ...data } : s))
-    const updated = localSources.find((s) => s.id === id)
-    addMockLog({
-      module: "sources",
-      type: "audit",
-      niveau: "info",
-      action: "modification",
-      message: `Mise à jour de la source : ${updated?.name || id}`,
-      details: { id, updates: data },
-    })
-    return updated
-  }
-}
-
-export const updateSourceStatus = async (id, status) => {
-  try {
-    const res = await adminApi.patch(`/api/admin/referentials/sources/${id}/status`, { status })
-    return res.data
-  } catch {
-    localSources = localSources.map((s) => (s.id === id ? { ...s, status } : s))
-    addMockLog({
-      module: "sources",
-      type: "audit",
-      niveau: status === "disabled" ? "warning" : "info",
-      action: "modification",
-      message: `Statut de la source (${id}) modifié -> ${status}`,
-      details: { id, status },
-    })
-    return localSources.find((s) => s.id === id)
-  }
-}
-
-export const deleteSource = async (id) => {
-  try {
-    await adminApi.delete(`/api/admin/referentials/sources/${id}`)
-  } catch {
-    const target = localSources.find((s) => s.id === id)
-    localSources = localSources.filter((s) => s.id !== id)
-    addMockLog({
-      module: "sources",
-      type: "audit",
-      niveau: "warning",
-      action: "suppression",
-      message: `Suppression de la source : ${target?.name || id}`,
-      details: { id },
-    })
-  }
-}
-
-/* ─── Filières Métiers ─── */
-export const fetchAdminFilieres = async () => {
-  try {
-    const res = await adminApi.get("/api/admin/referentials/filieres")
-    return res.data
-  } catch {
-    return localFilieres
-  }
-}
-
-export const createFiliere = async (data) => {
-  try {
-    const res = await adminApi.post("/api/admin/referentials/filieres", data)
-    return res.data
-  } catch {
-    const newFiliere = {
-      id: `fil-${Date.now()}`,
-      slug: data.slug || data.label?.toLowerCase().replace(/\s+/g, "-"),
-      total_offers: 0,
-      is_active: true,
-      specialties: data.specialties || [],
-      keywords: data.keywords || [],
-      sort_order: localFilieres.length + 1,
-      ...data,
-    }
-    localFilieres = [...localFilieres, newFiliere]
-    addMockLog({
-      module: "filieres",
-      type: "audit",
-      niveau: "info",
-      action: "creation",
-      message: `Création de la filière : ${newFiliere.label}`,
-      details: { id: newFiliere.id, label: newFiliere.label },
-    })
-    return newFiliere
-  }
-}
-
-export const updateFiliere = async (id, data) => {
-  try {
-    const res = await adminApi.put(`/api/admin/referentials/filieres/${id}`, data)
-    return res.data
-  } catch {
-    localFilieres = localFilieres.map((f) => (f.id === id ? { ...f, ...data } : f))
-    const updated = localFilieres.find((f) => f.id === id)
-    addMockLog({
-      module: "filieres",
-      type: "audit",
-      niveau: "info",
-      action: "modification",
-      message: `Mise à jour de la filière : ${updated?.label || id}`,
-      details: { id, updates: data },
-    })
-    return updated
-  }
-}
-
-export const updateFiliereKeywords = async (id, keywords) => {
-  try {
-    const res = await adminApi.put(`/api/admin/referentials/filieres/${id}/keywords`, { keywords })
-    return res.data
-  } catch {
-    localFilieres = localFilieres.map((f) => (f.id === id ? { ...f, keywords } : f))
-    addMockLog({
-      module: "filieres",
-      type: "audit",
-      niveau: "info",
-      action: "modification",
-      message: `Mise à jour des mots-clés pour la filière (${id}) (${keywords.length} mots-clés)`,
-      details: { id, count: keywords.length },
-    })
-    return { message: "Mots-clés mis à jour", count: keywords.length }
-  }
-}
-
-export const deleteFiliere = async (id) => {
-  try {
-    await adminApi.delete(`/api/admin/referentials/filieres/${id}`)
-  } catch {
-    const target = localFilieres.find((f) => f.id === id)
-    localFilieres = localFilieres.filter((f) => f.id !== id)
-    addMockLog({
-      module: "filieres",
-      type: "audit",
-      niveau: "warning",
-      action: "suppression",
-      message: `Suppression de la filière : ${target?.label || id}`,
-      details: { id },
-    })
-  }
-}

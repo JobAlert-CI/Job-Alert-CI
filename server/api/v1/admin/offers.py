@@ -144,7 +144,7 @@ async def update_offer_status(
     db: Session = Depends(get_db),
     admin: Administrator = Depends(get_current_admin),
 ):
-    """Change le statut (active, expired, filled, archived)."""
+    """Change le statut (active, expired, filled, archived, duplicate, hidden)."""
     offer = _require_offer(db, offer_id)
     offer.status = JobOfferStatus(payload.status)
     log_admin_action(

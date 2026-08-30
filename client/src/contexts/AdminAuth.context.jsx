@@ -1,8 +1,15 @@
-import { createContext, useContext, useEffect, useState } from "react"
+﻿import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react"
 import { getAdminProfile, loginAdmin, logoutAdmin } from "@/api/admin/adminAuth.api"
-import { ADMIN_USER_KEY, TOKEN_KEY } from "@/api/admin/adminAxios"
-import { INITIAL_ADMINS } from "@/api/admin/mockData"
-import { ALL_PERMISSIONS } from "@/api/admin/adminUsers.api"
+import { tokenStorage } from "@/api/admin/adminAxios"
+import { ADMIN_ROLES, ROLE_PAGES } from "@/api/admin/types"
+
+/**
+ * Store de session admin (S3).
+ * - access_token + refresh_token gérés par tokenStorage (cf. adminAxios)
+ * - profil résolu via GET /auth/me
+ * - logout → POST /auth/logout puis purge locale
+ * - écoute l'événement `admin:session-expired` émis par l'intercepteur 401
+ */
 
 const AdminAuthContext = createContext(null)
 
@@ -15,109 +22,107 @@ export const useAdminAuth = () => {
   return context
 }
 
-export const AdminAuthProvider = ({ children }) => {
-  const [user, setUser] = useState(() => {
-    const saved = localStorage.getItem(ADMIN_USER_KEY)
-    if (saved) {
-      try {
-        return JSON.parse(saved)
-      } catch {
-        return null
-      }
-    }
-    // En développement, si un token existe, initialiser avec le super admin par défaut
-    if (localStorage.getItem(TOKEN_KEY)) {
-      return INITIAL_ADMINS[0]
-    }
+const cachedUser = () => {
+  try {
+    const saved = localStorage.getItem("admin_current_user")
+    return saved ? JSON.parse(saved) : null
+  } catch {
     return null
-  })
+  }
+}
 
-  const [loading, setLoading] = useState(true)
+export const AdminAuthProvider = ({ children }) => {
+  const [user, setUser] = useState(() => (tokenStorage.access ? cachedUser() : null))
+  const [loading, setLoading] = useState(() => Boolean(tokenStorage.access))
 
+  // Résolution du profil au démarrage si un token existe
   useEffect(() => {
-    const initAuth = async () => {
-      const token = localStorage.getItem(TOKEN_KEY)
-      if (token) {
-        try {
-          const profile = await getAdminProfile()
-          setUser(profile)
-        } catch {
-          // Si le token est invalide
-          if (!import.meta.env.DEV) {
-            setUser(null)
-          }
-        }
+    let cancelled = false
+    const init = async () => {
+      if (!tokenStorage.access) {
+        setLoading(false)
+        return
       }
-      setLoading(false)
+      try {
+        const profile = await getAdminProfile()
+        if (!cancelled) {
+          setUser(profile)
+          localStorage.setItem("admin_current_user", JSON.stringify(profile))
+        }
+      } catch {
+        if (!cancelled && !import.meta.env.DEV) {
+          tokenStorage.clear()
+          setUser(null)
+        }
+      } finally {
+        if (!cancelled) setLoading(false)
+      }
     }
-    initAuth()
+    init()
+    return () => {
+      cancelled = true
+    }
   }, [])
 
-  const login = async ({ email, password }) => {
+  // Session expirée côté intercepteur HTTP → retour à l'écran de connexion
+  useEffect(() => {
+    const onExpired = () => {
+      setUser(null)
+      localStorage.removeItem("admin_current_user")
+      window.location.assign("/admin/connexion?expired=1")
+    }
+    window.addEventListener("admin:session-expired", onExpired)
+    return () => window.removeEventListener("admin:session-expired", onExpired)
+  }, [])
+
+  const login = useCallback(async ({ email, password }) => {
     setLoading(true)
     try {
-      const res = await loginAdmin({ email, password })
+      const tokens = await loginAdmin({ email, password })
       const profile = await getAdminProfile()
       const authUser = {
         ...profile,
-        role: res.role || profile.role || "super_admin",
+        id: profile.id || tokens.admin_id,
+        role: profile.role || tokens.role || ADMIN_ROLES.SUPER_ADMIN,
       }
       setUser(authUser)
-      localStorage.setItem(ADMIN_USER_KEY, JSON.stringify(authUser))
+      localStorage.setItem("admin_current_user", JSON.stringify(authUser))
       return authUser
     } finally {
       setLoading(false)
     }
-  }
+  }, [])
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     await logoutAdmin()
     setUser(null)
-  }
+  }, [])
 
-  // Vérification granulaire des permissions
-  const hasPermission = (permissionId) => {
-    if (!user) return false
-    // Le Super Admin a tous les pouvoirs par défaut
-    if (user.role === "super_admin" || user.role === "admin") return true
-    if (Array.isArray(user.permissions)) {
-      return user.permissions.includes(permissionId)
-    }
-    return false
-  }
+  /** @type {(role: import("@/api/admin/types").AdminRole | string) => boolean} */
+  const hasRole = useCallback(
+    (...roles) => Boolean(user?.is_active !== false && roles.includes(user?.role)),
+    [user]
+  )
 
-  const isSuperAdmin = Boolean(user && (user.role === "super_admin" || user.role === "admin"))
+  const canAccessPath = useCallback(
+    (path) => (user ? ROLE_PAGES[user.role]?.includes(path) || ROLE_PAGES[user.role] === "*" : false),
+    [user]
+  )
 
-  // Raccourci pour basculer facilement de rôle en développement
-  const switchRole = (targetRole) => {
-    if (!import.meta.env.DEV) return
-    const template = INITIAL_ADMINS.find((a) => a.role === targetRole) || INITIAL_ADMINS[0]
-    const updated = {
-      ...template,
-      permissions:
-        targetRole === "super_admin"
-          ? ALL_PERMISSIONS.map((p) => p.id)
-          : targetRole === "superviseur"
-          ? ["manage_offers", "manage_sources", "trigger_scrape", "manage_logs"]
-          : ["manage_offers", "manage_logs"],
-    }
-    setUser(updated)
-    localStorage.setItem(ADMIN_USER_KEY, JSON.stringify(updated))
-    localStorage.setItem(TOKEN_KEY, `mock-token-${targetRole}`)
-  }
-
-  const value = {
-    user,
-    role: user?.role || "super_admin",
-    permissions: user?.permissions || [],
-    isAuthenticated: Boolean(user),
-    isSuperAdmin,
-    hasPermission,
-    login,
-    logout,
-    switchRole,
-    loading,
-  }
+  const value = useMemo(
+    () => ({
+      user,
+      role: user?.role ?? null,
+      isAuthenticated: Boolean(user),
+      isSuperAdmin: user?.role === ADMIN_ROLES.SUPER_ADMIN,
+      hasRole,
+      canAccessPath,
+      login,
+      logout,
+      loading,
+    }),
+    [user, hasRole, canAccessPath, login, logout, loading]
+  )
 
   return <AdminAuthContext.Provider value={value}>{children}</AdminAuthContext.Provider>
 }

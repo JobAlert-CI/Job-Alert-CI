@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "dev:client": "cd ./client && npm run dev",
-    "dev:server": "cd ./server && uvicorn main:app --reload",
-    "dev": "concurrently \"cd ./server && uvicorn main:app --reload\" \"cd ./client && npm run dev\"",
+    "dev:server": "cd ./server && venv\\Scripts\\python.exe -m uvicorn main:app --reload",
+    "dev": "concurrently \"cd ./server && venv\\Scripts\\python.exe -m uvicorn main:app --reload\" \"cd ./client && npm run dev\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

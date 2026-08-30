@@ -120,9 +120,11 @@ class OfferVisibilityUpdate(ORMModel):
 
 
 class OfferStatusUpdate(ORMModel):
-    status: Literal["active", "expired", "filled", "archived"]
+    # Aligné sur JobOfferStatus (models/enums.py) — les 6 statuts sont modifiables.
+    status: Literal["active", "expired", "filled", "archived", "duplicate", "hidden"]
 
 
 class OfferBulkStatusUpdate(ORMModel):
     offer_ids: list[str] = Field(min_length=1, description="IDs des offres à modifier.")
-    status: Literal["active", "expired", "filled", "archived"]
+    # Aligné sur JobOfferStatus (models/enums.py) — les 6 statuts sont modifiables.
+    status: Literal["active", "expired", "filled", "archived", "duplicate", "hidden"]

@@ -1,133 +1,93 @@
 import adminApi from "./adminAxios"
 import { INITIAL_OFFERS } from "./mockData"
-import { addMockLog } from "./adminLogs.api"
 
-let localOffers = [...INITIAL_OFFERS]
+/**
+ * API offres (super_admin + gestionnaire_offres).
+ * GET /offers (filtres q, filiere_id, source_id, status, visible_site, origin) ·
+ * POST /offers · GET/PUT /{id} · PATCH /{id}/visibility · PATCH /{id}/status ·
+ * DELETE /{id} (soft) · POST /bulk-status.
+ *
+ * ⚠ Les référentiels se soumettent par **code** (filiere_code, contract_type_code…), jamais par UUID.
+ */
+
+let localOffers = [...INITIAL_OFFERS].map((o) => ({
+  ...o,
+  origin: "scraping",
+  company: { id: `co-${o.id}`, name: o.company, normalized_name: o.company?.toLowerCase() },
+  source: { id: o.source, code: o.source?.toLowerCase(), name: o.source },
+  primary_filiere: { id: o.filiere, code: o.filiere, label: o.filiere },
+  contract_type: { id: o.contract_type, code: o.contract_type, label: o.contract_type },
+  detail: null,
+}))
+
+const delay = (ms = 150) => new Promise((r) => setTimeout(r, ms))
 
 export const fetchAdminOffers = async (params = {}) => {
   try {
-    const res = await adminApi.get("/api/admin/offers", { params })
-    return res.data
-  } catch {
+    const { data } = await adminApi.get("/offers", { params })
+    return data
+  } catch (error) {
+    if (error?.response && error.response.status !== 502 && error.response.status !== 503 && error.response.status !== 504 && error.response.status !== 404) {
+      throw error
+    }
+    await delay()
     let list = [...localOffers]
     if (params.q) {
       const q = params.q.toLowerCase()
-      list = list.filter(
-        (o) =>
-          o.title.toLowerCase().includes(q) ||
-          o.company?.toLowerCase().includes(q) ||
-          o.location?.toLowerCase().includes(q)
-      )
+      list = list.filter((o) => o.title?.toLowerCase().includes(q) || o.company?.name?.toLowerCase().includes(q))
     }
-    if (params.status) {
-      list = list.filter((o) => o.status === params.status)
+    if (params.status) list = list.filter((o) => o.status === params.status)
+    if (params.filiere_id) list = list.filter((o) => o.primary_filiere?.code === params.filiere_id || o.primary_filiere?.id === params.filiere_id)
+    if (params.source_id) list = list.filter((o) => o.source?.code === params.source_id || o.source?.id === params.source_id)
+    if (typeof params.visible_site === "boolean" || params.visible_site === "true" || params.visible_site === "false") {
+      const wanted =
+        typeof params.visible_site === "boolean" ? params.visible_site : params.visible_site === "true"
+      list = list.filter((o) => o.visible_site === wanted)
     }
-    if (params.filiere) {
-      list = list.filter((o) => o.filiere === params.filiere)
-    }
-    if (params.source) {
-      list = list.filter((o) => o.source?.toLowerCase().includes(params.source.toLowerCase()))
-    }
-    if (params.visible_site !== undefined && params.visible_site !== "") {
-      list = list.filter((o) => o.visible_site === (params.visible_site === true || params.visible_site === "true"))
-    }
-    return list
+    if (params.origin) list = list.filter((o) => o.origin === params.origin)
+    return list.slice(params.offset || 0, (params.offset || 0) + (params.limit || 20))
   }
 }
 
-export const createOffer = async (data) => {
+export const getOfferById = async (offerId) => {
   try {
-    const res = await adminApi.post("/api/admin/offers", data)
-    return res.data
-  } catch {
-    const newOffer = {
-      id: `off-${Date.now()}`,
-      created_at: new Date().toISOString(),
-      status: "active",
-      visible_site: true,
-      ...data,
-    }
-    localOffers = [newOffer, ...localOffers]
-    addMockLog({
-      module: "offres",
-      type: "audit",
-      niveau: "info",
-      action: "creation",
-      message: `Création manuelle de l'offre : ${newOffer.title}`,
-      details: { offerId: newOffer.id, title: newOffer.title },
-    })
-    return newOffer
+    const { data } = await adminApi.get(`/offers/${offerId}`)
+    return data
+  } catch (error) {
+    if (error?.response) throw error
+    await delay()
+    return localOffers.find((o) => o.id === offerId) || null
   }
 }
 
-export const updateOffer = async (id, data) => {
-  try {
-    const res = await adminApi.put(`/api/admin/offers/${id}`, data)
-    return res.data
-  } catch {
-    localOffers = localOffers.map((o) => (o.id === id ? { ...o, ...data } : o))
-    const updated = localOffers.find((o) => o.id === id)
-    addMockLog({
-      module: "offres",
-      type: "audit",
-      niveau: "info",
-      action: "modification",
-      message: `Mise à jour de l'offre : ${updated?.title || id}`,
-      details: { id, updates: data },
-    })
-    return updated
-  }
+/** Création manuelle — référentiels par code. */
+export const createOffer = async (payload) => {
+  const { data } = await adminApi.post("/offers", payload)
+  return data
 }
 
-export const updateOfferStatus = async (id, status) => {
-  try {
-    const res = await adminApi.patch(`/api/admin/offers/${id}/status`, { status })
-    return res.data
-  } catch {
-    localOffers = localOffers.map((o) => (o.id === id ? { ...o, status } : o))
-    addMockLog({
-      module: "offres",
-      type: "audit",
-      niveau: status === "archived" ? "warning" : "info",
-      action: "modification",
-      message: `Changement de statut pour l'offre (${id}) -> ${status}`,
-      details: { id, status },
-    })
-    return localOffers.find((o) => o.id === id)
-  }
+export const updateOffer = async (offerId, payload) => {
+  const { data } = await adminApi.put(`/offers/${offerId}`, payload)
+  return data
 }
 
-export const updateOfferVisibility = async (id, visible_site) => {
-  try {
-    const res = await adminApi.patch(`/api/admin/offers/${id}/visibility`, { visible_site })
-    return res.data
-  } catch {
-    localOffers = localOffers.map((o) => (o.id === id ? { ...o, visible_site } : o))
-    addMockLog({
-      module: "offres",
-      type: "audit",
-      niveau: "info",
-      action: "modification",
-      message: `Visibilité modifiée pour l'offre (${id}) -> ${visible_site ? "Publique" : "Masquée"}`,
-      details: { id, visible_site },
-    })
-    return localOffers.find((o) => o.id === id)
-  }
+export const updateOfferVisibility = async (offerId, visibleSite) => {
+  const { data } = await adminApi.patch(`/offers/${offerId}/visibility`, { visible_site: visibleSite })
+  return data
 }
 
-export const deleteOffer = async (id) => {
-  try {
-    await adminApi.delete(`/api/admin/offers/${id}`)
-  } catch {
-    const target = localOffers.find((o) => o.id === id)
-    localOffers = localOffers.filter((o) => o.id !== id)
-    addMockLog({
-      module: "offres",
-      type: "audit",
-      niveau: "warning",
-      action: "suppression",
-      message: `Suppression définitive de l'offre : ${target?.title || id}`,
-      details: { id },
-    })
-  }
+export const updateOfferStatus = async (offerId, status) => {
+  const { data } = await adminApi.patch(`/offers/${offerId}/status`, { status })
+  return data
+}
+
+/** Suppression logique (soft delete). */
+export const deleteOffer = async (offerId) => {
+  await adminApi.delete(`/offers/${offerId}`)
+}
+
+/** Changement de statut en masse. */
+export const bulkUpdateStatus = async (offerIds, status) => {
+  const { data } = await adminApi.post("/offers/bulk-status", { offer_ids: offerIds, status })
+  return data
 }
