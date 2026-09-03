@@ -3,13 +3,24 @@ from __future__ import annotations
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from api.deps import get_current_admin, get_db, require_roles
-from models import AIApiKey, AIAlert, AIJob
+from models import AIApiKey, AIAlert, AIJob, AiProcessingJob
 from models.admin import AdminAction, Administrator
-from schemas.ai import AIApiKeyCreate, AIApiKeyRead, AIApiKeyUpdate, AIAlertRead, AIJobRead, AIRunRequest, AITestConnectionRead
+from models.enums import AIAlertSeverity, AiProcessingJobStatus, AiProcessingJobTrigger
+from schemas.ai import (
+    AIAlertAckResponse,
+    AIAlertRead,
+    AIApiKeyCreate,
+    AIApiKeyRead,
+    AIApiKeyUpdate,
+    AIJobRead,
+    AIQueueRead,
+    AIRunRequest,
+    AITestConnectionRead,
+)
 from services.ai_crypto import api_key_last4, decrypt_api_key, encrypt_api_key
 from services.ai_errors import AIProviderError
 from services.ai_providers import AIProviderFactory
@@ -132,16 +143,94 @@ def list_ai_jobs(db: Session = Depends(get_db), limit: int = Query(50, ge=1, le=
     return list(db.scalars(stmt))
 
 
+@router.get("/queue", response_model=AIQueueRead)
+def get_ai_queue(db: Session = Depends(get_db)):
+    """Vue agregee de la file d'attente IA pour le tableau de bord admin.
+
+    - `pending` / `running` : nombre de AiProcessingJob dans chaque statut
+    - `pending_ai_jobs` : nombre de AIJob (cles) en attente
+    - `last_sweep_at` / `last_sweep_status` : dernier sweep tous status confondus,
+      pour distinguer 'pas de sweep depuis longtemps' de 'sweep recent mais vide'
+
+    Pas de cache : chiffres toujours frais (lecture directe SQL).
+    """
+    counters = dict(
+        db.execute(
+            select(AiProcessingJob.status, func.count(AiProcessingJob.id)).group_by(AiProcessingJob.status)
+        ).all()
+    )
+    pending_ai_jobs = db.scalar(select(func.count(AIJob.id)).where(AIJob.status == "pending")) or 0
+
+    last_sweep = db.scalar(
+        select(AiProcessingJob)
+        .where(AiProcessingJob.trigger_type == AiProcessingJobTrigger.SWEEP)
+        .order_by(AiProcessingJob.started_at.desc().nullslast(), AiProcessingJob.created_at.desc())
+        .limit(1)
+    )
+
+    return AIQueueRead(
+        pending=counters.get(AiProcessingJobStatus.PENDING.value if hasattr(AiProcessingJobStatus.PENDING, "value") else AiProcessingJobStatus.PENDING, 0),
+        running=counters.get(AiProcessingJobStatus.RUNNING.value if hasattr(AiProcessingJobStatus.RUNNING, "value") else AiProcessingJobStatus.RUNNING, 0),
+        pending_ai_jobs=pending_ai_jobs,
+        last_sweep_at=last_sweep.started_at if last_sweep and last_sweep.started_at else None,
+        last_sweep_status=last_sweep.status.value if last_sweep and hasattr(last_sweep.status, "value") else (last_sweep.status if last_sweep else None),
+    )
+
+
 @router.get("/alerts", response_model=list[AIAlertRead])
 def list_ai_alerts(
     db: Session = Depends(get_db),
-    include_acknowledged: bool = False,
+    include_acknowledged: bool = Query(False, description="Inclure les alertes deja accusees (defaut: non)"),
+    severity: AIAlertSeverity | None = Query(None, description="Filtrer par severite (info/warning/error/critical)"),
     limit: int = Query(50, ge=1, le=200),
+    offset: int = Query(0, ge=0),
 ):
-    stmt = select(AIAlert).order_by(AIAlert.created_at.desc()).limit(limit)
+    """Liste paginee des alertes IA, avec filtre acknowledged + severity."""
+    stmt = select(AIAlert).order_by(AIAlert.created_at.desc())
     if not include_acknowledged:
         stmt = stmt.where(AIAlert.acknowledged_at.is_(None))
+    if severity is not None:
+        sev_value = severity.value if hasattr(severity, "value") else severity
+        stmt = stmt.where(AIAlert.severity == sev_value)
+    stmt = stmt.limit(limit).offset(offset)
     return list(db.scalars(stmt))
+
+
+@router.patch("/alerts/{alert_id}/ack", response_model=AIAlertAckResponse)
+def acknowledge_ai_alert(
+    alert_id: str,
+    db: Session = Depends(get_db),
+    admin: Administrator = Depends(get_current_admin),
+):
+    """Accuse reception d'une alerte (idempotent : re-acquitter est sans effet).
+
+    - 404 si l'alerte n'existe pas
+    - Si deja accusee, on retourne l'horodatage existant (pas d'erreur)
+    """
+    alert = db.get(AIAlert, alert_id)
+    if alert is None:
+        raise HTTPException(status_code=404, detail="Alerte IA introuvable")
+
+    now = datetime.now(timezone.utc)
+    if alert.acknowledged_at is None:
+        alert.acknowledged_at = now
+        alert.acknowledged_by_admin_id = admin.id
+        log_admin_action(
+            db,
+            admin_id=admin.id,
+            action=AdminAction.UPDATE,
+            target_table="ai_alerts",
+            target_id=alert.id,
+            details={"acknowledged_at": now.isoformat()},
+        )
+        db.commit()
+        db.refresh(alert)
+
+    return AIAlertAckResponse(
+        id=alert.id,
+        acknowledged_at=alert.acknowledged_at,
+        acknowledged_by_admin_id=alert.acknowledged_by_admin_id,
+    )
 
 
 @router.post("/run", status_code=status.HTTP_202_ACCEPTED)

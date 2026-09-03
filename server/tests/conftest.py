@@ -5,6 +5,11 @@ from collections.abc import Iterator
 
 import pytest
 
+# Charge les fixtures admin (admin_client, admin_db) depuis conftest_admin.py
+# via pytest_plugins (pytest ne decouvre que les `conftest.py`, pas les autres
+# fichiers par convention).
+pytest_plugins = ["tests.conftest_admin"]
+
 # La configuration est lue au moment de l'import (core.config). On force donc un
 # environnement de test AVANT tout import applicatif: base SQLite en fichier
 # temporaire, Redis desactive (fallback), aucune vraie cle Resend.
@@ -58,7 +63,16 @@ def fake_provider() -> FakeEmailProvider:
 
 
 @pytest.fixture(autouse=True)
-def _database() -> Iterator[None]:
+def _database(request: pytest.FixtureRequest) -> Iterator[None]:
+    """Cree/nettoie la base SQLite pour les tests SAUF les tests marques `admin_db`.
+
+    Le marker `admin_db` est pose sur les tests qui utilisent la fixture
+    `admin_db` (scope module). Pour ceux-la, on laisse le `_admin_database_lifecycle`
+    gerer la base, sinon on drop la session au milieu d'un test.
+    """
+    if "admin_db" in request.keywords:
+        yield
+        return
     import models  # noqa: F401  (enregistre toutes les tables)
 
     Base.metadata.drop_all(bind=engine)

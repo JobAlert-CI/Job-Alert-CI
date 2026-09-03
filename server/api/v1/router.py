@@ -6,11 +6,13 @@ from api.v1 import ingestion, internal_ai
 from api.v1.public import articles, contact, filieres, offers, referentials, sources, stats, subscriptions, webhooks_resend
 from api.v1.public import sitemap
 from api.v1.admin import (
+    aggregates as admin_aggregates,
     ai as admin_ai,
     admins,
     auth,
     content,
     dashboard,
+    exports as admin_exports,
     logs,
     offers as admin_offers,
     referentials as admin_referentials,
@@ -18,6 +20,7 @@ from api.v1.admin import (
     sending,
     settings,
     subscribers,
+    transactional_emails as admin_transactional_emails,
 )
 
 api_router = APIRouter()
@@ -49,3 +52,6 @@ api_router.include_router(admins.router)
 api_router.include_router(logs.router)
 api_router.include_router(settings.router)
 api_router.include_router(admin_ai.router)
+api_router.include_router(admin_aggregates.router)
+api_router.include_router(admin_exports.router)
+api_router.include_router(admin_transactional_emails.router)

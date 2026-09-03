@@ -60,7 +60,7 @@ export const useRepartition = () => {
     () => buildRepartition(query.data),
     [query.data]
   )
-  
+
   return { ...query, repartition }
 }
 
@@ -87,8 +87,7 @@ export const useHomeMetrics = () => {
       countForTitle:
         newOffersCount ?? (filieresReady ? repartition.totalMetric : null),
       bigNumber:
-        newOffersCount ??
-        totalOffersCount ??
+        newOffersCount || totalOffersCount ||
         (filieresReady ? repartition.totalMetric : 0),
     }
   }, [stats, statsPending, statsError, repartition, filieresPending, filieresError])

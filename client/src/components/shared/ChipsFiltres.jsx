@@ -48,8 +48,6 @@ const ChipsFiltres = ({ chips, actif, onSelect, max = 6, className }) => {
   const cachees = deborde ? chips.slice(max) : []
   const nbActivesCachees = cachees.filter((c) => c.code === actif).length
 
-  console.log(visibles)
-
   return (
     <div className={cn("flex flex-wrap items-center gap-2", className)}>
       {visibles.map((c) => (

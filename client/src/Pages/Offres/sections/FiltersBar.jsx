@@ -99,8 +99,6 @@ const SourceOptions = memo(function SourceOptions() {
   const { data: counts } = useOfferCountsQuery()
   const { filters, toggle } = useOffresFilters()
 
-  console.log(refs)
-
   if (isPending && refs.sources.length === 0) {
     return (
       <div aria-hidden="true">

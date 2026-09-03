@@ -48,7 +48,6 @@ export const OffreDetailProvider = ({ children }) => {
     return adapted ? { ...adapted, detail: raw.detail ?? {} } : null
   }, [detailQuery.data])
 
-  console.log(offre)
 
   const meta = useMemo(() => getFiliereTheme(offre?.filiere), [offre?.filiere])
   /* Couleur exacte de la filière (color_hex API) si dispo, sinon thème statique. */

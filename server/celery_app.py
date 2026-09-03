@@ -54,7 +54,7 @@ if SCRAPER_BEAT_ENABLED:
                 # NB: pas de kwarg `timezone` sur crontab (non supporte par la
                 # version de Celery du projet) — les heures sont lues comme
                 # heure locale du beat, cadree par celery_app.conf.timezone.
-                "schedule": crontab(hour=17, minute=00),
+                "schedule": crontab(hour=6, minute=00),
                 "args": ("goafrica",),
                 "options": {"queue": "ingestion"},
             },
@@ -79,8 +79,8 @@ if SCRAPER_BEAT_ENABLED:
 beat_schedule["digest-prepare"] = {
     "task": "tasks.digests.prepare_daily_digests",
     "schedule": crontab(
-        hour=17, #settings.daily_digest_prepare_hour,
-        minute=15 #settings.daily_digest_prepare_minute,
+        hour=settings.daily_digest_prepare_hour,
+        minute=settings.daily_digest_prepare_minute,
     ),
     "options": {"queue": "emails"},
 }
@@ -88,18 +88,18 @@ beat_schedule["digest-prepare"] = {
 beat_schedule["digest-send"] = {
     "task": "tasks.digests.send_daily_digests",
     "schedule": crontab(
-        hour=17, #settings.daily_digest_send_hour,
-        minute=17 #settings.daily_digest_send_minute,
+        hour=settings.daily_digest_send_hour,
+        minute=settings.daily_digest_send_minute,
     ),
     "options": {"queue": "emails"},
 }
 
-# Phase 2.5 a 08h15: envoi des emails 'no offer' pour les skipped_empty.
-# Tourne 15 min apres la phase 2 pour laisser le temps aux envois queued
+# Phase 2.5 a 08h30: envoi des emails 'no offer' pour les skipped_empty.
+# Tourne 30 min apres la phase 2 pour laisser le temps aux envois queued
 # de se terminer (les retries Celery peuvent prendre quelques minutes).
 beat_schedule["digest-send-no-offer"] = {
     "task": "tasks.digests.send_no_offer_emails",
-    "schedule": crontab(hour=8, minute=15),
+    "schedule": crontab(hour=8, minute=30),
     "options": {"queue": "emails"},
 }
 

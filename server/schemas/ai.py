@@ -226,3 +226,48 @@ class AIJobRead(TimestampRead):
     fallback_count: int
     error_message: str | None = None
     celery_task_id: str | None = None
+
+
+# ─── Enrichissement admin (etape 1 — dashboard / file IA / alertes) ───
+
+
+class AIAlertAckResponse(BaseModel):
+    """Reponse apres accuse de reception d'une alerte IA.
+
+    `acknowledged_by_admin_id` reste en str (pas UUID) pour rester aligne
+    avec le type des autres endpoints (les administrateurs utilisent un UUID,
+    mais on accepte aussi un identifiant logique pour les tests / seeds).
+    """
+
+    id: str
+    acknowledged_at: datetime
+    acknowledged_by_admin_id: str | None = None
+
+
+class AIQueueRead(BaseModel):
+    """Etat agrege de la file d'attente du pipeline IA pour le tableau de bord.
+
+    Compteurs en lecture directe sur `ai_processing_jobs` (status PENDING/RUNNING)
+    et `ai_jobs` (idem). Le dernier sweep designe le job de trigger SWEEP le plus
+    recent, tous status confondus, ce qui permet de distinguer 'pas de sweep
+    depuis longtemps' de 'sweep recent mais vide'.
+
+    Pourquoi pas l'ORM directement : on expose plusieurs compteurs en un seul
+    appel pour economiser un round-trip cote front.
+    """
+
+    pending: int = Field(ge=0, description="Nombre de AiProcessingJob en statut PENDING")
+    running: int = Field(ge=0, description="Nombre de AiProcessingJob en statut RUNNING")
+    pending_ai_jobs: int = Field(ge=0, description="Nombre de AIJob en statut PENDING")
+    last_sweep_at: datetime | None = Field(
+        default=None, description="Horodatage du dernier AiProcessingJob de trigger SWEEP (tous status)"
+    )
+    last_sweep_status: AIProcessingJobStatusLiteral | None = Field(
+        default=None, description="Statut du dernier sweep"
+    )
+
+
+AIProcessingJobStatusLiteral = Annotated[
+    str,
+    StringConstraints(pattern=r"^(pending|running|completed|failed|skipped|locked)$"),
+]
