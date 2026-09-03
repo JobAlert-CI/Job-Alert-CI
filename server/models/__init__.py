@@ -59,6 +59,7 @@ from models.referentials import (
     Location,
     Source,
 )
+from models.rejected_duplicates import RejectedDuplicatePair
 from models.scraping import ScrapeRun, SourceScrapeRun
 from models.subscriptions import (
     SavedOffer,

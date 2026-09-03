@@ -231,3 +231,18 @@ class LocationUpdate(BaseModel):
     label: str | None = Field(default=None, max_length=255)
     is_remote: bool | None = None
     is_active: bool | None = None
+
+class FiliereSimulationInput(BaseModel):
+    filiere_code: str = Field(..., max_length=120)
+    keywords: list[dict] = Field(
+        description="Liste de {keyword: str, weight: int} (1-100)", min_length=1
+    )
+
+
+class FiliereSimulationResult(BaseModel):
+    filiere_code: str
+    current_keyword_count: int
+    proposed_keyword_count: int
+    offers_affected_7_days: int
+    message: str
+

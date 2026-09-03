@@ -271,3 +271,27 @@ AIProcessingJobStatusLiteral = Annotated[
     str,
     StringConstraints(pattern=r"^(pending|running|completed|failed|skipped|locked)$"),
 ]
+
+
+# ─── Suggestions IA (admin review) ───────────────────────────────────────
+
+from models.enums import AIFiliereSuggestionStatus
+
+
+class AIFiliereSuggestionRead(TimestampRead):
+    id: UUID
+    offer_id: UUID | None
+    job_id: UUID | None
+    code: str
+    label: str
+    reason: str | None = None
+    status: AIFiliereSuggestionStatus
+    reviewed_by_admin_id: UUID | None = None
+    reviewed_at: datetime | None = None
+
+
+class AIFiliereSuggestionUpdate(BaseModel):
+    status: AIFiliereSuggestionStatus = Field(..., description="APPROVED ou REJECTED")
+    reviewed_by_admin_id: UUID | None = None
+    reviewed_by_admin_id: UUID | None = None
+    reviewed_at: datetime | None = None

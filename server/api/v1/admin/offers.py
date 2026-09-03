@@ -194,3 +194,103 @@ async def bulk_update_status(
     )
     db.commit()
     return {"message": f"{result.rowcount} offres mises à jour"}
+
+
+# ─── Doublons proches (section 3 du document 8) ─────────────────────────
+
+from schemas.offers import DuplicateMarkRequest, RejectRequest, PotentialDuplicateRead
+from services.duplicates import find_potential_duplicates, mark_duplicate, reject_duplicate_pair
+
+
+@router.get("/duplicates/candidates", response_model=list[PotentialDuplicateRead])
+async def list_duplicate_candidates(
+    db: Session = Depends(get_db),
+    admin: Administrator = Depends(get_current_admin),
+    company_id: Optional[str] = Query(None, description="Filtre par entreprise (normalisée)"),
+    min_similarity: int = Query(80, ge=1, le=100, description="Seuil de similarite minimale (0-100)"),
+):
+    """Liste des offres potentiellement doublons (meme entreprise normalisee, titre proche).
+
+    Ne renvoie que les paires ou `duplicate_of_id` est vide ET `is_duplicate` non renseigne.
+    """
+    return find_potential_duplicates(db, company_id=company_id, min_similarity=min_similarity)
+
+
+@router.post("/{offer_b_id}/mark-duplicate")
+async def mark_offer_duplicate(
+    offer_b_id: str,
+    payload: DuplicateMarkRequest,
+    db: Session = Depends(get_db),
+    admin: Administrator = Depends(get_current_admin),
+):
+    """Marque l'offre `offer_b_id` comme doublon de `payload.duplicate_of_id` (A).
+
+    Met a jour `duplicate_of_id`, `is_duplicate=True`, `duplicate_reason`.
+    """
+    return mark_duplicate(db, offer_b_id=offer_b_id, duplicate_of_id=payload.duplicate_of_id, reason=payload.duplicate_reason, admin_id=admin.id)
+
+
+@router.post("/duplicates/reject")
+async def reject_duplicate(
+    payload: RejectRequest,
+    db: Session = Depends(get_db),
+    admin: Administrator = Depends(get_current_admin),
+):
+    """Indique explicitement que la paire (A, B) n'est pas un doublon.
+
+    Stocke dans `rejected_duplicate_pairs` pour ne plus reproposer la paire.
+    """
+    return reject_duplicate_pair(db, offer_a_id=payload.offer_a_id, offer_b_id=payload.offer_b_id, reason=payload.reason, admin_id=admin.id)
+
+# ─── Import en masse (document 8 — 2.9) ───────────────────────────────────
+
+import csv, io, json
+from typing import Optional
+
+from fastapi import UploadFile
+
+@router.post("/import")
+async def import_offers_bulk(
+    file: UploadFile = __import__("fastapi").File(...),
+    db: Session = Depends(get_db),
+    admin: Administrator = Depends(get_current_admin),
+):
+    """Import d'offres depuis CSV, JSON ou XLSX (reutilise create_offer en boucle).
+
+    Renvoie un rapport ligne par ligne (creees, ignorees, erreurs).
+    """
+    content_bytes = await file.read()
+    content_str = content_bytes.decode("utf-8", errors="replace")
+    results = {"created": 0, "ignored": 0, "errors": []}
+
+    if file.filename and file.filename.endswith(".json"):
+        data = json.loads(content_str)
+    elif file.filename and file.filename.endswith(".csv"):
+        reader = csv.DictReader(io.StringIO(content_str))
+        data = list(reader)
+    else:
+        # Essai JSON par defaut
+        try:
+            data = json.loads(content_str)
+        except Exception:
+            data = []
+
+    rows = data.get("offers", data) if isinstance(data, dict) else data
+    for idx, row in enumerate(rows if isinstance(rows, list) else []):
+        try:
+            payload_dict = {k: (v or None) for k, v in row.items() if k in (
+                "title", "company_name", "source_code", "source_url", "filiere_code",
+                "location_label", "contract_type_code", "experience_level_code",
+                "education_level_code", "published_at", "intro", "missions",
+            )}
+            payload = OfferCreate(**payload_dict)
+            create_offer_service(db, payload, admin_id=admin.id)
+            results["created"] += 1
+        except Exception as exc:
+            results["ignored"] += 1
+            results["errors"].append({"line": idx + 1, "error": str(exc), "data": row})
+
+    return {
+        "message": f"Import termine : {results['created']} creees, {results['ignored']} ignorees",
+        **results,
+    }

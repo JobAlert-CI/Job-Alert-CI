@@ -23,6 +23,7 @@ class JobOfferStatus(StrEnum):
     EXPIRED = "expired"
     FILLED = "filled"
     ARCHIVED = "archived"
+    EN_RELECTURE = "en_relecture"
     DUPLICATE = "duplicate"
     HIDDEN = "hidden"
     BRUT = "brut"
@@ -188,6 +189,7 @@ class ContentStatus(StrEnum):
     DRAFT = "draft"
     PUBLISHED = "published"
     ARCHIVED = "archived"
+    EN_RELECTURE = "en_relecture"
 
 
 class ContentType(StrEnum):

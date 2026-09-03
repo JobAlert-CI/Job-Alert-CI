@@ -134,6 +134,23 @@ async def update_filiere_keywords(
     return {"message": "Mots-clés mis à jour", "count": len(payload.keywords)}
 
 
+
+# ─── Simulation de filière (document 8 — 1.5) ─────────────────────────────
+
+from schemas.referentials import FiliereSimulationInput, FiliereSimulationResult
+from services.filiere_simulator import simulate_filiere_matching
+
+
+@router.post("/filieres/simulate", response_model=FiliereSimulationResult)
+async def simulate_filiere(
+    payload: FiliereSimulationInput,
+    db: Session = Depends(get_db),
+    admin: Administrator = Depends(get_current_admin),
+) -> FiliereSimulationResult:
+    """Simule l'impact d'une liste de mots-clés candidats SANS modifier la base."""
+    result = simulate_filiere_matching(db, payload.filiere_code, payload.keywords)
+    return FiliereSimulationResult(**result)
+
 # ─── Spécialités ────────────────────────────────────────
 @router.get("/filieres/{filiere_id}/specialites", response_model=list[FiliereSpecialtyRead])
 async def list_specialites(filiere_id: str, db: Session = Depends(get_db)):

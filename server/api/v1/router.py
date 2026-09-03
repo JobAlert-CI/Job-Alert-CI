@@ -8,6 +8,8 @@ from api.v1.public import sitemap
 from api.v1.admin import (
     aggregates as admin_aggregates,
     ai as admin_ai,
+    ai_suggestions as admin_ai_suggestions,
+    companies as admin_companies,
     admins,
     auth,
     content,
@@ -18,6 +20,8 @@ from api.v1.admin import (
     referentials as admin_referentials,
     scraping,
     sending,
+    system_health as admin_system_health,
+    sending_preview as admin_sending_preview,
     settings,
     subscribers,
     transactional_emails as admin_transactional_emails,
@@ -52,6 +56,10 @@ api_router.include_router(admins.router)
 api_router.include_router(logs.router)
 api_router.include_router(settings.router)
 api_router.include_router(admin_ai.router)
+api_router.include_router(admin_ai_suggestions.router)
+api_router.include_router(admin_system_health.router)
+api_router.include_router(admin_sending_preview.router)
+api_router.include_router(admin_companies.router)
 api_router.include_router(admin_aggregates.router)
 api_router.include_router(admin_exports.router)
 api_router.include_router(admin_transactional_emails.router)

@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Literal
 
-from pydantic import Field
+from pydantic import BaseModel, Field
 
 from schemas.base import ORMModel, TimestampRead
 from schemas.referentials import (
@@ -142,3 +142,26 @@ class OfferStatusUpdate(ORMModel):
 class OfferBulkStatusUpdate(ORMModel):
     offer_ids: list[str] = Field(min_length=1, description="IDs des offres à modifier.")
     status: JobOfferStatusLiteral
+
+
+# ─── Doublons proches (document 8 — section 2) ─────────────────────────────
+
+class PotentialDuplicateRead(ORMModel):
+    offer_a_id: str
+    offer_b_id: str
+    offer_a_title: str
+    offer_b_title: str
+    offer_a_company: str | None = None
+    similarity_score: int
+    reason: str | None = None
+
+
+class DuplicateMarkRequest(BaseModel):
+    duplicate_of_id: str = Field(..., description="ID de l'offre de reference (A)")
+    duplicate_reason: str | None = Field(default=None, max_length=255)
+
+
+class RejectRequest(BaseModel):
+    offer_a_id: str = Field(..., description="ID de l'offre A (reference)")
+    offer_b_id: str = Field(..., description="ID de l'offre B (suspecte)")
+    reason: str | None = Field(default=None, max_length=255)
