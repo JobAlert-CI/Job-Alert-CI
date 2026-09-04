@@ -3,7 +3,7 @@ import { formatApiError } from "@/api/errors"
 import { getOffers } from "@/api/public/offers"
 import { useOffresFilters } from "@/contexts/Offres.context"
 import {
-  getOfferSats, getOfferSatsByContract, getOfferSatsByFiliere, getOfferSatsBySource, getGlobalSats
+  getOfferStats, getOfferStatsByContract, getOfferStatsByFiliere, getOfferStatsBySource, getGlobalStats
 } from "@/api/public/stats"
 import { Radar, Fingerprint, Send, FilterIcon } from "lucide-react"
 import { useMemo } from "react"
@@ -29,7 +29,7 @@ export const useOfferReferentialsQuery = () => {
   })
 }
 
-export const ABONNES = 10550 // TODO: À supprimer quand l'UI utilisera exclusivement getGlobalSats
+export const ABONNES = 10550 // TODO: À supprimer quand l'UI utilisera exclusivement getGlobalStats
 export const PAGE_SIZE = 12
 
 /** Pipeline du matin affiché dans la FluxCard (décoratif). */
@@ -85,9 +85,9 @@ export const useOfferCountsQuery = () =>
     queryKey: offresKeys.counts,
     queryFn: async () => {
       const [byFiliere, bySource, byContract] = await Promise.allSettled([
-        getOfferSatsByFiliere(),
-        getOfferSatsBySource(),
-        getOfferSatsByContract(),
+        getOfferStatsByFiliere(),
+        getOfferStatsBySource(),
+        getOfferStatsByContract(),
       ])
       return {
         filieres: toCountMap(settled(byFiliere)),
@@ -105,9 +105,9 @@ export const useOffersOverviewQuery = () =>
     queryKey: offresKeys.overview,
     queryFn: async () => {
       const [glob, summary, bySource] = await Promise.allSettled([
-        getGlobalSats(),
-        getOfferSats(),
-        getOfferSatsBySource(),
+        getGlobalStats(),
+        getOfferStats(),
+        getOfferStatsBySource(),
       ])
       const s = summary.status === "fulfilled" ? summary.value : null
       const g = glob.status === "fulfilled" ? glob.value : null

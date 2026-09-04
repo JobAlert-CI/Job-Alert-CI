@@ -1,0 +1,2448 @@
+{
+  "adminAuth": {
+    "login": {
+      "request": {
+        "method": "POST",
+        "url": "/api/admin/auth/login",
+        "json": {
+          "email": "admin@jobalert.ci",
+          "password": "********"
+        }
+      },
+      "status_code": 200,
+      "data": {
+        "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.demo-access.signature",
+        "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.demo-refresh.signature",
+        "token_type": "bearer",
+        "admin_id": "1a2b3c4d-0000-4000-8000-000000000001",
+        "role": "super_admin"
+      }
+    },
+    "refresh": {
+      "request": {
+        "method": "POST",
+        "url": "/api/admin/auth/refresh",
+        "json": {
+          "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.demo-refresh.signature"
+        }
+      },
+      "status_code": 200,
+      "data": {
+        "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.new-access.signature",
+        "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.new-refresh.signature",
+        "token_type": "bearer",
+        "admin_id": "1a2b3c4d-0000-4000-8000-000000000001",
+        "role": "super_admin"
+      }
+    },
+    "logout": {
+      "request": {
+        "method": "POST",
+        "url": "/api/admin/auth/logout"
+      },
+      "status_code": 200,
+      "data": {
+        "message": "Deconnexion reussie"
+      }
+    },
+    "getProfile": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/auth/me"
+      },
+      "status_code": 200,
+      "data": {
+        "id": "1a2b3c4d-0000-4000-8000-000000000001",
+        "email": "admin@jobalert.ci",
+        "full_name": "Admin Demo",
+        "role": "super_admin",
+        "is_active": true,
+        "last_login_at": "2026-09-04T08:30:00",
+        "created_at": "2026-01-15T10:00:00",
+        "updated_at": "2026-09-04T08:30:00"
+      }
+    },
+    "changePassword": {
+      "request": {
+        "method": "PUT",
+        "url": "/api/admin/auth/me/password",
+        "json": {
+          "current_password": "********",
+          "new_password": "************"
+        }
+      },
+      "status_code": 200,
+      "data": {
+        "message": "Mot de passe modifie"
+      }
+    },
+    "forgotPassword": {
+      "request": {
+        "method": "POST",
+        "url": "/api/admin/auth/forgot-password",
+        "json": {
+          "email": "admin@jobalert.ci"
+        }
+      },
+      "status_code": 200,
+      "data": {
+        "message": "Si un compte existe, un email de reinitialisation a ete envoye."
+      }
+    },
+    "resetPassword": {
+      "request": {
+        "method": "POST",
+        "url": "/api/admin/auth/reset-password",
+        "json": {
+          "token": "demo-reset-token-0000000000000000",
+          "new_password": "************"
+        }
+      },
+      "status_code": 200,
+      "data": {
+        "message": "Mot de passe reinitialise"
+      }
+    }
+  },
+  "adminDashboard": {
+    "getOverview": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/dashboard/overview"
+      },
+      "status_code": 200,
+      "data": {
+        "offers_total": 412,
+        "offers_active": 387,
+        "subscribers_total": 156,
+        "subscribers_active": 143,
+        "contact_messages_new": 3,
+        "sources_active": 3,
+        "last_scrape_run_at": "2026-09-04T06:12:44",
+        "last_scrape_status": "success",
+        "pending_digests": 0
+      }
+    },
+    "getRuns": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/dashboard/runs",
+        "params": {
+          "limit": 30
+        }
+      },
+      "status_code": 200,
+      "data": [
+        {
+          "id": "run-2026-09-04",
+          "run_date": "2026-09-04",
+          "status": "success",
+          "started_at": "2026-09-04T06:00:00",
+          "finished_at": "2026-09-04T06:12:44",
+          "triggered_by": "beat:schedule",
+          "total_raw": 87,
+          "total_inserted": 12,
+          "total_updated": 9,
+          "total_duplicates": 66,
+          "total_errors": 0,
+          "notes": null,
+          "source_runs": [],
+          "created_at": "2026-09-04T06:00:00",
+          "updated_at": "2026-09-04T06:12:44"
+        }
+      ]
+    },
+    "getRunDetail": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/dashboard/runs/run-2026-09-04"
+      },
+      "status_code": 200,
+      "data": {
+        "id": "run-2026-09-04",
+        "run_date": "2026-09-04",
+        "status": "success",
+        "started_at": "2026-09-04T06:00:00",
+        "finished_at": "2026-09-04T06:12:44",
+        "triggered_by": "beat:schedule",
+        "total_raw": 87,
+        "total_inserted": 12,
+        "total_updated": 9,
+        "total_duplicates": 66,
+        "total_errors": 0,
+        "notes": null,
+        "source_runs": [
+          {
+            "id": "srun-goafrica-2026-09-04",
+            "source_id": "src-goafrica",
+            "status": "success",
+            "started_at": "2026-09-04T06:00:00",
+            "finished_at": "2026-09-04T06:04:12",
+            "duration_ms": 252000,
+            "raw_count": 31,
+            "inserted_count": 4,
+            "updated_count": 3,
+            "duplicates_count": 24,
+            "errors_count": 0
+          }
+        ],
+        "created_at": "2026-09-04T06:00:00",
+        "updated_at": "2026-09-04T06:12:44"
+      }
+    },
+    "getTopViewedOffers": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/dashboard/top-viewed-offers",
+        "params": {
+          "days": 7,
+          "limit": 10
+        }
+      },
+      "status_code": 200,
+      "data": [
+        {
+          "id": "3bf36ef4-1929-43b9-b95b-502f2572a140",
+          "title": "Responsable Supply Chain",
+          "status": "active",
+          "visible_site": true,
+          "view_count": 774,
+          "save_count": 42,
+          "published_at": "2026-08-06T01:40:35",
+          "company": {
+            "id": "comp-transcargo",
+            "name": "TransCargo CI",
+            "slug": "transcargo-ci"
+          },
+          "primary_filiere_id": "fil-logistique"
+        }
+      ]
+    },
+    "globalSearch": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/search",
+        "params": {
+          "q": "supply",
+          "per_type_limit": 10
+        }
+      },
+      "status_code": 200,
+      "data": {
+        "query": "supply",
+        "per_type_limit": 10,
+        "offers": [
+          {
+            "id": "3bf36ef4-1929-43b9-b95b-502f2572a140",
+            "title": "Responsable Supply Chain",
+            "status": "active",
+            "visible_site": true,
+            "view_count": 774,
+            "save_count": 42,
+            "published_at": "2026-08-06T01:40:35",
+            "company": {
+              "id": "comp-transcargo",
+              "name": "TransCargo CI",
+              "slug": "transcargo-ci"
+            },
+            "primary_filiere_id": "fil-logistique"
+          }
+        ],
+        "subscribers": [],
+        "companies": [
+          {
+            "id": "comp-transcargo",
+            "name": "TransCargo CI",
+            "slug": "transcargo-ci"
+          }
+        ]
+      }
+    }
+  },
+  "adminOffers": {
+    "getOffers": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/offers",
+        "params": {
+          "q": "supply",
+          "status": "active",
+          "limit": 20,
+          "offset": 0
+        }
+      },
+      "status_code": 200,
+      "data": {
+        "_ref": "offers.getOffers.data",
+        "_note": "meme forme que public offers.getOffers ; statuts/masquees inclus"
+      }
+    },
+    "getOfferById": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/offers/3bf36ef4-1929-43b9-b95b-502f2572a140"
+      },
+      "status_code": 200,
+      "data": {
+        "_ref": "offers.getOfferById.data"
+      }
+    },
+    "createOffer": {
+      "request": {
+        "method": "POST",
+        "url": "/api/admin/offers",
+        "json": {
+          "title": "Chef de projet digital",
+          "company_name": "Agence Nova CI",
+          "source_code": "manuel",
+          "filiere_code": "tech-dev",
+          "location_label": "Abidjan - Plateau",
+          "contract_type_code": "cdi",
+          "published_at": "2026-09-01",
+          "intro": "Pilotage de projets digitaux pour grands comptes."
+        }
+      },
+      "status_code": 201,
+      "data": {
+        "_ref": "offers.getOfferById.data",
+        "_note": "origin=manuel"
+      }
+    },
+    "updateOffer": {
+      "request": {
+        "method": "PUT",
+        "url": "/api/admin/offers/3bf36ef4-1929-43b9-b95b-502f2572a140",
+        "json": {
+          "title": "Responsable Supply Chain (H/F)"
+        }
+      },
+      "status_code": 200,
+      "data": {
+        "_ref": "offers.getOfferById.data"
+      }
+    },
+    "updateVisibility": {
+      "request": {
+        "method": "PATCH",
+        "url": "/api/admin/offers/3bf36ef4-1929-43b9-b95b-502f2572a140/visibility",
+        "json": {
+          "visible_site": false
+        }
+      },
+      "status_code": 200,
+      "data": {
+        "message": "Visibilite mise a jour",
+        "visible_site": false
+      }
+    },
+    "updateStatus": {
+      "request": {
+        "method": "PATCH",
+        "url": "/api/admin/offers/3bf36ef4-1929-43b9-b95b-502f2572a140/status",
+        "json": {
+          "status": "archived"
+        }
+      },
+      "status_code": 200,
+      "data": {
+        "message": "Statut mis a jour",
+        "status": "archived"
+      }
+    },
+    "deleteOffer": {
+      "request": {
+        "method": "DELETE",
+        "url": "/api/admin/offers/3bf36ef4-1929-43b9-b95b-502f2572a140"
+      },
+      "status_code": 204,
+      "data": null
+    },
+    "bulkUpdateStatus": {
+      "request": {
+        "method": "POST",
+        "url": "/api/admin/offers/bulk-status",
+        "json": {
+          "offer_ids": [
+            "3bf36ef4-1929-43b9-b95b-502f2572a140"
+          ],
+          "status": "archived"
+        }
+      },
+      "status_code": 200,
+      "data": {
+        "message": "1 offres mises a jour"
+      }
+    },
+    "getDuplicateCandidates": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/offers/duplicates/candidates",
+        "params": {
+          "min_similarity": 80
+        }
+      },
+      "status_code": 200,
+      "data": [
+        {
+          "offer_a_id": "3bf36ef4-1929-43b9-b95b-502f2572a140",
+          "offer_b_id": "4bf36ef4-1929-43b9-b95b-502f2572a141",
+          "offer_a_title": "Responsable Supply Chain",
+          "offer_b_title": "Responsable Supply Chain (Cocody)",
+          "offer_a_company": "TransCargo CI",
+          "similarity_score": 93,
+          "reason": "titre + entreprise similaires"
+        }
+      ]
+    },
+    "markDuplicate": {
+      "request": {
+        "method": "POST",
+        "url": "/api/admin/offers/4bf36ef4-1929-43b9-b95b-502f2572a141/mark-duplicate",
+        "json": {
+          "duplicate_of_id": "3bf36ef4-1929-43b9-b95b-502f2572a140",
+          "duplicate_reason": "meme offre publiee sur 2 sources"
+        }
+      },
+      "status_code": 200,
+      "data": {
+        "message": "Doublon marque",
+        "offer_id": "4bf36ef4-1929-43b9-b95b-502f2572a141",
+        "duplicate_of_id": "3bf36ef4-1929-43b9-b95b-502f2572a140"
+      }
+    },
+    "rejectDuplicate": {
+      "request": {
+        "method": "POST",
+        "url": "/api/admin/offers/duplicates/reject",
+        "json": {
+          "offer_a_id": "3bf36ef4-1929-43b9-b95b-502f2572a140",
+          "offer_b_id": "4bf36ef4-1929-43b9-b95b-502f2572a141",
+          "reason": "postes effectivement distincts"
+        }
+      },
+      "status_code": 200,
+      "data": {
+        "message": "Paire rejetee",
+        "offer_a_id": "3bf36ef4-1929-43b9-b95b-502f2572a140",
+        "offer_b_id": "4bf36ef4-1929-43b9-b95b-502f2572a141"
+      }
+    },
+    "importOffers": {
+      "request": {
+        "method": "POST",
+        "url": "/api/admin/offers/import",
+        "form": {
+          "file": "offres_demo.csv"
+        }
+      },
+      "status_code": 200,
+      "data": {
+        "message": "Import termine: 2 creees, 1 ignorees",
+        "created": 2,
+        "ignored": 1,
+        "errors": [
+          {
+            "line": 3,
+            "error": "filiere_code inconnu: tech-devx",
+            "data": {
+              "title": "Offre ignoree"
+            }
+          }
+        ]
+      }
+    }
+  },
+  "adminSubscribers": {
+    "getSubscribers": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/subscribers",
+        "params": {
+          "status": "active",
+          "limit": 20,
+          "offset": 0
+        }
+      },
+      "status_code": 200,
+      "data": [
+        {
+          "id": "9f1c2d34-5e67-8901-abcd-ef0123456789",
+          "email": "demo.jsonclaude@example.com",
+          "full_name": "Utilisateur Demo",
+          "city": "Abidjan",
+          "status": "active",
+          "timezone": "Africa/Abidjan",
+          "wants_career_tips": true,
+          "source": "site",
+          "subscribed_at": "2026-08-10T11:46:36",
+          "filiere_links": [
+            {
+              "filiere_code": "tech-dev",
+              "filiere_label": "Tech & Dev",
+              "priority": 1
+            }
+          ],
+          "contract_preferences": [],
+          "created_at": "2026-08-10T11:46:36",
+          "updated_at": "2026-08-10T11:46:36"
+        }
+      ]
+    },
+    "getSubscriber": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/subscribers/9f1c2d34-5e67-8901-abcd-ef0123456789"
+      },
+      "status_code": 200,
+      "data": {
+        "_ref": "adminSubscribers.getSubscribers.data[0]"
+      }
+    },
+    "updateSubscriber": {
+      "request": {
+        "method": "PUT",
+        "url": "/api/admin/subscribers/9f1c2d34-5e67-8901-abcd-ef0123456789",
+        "json": {
+          "admin_notes": "Client VIP, a relancer en priorite"
+        }
+      },
+      "status_code": 200,
+      "data": {
+        "_ref": "adminSubscribers.getSubscribers.data[0]"
+      }
+    },
+    "updateSubscriberStatus": {
+      "request": {
+        "method": "PATCH",
+        "url": "/api/admin/subscribers/9f1c2d34-5e67-8901-abcd-ef0123456789/status",
+        "json": {
+          "status": "paused",
+          "reason": "demande de pause 1 mois"
+        }
+      },
+      "status_code": 200,
+      "data": {
+        "message": "Statut mis a jour",
+        "status": "paused"
+      }
+    },
+    "getSubscriberSends": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/subscribers/9f1c2d34-5e67-8901-abcd-ef0123456789/sends",
+        "params": {
+          "limit": 20
+        }
+      },
+      "status_code": 200,
+      "data": [
+        {
+          "id": "digest-2026-09-03-demo",
+          "subscriber_id": "9f1c2d34-5e67-8901-abcd-ef0123456789",
+          "scrape_run_id": null,
+          "digest_date": "2026-09-03",
+          "scheduled_for": "2026-09-03T06:30:00",
+          "status": "sent",
+          "subject": "Vos offres du 03/09",
+          "offer_count": 4,
+          "skipped_reason": null,
+          "sent_at": "2026-09-03T06:30:12",
+          "template_version": "v1",
+          "offer_links": [],
+          "created_at": "2026-09-03T06:30:00",
+          "updated_at": "2026-09-03T06:30:12"
+        }
+      ]
+    },
+    "sendCustomEmail": {
+      "request": {
+        "method": "POST",
+        "url": "/api/admin/subscribers/9f1c2d34-5e67-8901-abcd-ef0123456789/send",
+        "json": {
+          "offer_ids": [
+            "3bf36ef4-1929-43b9-b95b-502f2572a140"
+          ],
+          "subject": "Selection personnalisee"
+        }
+      },
+      "status_code": 201,
+      "data": {
+        "id": "digest-manual-2026-09-04-001",
+        "subscriber_id": "9f1c2d34-5e67-8901-abcd-ef0123456789",
+        "scrape_run_id": null,
+        "digest_date": "2026-09-04",
+        "scheduled_for": "2026-09-04T08:30:00",
+        "status": "queued",
+        "subject": "Selection personnalisee",
+        "offer_count": 1,
+        "skipped_reason": null,
+        "sent_at": null,
+        "template_version": "manual",
+        "offer_links": [
+          {
+            "id": "dlo-001",
+            "digest_id": "digest-manual-2026-09-04-001",
+            "offer_id": "3bf36ef4-1929-43b9-b95b-502f2572a140",
+            "position": 1,
+            "match_tier": "T0",
+            "match_kind": "filiere_keyword"
+          }
+        ],
+        "created_at": "2026-09-04T08:30:00",
+        "updated_at": "2026-09-04T08:30:00"
+      }
+    },
+    "deleteSubscriber": {
+      "request": {
+        "method": "DELETE",
+        "url": "/api/admin/subscribers/9f1c2d34-5e67-8901-abcd-ef0123456789"
+      },
+      "status_code": 204,
+      "data": null,
+      "_note": "anonymisation RGPD — pas de suppression physique"
+    }
+  },
+  "adminSending": {
+    "triggerPrepare": {
+      "request": {
+        "method": "POST",
+        "url": "/api/admin/sending/prepare",
+        "json": {}
+      },
+      "status_code": 202,
+      "data": {
+        "status": "dispatched",
+        "phase": "prepare",
+        "digest_date": null,
+        "task_id": "celery-task-prepare-001"
+      }
+    },
+    "triggerSend": {
+      "request": {
+        "method": "POST",
+        "url": "/api/admin/sending/send",
+        "json": {}
+      },
+      "status_code": 202,
+      "data": {
+        "status": "dispatched",
+        "phase": "send",
+        "digest_date": null,
+        "task_id": "celery-task-send-001"
+      }
+    },
+    "triggerRun": {
+      "request": {
+        "method": "POST",
+        "url": "/api/admin/sending/run",
+        "json": {
+          "date_override": "2026-09-04"
+        }
+      },
+      "status_code": 202,
+      "data": {
+        "status": "dispatched",
+        "phases": [
+          "prepare",
+          "send"
+        ],
+        "digest_date": "2026-09-04",
+        "task_id": "celery-task-chain-001"
+      }
+    },
+    "getSends": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/sending/sends",
+        "params": {
+          "status": "sent",
+          "limit": 20,
+          "offset": 0
+        }
+      },
+      "status_code": 200,
+      "data": [
+        {
+          "id": "digest-2026-09-03-demo",
+          "subscriber_id": "9f1c2d34-5e67-8901-abcd-ef0123456789",
+          "scrape_run_id": null,
+          "digest_date": "2026-09-03",
+          "scheduled_for": "2026-09-03T06:30:00",
+          "status": "sent",
+          "subject": "Vos offres du 03/09",
+          "offer_count": 4,
+          "skipped_reason": null,
+          "sent_at": "2026-09-03T06:30:12",
+          "template_version": "v1",
+          "offer_links": [],
+          "created_at": "2026-09-03T06:30:00",
+          "updated_at": "2026-09-03T06:30:12"
+        }
+      ]
+    },
+    "getSendDetail": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/sending/sends/digest-2026-09-03-demo"
+      },
+      "status_code": 200,
+      "data": {
+        "_ref": "adminSending.getSends.data[0]"
+      }
+    },
+    "triggerSegmentSend": {
+      "request": {
+        "method": "POST",
+        "url": "/api/admin/sending/trigger",
+        "json": {
+          "filiere_code": "tech-dev"
+        }
+      },
+      "status_code": 201,
+      "data": [
+        {
+          "id": "digest-2026-09-04-tech-001",
+          "subscriber_id": "9f1c2d34-5e67-8901-abcd-ef0123456789",
+          "scrape_run_id": null,
+          "digest_date": "2026-09-04",
+          "scheduled_for": "2026-09-04T08:30:00",
+          "status": "queued",
+          "subject": null,
+          "offer_count": 0,
+          "skipped_reason": null,
+          "sent_at": null,
+          "template_version": "v1",
+          "offer_links": [],
+          "created_at": "2026-09-04T08:30:00",
+          "updated_at": "2026-09-04T08:30:00"
+        }
+      ]
+    },
+    "getSendingStats": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/sending/stats",
+        "params": {
+          "period_days": 30
+        }
+      },
+      "status_code": 200,
+      "data": {
+        "period_days": 30,
+        "total_sent": 2891,
+        "total_failed": 12,
+        "total_skipped": 44,
+        "success_rate": 99.59
+      }
+    },
+    "getTierStats": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/sending/tier-stats",
+        "params": {
+          "period_days": 7
+        }
+      },
+      "status_code": 200,
+      "data": {
+        "period_days": 7,
+        "since": "2026-08-29",
+        "until": "2026-09-04",
+        "tier_distribution": {
+          "by_date": [
+            {
+              "date": "2026-09-04",
+              "T0": 98,
+              "T1": 31,
+              "T2": 7,
+              "T3": 2,
+              "T4": 0,
+              "T5": 0
+            }
+          ],
+          "global": {
+            "T0": 683,
+            "T1": 214,
+            "T2": 51,
+            "T3": 9,
+            "T4": 1,
+            "T5": 0
+          }
+        },
+        "match_kind_distribution": {
+          "filiere_keyword": 612,
+          "city_match": 198,
+          "fallback_tier": 34
+        }
+      }
+    },
+    "previewDigest": {
+      "request": {
+        "method": "POST",
+        "url": "/api/admin/sending/preview",
+        "params": {
+          "subscriber_id": "9f1c2d34-5e67-8901-abcd-ef0123456789",
+          "offer_ids": [
+            "3bf36ef4-1929-43b9-b95b-502f2572a140"
+          ]
+        }
+      },
+      "status_code": 200,
+      "data": {
+        "preview": "<!DOCTYPE html><html lang=\"fr\"><body><h1>Vos offres JobAlert CI</h1>...(rendu HTML tronque pour l'exemple)...</body></html>",
+        "message": "Apercu du digest (non envoye) — selection personnalisee"
+      }
+    }
+  },
+  "adminScraping": {
+    "getScrapingStatus": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/scraping/status"
+      },
+      "status_code": 200,
+      "data": [
+        {
+          "source_code": "goafrica",
+          "source_name": "GoAfrica",
+          "last_run_at": "2026-09-04T06:04:12",
+          "last_status": "success",
+          "last_duration_ms": 252000,
+          "last_error": null,
+          "total_runs": 42
+        },
+        {
+          "source_code": "jobivoire",
+          "source_name": "JobIvoire",
+          "last_run_at": "2026-09-04T06:08:40",
+          "last_status": "success",
+          "last_duration_ms": 268000,
+          "last_error": null,
+          "total_runs": 40
+        },
+        {
+          "source_code": "educarriere",
+          "source_name": "Educarriere",
+          "last_run_at": "2026-09-04T06:12:44",
+          "last_status": "partial_failure",
+          "last_duration_ms": 244000,
+          "last_error": "2 offres rejettees: format de date inattendu",
+          "total_runs": 39
+        }
+      ]
+    },
+    "triggerScraping": {
+      "request": {
+        "method": "POST",
+        "url": "/api/admin/scraping/trigger",
+        "json": {
+          "source_code": "goafrica",
+          "notes": "relance manuelle apres correction"
+        }
+      },
+      "status_code": 201,
+      "data": {
+        "id": "run-manual-2026-09-04-001",
+        "run_date": "2026-09-04",
+        "status": "pending",
+        "started_at": null,
+        "finished_at": null,
+        "triggered_by": "admin:1a2b3c4d-0000-4000-8000-000000000001",
+        "total_raw": 0,
+        "total_inserted": 0,
+        "total_updated": 0,
+        "total_duplicates": 0,
+        "total_errors": 0,
+        "notes": "relance manuelle apres correction",
+        "source_runs": [
+          {
+            "id": "srun-manual-goafrica-001",
+            "source_id": "src-goafrica",
+            "status": "pending"
+          }
+        ],
+        "created_at": "2026-09-04T08:30:00",
+        "updated_at": "2026-09-04T08:30:00"
+      }
+    },
+    "getRuns": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/scraping/runs",
+        "params": {
+          "limit": 30,
+          "offset": 0
+        }
+      },
+      "status_code": 200,
+      "data": [
+        {
+          "id": "run-2026-09-04",
+          "run_date": "2026-09-04",
+          "status": "success",
+          "started_at": "2026-09-04T06:00:00",
+          "finished_at": "2026-09-04T06:12:44",
+          "triggered_by": "beat:schedule",
+          "total_raw": 87,
+          "total_inserted": 12,
+          "total_updated": 9,
+          "total_duplicates": 66,
+          "total_errors": 0,
+          "notes": null,
+          "source_runs": [],
+          "created_at": "2026-09-04T06:00:00",
+          "updated_at": "2026-09-04T06:12:44"
+        }
+      ]
+    },
+    "getRunDetail": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/scraping/runs/run-2026-09-04"
+      },
+      "status_code": 200,
+      "data": {
+        "_ref": "adminDashboard.getRunDetail.data"
+      }
+    },
+    "getRunLogs": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/scraping/runs/run-2026-09-04/logs"
+      },
+      "status_code": 200,
+      "data": [
+        {
+          "id": "evt-001",
+          "created_at": "2026-09-04T06:01:00",
+          "updated_at": "2026-09-04T06:01:00",
+          "module": "scraping",
+          "niveau": "info",
+          "action": "inserted",
+          "offer_id": "3bf36ef4-1929-43b9-b95b-502f2572a140",
+          "source_scrape_run_id": "srun-goafrica-2026-09-04",
+          "hash_unique": "a3f5c9d2e8b0...",
+          "raw_url": "https://www.linkedin.com/offres/responsable-supply-chain",
+          "message": null
+        }
+      ]
+    }
+  },
+  "adminCompanies": {
+    "getCompanies": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/companies",
+        "params": {
+          "q": "trans",
+          "limit": 50,
+          "offset": 0
+        }
+      },
+      "status_code": 200,
+      "data": [
+        {
+          "id": "comp-transcargo",
+          "name": "TransCargo CI",
+          "normalized_name": "transcargo ci",
+          "slug": "transcargo-ci",
+          "website_url": "https://transcargo.ci",
+          "logo_url": null,
+          "description": "Logistique et transport de marchandises",
+          "primary_filiere_id": "fil-logistique",
+          "active_offers_count": 6,
+          "created_at": "2026-08-01T10:00:00",
+          "updated_at": "2026-09-04T08:30:00"
+        }
+      ]
+    },
+    "getTopRecruiters": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/companies/top-recruiters",
+        "params": {
+          "limit": 10
+        }
+      },
+      "status_code": 200,
+      "data": [
+        {
+          "id": "comp-transcargo",
+          "name": "TransCargo CI",
+          "normalized_name": "transcargo ci",
+          "slug": "transcargo-ci",
+          "website_url": null,
+          "logo_url": null,
+          "description": null,
+          "primary_filiere_id": "fil-logistique",
+          "active_offers_count": 14,
+          "created_at": "2026-08-01T10:00:00",
+          "updated_at": "2026-09-04T08:30:00"
+        }
+      ]
+    },
+    "createCompany": {
+      "request": {
+        "method": "POST",
+        "url": "/api/admin/companies",
+        "json": {
+          "name": "Agence Nova CI",
+          "website_url": "https://nova.ci",
+          "description": "Agence digitale"
+        }
+      },
+      "status_code": 201,
+      "data": {
+        "id": "comp-nova",
+        "name": "Agence Nova CI",
+        "normalized_name": "agence nova ci",
+        "slug": "agence-nova-ci",
+        "website_url": "https://nova.ci",
+        "logo_url": null,
+        "description": "Agence digitale",
+        "primary_filiere_id": null,
+        "active_offers_count": 0,
+        "created_at": "2026-09-04T08:30:00",
+        "updated_at": "2026-09-04T08:30:00"
+      }
+    },
+    "updateCompany": {
+      "request": {
+        "method": "PUT",
+        "url": "/api/admin/companies/comp-nova",
+        "json": {
+          "description": "Agence digitale et studio creatif"
+        }
+      },
+      "status_code": 200,
+      "data": {
+        "_ref": "adminCompanies.createCompany.data",
+        "_note": "champs modifies uniquement"
+      }
+    },
+    "deleteCompany": {
+      "request": {
+        "method": "DELETE",
+        "url": "/api/admin/companies/comp-nova"
+      },
+      "status_code": 204,
+      "data": null,
+      "_note": "soft delete"
+    },
+    "mergeCompanies": {
+      "request": {
+        "method": "POST",
+        "url": "/api/admin/companies/comp-transcargo/merge/comp-transcargo-doublon"
+      },
+      "status_code": 200,
+      "data": {
+        "message": "Fusion terminee",
+        "source_id": "comp-transcargo-doublon",
+        "target_id": "comp-transcargo",
+        "offers_reassigned": 3
+      }
+    }
+  },
+  "adminReferentials": {
+    "getFilieres": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/referentials/filieres"
+      },
+      "status_code": 200,
+      "data": [
+        {
+          "id": "fil-logistique",
+          "code": "logistique",
+          "label": "Logistique",
+          "slug": "logistique",
+          "is_active": true,
+          "sort_order": 3,
+          "keywords": [],
+          "specialties": [
+            {
+              "id": "spec-transport",
+              "filiere_id": "fil-logistique",
+              "code": "transport",
+              "label": "Transport",
+              "sort_order": 1,
+              "is_active": true
+            }
+          ]
+        }
+      ]
+    },
+    "createFiliere": {
+      "request": {
+        "method": "POST",
+        "url": "/api/admin/referentials/filieres",
+        "json": {
+          "code": "agro",
+          "label": "Agroalimentaire",
+          "slug": "agroalimentaire"
+        }
+      },
+      "status_code": 201,
+      "data": {
+        "id": "fil-agro",
+        "code": "agro",
+        "label": "Agroalimentaire",
+        "slug": "agroalimentaire",
+        "is_active": true,
+        "sort_order": 10,
+        "keywords": [],
+        "specialties": []
+      }
+    },
+    "updateFiliere": {
+      "request": {
+        "method": "PUT",
+        "url": "/api/admin/referentials/filieres/fil-agro",
+        "json": {
+          "is_active": false
+        }
+      },
+      "status_code": 200,
+      "data": {
+        "_ref": "adminReferentials.createFiliere.data",
+        "_note": "champs modifies uniquement"
+      }
+    },
+    "deleteFiliere": {
+      "request": {
+        "method": "DELETE",
+        "url": "/api/admin/referentials/filieres/fil-agro"
+      },
+      "status_code": 204,
+      "data": null
+    },
+    "updateFiliereKeywords": {
+      "request": {
+        "method": "PUT",
+        "url": "/api/admin/referentials/filieres/fil-logistique/keywords",
+        "json": {
+          "keywords": [
+            {
+              "keyword": "supply chain",
+              "weight": 80
+            },
+            {
+              "keyword": "logistique",
+              "weight": 60
+            }
+          ]
+        }
+      },
+      "status_code": 200,
+      "data": {
+        "message": "Mots-cles mis a jour",
+        "count": 2
+      },
+      "_note": "remplacement complet de la liste, pas un ajout"
+    },
+    "simulateFiliere": {
+      "request": {
+        "method": "POST",
+        "url": "/api/admin/referentials/filieres/simulate",
+        "json": {
+          "filiere_code": "logistique",
+          "keywords": [
+            "supply chain",
+            "chaine d'approvisionnement"
+          ]
+        }
+      },
+      "status_code": 200,
+      "data": {
+        "filiere_code": "logistique",
+        "keywords_tested": 2,
+        "matched_offers": 27,
+        "unmatched_offers": 112,
+        "sample_matches": [
+          {
+            "id": "3bf36ef4-1929-43b9-b95b-502f2572a140",
+            "title": "Responsable Supply Chain",
+            "matched_keyword": "supply chain"
+          }
+        ]
+      }
+    },
+    "getSpecialites": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/referentials/filieres/fil-logistique/specialites"
+      },
+      "status_code": 200,
+      "data": [
+        {
+          "id": "spec-transport",
+          "filiere_id": "fil-logistique",
+          "code": "transport",
+          "label": "Transport",
+          "sort_order": 1,
+          "is_active": true
+        }
+      ]
+    },
+    "createSpecialite": {
+      "request": {
+        "method": "POST",
+        "url": "/api/admin/referentials/filieres/fil-logistique/specialites",
+        "json": {
+          "code": "entrepot",
+          "label": "Entrepot"
+        }
+      },
+      "status_code": 201,
+      "data": {
+        "id": "spec-entrepot",
+        "filiere_id": "fil-logistique",
+        "code": "entrepot",
+        "label": "Entrepot",
+        "sort_order": 2,
+        "is_active": true
+      }
+    },
+    "updateSpecialite": {
+      "request": {
+        "method": "PUT",
+        "url": "/api/admin/referentials/specialites/spec-entrepot",
+        "json": {
+          "label": "Gestion d'entrepot"
+        }
+      },
+      "status_code": 200,
+      "data": {
+        "_ref": "adminReferentials.createSpecialite.data",
+        "_note": "champs modifies uniquement"
+      }
+    },
+    "deleteSpecialite": {
+      "request": {
+        "method": "DELETE",
+        "url": "/api/admin/referentials/specialites/spec-entrepot"
+      },
+      "status_code": 204,
+      "data": null
+    },
+    "getSources": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/referentials/sources"
+      },
+      "status_code": 200,
+      "data": [
+        {
+          "id": "src-goafrica",
+          "code": "goafrica",
+          "name": "GoAfrica",
+          "base_url": "https://goafricajobs.com",
+          "status": "active",
+          "priority": 1,
+          "last_scraped_at": "2026-09-04T06:04:12"
+        }
+      ]
+    },
+    "createSource": {
+      "request": {
+        "method": "POST",
+        "url": "/api/admin/referentials/sources",
+        "json": {
+          "code": "nouveausite",
+          "name": "Nouveau Site",
+          "base_url": "https://nouveausite.ci"
+        }
+      },
+      "status_code": 201,
+      "data": {
+        "id": "src-nouveausite",
+        "code": "nouveausite",
+        "name": "Nouveau Site",
+        "base_url": "https://nouveausite.ci",
+        "status": "active",
+        "priority": 10
+      }
+    },
+    "updateSource": {
+      "request": {
+        "method": "PUT",
+        "url": "/api/admin/referentials/sources/src-nouveausite",
+        "json": {
+          "priority": 5
+        }
+      },
+      "status_code": 200,
+      "data": {
+        "_ref": "adminReferentials.createSource.data",
+        "_note": "champs modifies uniquement"
+      }
+    },
+    "updateSourceStatus": {
+      "request": {
+        "method": "PATCH",
+        "url": "/api/admin/referentials/sources/src-nouveausite/status",
+        "json": {
+          "status": "paused"
+        }
+      },
+      "status_code": 200,
+      "data": {
+        "message": "Statut mis a jour",
+        "status": "paused"
+      }
+    },
+    "deleteSource": {
+      "request": {
+        "method": "DELETE",
+        "url": "/api/admin/referentials/sources/src-nouveausite"
+      },
+      "status_code": 204,
+      "data": null
+    },
+    "contractTypes": {
+      "list": {
+        "request": {
+          "method": "GET",
+          "url": "/api/admin/referentials/contract-types"
+        },
+        "status_code": 200,
+        "data": [
+          {
+            "id": "ct-cdi",
+            "code": "cdi",
+            "label": "CDI",
+            "sort_order": 1,
+            "is_active": true
+          }
+        ]
+      },
+      "create": {
+        "request": {
+          "method": "POST",
+          "url": "/api/admin/referentials/contract-types",
+          "json": {
+            "code": "stage",
+            "label": "Stage"
+          }
+        },
+        "status_code": 201,
+        "data": {
+          "id": "ct-stage",
+          "code": "stage",
+          "label": "Stage",
+          "sort_order": 6,
+          "is_active": true
+        }
+      },
+      "update": {
+        "request": {
+          "method": "PUT",
+          "url": "/api/admin/referentials/contract-types/ct-stage",
+          "json": {
+            "label": "Stage / Alternance"
+          }
+        },
+        "status_code": 200,
+        "data": {
+          "_ref": "adminReferentials.contractTypes.create.data",
+          "_note": "champs modifies uniquement"
+        }
+      },
+      "remove": {
+        "request": {
+          "method": "DELETE",
+          "url": "/api/admin/referentials/contract-types/ct-stage"
+        },
+        "status_code": 204,
+        "data": null
+      }
+    },
+    "experienceLevels": {
+      "list": {
+        "request": {
+          "method": "GET",
+          "url": "/api/admin/referentials/experience-levels"
+        },
+        "status_code": 200,
+        "data": [
+          {
+            "id": "xp-junior",
+            "code": "junior",
+            "label": "Junior (0-2 ans)",
+            "sort_order": 1,
+            "is_active": true
+          }
+        ]
+      },
+      "_note": "create/update/remove suivent le meme pattern que contractTypes"
+    },
+    "educationLevels": {
+      "list": {
+        "request": {
+          "method": "GET",
+          "url": "/api/admin/referentials/education-levels"
+        },
+        "status_code": 200,
+        "data": [
+          {
+            "id": "edu-bac3",
+            "code": "bac3",
+            "label": "Bac+3",
+            "sort_order": 1,
+            "is_active": true
+          }
+        ]
+      },
+      "_note": "create/update/remove suivent le meme pattern que contractTypes"
+    },
+    "locations": {
+      "list": {
+        "request": {
+          "method": "GET",
+          "url": "/api/admin/referentials/locations"
+        },
+        "status_code": 200,
+        "data": [
+          {
+            "id": "loc-abidjan",
+            "code": "abidjan",
+            "label": "Abidjan",
+            "region": "Lagunes",
+            "sort_order": 1,
+            "is_active": true
+          }
+        ]
+      },
+      "_note": "create/update/remove suivent le meme pattern que contractTypes"
+    }
+  },
+  "adminContent": {
+    "getArticles": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/content/articles",
+        "params": {
+          "status": "published",
+          "limit": 20,
+          "offset": 0
+        }
+      },
+      "status_code": 200,
+      "data": {
+        "_ref": "articles.getArticles.data",
+        "_note": "inclut aussi les brouillons si status omis"
+      }
+    },
+    "getArticle": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/content/articles/3b273360-3af3-4a11-8dd8-e76c072854f9"
+      },
+      "status_code": 200,
+      "data": {
+        "_ref": "articles.getArticleBySlug.data"
+      }
+    },
+    "createArticle": {
+      "request": {
+        "method": "POST",
+        "url": "/api/admin/content/articles",
+        "json": {
+          "title": "Reussir son entretien d'embauche",
+          "category_id": "b2046120-bdce-4c92-b0d5-1ae4ca0147d5",
+          "status": "draft"
+        }
+      },
+      "status_code": 201,
+      "data": {
+        "_ref": "articles.getArticleBySlug.data",
+        "_note": "statut initial draft"
+      }
+    },
+    "updateArticle": {
+      "request": {
+        "method": "PUT",
+        "url": "/api/admin/content/articles/3b273360-3af3-4a11-8dd8-e76c072854f9",
+        "json": {
+          "title": "Reussir son entretien : le guide 2026"
+        }
+      },
+      "status_code": 200,
+      "data": {
+        "_ref": "articles.getArticleBySlug.data"
+      }
+    },
+    "updateArticleStatus": {
+      "request": {
+        "method": "PATCH",
+        "url": "/api/admin/content/articles/3b273360-3af3-4a11-8dd8-e76c072854f9/status",
+        "json": {
+          "status": "published"
+        }
+      },
+      "status_code": 200,
+      "data": {
+        "message": "Statut mis a jour",
+        "status": "published"
+      }
+    },
+    "updateArticleFeatured": {
+      "request": {
+        "method": "PATCH",
+        "url": "/api/admin/content/articles/3b273360-3af3-4a11-8dd8-e76c072854f9/featured",
+        "json": {
+          "is_featured": true,
+          "featured_order": 1
+        }
+      },
+      "status_code": 200,
+      "data": {
+        "message": "Mis a jour",
+        "is_featured": true
+      }
+    },
+    "deleteArticle": {
+      "request": {
+        "method": "DELETE",
+        "url": "/api/admin/content/articles/3b273360-3af3-4a11-8dd8-e76c072854f9"
+      },
+      "status_code": 204,
+      "data": null
+    },
+    "createSection": {
+      "request": {
+        "method": "POST",
+        "url": "/api/admin/content/articles/3b273360-3af3-4a11-8dd8-e76c072854f9/sections",
+        "json": {
+          "title": "Preparer ses exemples",
+          "anchor": "exemples"
+        }
+      },
+      "status_code": 201,
+      "data": {
+        "_ref": "articles.getArticleBySlug.data"
+      }
+    },
+    "updateSection": {
+      "request": {
+        "method": "PUT",
+        "url": "/api/admin/content/sections/d76e495b-93d4-4a26-80ed-c3f46184c457",
+        "json": {
+          "title": "Une structure claire"
+        }
+      },
+      "status_code": 200,
+      "data": {
+        "message": "Section mise a jour"
+      }
+    },
+    "deleteSection": {
+      "request": {
+        "method": "DELETE",
+        "url": "/api/admin/content/sections/d76e495b-93d4-4a26-80ed-c3f46184c457"
+      },
+      "status_code": 204,
+      "data": null
+    },
+    "createBlock": {
+      "request": {
+        "method": "POST",
+        "url": "/api/admin/content/sections/d76e495b-93d4-4a26-80ed-c3f46184c457/blocks",
+        "json": {
+          "block_type": "paragraph",
+          "content": "Un nouveau bloc de texte.",
+          "position": 3
+        }
+      },
+      "status_code": 201,
+      "data": {
+        "message": "Bloc cree"
+      }
+    },
+    "updateBlock": {
+      "request": {
+        "method": "PUT",
+        "url": "/api/admin/content/blocks/15b7836a-d4f9-4404-8aa2-a11febec4084",
+        "json": {
+          "content": "Texte du bloc revise."
+        }
+      },
+      "status_code": 200,
+      "data": {
+        "message": "Bloc mis a jour"
+      }
+    },
+    "deleteBlock": {
+      "request": {
+        "method": "DELETE",
+        "url": "/api/admin/content/blocks/15b7836a-d4f9-4404-8aa2-a11febec4084"
+      },
+      "status_code": 204,
+      "data": null
+    },
+    "reorderSections": {
+      "request": {
+        "method": "PUT",
+        "url": "/api/admin/content/articles/3b273360-3af3-4a11-8dd8-e76c072854f9/sections/reorder",
+        "json": {
+          "section_ids": [
+            "8a9b41ca-5eca-4e1d-9ea9-d3c48b33a196",
+            "d76e495b-93d4-4a26-80ed-c3f46184c457"
+          ]
+        }
+      },
+      "status_code": 200,
+      "data": {
+        "message": "Ordre des sections mis a jour"
+      }
+    },
+    "getCategories": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/content/categories"
+      },
+      "status_code": 200,
+      "data": {
+        "_ref": "articles.getArticleCategories.data"
+      }
+    },
+    "createCategory": {
+      "request": {
+        "method": "POST",
+        "url": "/api/admin/content/categories",
+        "json": {
+          "code": "entretiens",
+          "label": "Entretiens",
+          "slug": "entretiens",
+          "hue": "amber"
+        }
+      },
+      "status_code": 201,
+      "data": {
+        "id": "cat-entretiens",
+        "code": "entretiens",
+        "label": "Entretiens",
+        "slug": "entretiens",
+        "hue": "amber",
+        "icon_name": "message-circle",
+        "sort_order": 2,
+        "is_active": true
+      }
+    },
+    "updateCategory": {
+      "request": {
+        "method": "PUT",
+        "url": "/api/admin/content/categories/cat-entretiens",
+        "json": {
+          "label": "Entretiens & Relances"
+        }
+      },
+      "status_code": 200,
+      "data": {
+        "_ref": "adminContent.createCategory.data",
+        "_note": "champs modifies uniquement"
+      }
+    },
+    "deleteCategory": {
+      "request": {
+        "method": "DELETE",
+        "url": "/api/admin/content/categories/cat-entretiens"
+      },
+      "status_code": 204,
+      "data": null
+    },
+    "getDailyTips": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/content/daily-tips"
+      },
+      "status_code": 200,
+      "data": [
+        {
+          "id": "tip-001",
+          "tip_date": "2026-09-04",
+          "content": "Relisez votre CV a voix haute avant chaque candidature.",
+          "is_active": true
+        }
+      ]
+    },
+    "createDailyTip": {
+      "request": {
+        "method": "POST",
+        "url": "/api/admin/content/daily-tips",
+        "json": {
+          "tip_date": "2026-09-05",
+          "content": "Personnalisez chaque lettre de motivation en 3 phrases."
+        }
+      },
+      "status_code": 201,
+      "data": {
+        "id": "tip-002",
+        "tip_date": "2026-09-05",
+        "content": "Personnalisez chaque lettre de motivation en 3 phrases.",
+        "is_active": true
+      }
+    },
+    "updateDailyTip": {
+      "request": {
+        "method": "PUT",
+        "url": "/api/admin/content/daily-tips/tip-002",
+        "json": {
+          "content": "Personnalisez chaque lettre : 3 phrases suffisent."
+        }
+      },
+      "status_code": 200,
+      "data": {
+        "_ref": "adminContent.createDailyTip.data",
+        "_note": "champs modifies uniquement"
+      }
+    },
+    "deleteDailyTip": {
+      "request": {
+        "method": "DELETE",
+        "url": "/api/admin/content/daily-tips/tip-002"
+      },
+      "status_code": 204,
+      "data": null
+    },
+    "getSeries": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/content/series"
+      },
+      "status_code": 200,
+      "data": {
+        "_ref": "articles.getArticleSeries.data"
+      }
+    },
+    "createSeries": {
+      "request": {
+        "method": "POST",
+        "url": "/api/admin/content/series",
+        "json": {
+          "title": "Recrutement en Cote d'Ivoire",
+          "slug": "recrutement-cote-divoire"
+        }
+      },
+      "status_code": 201,
+      "data": {
+        "id": "serie-001",
+        "title": "Recrutement en Cote d'Ivoire",
+        "slug": "recrutement-cote-divoire",
+        "description": null,
+        "is_active": true
+      }
+    },
+    "updateSeries": {
+      "request": {
+        "method": "PUT",
+        "url": "/api/admin/content/series/serie-001",
+        "json": {
+          "description": "Tout savoir sur les tendances de recrutement local."
+        }
+      },
+      "status_code": 200,
+      "data": {
+        "_ref": "adminContent.createSeries.data",
+        "_note": "champs modifies uniquement"
+      }
+    },
+    "deleteSeries": {
+      "request": {
+        "method": "DELETE",
+        "url": "/api/admin/content/series/serie-001"
+      },
+      "status_code": 204,
+      "data": null
+    },
+    "updateSeriesArticles": {
+      "request": {
+        "method": "PUT",
+        "url": "/api/admin/content/series/serie-001/articles",
+        "json": {
+          "article_ids": [
+            "3b273360-3af3-4a11-8dd8-e76c072854f9"
+          ]
+        }
+      },
+      "status_code": 200,
+      "data": {
+        "message": "Articles de la serie mis a jour",
+        "count": 1
+      }
+    },
+    "getPages": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/content/pages"
+      },
+      "status_code": 200,
+      "data": [
+        {
+          "id": "page-mentions",
+          "slug": "mentions-legales",
+          "title": "Mentions legales",
+          "status": "published",
+          "body_json": [],
+          "created_at": "2026-01-15T10:00:00",
+          "updated_at": "2026-09-04T08:30:00"
+        }
+      ]
+    },
+    "createPage": {
+      "request": {
+        "method": "POST",
+        "url": "/api/admin/content/pages",
+        "json": {
+          "slug": "cgu",
+          "title": "Conditions generales",
+          "status": "draft"
+        }
+      },
+      "status_code": 201,
+      "data": {
+        "id": "page-cgu",
+        "slug": "cgu",
+        "title": "Conditions generales",
+        "status": "draft",
+        "body_json": [],
+        "created_at": "2026-09-04T08:30:00",
+        "updated_at": "2026-09-04T08:30:00"
+      }
+    },
+    "updatePage": {
+      "request": {
+        "method": "PUT",
+        "url": "/api/admin/content/pages/page-cgu",
+        "json": {
+          "status": "published"
+        }
+      },
+      "status_code": 200,
+      "data": {
+        "_ref": "adminContent.createPage.data",
+        "_note": "champs modifies uniquement"
+      }
+    },
+    "deletePage": {
+      "request": {
+        "method": "DELETE",
+        "url": "/api/admin/content/pages/page-cgu"
+      },
+      "status_code": 204,
+      "data": null
+    }
+  },
+  "adminAdmins": {
+    "getAdmins": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/admins",
+        "params": {
+          "limit": 50,
+          "offset": 0
+        }
+      },
+      "status_code": 200,
+      "data": [
+        {
+          "id": "1a2b3c4d-0000-4000-8000-000000000001",
+          "email": "admin@jobalert.ci",
+          "full_name": "Admin Demo",
+          "role": "super_admin",
+          "is_active": true,
+          "last_login_at": "2026-09-04T08:30:00",
+          "created_at": "2026-01-15T10:00:00",
+          "updated_at": "2026-09-04T08:30:00"
+        }
+      ]
+    },
+    "createAdmin": {
+      "request": {
+        "method": "POST",
+        "url": "/api/admin/admins",
+        "json": {
+          "email": "gestionnaire@jobalert.ci",
+          "password": "************",
+          "full_name": "Gestionnaire Offres",
+          "role": "gestionnaire_offres"
+        }
+      },
+      "status_code": 201,
+      "data": {
+        "id": "5e6f7a8b-0000-4000-8000-000000000002",
+        "email": "gestionnaire@jobalert.ci",
+        "full_name": "Gestionnaire Offres",
+        "role": "gestionnaire_offres",
+        "is_active": true,
+        "last_login_at": null,
+        "created_at": "2026-09-04T08:30:00",
+        "updated_at": "2026-09-04T08:30:00"
+      }
+    },
+    "getAdmin": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/admins/5e6f7a8b-0000-4000-8000-000000000002"
+      },
+      "status_code": 200,
+      "data": {
+        "_ref": "adminAdmins.createAdmin.data"
+      }
+    },
+    "updateAdmin": {
+      "request": {
+        "method": "PUT",
+        "url": "/api/admin/admins/5e6f7a8b-0000-4000-8000-000000000002",
+        "json": {
+          "full_name": "Gestionnaire des Offres"
+        }
+      },
+      "status_code": 200,
+      "data": {
+        "_ref": "adminAdmins.createAdmin.data",
+        "_note": "auto-desactivation interdite cote serveur"
+      }
+    },
+    "updateAdminRole": {
+      "request": {
+        "method": "PATCH",
+        "url": "/api/admin/admins/5e6f7a8b-0000-4000-8000-000000000002/role",
+        "json": {
+          "role": "moderateur"
+        }
+      },
+      "status_code": 200,
+      "data": {
+        "_ref": "adminAdmins.createAdmin.data",
+        "_note": "role change en moderateur"
+      }
+    },
+    "toggleAdminStatus": {
+      "request": {
+        "method": "PATCH",
+        "url": "/api/admin/admins/5e6f7a8b-0000-4000-8000-000000000002/status"
+      },
+      "status_code": 200,
+      "data": {
+        "_ref": "adminAdmins.createAdmin.data",
+        "_note": "bascule active <-> inactive ; interdit sur son propre compte"
+      }
+    },
+    "deleteAdmin": {
+      "request": {
+        "method": "DELETE",
+        "url": "/api/admin/admins/5e6f7a8b-0000-4000-8000-000000000002"
+      },
+      "status_code": 204,
+      "data": null
+    }
+  },
+  "adminLogs": {
+    "getAuditLogs": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/logs/audit",
+        "params": {
+          "limit": 50,
+          "offset": 0
+        }
+      },
+      "status_code": 200,
+      "data": [
+        {
+          "id": "log-001",
+          "admin_id": "1a2b3c4d-0000-4000-8000-000000000001",
+          "action": "modification",
+          "target_table": "job_offers",
+          "target_id": "3bf36ef4-1929-43b9-b95b-502f2572a140",
+          "details": {
+            "status": "archived"
+          },
+          "created_at": "2026-09-04T08:30:00",
+          "updated_at": "2026-09-04T08:30:00"
+        }
+      ]
+    },
+    "getEventLogs": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/logs/events",
+        "params": {
+          "module": "scraping",
+          "level": "error",
+          "limit": 50
+        }
+      },
+      "status_code": 200,
+      "data": [
+        {
+          "id": "evt-err-001",
+          "created_at": "2026-09-04T08:30:00",
+          "updated_at": "2026-09-04T08:30:00",
+          "module": "scraping",
+          "niveau": "error",
+          "action": "failed",
+          "offer_id": null,
+          "source_scrape_run_id": "srun-educarriere-2026-09-04",
+          "hash_unique": null,
+          "raw_url": "https://educarriere.ci/offre/123",
+          "message": "format de date inattendu: 'publie hier'"
+        }
+      ]
+    },
+    "getContactMessages": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/logs/contacts",
+        "params": {
+          "status": "new",
+          "limit": 20,
+          "offset": 0
+        }
+      },
+      "status_code": 200,
+      "data": [
+        {
+          "id": "contact-001",
+          "full_name": "Utilisateur Demo",
+          "email": "demo.jsonclaude@example.com",
+          "subject_code": "question_generale",
+          "subject_label": "Question generale",
+          "message": "Ceci est un message de test.",
+          "status": "new",
+          "ip_hash": "9f86d0818...",
+          "user_agent": "Mozilla/5.0",
+          "replied_at": null,
+          "created_at": "2026-09-04T08:30:00",
+          "updated_at": "2026-09-04T08:30:00"
+        }
+      ]
+    },
+    "updateContactStatus": {
+      "request": {
+        "method": "PATCH",
+        "url": "/api/admin/logs/contacts/contact-001/status",
+        "json": {
+          "status": "read"
+        }
+      },
+      "status_code": 200,
+      "data": {
+        "_ref": "adminLogs.getContactMessages.data[0]",
+        "_note": "status passe en read"
+      }
+    }
+  },
+  "adminSettings": {
+    "getSettings": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/settings"
+      },
+      "status_code": 200,
+      "data": [
+        {
+          "key": "digest_send_hour",
+          "value": "07",
+          "description": "Heure d'envoi des digests (UTC)",
+          "updated_by_admin_id": null,
+          "created_at": "2026-01-15T10:00:00",
+          "updated_at": "2026-01-15T10:00:00"
+        },
+        {
+          "key": "contact_email",
+          "value": "contact@jobalert.ci",
+          "description": "Adresse de contact affichee sur le site",
+          "updated_by_admin_id": null,
+          "created_at": "2026-01-15T10:00:00",
+          "updated_at": "2026-01-15T10:00:00"
+        }
+      ]
+    },
+    "getSetting": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/settings/digest_send_hour"
+      },
+      "status_code": 200,
+      "data": {
+        "_ref": "adminSettings.getSettings.data[0]"
+      }
+    },
+    "updateSetting": {
+      "request": {
+        "method": "PUT",
+        "url": "/api/admin/settings/digest_send_hour",
+        "json": {
+          "value": "06",
+          "description": "Heure d'envoi des digests (UTC)"
+        }
+      },
+      "status_code": 200,
+      "data": {
+        "_ref": "adminSettings.getSettings.data[0]",
+        "_note": "value passe en 06"
+      }
+    },
+    "bulkUpdateSettings": {
+      "request": {
+        "method": "POST",
+        "url": "/api/admin/settings/bulk",
+        "json": {
+          "settings": {
+            "digest_send_hour": "06",
+            "contact_email": "contact@jobalert.ci"
+          }
+        }
+      },
+      "status_code": 200,
+      "data": {
+        "_ref": "adminSettings.getSettings.data",
+        "_note": "liste complete des parametres mis a jour"
+      }
+    }
+  },
+  "adminAi": {
+    "getKeys": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/ai/keys"
+      },
+      "status_code": 200,
+      "data": [
+        {
+          "id": "aik-001",
+          "name": "Cle production",
+          "provider_type": "openai_compatible",
+          "base_url": "https://api.openai.com/v1",
+          "models": [
+            "gpt-4o-mini"
+          ],
+          "priority": 0,
+          "is_active": true,
+          "max_concurrent_requests": 2,
+          "timeout_seconds": 30,
+          "max_retries": 2,
+          "retry_backoff_seconds": 5,
+          "rate_limit_per_minute": null,
+          "notes": null,
+          "last_used_at": "2026-09-04T06:45:00",
+          "last_error_at": null,
+          "created_at": "2026-02-01T10:00:00",
+          "updated_at": "2026-09-04T08:30:00"
+        }
+      ]
+    },
+    "createKey": {
+      "request": {
+        "method": "POST",
+        "url": "/api/admin/ai/keys",
+        "json": {
+          "name": "Cle de secours",
+          "provider_type": "openai_compatible",
+          "base_url": "https://api.openai.com/v1",
+          "api_key": "sk-************",
+          "priority": 10
+        }
+      },
+      "status_code": 201,
+      "data": {
+        "_ref": "adminAi.getKeys.data[0]",
+        "_note": "api_key jamais renvoye en clair ; seuls api_key_last4 (exclu) sont conserves"
+      }
+    },
+    "updateKey": {
+      "request": {
+        "method": "PATCH",
+        "url": "/api/admin/ai/keys/aik-001",
+        "json": {
+          "timeout_seconds": 45
+        }
+      },
+      "status_code": 200,
+      "data": {
+        "_ref": "adminAi.getKeys.data[0]"
+      }
+    },
+    "deleteKey": {
+      "request": {
+        "method": "DELETE",
+        "url": "/api/admin/ai/keys/aik-001"
+      },
+      "status_code": 204,
+      "data": null,
+      "_note": "refuse si c'est la derniere cle active"
+    },
+    "testKey": {
+      "request": {
+        "method": "POST",
+        "url": "/api/admin/ai/keys/aik-001/test"
+      },
+      "status_code": 200,
+      "data": {
+        "ok": true,
+        "provider": "openai_compatible",
+        "model": "gpt-4o-mini"
+      }
+    },
+    "getJobs": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/ai/jobs",
+        "params": {
+          "limit": 50,
+          "offset": 0
+        }
+      },
+      "status_code": 200,
+      "data": [
+        {
+          "id": "aijob-001",
+          "trigger_type": "sweep",
+          "status": "success",
+          "started_at": "2026-09-04T06:45:00",
+          "finished_at": "2026-09-04T06:47:31",
+          "offers_total": 12,
+          "offers_activated": 9,
+          "offers_pending_review": 1,
+          "offers_rejected": 2,
+          "offers_reprocess_required": 0,
+          "primary_api_key_id": "aik-001",
+          "fallback_count": 0,
+          "error_message": null,
+          "celery_task_id": "celery-ai-001",
+          "created_at": "2026-09-04T06:45:00",
+          "updated_at": "2026-09-04T06:47:31"
+        }
+      ]
+    },
+    "getQueue": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/ai/queue"
+      },
+      "status_code": 200,
+      "data": {
+        "pending": 3,
+        "running": 1,
+        "pending_ai_jobs": 3,
+        "last_sweep_at": "2026-09-04T06:45:00",
+        "last_sweep_status": "success"
+      }
+    },
+    "getAlerts": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/ai/alerts",
+        "params": {
+          "include_acknowledged": false,
+          "limit": 50
+        }
+      },
+      "status_code": 200,
+      "data": [
+        {
+          "id": "aia-001",
+          "job_id": "aijob-001",
+          "type": "quota_exceeded",
+          "severity": "warning",
+          "message": "Quota API bientot epuise (90%)",
+          "payload": {
+            "used": 9000,
+            "limit": 10000
+          },
+          "acknowledged_at": null,
+          "acknowledged_by_admin_id": null,
+          "created_at": "2026-09-04T08:30:00",
+          "updated_at": "2026-09-04T08:30:00"
+        }
+      ]
+    },
+    "acknowledgeAlert": {
+      "request": {
+        "method": "PATCH",
+        "url": "/api/admin/ai/alerts/aia-001/ack"
+      },
+      "status_code": 200,
+      "data": {
+        "id": "aia-001",
+        "acknowledged_at": "2026-09-04T08:30:00",
+        "acknowledged_by_admin_id": "1a2b3c4d-0000-4000-8000-000000000001"
+      }
+    },
+    "runProcessing": {
+      "request": {
+        "method": "POST",
+        "url": "/api/admin/ai/run",
+        "json": {
+          "force": true,
+          "trigger_type": "manual"
+        }
+      },
+      "status_code": 202,
+      "data": {
+        "status": "queued",
+        "task_id": "celery-ai-manual-001",
+        "triggered_by": "1a2b3c4d-0000-4000-8000-000000000001"
+      }
+    },
+    "getSuggestions": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/ai/suggestions",
+        "params": {
+          "status_filter": "pending",
+          "limit": 20,
+          "offset": 0
+        }
+      },
+      "status_code": 200,
+      "data": [
+        {
+          "id": "ais-001",
+          "offer_id": "3bf36ef4-1929-43b9-b95b-502f2572a140",
+          "job_id": "aijob-001",
+          "code": "data",
+          "label": "Data & Analytics",
+          "reason": "Occurrences repetees de: data analyst, dashboard, SQL",
+          "status": "pending",
+          "reviewed_by_admin_id": null,
+          "reviewed_at": null,
+          "created_at": "2026-09-04T08:30:00",
+          "updated_at": "2026-09-04T08:30:00"
+        }
+      ]
+    },
+    "reviewSuggestion": {
+      "request": {
+        "method": "PATCH",
+        "url": "/api/admin/ai/suggestions/ais-001",
+        "json": {
+          "status": "approved"
+        }
+      },
+      "status_code": 200,
+      "data": {
+        "_ref": "adminAi.getSuggestions.data[0]",
+        "_note": "status passe en approved ; la filiere est creee automatiquement"
+      }
+    }
+  },
+  "adminSystem": {
+    "getSystemHealth": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/system/health"
+      },
+      "status_code": 200,
+      "data": {
+        "database": {
+          "status": "ok",
+          "message": "Base de donnees accessible"
+        },
+        "celery": {
+          "status": "ok",
+          "workers_active": 3,
+          "message": "Workers actifs detectes"
+        },
+        "redis_queues": {
+          "status": "ok",
+          "queues": {
+            "emails_queued": 0,
+            "ingestion_depth": "N/A (simulee: pas de file Redis directe exposee)",
+            "ai_depth": "N/A"
+          },
+          "message": "0 digests en file d'attente"
+        },
+        "heartbeat": {
+          "status": "ok",
+          "last_heartbeat_at": "2026-09-04T06:52:35",
+          "message": "Derniere offre creee"
+        },
+        "admin_auth": {
+          "status": "ok",
+          "current_role": "super_admin",
+          "is_active": true
+        },
+        "overall_status": "ok"
+      }
+    },
+    "exportOffers": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/exports/data-export/offers",
+        "params": {
+          "format": "csv",
+          "status": "active"
+        }
+      },
+      "status_code": 200,
+      "data": "content_type: text/csv (fichier telecharge en blob)\n\nid,title,company_name,status,visible_site,published_at,view_count,save_count\n3bf36ef4-1929-43b9-b95b-502f2572a140,Responsable Supply Chain,TransCargo CI,active,true,2026-08-06T01:40:35,774,42"
+    },
+    "exportSubscribers": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/exports/data-export/subscribers",
+        "params": {
+          "format": "csv",
+          "status": "active"
+        }
+      },
+      "status_code": 200,
+      "data": "content_type: text/csv (fichier telecharge en blob)\n\nid,email,full_name,city,status,subscribed_at,filieres\n9f1c2d34-5e67-8901-abcd-ef0123456789,demo.jsonclaude@example.com,Utilisateur Demo,Abidjan,active,2026-08-10T11:46:36,tech-dev"
+    },
+    "exportSending": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/exports/data-export/sending",
+        "params": {
+          "format": "csv",
+          "status": "sent"
+        }
+      },
+      "status_code": 200,
+      "data": "content_type: text/csv (fichier telecharge en blob)\n\nid,subscriber_email,digest_date,status,offer_count,template_version,match_tier,sent_at\ndigest-2026-09-03-demo,demo.jsonclaude@example.com,2026-09-03,sent,4,v1,T0,2026-09-03T06:30:12"
+    },
+    "getTransactionalEmails": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/transactional-emails",
+        "params": {
+          "purpose": "confirm_email",
+          "limit": 50,
+          "offset": 0
+        }
+      },
+      "status_code": 200,
+      "data": [
+        {
+          "id": "tee-001",
+          "purpose": "confirm_email",
+          "status": "sent",
+          "to_email": "demo.jsonclaude@example.com",
+          "subscriber_id": "9f1c2d34-5e67-8901-abcd-ef0123456789",
+          "provider": "resend",
+          "provider_message_id": "msg-001",
+          "error_message": null,
+          "sent_at": "2026-08-10T11:46:40",
+          "created_at": "2026-08-10T11:46:36",
+          "updated_at": "2026-08-10T11:46:40"
+        }
+      ]
+    },
+    "countTransactionalEmails": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/transactional-emails/count",
+        "params": {
+          "status": "sent"
+        }
+      },
+      "status_code": 200,
+      "data": {
+        "count": 182
+      }
+    }
+  }
+}

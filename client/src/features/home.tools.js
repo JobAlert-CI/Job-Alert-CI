@@ -1,6 +1,6 @@
 
 import { queryClient } from "@/lib/queryClient"
-import { getOfferSats, getOfferSatsByFiliere, getGlobalSats } from "@/api/public/stats"
+import { getOfferStats, getOfferStatsByFiliere, getGlobalStats } from "@/api/public/stats"
 import { getOffers } from "@/api/public/offers"
 import { useMemo } from "react"
 import { useQuery } from "@tanstack/react-query"
@@ -39,12 +39,12 @@ export const homeKeys = {
 }
 
 export const useHomeStats = () =>
-  useQuery({ queryKey: homeKeys.stats, queryFn: getGlobalSats })
+  useQuery({ queryKey: homeKeys.stats, queryFn: getGlobalStats })
 
 export const useFiliereStats = () =>
   useQuery({
     queryKey: homeKeys.filieres,
-    queryFn: () => getOfferSatsByFiliere({ limit: FILIERE_STATS_LIMIT }),
+    queryFn: () => getOfferStatsByFiliere({ limit: FILIERE_STATS_LIMIT }),
   })
 
 export const useRecentOffers = () =>
@@ -107,10 +107,10 @@ export const useHomeMetrics = () => {
  * Exemple : { path: "/", element: <Home />, loader: prefetchHome }
  */
 export const prefetchHome = () => {
-  queryClient.prefetchQuery({ queryKey: homeKeys.stats, queryFn: getOfferSats })
+  queryClient.prefetchQuery({ queryKey: homeKeys.stats, queryFn: getOfferStats })
   queryClient.prefetchQuery({
     queryKey: homeKeys.filieres,
-    queryFn: () => getOfferSatsByFiliere({ limit: FILIERE_STATS_LIMIT }),
+    queryFn: () => getOfferStatsByFiliere({ limit: FILIERE_STATS_LIMIT }),
   })
   queryClient.prefetchQuery({
     queryKey: homeKeys.offers,

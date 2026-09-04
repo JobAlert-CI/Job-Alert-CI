@@ -9,7 +9,7 @@ import { formatApiError } from "@/api/errors"
 import {
   getOfferById, getSimilarOffers, incrementeView, saveOffer,
 } from "@/api/public/offers"
-import { getOfferSats, getOfferSatsBySource } from "@/api/public/stats"
+import { getOfferStats, getOfferStatsBySource } from "@/api/public/stats"
 
 /** Empreinte stable supportant les UUIDs (chaînes de caractères). */
 export const fakeHash = (id) => {
@@ -116,8 +116,8 @@ export const useOffresSimilairesQuery = (id) =>
 /* ─────────────── Collecte du jour (MiniCollecte) — un seul aller-retour ─────────────── */
 const loadCollecteJour = async () => {
   const [summary, bySource] = await Promise.allSettled([
-    getOfferSats(),
-    getOfferSatsBySource(),
+    getOfferStats(),
+    getOfferStatsBySource(),
   ])
   const s = summary.status === "fulfilled" ? summary.value : null
   return {

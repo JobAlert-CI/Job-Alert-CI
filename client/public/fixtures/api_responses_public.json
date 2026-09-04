@@ -328,14 +328,16 @@
         "method": "POST",
         "url": "/api/contact",
         "json": {
-          "full_name": "Utilisateur Démo",
+          "full_name": "Utilisateur Demo",
           "email": "demo.jsonclaude@example.com",
           "subject_code": "question_generale",
-          "message": "Ceci est un message de test envoyé pour générer un exemple de réponse API."
+          "message": "Ceci est un message de test envoye pour generer un exemple de reponse API."
         }
       },
-      "status_code": 500,
-      "data": "Internal Server Error"
+      "status_code": 201,
+      "data": {
+        "message": "Message recu. Notre equipe vous repondra sous 48h."
+      }
     }
   },
   "filieres": {
@@ -1484,6 +1486,59 @@
           "is_active": true
         }
       ]
+    },
+    "getAllReferentials": {
+      "request": {
+        "_composite": true,
+        "calls": [
+          {
+            "method": "GET",
+            "url": "/api/referentials/filieres"
+          },
+          {
+            "method": "GET",
+            "url": "/api/referentials/sources"
+          },
+          {
+            "method": "GET",
+            "url": "/api/referentials/contract-types"
+          },
+          {
+            "method": "GET",
+            "url": "/api/referentials/experience-levels"
+          },
+          {
+            "method": "GET",
+            "url": "/api/referentials/education-levels"
+          },
+          {
+            "method": "GET",
+            "url": "/api/referentials/locations"
+          }
+        ],
+        "note": "Helper client : Promise.all sur les 6 routes, aucune route HTTP unique."
+      },
+      "status_code": 200,
+      "data": {
+        "filieres": {
+          "_ref": "referentials.getFilieres.data"
+        },
+        "sources": {
+          "_ref": "referentials.getSources.data"
+        },
+        "contractTypes": {
+          "_ref": "referentials.getContractTypes.data"
+        },
+        "experienceLevels": {
+          "_ref": "referentials.getExperienceLevels.data"
+        },
+        "educationLevels": {
+          "_ref": "referentials.getEducationLevels.data"
+        },
+        "locations": {
+          "_ref": "referentials.getLocations.data"
+        }
+      }
     }
   },
   "sources": {
@@ -1752,7 +1807,7 @@
     }
   },
   "stats": {
-    "getGlobalSats": {
+    "getGlobalStats": {
       "request": {
         "method": "GET",
         "url": "/api/stats/global"
@@ -1776,7 +1831,7 @@
         "last_run_date": null
       }
     },
-    "getOfferSats": {
+    "getOfferStats": {
       "request": {
         "method": "GET",
         "url": "/api/stats/offers"
@@ -1787,7 +1842,7 @@
         "new_offers": 9
       }
     },
-    "getOfferSatsByFiliere": {
+    "getOfferStatsByFiliere": {
       "request": {
         "method": "GET",
         "url": "/api/stats/offers/by-filiere"
@@ -1887,7 +1942,7 @@
         }
       ]
     },
-    "getOfferSatsBySource": {
+    "getOfferStatsBySource": {
       "request": {
         "method": "GET",
         "url": "/api/stats/offers/by-source"
@@ -1924,7 +1979,7 @@
         }
       ]
     },
-    "getOfferSatsByContract": {
+    "getOfferStatsByContract": {
       "request": {
         "method": "GET",
         "url": "/api/stats/offers/by-contract"
@@ -2012,7 +2067,7 @@
         "contract_preferences": []
       }
     },
-    "ConfirmSubscribe": {
+    "confirmSubscribe": {
       "request": {
         "method": "GET",
         "url": "/api/subscriptions/confirm/demo-token-jobalertci-confirm-0000"
@@ -2065,8 +2120,28 @@
           "wants_career_tips": false
         }
       },
-      "status_code": 500,
-      "data": "Internal Server Error"
+      "status_code": 200,
+      "data": {
+        "id": "9f1c2d34-5e67-8901-abcd-ef0123456789",
+        "email": "demo.jsonclaude@example.com",
+        "full_name": "Utilisateur Demo",
+        "city": "Abidjan",
+        "status": "active",
+        "timezone": "Africa/Abidjan",
+        "wants_career_tips": false,
+        "source": "site",
+        "subscribed_at": "2026-08-10T11:46:36",
+        "created_at": "2026-08-10T11:46:36",
+        "updated_at": "2026-08-11T09:12:00",
+        "filiere_links": [
+          {
+            "filiere_code": "tech-dev",
+            "filiere_label": "Tech & Dev",
+            "priority": 1
+          }
+        ],
+        "contract_preferences": []
+      }
     },
     "unsubscribe": {
       "request": {
@@ -2077,6 +2152,30 @@
       "data": {
         "message": "Désinscription enregistrée"
       }
+    },
+    "resendConfirmation": {
+      "request": {
+        "method": "POST",
+        "url": "/api/subscriptions/resend-confirmation",
+        "json": {
+          "email": "demo.jsonclaude@example.com"
+        }
+      },
+      "status_code": 200,
+      "data": {
+        "message": "Si un compte existe, un nouvel email de confirmation a ete envoye.",
+        "email": "demo.jsonclaude@example.com"
+      }
     }
-  }
+  },
+  "seo": {
+    "getSitemap": {
+      "request": {
+        "method": "GET",
+        "url": "/sitemap.xml"
+      },
+      "status_code": 200,
+      "data": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n  <url><loc>https://jobalert.ci/</loc></url>\n  <url><loc>https://jobalert.ci/offres</loc></url>\n  <url><loc>https://jobalert.ci/filieres</loc></url>\n</urlset>"
+    }
+  }  
 }

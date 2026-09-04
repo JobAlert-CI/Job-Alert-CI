@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState, useMemo } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { getFilieres } from "@/api/public/filieres"
 import { getOffers } from "@/api/public/offers"
-import { getGlobalSats, getOfferSatsBySource } from "@/api/public/stats"
+import { getGlobalStats, getOfferStatsBySource } from "@/api/public/stats"
 import { useUrlFilters } from "@/hooks/use-url-filters"
 import { paletteDepuisHex } from "@/lib/hues"
 import getFiliereTheme from "@/lib/filiere-theme"
@@ -177,7 +177,7 @@ export const useFilieresAdapted = () => {
 export const useGlobalStatsQuery = () =>
   useQuery({
     queryKey: filieresKeys.statsGlobal,
-    queryFn: getGlobalSats,
+    queryFn: getGlobalStats,
     staleTime: 5 * 60 * 1000,
     placeholderData: { active_offers: 0, new_today: 0, subscribers: 0, sources: 0 },
   })
@@ -186,7 +186,7 @@ export const useGlobalStatsQuery = () =>
 export const useStatsParSourceQuery = () =>
   useQuery({
     queryKey: filieresKeys.statsParSource,
-    queryFn: () => getOfferSatsBySource(),
+    queryFn: () => getOfferStatsBySource(),
     staleTime: 5 * 60 * 1000,
     placeholderData: [],
   })

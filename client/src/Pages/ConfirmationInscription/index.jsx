@@ -56,7 +56,7 @@ export const ConfirmationInscription = () => {
         return
       }
       try {
-        const response = await subscriptionsApi.ConfirmSubscribe(token)
+        const response = await subscriptionsApi.confirmSubscribe(token)
         /* Le token validé ne doit pas rester dans l'historique du navigateur
            (URL partageable, extensions, écran "précédent") — Cf. Audit.md P0-3. */
         window.history.replaceState(null, "", "/inscription")

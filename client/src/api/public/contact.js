@@ -1,23 +1,16 @@
 import api from "../axiosInstance";
 
-
 const API_URL = "/api/contact";
 
 /**
- * 
- * @param {list} data = {
-    "full_name": "string",
-    "email": "string",
-    "subject_code": "string",
-    "message": "string"
-  }
- * @returns 
+ * POST /api/contact → 201
+ * @param {Object} data { full_name, email, subject_code, message }
  */
-const createContact = async(data) => {
-  const response = await api.post(API_URL, data)
-  return response.data
-}
+const createContact = async (data, { signal } = {}) => {
+  const response = await api.post(API_URL, data, { signal });
+  return response.data;
+};
 
-export default {
-  createContact
-}
+export { createContact };
+
+export default { createContact };

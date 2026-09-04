@@ -4,7 +4,7 @@ import {
 } from "lucide-react"
 import { useQuery } from "@tanstack/react-query"
 import { getSources } from "@/api/public/sources"
-import { getGlobalSats, getOfferSatsBySource } from "@/api/public/stats"
+import { getGlobalStats, getOfferStatsBySource } from "@/api/public/stats"
 
 /* ════════════════════════════════════════════════════════════════════
    POSITIONS RADAR — coordonnées en % pour sources 1..N.
@@ -244,7 +244,7 @@ export const useSourcesStatsQuery = () =>
   useQuery({
     queryKey: sourcesKeys.stats,
     queryFn: async () => {
-      const data = await getOfferSatsBySource()
+      const data = await getOfferStatsBySource()
       return Array.isArray(data) ? data : []
     },
     staleTime: 5 * 60 * 1000,
@@ -256,7 +256,7 @@ export const useGlobalStatsQuery = () =>
   useQuery({
     queryKey: sourcesKeys.global,
     queryFn: async () => {
-      const data = await getGlobalSats()
+      const data = await getGlobalStats()
       return data && typeof data === "object" ? data : {}
     },
     staleTime: 5 * 60 * 1000,

@@ -2,7 +2,7 @@
 import { useQuery } from "@tanstack/react-query"
 import { getFilieres } from "@/api/public/filieres"
 import { getArticlesPopular } from "@/api/public/articles"
-import { getGlobalSats, getOfferSatsBySource } from "@/api/public/stats"
+import { getGlobalStats, getOfferStatsBySource } from "@/api/public/stats"
 import { paletteDepuisHex } from "@/lib/hues"
 import { getSources } from "@/api/public/sources"   // ← import à ajouter
 
@@ -89,7 +89,7 @@ export const useNavigationData = () => {
 
   const overview = useQuery({
     queryKey: navKeys.overview,
-    queryFn: getGlobalSats,
+    queryFn: getGlobalStats,
     staleTime: 5 * 60 * 1000,
     placeholderData: {
       active_offers: 0,
@@ -101,7 +101,7 @@ export const useNavigationData = () => {
 
   const sources = useQuery({
     queryKey: navKeys.sources,
-    queryFn: () => getOfferSatsBySource({ new_since_days: 1 }),
+    queryFn: () => getOfferStatsBySource({ new_since_days: 1 }),
     staleTime: 5 * 60 * 1000,
     placeholderData: [],
   })
