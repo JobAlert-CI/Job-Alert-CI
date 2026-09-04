@@ -1,14 +1,20 @@
-"""Service metier : reinitialisation du mot de passe admin (audit 2, N2-N6).
+"""Service metier : reinitialisation du mot de passe admin (audit 2, N2-N6,
+durci audit 3 W1).
 
 Corrige les flaws du flux historique:
 - le token est stocke **hashe** (SHA-256) dans `request_payload`, jamais en clair
   (convention du projet, cf. SubscriberToken) ;
-- usage unique: un token consomme ne peut plus reset (champ `used` + statut) ;
+- usage unique: un token consomme ne peut plus reset (colonne
+  `reset_token_used_at` + payload legacy) ;
 - TTL: un token expire apres `admin_reset_token_ttl_minutes` (60 min) ;
 - l'envoi passe par `provider.send(EmailMessage)` (le protocole reel),
   plus de methode `send_simple` inexistante ;
 - le message est neutre pour ne pas reveler l'existence d'un compte.
 
+Audit 3, W1 : le hash du token vit desormais dans une COLONNE dediee indexee
+(`reset_token_hash`) au lieu du seul JSON — plus de scan des 200 derniers
+events, donc un attaquant ne peut plus noyer le token legitime sous des
+demandes de reset.
 Ce service ne connait pas FastAPI: la route traduit les exceptions.
 """
 from __future__ import annotations
@@ -16,6 +22,7 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
+from secrets import token_urlsafe
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -47,11 +54,6 @@ class AdminResetRequest:
     event_id: str | None
 
 
-def _match_payload_hash(event: TransactionalEmailEvent) -> bool:
-    payload = event.request_payload or {}
-    return isinstance(payload, dict) and payload.get("reset_token_hash") is not None
-
-
 def request_password_reset(
     db: Session,
     *,
@@ -72,16 +74,18 @@ def request_password_reset(
         logger.info("Demande de reset pour email inconnu (silence)")
         return AdminResetRequest(token=None, event_id=None)
 
-    from secrets import token_urlsafe
-
     raw_token = token_urlsafe(32)
     now = datetime.now(UTC)
     event = TransactionalEmailEvent(
         purpose=TransactionalEmailPurpose.RESET_PASSWORD,
         to_email=admin.email,
         status=TransactionalEmailStatus.QUEUED,
+        # Audit 3, W1 : colonne dediee indexee (lookup O(1) a la consommation).
+        reset_token_hash=token_hash(raw_token),
+        reset_token_used_at=None,
         request_payload={
-            # Jamais le token brut: seulement son SHA-256 (convention projet).
+            # Jamais le token brut: seulement son SHA-256 (convention projet),
+            # conserve en payload pour compatibilite des outils existants.
             "reset_token_hash": token_hash(raw_token),
             "expires_at": (now + timedelta(minutes=RESET_TOKEN_TTL_MINUTES)).isoformat(),
         },
@@ -114,6 +118,44 @@ def request_password_reset(
     return AdminResetRequest(token=raw_token, event_id=event.id)
 
 
+def _find_reset_event(db: Session, hashed: str) -> TransactionalEmailEvent | None:
+    """Resout l'event du token par la colonne indexee (audit 3, W1).
+
+    En production les tokens emis apres la migration ont toujours la colonne
+    renseignee ; les tokens ANTERIEURS a la migration sont retrouves via le
+    backfill 0013 (ou, en derniere defence, par le scan JSON historique).
+    """
+    candidate = db.scalar(
+        select(TransactionalEmailEvent)
+        .where(
+            TransactionalEmailEvent.reset_token_hash == hashed,
+            TransactionalEmailEvent.purpose == TransactionalEmailPurpose.RESET_PASSWORD,
+        )
+        .order_by(TransactionalEmailEvent.created_at.desc())
+        .limit(1)
+    )
+    if candidate is not None:
+        return candidate
+
+    # Fallback legacy : token emis avant la migration 0013 sans backfill.
+    events = db.scalars(
+        select(TransactionalEmailEvent)
+        .where(
+            TransactionalEmailEvent.purpose == TransactionalEmailPurpose.RESET_PASSWORD,
+            TransactionalEmailEvent.status.in_(
+                [TransactionalEmailStatus.QUEUED, TransactionalEmailStatus.SENT]
+            ),
+        )
+        .order_by(TransactionalEmailEvent.created_at.desc())
+        .limit(200)
+    ).all()
+    for ev in events:
+        payload = ev.request_payload or {}
+        if isinstance(payload, dict) and payload.get("reset_token_hash") == hashed:
+            return ev
+    return None
+
+
 def consume_reset_token(
     db: Session,
     *,
@@ -131,42 +173,29 @@ def consume_reset_token(
 
     hashed = token_hash(raw_token)
     now = datetime.now(UTC)
-    candidate = None
-    events = db.scalars(
-        select(TransactionalEmailEvent)
-        .where(
-            TransactionalEmailEvent.purpose == TransactionalEmailPurpose.RESET_PASSWORD,
-            TransactionalEmailEvent.status.in_(
-                [TransactionalEmailStatus.QUEUED, TransactionalEmailStatus.SENT]
-            ),
-        )
-        .order_by(TransactionalEmailEvent.created_at.desc())
-        .limit(200)
-    ).all()
-    for ev in events:
-        payload = ev.request_payload or {}
-        if not isinstance(payload, dict):
-            continue
-        if payload.get("reset_token_hash") != hashed:
-            continue
-        # Le token est consomme des qu'un nouveau mdp a ete applique.
-        if payload.get("used") is True:
-            raise AdminResetPasswordError("Token deja utilise", status_code=400)
-        expires_raw = payload.get("expires_at")
-        if expires_raw:
-            try:
-                expires_at = datetime.fromisoformat(expires_raw)
-                if expires_at.tzinfo is None:
-                    expires_at = expires_at.replace(tzinfo=UTC)
-                if expires_at <= now:
-                    raise AdminResetPasswordError("Token expire", status_code=400)
-            except ValueError:
-                pass  # format inattendu: on laisse passer (legacy)
-        candidate = ev
-        break
+    candidate = _find_reset_event(db, hashed)
 
     if candidate is None:
         raise AdminResetPasswordError("Token invalide ou expire", status_code=400)
+
+    # Usage unique : colonne dediee d'abord, payload legacy ensuite.
+    if candidate.reset_token_used_at is not None:
+        raise AdminResetPasswordError("Token deja utilise", status_code=400)
+    payload = candidate.request_payload or {}
+    if isinstance(payload, dict) and payload.get("used") is True:
+        raise AdminResetPasswordError("Token deja utilise", status_code=400)
+
+    # TTL.
+    expires_raw = payload.get("expires_at") if isinstance(payload, dict) else None
+    if expires_raw:
+        try:
+            expires_at = datetime.fromisoformat(expires_raw)
+            if expires_at.tzinfo is None:
+                expires_at = expires_at.replace(tzinfo=UTC)
+            if expires_at <= now:
+                raise AdminResetPasswordError("Token expire", status_code=400)
+        except ValueError:
+            pass  # format inattendu: on laisse passer (legacy)
 
     admin = db.scalar(select(Administrator).where(Administrator.email == candidate.to_email))
     if admin is None:
@@ -174,11 +203,13 @@ def consume_reset_token(
 
     admin.password_hash = new_password_hash
 
-    # Usage unique: on marque le token consomme dans le payload.
-    payload = dict(candidate.request_payload or {})
-    payload["used"] = True
-    payload["used_at"] = now.isoformat()
-    candidate.request_payload = payload
+    # Usage unique: on marque le token consomme (colonne + payload legacy).
+    if isinstance(payload, dict):
+        payload = dict(payload)
+        payload["used"] = True
+        payload["used_at"] = now.isoformat()
+        candidate.request_payload = payload
+    candidate.reset_token_used_at = now
     candidate.status = TransactionalEmailStatus.SENT
     db.commit()
     logger.info(

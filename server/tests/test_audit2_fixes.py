@@ -20,7 +20,7 @@ from sqlalchemy import select
 
 from api.deps import get_current_admin, get_db
 from api.v1 import router as api_router  # router parent pour monter les routes
-from core.security import hash_password
+from core.security import hash_password, verify_password
 from db.base import Base
 from db.session import SessionLocal, engine
 from models.admin import AdminRole, Administrator
@@ -223,6 +223,44 @@ def test_forgot_password_email_inconnu_ne_leve_pas(admin_client, admin_db):
     assert result.token is None
     assert result.event_id is None
     assert after_count == before_count
+
+
+def test_reset_token_trouve_malgre_201_events_reset(admin_client, admin_db):
+    """Audit 3, W1 : la colonne indexee remplace le scan des 200 derniers.
+
+    Un attaquant qui noie l'historique de 200+ events RESET_PASSWORD ne doit
+    plus rendre le token legitime introuvable (DoS du scan legacy).
+    """
+    from datetime import UTC, datetime
+
+    from models.emails import TransactionalEmailEvent
+    from models.enums import TransactionalEmailPurpose
+
+    admin = _ensure_admin(admin_db, email="flood@example.com")
+    provider = _FakeProvider()
+    result = request_password_reset(admin_db, email=admin.email, provider=provider)
+    assert result.token is not None
+
+    # On emplit l'historique avec 201 events RESET_PASSWORD plus RECENTS
+    # (le scan legacy ne regardait que les 200 derniers).
+    now = datetime.now(UTC)
+    admin_db.add_all(
+        TransactionalEmailEvent(
+            purpose=TransactionalEmailPurpose.RESET_PASSWORD,
+            to_email="bruit@example.com",
+            status=TransactionalEmailStatus.QUEUED,
+            created_at=now,
+            updated_at=now,
+            request_payload={"reset_token_hash": f"bruit-{index}", "expires_at": now.isoformat()},
+        )
+        for index in range(201)
+    )
+    admin_db.commit()
+
+    # Le token legitime reste consommable : lookup par colonne indexee.
+    consume_reset_token(admin_db, raw_token=result.token, new_password_hash=hash_password("Flood1234"))
+    admin_db.refresh(admin)
+    assert verify_password("Flood1234", admin.password_hash)
 
 
 # ─── Duplicates: erreurs traduites, pas de 500 ─────────────────────────

@@ -31,10 +31,8 @@ def _load_dotenv_file() -> None:
             if val.startswith(('"', "'")):
                 quote = val[0]
                 end_idx = val.find(quote, 1)
-                if end_idx != -1:
-                    val = val[1:end_idx]
-                else:
-                    val = val.strip(quote)
+                # SIM108 (audit 3, Q1) : ternaire au lieu du bloc if/else.
+                val = val[1:end_idx] if end_idx != -1 else val.strip(quote)
             else:
                 val = val.split("#", 1)[0].strip()
             os.environ[key] = val

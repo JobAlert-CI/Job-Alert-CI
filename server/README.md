@@ -34,6 +34,11 @@ API_BASE_URL="http://localhost:8000"
 
 PostgreSQL porte les tables SQLAlchemy et Redis sert de broker Celery et de verrou distribue.
 
+**Redis >= 6.2 requis** (commande `GETDEL`, utilisee par le flush des compteurs
+view/save — `services/offer_metrics.py`). Un serveur plus ancien fonctionne
+aussi grace au fallback pipeline GET+DEL, mais la version 6.2+ reste
+recommandee. Verifier avec `redis-server --version` ou `INFO server`.
+
 ```powershell
 # PostgreSQL: creer la base jobalert_ci puis renseigner DATABASE_URL
 cd server

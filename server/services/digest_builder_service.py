@@ -94,9 +94,8 @@ def is_subscriber_eligible(subscriber: Subscriber, now: datetime | None = None) 
     if not subscriber.filiere_links:
         return False
     paused_until = _as_aware(subscriber.paused_until)
-    if paused_until is not None and paused_until > effective_now:
-        return False
-    return True
+    # SIM103 (audit 3, Q1) : condition negee retournee directement.
+    return paused_until is None or paused_until <= effective_now
 
 
 def get_eligible_subscriber_ids(db: Session) -> list[str]:

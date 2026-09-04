@@ -52,7 +52,17 @@ def _extract_bearer_token(authorization: str | None) -> str:
             detail="Authentification requise",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    return authorization.split(" ", 1)[1].strip()
+    # Audit 3, S10 (heritage audit 1) : on refuse les doublets d'espaces
+    # ("Bearer  abc") et tout espace interne ; l'espace APRES "Bearer " doit
+    # etre unique. L'espace final reste tolere (comportement historique).
+    token = authorization.split(" ", 1)[1]
+    if not token or token != token.lstrip() or " " in token.strip():
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="En-tete Authorization malforme",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return token.strip()
 
 
 def get_current_admin(

@@ -53,7 +53,10 @@ async def metrics_middleware(request: Request, call_next):
     response = await call_next(request)
     duration = time.perf_counter() - start
     route = request.scope.get("route")
-    path_template = getattr(route, "path", request.url.path)
+    # Audit 3, W3 : sur 404 (route non resolue), le path URL brut deviendrait
+    # une cle de metrique unique par requete — un flood d'URLs inexistantes
+    # evincerait les vraies routes du top. On normalise vers "unmatched".
+    path_template = getattr(route, "path", None) or "unmatched"
     observe_request(
         method=request.method,
         path=path_template,

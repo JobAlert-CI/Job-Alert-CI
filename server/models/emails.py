@@ -127,6 +127,13 @@ class TransactionalEmailEvent(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     last_error: Mapped[str | None] = mapped_column(Text, nullable=True)
     request_payload: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     response_payload: Mapped[dict | None] = mapped_column(JSON, nullable=True)
+    # Audit 3, W1 : hash SHA-256 du token de reset admin, en colonne dediee
+    # ET indexee — remplace le scan JSON des 200 derniers events (qui rendait
+    # le token legitime introuvable si un attaquant noyait l'historique).
+    reset_token_hash: Mapped[str | None] = mapped_column(String(128), nullable=True, index=True)
+    # Consommation du token (usage unique) horodatee en colonne pour la meme
+    # raison: un WHERE reset_token_hash = :h est resolu par l'index.
+    reset_token_used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     subscriber: Mapped[Subscriber | None] = relationship()
 

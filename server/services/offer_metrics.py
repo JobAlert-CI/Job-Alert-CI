@@ -11,6 +11,12 @@ Solution:
   Redis et applique les deltas en base en UN update par offre.
 - Si Redis est indisponible: fallback au comportement synchrone direct
   (correct mais lent), journalise en WARNING.
+
+Choix assume (audit 3, W4) : entre le GETDEL Redis et le UPDATE SQL, un crash
+du worker au pire perd le delta de compteurs de vues d'une minute — aucun
+file d'attente durable n'est prevu car ce sont des compteurs best-effort,
+pas des donnees financieres. Le widget public reste coherent (valeur Redis
+immediate), la base rattrape au flush suivant.
 """
 from __future__ import annotations
 
@@ -60,6 +66,36 @@ def record_metric(db: Session, offer: JobOffer, field: MetricField) -> int | Non
         return None
 
 
+def _redis_version(client) -> tuple[int, int]:
+    """Version du serveur Redis sous forme (majeure, mineure), (0, 0) si illisible."""
+    try:
+        info = client.info("server")
+        raw = str(info.get("redis_version", "0"))
+        parts = raw.split(".")
+        return (int(parts[0]), int(parts[1]) if len(parts) > 1 else 0)
+    except Exception:
+        return (0, 0)
+
+
+def _getdel_one(client, key: str, redis_version: tuple[int, int]) -> str | None:
+    """GETDEL atomique, avec fallback pipeline GET+DEL pour Redis < 6.2.
+
+    Audit 3, W2 : GETDEL n'existe que depuis Redis 6.2. Le flush tourne en
+    une seule tache Celery sequentielle (beat, un seul worker au moment du
+    flush) donc le pipeline GET puis DEL n'a pas de fenetre de concurrence
+    exploitable ; GETDEL reste utilise des que le serveur le supporte.
+    `redis_version` est calcule UNE fois par collecte (pas de round-trip
+    INFO par cle).
+    """
+    if redis_version >= (6, 2):
+        return client.getdel(key)
+    pipe = client.pipeline(transaction=True)
+    pipe.get(key)
+    pipe.delete(key)
+    value, _deleted = pipe.execute()
+    return value
+
+
 def collect_metric_deltas(max_keys: int = METRIC_FLUSH_BATCH) -> dict[tuple[MetricField, str], int]:
     """Lit (et remet a zero) jusqu'a `max_keys` compteurs bufferises.
 
@@ -69,6 +105,8 @@ def collect_metric_deltas(max_keys: int = METRIC_FLUSH_BATCH) -> dict[tuple[Metr
     deltas: dict[tuple[MetricField, str], int] = {}
     try:
         client = _redis_client()
+        # Audit 3, W2 : version resolue une fois pour toute la collecte.
+        version = _redis_version(client)
         cursor = 0
         scanned = 0
         while scanned < max_keys:
@@ -76,7 +114,7 @@ def collect_metric_deltas(max_keys: int = METRIC_FLUSH_BATCH) -> dict[tuple[Metr
             for key in keys:
                 if scanned >= max_keys:
                     break
-                value = client.getdel(key)
+                value = _getdel_one(client, key, version)
                 if value is None:
                     continue
                 try:

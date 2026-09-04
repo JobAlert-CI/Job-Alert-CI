@@ -400,7 +400,8 @@ def _select_with_city_fallback(
     )
     if fallback_loc_ids:
         new_cond = or_(conditions[-1], JobOffer.location_id.in_(fallback_loc_ids))
-        new_conditions = conditions[:-1] + [new_cond]
+        # RUF005 (audit 3, Q1) : unpacking au lieu de la concatenation de listes.
+        new_conditions = [*conditions[:-1], new_cond]
     else:
         new_conditions = conditions
     stmt = select(JobOffer).where(*new_conditions).order_by(JobOffer.published_at.desc().nullslast())

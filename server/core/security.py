@@ -110,6 +110,14 @@ def decode_token(token: str, *, expected_type: str | None = None) -> TokenPayloa
     if int(payload.get("exp", 0)) < int(time.time()):
         raise TokenError("Token expire")
 
+    # Audit 3, W6 (heritage S14 audit 1) : sanity horloge. Un iat trop dans
+    # le futur signale une horloge divergente (multi-noeuds) ou un token
+    # forge : on refuse plutot que d'accepter un token "pas encore emis".
+    # Tolerance de 60s pour absorber un drift legitime entre noeuds.
+    iat = int(payload.get("iat", 0))
+    if iat > int(time.time()) + 60:
+        raise TokenError("Token emis dans le futur (horloge incoherente)")
+
     if expected_type and payload.get("type") != expected_type:
         raise TokenError("Type de token inattendu")
 

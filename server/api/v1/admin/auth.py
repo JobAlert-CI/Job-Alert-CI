@@ -44,7 +44,7 @@ from services.admin_password_reset import (
 )
 from services.email.resend_provider import get_email_provider
 from services.normalization import token_hash
-from services.rate_limit import check_ip_rate_limit
+from services.rate_limit import check_ip_rate_limit, clear_login_failures, is_login_blocked, register_login_failure
 
 router = APIRouter(prefix="/api/admin/auth", tags=["admin-auth"])
 
@@ -100,15 +100,35 @@ def _issue_tokens(db: Session, admin: Administrator) -> TokenRead:
 async def admin_login(payload: AdminLogin, request: Request, db: Session = Depends(get_db)):
     """Connexion email + mot de passe -> couple access/refresh token (JWT).
 
-    Rate-limit 10 essais/min/IP (audit 2, N7) contre le brute-force.
+    Defense en profondeur (audit 2 N7 + audit 3 W5):
+    - rate-limit par IP (10 essais/min) contre le brute-force mono-IP;
+    - rate-limit par EMAIL sur les ECHECS (10 echecs/15 min) contre un
+      botnet distribue qui brute-force un meme compte.
     """
     _guard_rate_limit(request, "admin-login", limit_per_minute=10, cooldown=2)
-    admin = db.scalar(select(Administrator).where(Administrator.email == payload.email.strip().lower()))
+    normalized_email = payload.email.strip().lower()
+
+    # Audit 3, W5: si l'email a deja accumule trop d'echecs, on refuse avant
+    # meme le hachage bcrypt (economie de CPU en cas de flood).
+    failure_decision = is_login_blocked(normalized_email, max_failures=10)
+    if not failure_decision.allowed:
+        raise HTTPException(
+            status_code=429,
+            detail="Trop de tentatives pour ce compte. Merci de patienter.",
+            headers={"Retry-After": str(failure_decision.retry_after_seconds or 900)},
+        )
+
+    admin = db.scalar(select(Administrator).where(Administrator.email == normalized_email))
     if not admin or not verify_password(payload.password, admin.password_hash):
+        # L'echec est compte cote Redis pour CE compte (independamment de l'IP).
+        register_login_failure(normalized_email, window_seconds=900)
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Email ou mot de passe incorrect")
 
     if not admin.is_active:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Compte inactif")
+
+    # Connexion reussie: le compteur d'echecs de ce compte est purge.
+    clear_login_failures(normalized_email)
 
     admin.last_login_at = datetime.now(UTC)
     db.commit()

@@ -74,6 +74,15 @@ def _apply_detail(offer: JobOffer, result) -> None:
     offer.detail.tags = result.detail.tags
 
 
+def _mark_ai_failed(offer: JobOffer, message: str) -> None:
+    """Remet l'offre en BRUT/FAILED avec le message d'erreur (audit 3, F1)."""
+    offer.status = JobOfferStatus.BRUT
+    offer.visible_site = False
+    offer.ai_status = AiOfferStatus.FAILED
+    offer.ai_error_message = message[:1000]
+    offer.ai_processed_at = _now()
+
+
 def apply_ai_results(db: Session, payload: AIInternalResultSubmission) -> AIValidationSummary:
     errors: list[AIValidationErrorItem] = []
     activated = pending_review = rejected = reprocess_required = 0
@@ -90,6 +99,12 @@ def apply_ai_results(db: Session, payload: AIInternalResultSubmission) -> AIVali
             errors.append(AIValidationErrorItem(offer_id=result.offer_id, message="offre deja active, ignoree"))
             continue
 
+        # Audit 3, F1 (heritage R7 audit 1) : SAVEPOINT par resultat. Un
+        # resultat fautif (ValueError metier OU exception inattendue type
+        # IntegrityError) est annule seul via rollback du savepoint — les
+        # N-1 autres resultats restent intacts. La route commite une seule
+        # fois a la fin.
+        nested = db.begin_nested()
         try:
             filiere = _optional_code(db, Filiere, result.primary_filiere_code, "Filiere")
             if not result.requires_admin_review and filiere is None:
@@ -112,11 +127,14 @@ def apply_ai_results(db: Session, payload: AIInternalResultSubmission) -> AIVali
             offer.requires_admin_review = result.requires_admin_review
             offer.suggested_filiere_payload = result.suggested_filiere.model_dump(mode="json") if result.suggested_filiere else None
 
+            # Outcome du resultat courant: incremente SEULEMENT apres que le
+            # savepoint a ete valide (sinon un rollback laisserait un compteur
+            # qui ne reflete pas la base — audit 3, F1).
+            outcome = "activated" if not result.requires_admin_review else "pending_review"
             if result.requires_admin_review:
                 offer.status = JobOfferStatus.PENDING_REVIEW
                 offer.visible_site = False
                 offer.ai_status = AiOfferStatus.SKIPPED
-                pending_review += 1
                 if result.suggested_filiere is not None:
                     db.add(
                         AIFiliereSuggestion(
@@ -131,7 +149,6 @@ def apply_ai_results(db: Session, payload: AIInternalResultSubmission) -> AIVali
                 offer.status = JobOfferStatus.ACTIVE
                 offer.visible_site = True
                 offer.ai_status = AiOfferStatus.NOOP
-                activated += 1
                 if filiere is not None:
                     _upsert_offer_filiere(db, offer, filiere, result.filiere_confidence)
 
@@ -146,13 +163,36 @@ def apply_ai_results(db: Session, payload: AIInternalResultSubmission) -> AIVali
                     raw_payload={"job_id": str(payload.job_id), "provider_key_id": str(payload.provider_key_id) if payload.provider_key_id else None},
                 )
             )
+            # Le SAVEPOINT doit etre cloture proprement avant de continuer.
+            nested.commit()
+            if outcome == "activated":
+                activated += 1
+            else:
+                pending_review += 1
         except ValueError as exc:
-            offer.status = JobOfferStatus.BRUT
-            offer.visible_site = False
-            offer.ai_status = AiOfferStatus.FAILED
-            offer.ai_error_message = str(exc)[:1000]
-            offer.ai_processed_at = _now()
+            # Erreur metier attendue: on annule le resultat fautif puis on
+            # le re-marque FAILED dans son propre savepoint.
+            nested.rollback()
+            failed = db.begin_nested()
+            try:
+                _mark_ai_failed(offer, str(exc))
+                failed.commit()
+            except Exception:  # pragma: no cover - definitivement inattendu
+                failed.rollback()
             errors.append(AIValidationErrorItem(offer_id=result.offer_id, message=str(exc)))
+            reprocess_required += 1
+        except Exception as exc:
+            # Exception inattendue (ex. IntegrityError sur _upsert_offer_filiere) :
+            # le savepoint annule TOUTES les modifications du resultat courant
+            # (detail, filieres, statut) — plus de commit partiel silencieux.
+            nested.rollback()
+            failed = db.begin_nested()
+            try:
+                _mark_ai_failed(offer, f"erreur inattendue: {exc}")
+                failed.commit()
+            except Exception:  # pragma: no cover - definitivement inattendu
+                failed.rollback()
+            errors.append(AIValidationErrorItem(offer_id=result.offer_id, message=f"erreur inattendue: {exc}"[:1000]))
             reprocess_required += 1
 
     processed = activated + pending_review + rejected

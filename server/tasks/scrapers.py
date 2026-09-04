@@ -28,6 +28,25 @@ SCRAPER_SCRIPTS = {
 }
 
 
+def _sanitize_output(text: str | None) -> str:
+    """Neutralise les secrets connus avant journalisation (audit 3, S32).
+
+    Les scrapers tournent avec SCRAPER_API_TOKEN dans l'environnement ; un
+    print() malheureux du script enfant (ou d'une lib) ne doit pas finir en
+    clair dans les logs du worker. Le jeton est masque, pas supprime, pour
+    garder le contexte de debug.
+    """
+    if not text:
+        return ""
+    sanitized = text
+    settings = get_settings()
+    secrets = [settings.scraper_api_token, settings.internal_api_token, settings.admin_api_key]
+    for secret in secrets:
+        if secret and len(secret) >= 8:
+            sanitized = sanitized.replace(secret, "[REDACTED]")
+    return sanitized
+
+
 def _load_env_file(path: Path, env: dict[str, str]) -> None:
     if not path.exists():
         return
@@ -88,25 +107,41 @@ def _run_local_scraper_script(source_code: str, task_id: str | None) -> dict | N
         timeout=int(os.getenv("SCRAPER_SUBPROCESS_TIMEOUT_SECONDS", "3600")),
     )
     if completed.returncode != 0:
+        # Audit 3, S32 : stdout/stderr sanitises avant logging (secrets masques).
+        sanitized_err = _sanitize_output(completed.stderr)
+        sanitized_out = _sanitize_output(completed.stdout)
         logger.error(
             "Scraper local en erreur: %s",
-            completed.stderr[-4000:] or completed.stdout[-4000:],
+            sanitized_err[-4000:] or sanitized_out[-4000:],
             extra={
                 "source_code": source_code,
                 "returncode": completed.returncode,
-                "stdout": completed.stdout[-2000:],
-                "stderr": completed.stderr[-4000:],
+                "stdout": sanitized_out[-2000:],
+                "stderr": sanitized_err[-4000:],
             },
         )
         raise RuntimeError(f"Scraper {source_code} termine avec le code {completed.returncode}")
+    # Audit 3, S32 : idem cote succes — le stdout du scraper peut contenir
+    # des echoes d'environnement malencontreux.
+    sanitized_out = _sanitize_output(completed.stdout)
+    sanitized_err = _sanitize_output(completed.stderr)
     logger.info(
         "Scraper local termine",
-        extra={"source_code": source_code, "stdout": completed.stdout[-1000:], "stderr": completed.stderr[-1000:]},
+        extra={"source_code": source_code, "stdout": sanitized_out[-1000:], "stderr": sanitized_err[-1000:]},
     )
     return {"status": "completed", "source_code": source_code, "mode": "local_script"}
 
 
-@celery_app.task(name="tasks.scrapers.run_source_scraper", bind=True, autoretry_for=(httpx.TransportError,), retry_backoff=True, retry_kwargs={"max_retries": 3})
+@celery_app.task(
+    name="tasks.scrapers.run_source_scraper",
+    bind=True,
+    # Audit 3, C4 (heritage audit 1) : un scraper qui depasse son timeout
+    # subprocess ne doit pas marquer la tache FAILED definitive — on retente
+    # avec backoff comme pour les erreurs transport HTTP.
+    autoretry_for=(httpx.TransportError, subprocess.TimeoutExpired),
+    retry_backoff=True,
+    retry_kwargs={"max_retries": 3},
+)
 def run_source_scraper(self, source_code: str) -> dict:
     settings = get_settings()
     lock_name = f"scraper:{source_code}"

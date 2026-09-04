@@ -50,6 +50,15 @@ def _today(tz_name: str | None = None):
     return digest_date_for(None, tz_name=tz_name)
 
 
+def _resolve_digest_day(date_override: str | None):
+    """Jour cible du digest : override explicite (format YYYY-MM-DD) ou aujourd'hui.
+
+    Factorise les 4 occurrences identiques du pattern (SIM108, audit 3 Q1).
+    """
+    # SIM108 : ternaire au lieu du bloc if/else.
+    return datetime.strptime(date_override, "%Y-%m-%d").date() if date_override else _today()
+
+
 def _redis():
     from redis import Redis
 
@@ -86,10 +95,7 @@ def prepare_daily_digests(
 
     settings = get_settings()
 
-    if date_override:
-        digest_day = datetime.strptime(date_override, "%Y-%m-%d").date()
-    else:
-        digest_day = _today()
+    digest_day = _resolve_digest_day(date_override)
 
     day_key = digest_day.isoformat()
     client = _redis()
@@ -210,10 +216,7 @@ def send_daily_digests(self, date_override: str | None = None) -> dict:
     """Orchestrateur de la phase 2: fan-out vers send_digest."""
 
     settings = get_settings()
-    if date_override:
-        digest_day = datetime.strptime(date_override, "%Y-%m-%d").date()
-    else:
-        digest_day = _today()
+    digest_day = _resolve_digest_day(date_override)
 
     day_key = digest_day.isoformat()
     client = _redis()
@@ -389,10 +392,7 @@ def send_no_offer_emails(date_override: str | None = None) -> dict:
     interferer avec la phase 2 en cas de reexecution.
     """
     settings = get_settings()
-    if date_override:
-        digest_day = datetime.strptime(date_override, "%Y-%m-%d").date()
-    else:
-        digest_day = _today()
+    digest_day = _resolve_digest_day(date_override)
 
     day_key = digest_day.isoformat()
 
@@ -445,10 +445,7 @@ def retry_failed_digests(date_override: str | None = None) -> dict:
         logger.info("retry_failed_digests desactive (RETRY_FAILED_DIGESTS_ENABLED=false)")
         return {"status": "disabled"}
 
-    if date_override:
-        digest_day = datetime.strptime(date_override, "%Y-%m-%d").date()
-    else:
-        digest_day = _today()
+    digest_day = _resolve_digest_day(date_override)
 
     from sqlalchemy import func
 
