@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Boolean, CheckConstraint, DateTime, ForeignKey, Index, Integer, JSON, String, Text, func
+from sqlalchemy import JSON, Boolean, CheckConstraint, DateTime, ForeignKey, Index, Integer, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from db.base import Base, SoftDeleteMixin, TimestampMixin, UUIDPrimaryKeyMixin
@@ -14,9 +14,9 @@ from models.enums import (
     AIJobStatus,
     AIJobTrigger,
     AIOfferAttemptStatus,
-    AIProviderType,
     AiProcessingJobStatus,
     AiProcessingJobTrigger,
+    AIProviderType,
 )
 from models.types import enum_column
 
@@ -48,8 +48,8 @@ class AIApiKey(UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin, Base):
     last_error_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), index=True, nullable=True)
     disabled_until: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), index=True, nullable=True)
 
-    jobs: Mapped[list["AIJob"]] = relationship(back_populates="primary_api_key")
-    attempts: Mapped[list["AIOfferAttempt"]] = relationship(back_populates="api_key")
+    jobs: Mapped[list[AIJob]] = relationship(back_populates="primary_api_key")
+    attempts: Mapped[list[AIOfferAttempt]] = relationship(back_populates="api_key")
 
     __table_args__ = (
         CheckConstraint("priority >= 0", name="ai_api_key_priority_positive"),
@@ -81,10 +81,10 @@ class AIJob(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
     celery_task_id: Mapped[str | None] = mapped_column(String(255), index=True, nullable=True)
 
-    primary_api_key: Mapped["AIApiKey | None"] = relationship(back_populates="jobs")
-    attempts: Mapped[list["AIOfferAttempt"]] = relationship(back_populates="job")
-    alerts: Mapped[list["AIAlert"]] = relationship(back_populates="job")
-    filiere_suggestions: Mapped[list["AIFiliereSuggestion"]] = relationship(back_populates="job")
+    primary_api_key: Mapped[AIApiKey | None] = relationship(back_populates="jobs")
+    attempts: Mapped[list[AIOfferAttempt]] = relationship(back_populates="job")
+    alerts: Mapped[list[AIAlert]] = relationship(back_populates="job")
+    filiere_suggestions: Mapped[list[AIFiliereSuggestion]] = relationship(back_populates="job")
 
     __table_args__ = (
         CheckConstraint("offers_total >= 0", name="ai_job_offers_total_positive"),
@@ -110,9 +110,9 @@ class AIOfferAttempt(UUIDPrimaryKeyMixin, Base):
     duration_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
-    offer: Mapped["JobOffer"] = relationship()
-    job: Mapped["AIJob | None"] = relationship(back_populates="attempts")
-    api_key: Mapped["AIApiKey | None"] = relationship(back_populates="attempts")
+    offer: Mapped[JobOffer] = relationship()
+    job: Mapped[AIJob | None] = relationship(back_populates="attempts")
+    api_key: Mapped[AIApiKey | None] = relationship(back_populates="attempts")
 
     __table_args__ = (
         CheckConstraint("attempt_number >= 1", name="ai_offer_attempt_number_positive"),
@@ -134,8 +134,8 @@ class AIAlert(UUIDPrimaryKeyMixin, Base):
     )
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
 
-    job: Mapped["AIJob | None"] = relationship(back_populates="alerts")
-    acknowledged_by_admin: Mapped["Administrator | None"] = relationship()
+    job: Mapped[AIJob | None] = relationship(back_populates="alerts")
+    acknowledged_by_admin: Mapped[Administrator | None] = relationship()
 
 
 class AIFiliereSuggestion(UUIDPrimaryKeyMixin, TimestampMixin, Base):
@@ -154,9 +154,9 @@ class AIFiliereSuggestion(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     )
     reviewed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
-    offer: Mapped["JobOffer | None"] = relationship()
-    job: Mapped["AIJob | None"] = relationship(back_populates="filiere_suggestions")
-    reviewed_by_admin: Mapped["Administrator | None"] = relationship()
+    offer: Mapped[JobOffer | None] = relationship()
+    job: Mapped[AIJob | None] = relationship(back_populates="filiere_suggestions")
+    reviewed_by_admin: Mapped[Administrator | None] = relationship()
 
 
 class AiProcessingJob(UUIDPrimaryKeyMixin, TimestampMixin, Base):
@@ -178,9 +178,9 @@ class AiProcessingJob(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
-    scrape_run: Mapped["ScrapeRun | None"] = relationship(back_populates="ai_jobs")
-    source: Mapped["Source | None"] = relationship()
-    offers: Mapped[list["JobOffer"]] = relationship(back_populates="ai_processing_job")
+    scrape_run: Mapped[ScrapeRun | None] = relationship(back_populates="ai_jobs")
+    source: Mapped[Source | None] = relationship()
+    offers: Mapped[list[JobOffer]] = relationship(back_populates="ai_processing_job")
 
     __table_args__ = (
         CheckConstraint("offers_total >= 0", name="ai_processing_job_offers_total_positive"),

@@ -49,17 +49,17 @@ class Subscriber(UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin, Base):
     bounce_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     admin_notes: Mapped[str | None] = mapped_column(Text, nullable=True)
 
-    experience_level: Mapped["ExperienceLevel | None"] = relationship(back_populates="subscribers")
-    filiere_links: Mapped[list["SubscriberFiliere"]] = relationship(
+    experience_level: Mapped[ExperienceLevel | None] = relationship(back_populates="subscribers")
+    filiere_links: Mapped[list[SubscriberFiliere]] = relationship(
         back_populates="subscriber", cascade="all, delete-orphan", order_by="SubscriberFiliere.priority"
     )
-    contract_preferences: Mapped[list["SubscriberContractPreference"]] = relationship(
+    contract_preferences: Mapped[list[SubscriberContractPreference]] = relationship(
         back_populates="subscriber", cascade="all, delete-orphan"
     )
-    tokens: Mapped[list["SubscriberToken"]] = relationship(back_populates="subscriber", cascade="all, delete-orphan")
-    digests: Mapped[list["EmailDigest"]] = relationship(back_populates="subscriber")
-    saved_offers: Mapped[list["SavedOffer"]] = relationship(back_populates="subscriber", cascade="all, delete-orphan")
-    unsubscribe_events: Mapped[list["UnsubscribeEvent"]] = relationship(back_populates="subscriber", cascade="all, delete-orphan")
+    tokens: Mapped[list[SubscriberToken]] = relationship(back_populates="subscriber", cascade="all, delete-orphan")
+    digests: Mapped[list[EmailDigest]] = relationship(back_populates="subscriber")
+    saved_offers: Mapped[list[SavedOffer]] = relationship(back_populates="subscriber", cascade="all, delete-orphan")
+    unsubscribe_events: Mapped[list[UnsubscribeEvent]] = relationship(back_populates="subscriber", cascade="all, delete-orphan")
 
     __table_args__ = (CheckConstraint("bounce_count >= 0", name="subscriber_bounce_count_positive"),)
 
@@ -71,8 +71,8 @@ class SubscriberFiliere(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     filiere_id: Mapped[str] = mapped_column(ForeignKey("filieres.id", ondelete="CASCADE"), index=True, nullable=False)
     priority: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
 
-    subscriber: Mapped["Subscriber"] = relationship(back_populates="filiere_links")
-    filiere: Mapped["Filiere"] = relationship(back_populates="subscriber_links")
+    subscriber: Mapped[Subscriber] = relationship(back_populates="filiere_links")
+    filiere: Mapped[Filiere] = relationship(back_populates="subscriber_links")
 
     __table_args__ = (
         UniqueConstraint("subscriber_id", "filiere_id", name="uq_subscriber_filieres_subscriber_filiere"),
@@ -87,8 +87,8 @@ class SubscriberContractPreference(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     subscriber_id: Mapped[str] = mapped_column(ForeignKey("subscribers.id", ondelete="CASCADE"), index=True, nullable=False)
     contract_type_id: Mapped[str] = mapped_column(ForeignKey("contract_types.id", ondelete="CASCADE"), index=True, nullable=False)
 
-    subscriber: Mapped["Subscriber"] = relationship(back_populates="contract_preferences")
-    contract_type: Mapped["ContractType"] = relationship(back_populates="subscriber_preferences")
+    subscriber: Mapped[Subscriber] = relationship(back_populates="contract_preferences")
+    contract_type: Mapped[ContractType] = relationship(back_populates="subscriber_preferences")
 
     __table_args__ = (
         UniqueConstraint("subscriber_id", "contract_type_id", name="uq_subscriber_contract_preferences_subscriber_contract"),
@@ -105,7 +105,7 @@ class SubscriberToken(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
-    subscriber: Mapped["Subscriber"] = relationship(back_populates="tokens")
+    subscriber: Mapped[Subscriber] = relationship(back_populates="tokens")
 
 
 class UnsubscribeEvent(UUIDPrimaryKeyMixin, TimestampMixin, Base):
@@ -117,7 +117,7 @@ class UnsubscribeEvent(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     ip_hash: Mapped[str | None] = mapped_column(String(128), nullable=True)
     user_agent: Mapped[str | None] = mapped_column(String(500), nullable=True)
 
-    subscriber: Mapped["Subscriber"] = relationship(back_populates="unsubscribe_events")
+    subscriber: Mapped[Subscriber] = relationship(back_populates="unsubscribe_events")
 
 
 class SavedOffer(TimestampMixin, Base):
@@ -126,5 +126,5 @@ class SavedOffer(TimestampMixin, Base):
     subscriber_id: Mapped[str] = mapped_column(ForeignKey("subscribers.id", ondelete="CASCADE"), primary_key=True)
     offer_id: Mapped[str] = mapped_column(ForeignKey("job_offers.id", ondelete="CASCADE"), primary_key=True)
 
-    subscriber: Mapped["Subscriber"] = relationship(back_populates="saved_offers")
-    offer: Mapped["JobOffer"] = relationship(back_populates="saved_by")
+    subscriber: Mapped[Subscriber] = relationship(back_populates="saved_offers")
+    offer: Mapped[JobOffer] = relationship(back_populates="saved_by")

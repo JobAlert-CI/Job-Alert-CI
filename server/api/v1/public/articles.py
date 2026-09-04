@@ -1,11 +1,11 @@
-from typing import Optional
+
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import select
 from sqlalchemy.orm import Session, joinedload
 
 from api.deps import get_db
-from models.editorial import Article, ArticleCategory, ArticleSeries, DailyTip
 from models.content import ContentPage
+from models.editorial import Article, ArticleCategory, ArticleSeries, DailyTip
 from models.enums import ContentStatus
 from schemas.editorial import (
     ArticleCategoryRead,
@@ -14,6 +14,7 @@ from schemas.editorial import (
     ArticleSeriesRead,
     DailyTipRead,
 )
+from services.search_utils import safe_ilike
 
 router = APIRouter(prefix="/api/articles", tags=["articles"])
 
@@ -65,10 +66,10 @@ def _build_article_read(article: Article) -> dict:
 @router.get("", response_model=list[ArticleListItem])
 async def list_articles(
     db: Session = Depends(get_db),
-    category_id: Optional[str] = None,
-    q: Optional[str] = Query(None, min_length=2),
+    category_id: str | None = None,
+    q: str | None = Query(None, min_length=2),
     sort: str = Query("recent", pattern="^(recent|popular|short)$"),
-    is_featured: Optional[bool] = None,
+    is_featured: bool | None = None,
     limit: int = Query(9, ge=1, le=50),
     offset: int = Query(0, ge=0),
 ):
@@ -84,7 +85,7 @@ async def list_articles(
     if is_featured is not None:
         stmt = stmt.where(Article.is_featured == is_featured)
     if q:
-        stmt = stmt.where(ContentPage.title.ilike(f"%{q}%"))
+            stmt = stmt.where(safe_ilike(ContentPage.title, q))
 
     if sort == "popular":
         stmt = stmt.order_by(Article.view_count.desc())

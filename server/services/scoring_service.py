@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 """Scoring du digest quotidien.
 
@@ -41,7 +41,7 @@ FRESHNESS_24H_SCORE = 15
 FRESHNESS_48H_SCORE = 10
 FRESHNESS_7D_SCORE = 5
 
-_FAR_PAST = datetime.min.replace(tzinfo=timezone.utc)
+_FAR_PAST = datetime.min.replace(tzinfo=UTC)
 _DISTANT_AGE_THRESHOLD = timedelta(days=30)
 
 
@@ -115,7 +115,7 @@ def _as_utc(value: datetime | None) -> datetime | None:
     if value is None:
         return None
     if value.tzinfo is None:
-        return value.replace(tzinfo=timezone.utc)
+        return value.replace(tzinfo=UTC)
     return value
 
 
@@ -152,7 +152,7 @@ def compute_freshness_score(
 ) -> int:
     """Score fraicheur sur JobOffer.published_at (fallback collecte/created)."""
 
-    aware_now = _as_utc(now) or datetime.now(timezone.utc)
+    aware_now = _as_utc(now) or datetime.now(UTC)
     reference = _as_utc(published_at)
     if reference is None:
         # Pas de date exploitable : on considere l'offre ancienne.

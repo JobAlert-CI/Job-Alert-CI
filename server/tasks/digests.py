@@ -10,11 +10,10 @@ from sqlalchemy import select
 from celery_app import celery_app
 from core.config import get_settings
 from db.session import session_scope
-from models import DigestStatus, EmailDigest
+from models import DigestStatus, EmailDeliveryAttempt, EmailDigest
 from services.digest_builder_service import (
     digest_date_for,
     get_eligible_subscriber_ids,
-    scheduled_send_time,
 )
 from services.email.resend_provider import get_email_provider
 from tasks.locks import redis_lock
@@ -177,7 +176,6 @@ def mark_preparation_completed(results, digest_date: str) -> dict:
     results = results if isinstance(results, list) else []
     queued = sum(1 for item in results if isinstance(item, dict) and item.get("status") == "queued")
     skipped = sum(1 for item in results if isinstance(item, dict) and item.get("status") == "skipped_empty")
-    already = sum(1 for item in results if isinstance(item, dict) and item.get("detail"))
     errors = sum(1 for item in results if isinstance(item, dict) and item.get("status") == "error")
     processed = len(results)
     status = "completed" if errors == 0 else ("partial_failure" if queued + skipped > 0 else "failed")
@@ -300,7 +298,7 @@ def send_digest(self, digest_id: str) -> dict:
         # Erreur technique (DB/Redis temporaire): retentable dans la limite 3.
         attempts_done = self.request.retries + 1
         if attempts_done < settings.email_max_retries:
-            raise self.retry(countdown=settings.email_retry_backoff_seconds * (2**self.request.retries))
+            raise self.retry(countdown=settings.email_retry_backoff_seconds * (2**self.request.retries)) from exc
         logger.exception("send_digest abandonne (digest_id=%s)", digest_id)
         return {"digest_id": digest_id, "success": False, "status": "error", "error": type(exc).__name__}
 
@@ -397,7 +395,6 @@ def send_no_offer_emails(date_override: str | None = None) -> dict:
         digest_day = _today()
 
     day_key = digest_day.isoformat()
-    client = _redis()
 
     with redis_lock(
         f"lock:digest:no_offer:{day_key}",

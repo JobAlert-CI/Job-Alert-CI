@@ -43,6 +43,13 @@ class RefreshTokenRequest(BaseModel):
     refresh_token: str = Field(min_length=10)
 
 
+class AdminResetPasswordRequest(BaseModel):
+    """Corps de POST /api/admin/auth/reset-password (audit 2, N2/N6)."""
+
+    token: str = Field(min_length=20, max_length=255)
+    new_password: str = Field(min_length=8, max_length=128)
+
+
 # ─── Administrator ───────────────────────────────────────
 
 class AdminRead(TimestampRead):

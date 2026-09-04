@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -68,7 +68,7 @@ def create_offer(db: Session, payload: OfferCreate, admin_id: str | None = None)
     contract_type = _get_optional_by_code(db, ContractType, payload.contract_type_code)
     experience_level = _get_optional_by_code(db, ExperienceLevel, payload.experience_level_code)
     education_level = _get_optional_by_code(db, EducationLevel, payload.education_level_code)
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     unique_hash = hash_offer(payload.title, payload.company_name, payload.source_url, payload.source_reference)
 
     existing = db.scalar(select(JobOffer).where(JobOffer.hash_unique == unique_hash))

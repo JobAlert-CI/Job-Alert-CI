@@ -1,17 +1,19 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Literal
 
-from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import case, func, select
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
+from sqlalchemy import select
 from sqlalchemy.orm import Session, joinedload
 
 from api.deps import get_db
 from models import ContractType, EducationLevel, ExperienceLevel, Filiere, JobOffer, JobOfferStatus, Source
-from schemas.offer_stats import OfferStatsBucketRead, OfferStatsSummaryRead
 from schemas.offers import JobOfferRead
 from services.normalization import normalize_text
+from services.offer_metrics import record_metric
+from services.rate_limit import check_ip_rate_limit
+from services.search_utils import safe_like_lower
 
 router = APIRouter(prefix="/api/offers", tags=["offers"])
 
@@ -88,7 +90,9 @@ def _apply_offer_filters(
     if _codes(niveaux):
         stmt = stmt.where(JobOffer.education_level.has(EducationLevel.code.in_(_codes(niveaux))))
     if q:
-        stmt = stmt.where(JobOffer.normalized_title.contains(normalize_text(q)))
+            # `normalized_title` est case-insensitive en base (normalise en lowercase).
+            # On utilise LIKE avec ESCAPE pour eviter l'injection de wildcards.
+            stmt = stmt.where(safe_like_lower(JobOffer.normalized_title, normalize_text(q)))
     if published_since:
         stmt = stmt.where(JobOffer.published_at >= published_since)
     if published_until:
@@ -183,20 +187,73 @@ def get_similar_offers(offer_id: str, db: Session = Depends(get_db), limit: int 
 
 
 @router.post("/{offer_id}/view")
-def register_offer_view(offer_id: str, db: Session = Depends(get_db)) -> dict[str, int]:
-    offer = db.scalar(select(JobOffer).where((JobOffer.id == offer_id) | (JobOffer.slug == offer_id), *_public_filters()))
+def register_offer_view(
+    offer_id: str,
+    request: Request,
+    db: Session = Depends(get_db),
+) -> dict[str, int]:
+    """Incremente `view_count` (audit S7 + audit 2, F3: bufferise Redis).
+
+    Le compteur affiche vient de Redis (valeur base + buffer) quand Redis
+    est disponible; sinon fallback synchrone direct.
+    """
+    _enforce_metric_rate_limit(request, scope="offer-view")
+    offer = db.scalar(
+        select(JobOffer).where(
+            (JobOffer.id == offer_id) | (JobOffer.slug == offer_id),
+            *_public_filters(),
+        )
+    )
     if offer is None:
         raise HTTPException(status_code=404, detail="Offre introuvable")
-    offer.view_count += 1
-    db.commit()
-    return {"view_count": offer.view_count}
+    counted = record_metric(db, offer, "view")
+    if counted is None:
+        # Redis indisponible: increment direct en base.
+        offer.view_count += 1
+        db.commit()
+        counted = offer.view_count
+    return {"view_count": counted}
 
 
 @router.post("/{offer_id}/save")
-def save_offer(offer_id: str, db: Session = Depends(get_db)) -> dict[str, int]:
-    offer = db.scalar(select(JobOffer).where((JobOffer.id == offer_id) | (JobOffer.slug == offer_id), *_public_filters()))
+def save_offer(
+    offer_id: str,
+    request: Request,
+    db: Session = Depends(get_db),
+) -> dict[str, int]:
+    """Incremente `save_count` (audit S7 + audit 2, F3: bufferise Redis)."""
+    _enforce_metric_rate_limit(request, scope="offer-save")
+    offer = db.scalar(
+        select(JobOffer).where(
+            (JobOffer.id == offer_id) | (JobOffer.slug == offer_id),
+            *_public_filters(),
+        )
+    )
     if offer is None:
         raise HTTPException(status_code=404, detail="Offre introuvable")
-    offer.save_count += 1
-    db.commit()
-    return {"save_count": offer.save_count}
+    counted = record_metric(db, offer, "save")
+    if counted is None:
+        # Redis indisponible: increment direct en base.
+        offer.save_count += 1
+        db.commit()
+        counted = offer.save_count
+    return {"save_count": counted}
+
+
+def _enforce_metric_rate_limit(request: Request, *, scope: str) -> None:
+    """Rate-limit anti-gonflement (audit S7). 60 hits/min par IP."""
+    ip = _client_ip(request) or "unknown"
+    decision = check_ip_rate_limit(scope=scope, client_ip=ip, limit_per_minute=60)
+    if not decision.allowed:
+        raise HTTPException(
+            status_code=429,
+            detail="Trop de requetes",
+            headers={"Retry-After": str(decision.retry_after_seconds or 60)},
+        )
+
+
+def _client_ip(request: Request) -> str | None:
+    forwarded = request.headers.get("x-forwarded-for")
+    if forwarded:
+        return forwarded.split(",")[0].strip()
+    return request.client.host if request.client else None

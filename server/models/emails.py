@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import date, datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import CheckConstraint, Date, DateTime, ForeignKey, Integer, JSON, String, Text, UniqueConstraint
+from sqlalchemy import JSON, CheckConstraint, Date, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from db.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
@@ -39,12 +39,12 @@ class EmailDigest(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     # Palier de matching atteint par la cascade T0-T5 (defaut T0 = selection stricte).
     match_tier: Mapped[str] = mapped_column(String(8), default="T0", index=True, nullable=False)
 
-    subscriber: Mapped["Subscriber"] = relationship(back_populates="digests")
-    scrape_run: Mapped["ScrapeRun | None"] = relationship(back_populates="digests")
-    offer_links: Mapped[list["EmailDigestOffer"]] = relationship(
+    subscriber: Mapped[Subscriber] = relationship(back_populates="digests")
+    scrape_run: Mapped[ScrapeRun | None] = relationship(back_populates="digests")
+    offer_links: Mapped[list[EmailDigestOffer]] = relationship(
         back_populates="digest", cascade="all, delete-orphan", order_by="EmailDigestOffer.position"
     )
-    attempts: Mapped[list["EmailDeliveryAttempt"]] = relationship(
+    attempts: Mapped[list[EmailDeliveryAttempt]] = relationship(
         back_populates="digest", cascade="all, delete-orphan", order_by="EmailDeliveryAttempt.attempt_no"
     )
 
@@ -65,8 +65,8 @@ class EmailDigestOffer(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     # 'fallback_experience' (T4), 'fallback_city' (T5).
     match_kind: Mapped[str] = mapped_column(String(32), default="primary", nullable=False)
 
-    digest: Mapped["EmailDigest"] = relationship(back_populates="offer_links")
-    offer: Mapped["JobOffer"] = relationship(back_populates="digest_links")
+    digest: Mapped[EmailDigest] = relationship(back_populates="offer_links")
+    offer: Mapped[JobOffer] = relationship(back_populates="digest_links")
 
     __table_args__ = (
         UniqueConstraint("digest_id", "offer_id", name="uq_email_digest_offers_digest_offer"),
@@ -89,7 +89,7 @@ class EmailDeliveryAttempt(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
 
-    digest: Mapped["EmailDigest"] = relationship(back_populates="attempts")
+    digest: Mapped[EmailDigest] = relationship(back_populates="attempts")
 
     __table_args__ = (
         UniqueConstraint("digest_id", "attempt_no", name="uq_email_delivery_attempts_digest_attempt"),
@@ -128,7 +128,7 @@ class TransactionalEmailEvent(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     request_payload: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     response_payload: Mapped[dict | None] = mapped_column(JSON, nullable=True)
 
-    subscriber: Mapped["Subscriber | None"] = relationship()
+    subscriber: Mapped[Subscriber | None] = relationship()
 
     __table_args__ = (CheckConstraint("attempts >= 0", name="attempts_positive"),)
 
@@ -154,4 +154,4 @@ class NoOfferEmailLog(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     digest_date: Mapped[date] = mapped_column(Date, index=True, nullable=False)
     sent_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True, nullable=False)
 
-    subscriber: Mapped["Subscriber"] = relationship()
+    subscriber: Mapped[Subscriber] = relationship()

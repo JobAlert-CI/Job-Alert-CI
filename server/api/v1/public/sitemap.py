@@ -7,9 +7,9 @@ publiés à chaque requête. Vercel rewrites `/sitemap.xml` vers cette route.
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
-from xml.sax.saxutils import escape
+from datetime import UTC, datetime
 from xml.etree.ElementTree import Element, SubElement, tostring
+from xml.sax.saxutils import escape
 
 from fastapi import APIRouter, Depends, Response
 from sqlalchemy import select
@@ -36,8 +36,8 @@ def _fmt_date(value: datetime | None) -> str | None:
     if not value:
         return None
     if value.tzinfo is None:
-        value = value.replace(tzinfo=timezone.utc)
-    return value.astimezone(timezone.utc).strftime("%Y-%m-%d")
+        value = value.replace(tzinfo=UTC)
+    return value.astimezone(UTC).strftime("%Y-%m-%d")
 
 
 def _add_url(urlset: Element, loc: str, *, lastmod: str | None = None, changefreq: str | None = None, priority: str | None = None) -> None:
@@ -95,7 +95,7 @@ def sitemap(db: Session = Depends(get_db)):
         .order_by(JobOffer.published_at.desc().nullslast())
         .limit(MAX_OFFERS)
     ).all()
-    today = _fmt_date(datetime.now(timezone.utc))
+    today = _fmt_date(datetime.now(UTC))
     for slug, offer_id, updated_at in offers:
         # L'API détail accepte l'id OU le slug ; on privilégie le slug (SEO).
         _add_url(

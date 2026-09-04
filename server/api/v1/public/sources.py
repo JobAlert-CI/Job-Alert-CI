@@ -1,13 +1,14 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
+from pydantic import BaseModel
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
-from pydantic import BaseModel
 
 from api.deps import get_db
+from api.v1.public.offers import _load_offer_relations, _public_filters
 from models import JobOffer, Source, SourceScrapeRun
 from schemas.offers import JobOfferRead
 from schemas.referentials import SourceRead
-from api.v1.public.offers import _public_filters, _load_offer_relations
+
 from ._time_utils import today_start_utc
 
 router = APIRouter(prefix="/api/sources", tags=["sources"])
@@ -32,9 +33,9 @@ def list_sources_page(db: Session = Depends(get_db)):
         .where(Source.status == "active")
         .order_by(Source.priority.asc())
     ).all()
-    
+
     today = today_start_utc()
-    
+
     results = []
     for s in sources:
         active_offers = db.scalar(
@@ -45,17 +46,17 @@ def list_sources_page(db: Session = Depends(get_db)):
             select(func.count(JobOffer.id))
             .where(JobOffer.source_id == s.id, JobOffer.first_seen_at >= today, *_public_filters())
         ) or 0
-        
+
         last_run = db.scalar(
             select(SourceScrapeRun)
             .where(SourceScrapeRun.source_id == s.id)
             .order_by(SourceScrapeRun.started_at.desc().nullslast())
             .limit(1)
         )
-        
+
         last_scrape_status = last_run.status.value if last_run and last_run.status else None
         last_scrape_duration = last_run.duration_ms if last_run else None
-        
+
         results.append(
             SourceWithStats(
                 **s.__dict__,
@@ -67,7 +68,7 @@ def list_sources_page(db: Session = Depends(get_db)):
                 )
             )
         )
-        
+
     return results
 
 
@@ -90,17 +91,17 @@ def get_source_detail(slug: str, db: Session = Depends(get_db)):
         select(func.count(JobOffer.id))
         .where(JobOffer.source_id == s.id, JobOffer.first_seen_at >= today, *_public_filters())
     ) or 0
-    
+
     last_run = db.scalar(
         select(SourceScrapeRun)
         .where(SourceScrapeRun.source_id == s.id)
         .order_by(SourceScrapeRun.started_at.desc().nullslast())
         .limit(1)
     )
-    
+
     last_scrape_status = last_run.status.value if last_run and last_run.status else None
     last_scrape_duration = last_run.duration_ms if last_run else None
-    
+
     return SourceWithStats(
         **s.__dict__,
         stats=SourceStatsRead(
@@ -114,9 +115,9 @@ def get_source_detail(slug: str, db: Session = Depends(get_db)):
 
 @router.get("/{slug}/offers", response_model=list[JobOfferRead])
 def list_source_offers(
-    slug: str, 
-    db: Session = Depends(get_db), 
-    limit: int = Query(20, ge=1, le=100), 
+    slug: str,
+    db: Session = Depends(get_db),
+    limit: int = Query(20, ge=1, le=100),
     offset: int = Query(0, ge=0)
 ):
     """Offres d'une source (lien 'Voir les offres' sur Sources.jsx)."""

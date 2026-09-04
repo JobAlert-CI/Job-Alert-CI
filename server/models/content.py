@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, JSON, String, Text, UniqueConstraint
+from sqlalchemy import JSON, Boolean, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from db.base import Base, SoftDeleteMixin, TimestampMixin, UUIDPrimaryKeyMixin
@@ -40,9 +40,9 @@ class ContentPage(UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin, Base):
         ForeignKey("administrators.id", ondelete="SET NULL"), nullable=True
     )
 
-    article: Mapped["Article | None"] = relationship(back_populates="content_page", uselist=False)
-    faq_items: Mapped[list["FaqItem"]] = relationship(back_populates="content_page")
-    updated_by_admin: Mapped["Administrator | None"] = relationship(back_populates="content_pages")
+    article: Mapped[Article | None] = relationship(back_populates="content_page", uselist=False)
+    faq_items: Mapped[list[FaqItem]] = relationship(back_populates="content_page")
+    updated_by_admin: Mapped[Administrator | None] = relationship(back_populates="content_pages")
 
     __table_args__ = (UniqueConstraint("content_type", "slug", name="uq_content_pages_type_slug"),)
 
@@ -56,7 +56,7 @@ class FaqCategory(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     sort_order: Mapped[int] = mapped_column(Integer, default=100, nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
-    items: Mapped[list["FaqItem"]] = relationship(back_populates="category", cascade="all, delete-orphan")
+    items: Mapped[list[FaqItem]] = relationship(back_populates="category", cascade="all, delete-orphan")
 
 
 class FaqItem(UUIDPrimaryKeyMixin, TimestampMixin, Base):
@@ -70,8 +70,8 @@ class FaqItem(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     sort_order: Mapped[int] = mapped_column(Integer, default=100, nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
-    category: Mapped["FaqCategory"] = relationship(back_populates="items")
-    content_page: Mapped["ContentPage | None"] = relationship(back_populates="faq_items")
+    category: Mapped[FaqCategory] = relationship(back_populates="items")
+    content_page: Mapped[ContentPage | None] = relationship(back_populates="faq_items")
 
     __table_args__ = (UniqueConstraint("category_id", "code", name="uq_faq_items_category_code"),)
 

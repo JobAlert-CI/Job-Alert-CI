@@ -4,7 +4,7 @@ import logging
 import os
 import subprocess
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from uuid import uuid4
 
@@ -43,7 +43,7 @@ def _load_env_file(path: Path, env: dict[str, str]) -> None:
 
 
 def _demo_scrape(source_code: str, count: int = 2) -> list[dict]:
-    now = datetime.now(timezone.utc).replace(microsecond=0)
+    now = datetime.now(UTC).replace(microsecond=0)
     return [
         {
             "source_reference": f"demo-{source_code}-{now:%Y%m%d%H%M}-{index}",
@@ -135,7 +135,7 @@ def run_source_scraper(self, source_code: str) -> dict:
             "batch_id": batch_id,
             "source_code": source_code,
             "run_reference": f"celery:{self.request.id}",
-            "scraped_at": datetime.now(timezone.utc).isoformat(),
+            "scraped_at": datetime.now(UTC).isoformat(),
             "offers": _demo_scrape(source_code),
         }
         headers = {"X-Scraper-Token": settings.scraper_api_token or ""}

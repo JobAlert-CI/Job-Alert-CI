@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Optional
-
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -47,9 +45,9 @@ _VALID_AUDIT_ACTIONS = {action.value for action in AdminAction}
 @router.get("/audit", response_model=list[AdminActionLogRead])
 async def list_audit_logs(
     db: Session = Depends(get_db),
-    admin_id: Optional[str] = None,
-    action: Optional[str] = None,
-    target_table: Optional[str] = None,
+    admin_id: str | None = None,
+    action: str | None = None,
+    target_table: str | None = None,
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
 ):
@@ -71,15 +69,27 @@ async def list_audit_logs(
 @router.get("/events", response_model=list[EventLogRead])
 async def list_event_logs(
     db: Session = Depends(get_db),
-    module: Optional[str] = Query(None, description="Toujours 'scraping' pour l'instant (seule source d'événements disponible)."),
-    level: Optional[str] = Query(None, description="info, warning ou error"),
-    source_id: Optional[str] = Query(None, description="ID de source, pour ne garder que ses runs"),
+    module: str | None = Query(None, description="Toujours 'scraping' pour l'instant (seule source d'evenements disponible)."),
+    level: str | None = Query(None, description="info, warning ou error"),
+    source_id: str | None = Query(None, description="ID de source, pour ne garder que ses runs"),
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
 ):
-    """Logs techniques filtrables par module et niveau (dérivés du suivi d'ingestion des offres)."""
+    """Logs techniques filtrables par module et niveau.
+
+    Audit P1 #14: on filtre SQL sur `level` (mapping _LEVEL_BY_ACTION inverse)
+    pour eviter le sur-fetch * 3 + filtre Python.
+    """
     if module and module != "scraping":
         return []
+
+    # Mapping inverse: level -> liste d'actions correspondantes.
+    if level is None:
+        allowed_actions = None  # tous
+    else:
+        allowed_actions = [action for action, lvl in _LEVEL_BY_ACTION.items() if lvl == level]
+        if not allowed_actions:
+            return []
 
     stmt = select(OfferIngestionEvent).order_by(OfferIngestionEvent.created_at.desc())
     if source_id:
@@ -87,38 +97,33 @@ async def list_event_logs(
             stmt.join(SourceScrapeRun, SourceScrapeRun.id == OfferIngestionEvent.source_scrape_run_id)
             .where(SourceScrapeRun.source_id == source_id)
         )
-    events = list(db.scalars(stmt.limit(limit * 3).offset(offset)))
+    if allowed_actions is not None:
+        stmt = stmt.where(OfferIngestionEvent.action.in_(allowed_actions))
+    events = list(db.scalars(stmt.limit(limit).offset(offset)))
 
-    results = []
-    for event in events:
-        computed_level = _LEVEL_BY_ACTION.get(event.action, "info")
-        if level and computed_level != level:
-            continue
-        results.append(
-            EventLogRead(
-                id=event.id,
-                created_at=event.created_at,
-                updated_at=event.created_at,
-                module="scraping",
-                niveau=computed_level,
-                action=event.action.value,
-                offer_id=event.offer_id,
-                source_scrape_run_id=event.source_scrape_run_id,
-                hash_unique=event.hash_unique,
-                raw_url=event.raw_url,
-                message=event.reason,
-            )
+    return [
+        EventLogRead(
+            id=event.id,
+            created_at=event.created_at,
+            updated_at=event.created_at,
+            module="scraping",
+            niveau=_LEVEL_BY_ACTION.get(event.action, "info"),
+            action=event.action.value,
+            offer_id=event.offer_id,
+            source_scrape_run_id=event.source_scrape_run_id,
+            hash_unique=event.hash_unique,
+            raw_url=event.raw_url,
+            message=event.reason,
         )
-        if len(results) >= limit:
-            break
-    return results
+        for event in events
+    ]
 
 
 # ─── Messages de contact ───────────────────────────────
 @router.get("/contacts", response_model=list[ContactMessageAdminRead])
 async def list_contact_messages(
     db: Session = Depends(get_db),
-    status: Optional[str] = None,
+    status: str | None = None,
     limit: int = Query(20, ge=1, le=100),
     offset: int = Query(0, ge=0),
 ):

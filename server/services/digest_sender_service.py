@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
@@ -11,8 +11,8 @@ from core.config import Settings, get_settings
 from models import (
     DigestStatus,
     EmailAttemptStatus,
-    EmailDigest,
     EmailDeliveryAttempt,
+    EmailDigest,
     Subscriber,
     SubscriberStatus,
     TokenPurpose,
@@ -115,7 +115,7 @@ def send_digest_now(
     provider: EmailProviderProtocol,
     settings: Settings | None = None,
     now: datetime | None = None,
-) -> "DigestSendOutcome":
+) -> DigestSendOutcome:
     """Une tentative d'envoi du digest. Ne decide pas du retry elle-meme.
 
     La tache Celery appelle cette fonction jusqu'a EMAIL_MAX_RETRIES fois en
@@ -124,7 +124,7 @@ def send_digest_now(
     """
 
     resolved_settings = settings or get_settings()
-    effective_now = now or datetime.now(timezone.utc)
+    effective_now = now or datetime.now(UTC)
 
     digest = db.scalar(
         select(EmailDigest)
@@ -247,7 +247,7 @@ def send_digest_now(
     )
     result = provider.send(message)
 
-    finished_at = datetime.now(timezone.utc)
+    finished_at = datetime.now(UTC)
     attempt.status = EmailAttemptStatus.SUCCESS if result.success else EmailAttemptStatus.FAILED
     attempt.provider_message_id = result.provider_email_id
     attempt.finished_at = finished_at

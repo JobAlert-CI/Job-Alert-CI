@@ -3,15 +3,28 @@
 Prend une liste de mots-clés (candidats) et renvoie le nombre d'offres des
 7 derniers jours qui seraient taguées différemment, SANS appliquer la
 modification (pas d'écriture en base).
+
+Audit 2, R7: service pur — plus d'import FastAPI. L'erreur metier
+`FiliereSimulationError` est traduite en HTTPException par la route.
 """
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
-from sqlalchemy import select, func
+from datetime import UTC, datetime, timedelta
+
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from models.referentials import Filiere, FiliereKeyword
 from models.jobs import JobOffer
+from models.referentials import Filiere, FiliereKeyword
+
+
+class FiliereSimulationError(Exception):
+    """Erreur metier portant le code HTTP a renvoyer par la route."""
+
+    def __init__(self, message: str, *, status_code: int = 404) -> None:
+        super().__init__(message)
+        self.message = message
+        self.status_code = status_code
 
 
 def simulate_filiere_matching(
@@ -31,8 +44,7 @@ def simulate_filiere_matching(
     """
     filiere = db.scalar(select(Filiere).where(Filiere.code == filiere_code))
     if not filiere:
-        from fastapi import HTTPException
-        raise HTTPException(status_code=404, detail=f"Filière {filiere_code} non trouvée")
+        raise FiliereSimulationError(f"Filiere {filiere_code} non trouvee", status_code=404)
 
     # Mots-clés actuels
     current = db.scalars(select(FiliereKeyword).where(FiliereKeyword.filiere_id == filiere.id)).all()
@@ -45,7 +57,7 @@ def simulate_filiere_matching(
             proposed_words.add(word)
 
     # Offres des 7 derniers jours liées à cette filière (via primary_filiere ou tags)
-    since = datetime.now(timezone.utc) - timedelta(days=days)
+    since = datetime.now(UTC) - timedelta(days=days)
     offers_stmt = (
         select(JobOffer)
         .where(

@@ -5,6 +5,7 @@ import dataclasses
 import hashlib
 import hmac
 import json
+import time
 
 import pytest
 from fastapi import FastAPI
@@ -34,14 +35,19 @@ def webhook_client(monkeypatch):
         yield client
 
 
-def _signed_headers(body: bytes) -> dict[str, str]:
-    svix_id, timestamp = "msg_1", "1700000000"
+def _signed_headers(body: bytes, timestamp: str | None = None) -> dict[str, str]:
+    """Signe avec un timestamp frais (audit P1 #17: tolerance 5 min).
+
+    `timestamp` peut etre surcharge pour tester le cas "timestamp obsolete".
+    """
+    svix_id = "msg_1"
+    svix_timestamp = timestamp if timestamp is not None else str(int(time.time()))
     secret_bytes = base64.b64decode(SECRET.removeprefix("whsec_"))
-    signed = f"{svix_id}.{timestamp}.".encode() + body
+    signed = f"{svix_id}.{svix_timestamp}.".encode() + body
     signature = base64.b64encode(hmac.new(secret_bytes, signed, hashlib.sha256).digest()).decode()
     return {
         "svix-id": svix_id,
-        "svix-timestamp": timestamp,
+        "svix-timestamp": svix_timestamp,
         "svix-signature": f"v1,{signature}",
         "content-type": "application/json",
     }
@@ -92,3 +98,12 @@ def test_webhook_unknown_email_id_is_ignored(webhook_client, db):
     body = json.dumps({"type": "email.delivered", "data": {"email_id": "inconnu"}}).encode()
     response = webhook_client.post("/api/webhooks/resend", content=body, headers=_signed_headers(body))
     assert response.status_code == 200
+
+
+def test_webhook_rejects_stale_timestamp(webhook_client):
+    """Audit P1 #17: un timestamp de +5 min doit etre rejete (anti-replay)."""
+    body = json.dumps({"type": "email.delivered", "data": {"email_id": "x"}}).encode()
+    stale_ts = str(int(time.time()) - 3600)  # 1 heure dans le passe
+    response = webhook_client.post("/api/webhooks/resend", content=body, headers=_signed_headers(body, timestamp=stale_ts))
+    assert response.status_code == 401
+    assert "Timestamp" in response.json()["detail"]

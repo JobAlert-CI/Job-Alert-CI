@@ -22,9 +22,9 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from datetime import date, datetime, timedelta, timezone
-
+from datetime import UTC, date, datetime, timedelta
 from html import escape
+
 from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
@@ -57,7 +57,7 @@ def should_send_no_offer_email(
     Regle: aucun envoi 'no offer' dans les `min_interval_days` derniers
     jours. Si pas de log precedent, on peut envoyer.
     """
-    effective_now = now or datetime.now(timezone.utc)
+    effective_now = now or datetime.now(UTC)
     threshold = effective_now - timedelta(days=min_interval_days)
     last_log = db.scalar(
         select(NoOfferEmailLog)
@@ -82,7 +82,7 @@ def record_no_offer_email_sent(
     log = NoOfferEmailLog(
         subscriber_id=subscriber_id,
         digest_date=digest_date,
-        sent_at=sent_at or datetime.now(timezone.utc),
+        sent_at=sent_at or datetime.now(UTC),
     )
     db.add(log)
     db.flush()
@@ -320,7 +320,7 @@ def send_no_offer_email_now(
     result = provider.send(message)
 
     # Trace l'attempt sur le digest skipped_empty (FK respectee).
-    finished_at = datetime.now(timezone.utc)
+    finished_at = datetime.now(UTC)
     attempt = EmailDeliveryAttempt(
         digest_id=digest.id,
         attempt_no=1,  # 1 seule tentative: pas de retry pour les emails transactionnels.

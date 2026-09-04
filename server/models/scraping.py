@@ -43,11 +43,11 @@ class ScrapeRun(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     total_errors: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
 
-    source_runs: Mapped[list["SourceScrapeRun"]] = relationship(
+    source_runs: Mapped[list[SourceScrapeRun]] = relationship(
         back_populates="scrape_run", cascade="all, delete-orphan", order_by="SourceScrapeRun.started_at"
     )
-    digests: Mapped[list["EmailDigest"]] = relationship(back_populates="scrape_run")
-    ai_jobs: Mapped[list["AiProcessingJob"]] = relationship(back_populates="scrape_run")
+    digests: Mapped[list[EmailDigest]] = relationship(back_populates="scrape_run")
+    ai_jobs: Mapped[list[AiProcessingJob]] = relationship(back_populates="scrape_run")
 
     __table_args__ = (
         UniqueConstraint("run_date", "triggered_by", name="uq_scrape_runs_date_triggered_by"),
@@ -78,10 +78,10 @@ class SourceScrapeRun(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     error_count: Mapped[int] = mapped_column(Integer, default=0, nullable=False)
     error_message: Mapped[str | None] = mapped_column(Text, nullable=True)
 
-    scrape_run: Mapped["ScrapeRun"] = relationship(back_populates="source_runs")
-    source: Mapped["Source"] = relationship(back_populates="scrape_runs")
-    ingestion_events: Mapped[list["OfferIngestionEvent"]] = relationship(back_populates="source_scrape_run")
-    offers: Mapped[list["JobOffer"]] = relationship(back_populates="source_scrape_run")
+    scrape_run: Mapped[ScrapeRun] = relationship(back_populates="source_runs")
+    source: Mapped[Source] = relationship(back_populates="scrape_runs")
+    ingestion_events: Mapped[list[OfferIngestionEvent]] = relationship(back_populates="source_scrape_run")
+    offers: Mapped[list[JobOffer]] = relationship(back_populates="source_scrape_run")
 
     __table_args__ = (
         UniqueConstraint("scrape_run_id", "source_id", name="uq_source_scrape_runs_run_source"),

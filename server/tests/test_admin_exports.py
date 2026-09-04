@@ -165,18 +165,21 @@ def _seed_minimal(admin_db):
 
 
 def test_offers_export_csv_default(admin_client, admin_db):
-    """GET /offers/export?format=csv : header + une ligne par offre."""
-    before = admin_client.get("/api/admin/exports/data-export/offers?format=csv").text.count("\n")
+    """GET /offers/export?format=csv : header + une ligne par offre.
+
+    Audit 2, Q1: assertion absolue sur les 5 titres du seed (les deltas
+    relatifs echouaient quand un test precedent avait deja seme).
+    """
     _seed_minimal(admin_db)
     resp = admin_client.get("/api/admin/exports/data-export/offers?format=csv")
     assert resp.status_code == 200
     assert resp.headers["content-type"].startswith("text/csv")
     assert "attachment" in resp.headers["content-disposition"]
 
-    after = resp.text.count("\n")
-    # Le seed ajoute exactement 5 offres (1 ligne par offre + 1 header = 6 lignes).
-    # On accepte un delta de 5 ou 6 (header peut etre sur la meme ligne).
-    assert after - before >= 5, f"delta attendu >=5, got {after - before}"
+    rows = list(csv.DictReader(io.StringIO(resp.text)))
+    titles_in_export = {r["title"] for r in rows}
+    for i in range(5):
+        assert f"Offre {i}" in titles_in_export
     # Header present
     assert "id" in resp.text and "title" in resp.text and "company_name" in resp.text
 
@@ -202,13 +205,15 @@ def test_offers_export_csv_filtre_status(admin_client, admin_db):
 def test_offers_export_json_valide(admin_client, admin_db):
     """GET /offers/export?format=json : tableau JSON parsable.
 
-    Strategie incrementale : avant/apres seed, le delta de longueur doit etre >= 5.
+    Audit 2, Q1: assertion absolue sur les 5 titres du seed (les deltas
+    relatifs echouaient quand un test precedent avait deja seme).
     """
-    before = admin_client.get("/api/admin/exports/data-export/offers?format=json").json()
     _seed_minimal(admin_db)
     body = admin_client.get("/api/admin/exports/data-export/offers?format=json").json()
     assert isinstance(body, list)
-    assert len(body) - len(before) >= 5
+    titles_in_export = {row.get("title") for row in body}
+    for i in range(5):
+        assert f"Offre {i}" in titles_in_export
     # La premiere ligne retournee par le seed a bien les champs attendus
     if body:
         assert {"id", "title", "company_name"} <= set(body[0].keys())
@@ -268,25 +273,33 @@ def test_offers_export_echappement_csv(admin_client, admin_db):
 def test_subscribers_export_csv(admin_client, admin_db):
     """L'export CSV des abonnes renvoie toutes les colonnes attendues.
 
-    Strategie incrementale : on verifie que le seed ajoute bien 3 lignes.
+    Audit 2, Q1: assertion absolue sur les 3 emails du seed (les deltas
+    relatifs echouaient quand un test precedent avait deja seme).
     """
-    before_count = admin_client.get("/api/admin/exports/data-export/subscribers?format=csv").text.count("\n")
     _seed_minimal(admin_db)
     resp = admin_client.get("/api/admin/exports/data-export/subscribers?format=csv")
     assert resp.status_code == 200
-    after_count = resp.text.count("\n")
-    # Header + 3 abonnes => delta >= 3 (on ne compte pas precisement le header)
-    assert after_count - before_count >= 3
+    assert resp.headers["content-type"].startswith("text/csv")
     assert "email" in resp.text and "full_name" in resp.text
+    rows = list(csv.DictReader(io.StringIO(resp.text)))
+    emails_in_export = {r["email"] for r in rows}
+    for i in range(3):
+        assert f"u{i}@example.com" in emails_in_export, (
+            f"L'abonne u{i}@example.com doit figurer dans l'export (contenu: {emails_in_export})"
+        )
 
 
 def test_subscribers_export_json(admin_client, admin_db):
-    """L'export JSON des abonnes produit un tableau valide (delta >= 3)."""
-    before = admin_client.get("/api/admin/exports/data-export/subscribers?format=json").json()
+    """L'export JSON des abonnes produit un tableau valide avec le seed complet.
+
+    Audit 2, Q1: assertion absolue sur les 3 emails du seed.
+    """
     _seed_minimal(admin_db)
     body = admin_client.get("/api/admin/exports/data-export/subscribers?format=json").json()
     assert isinstance(body, list)
-    assert len(body) - len(before) >= 3
+    emails_in_export = {row.get("email") for row in body}
+    for i in range(3):
+        assert f"u{i}@example.com" in emails_in_export
 
 
 def test_subscribers_export_filtre_status(admin_client, admin_db):

@@ -3,7 +3,20 @@ from __future__ import annotations
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Boolean, CheckConstraint, DateTime, Float, ForeignKey, Index, Integer, JSON, String, Text, UniqueConstraint, func
+from sqlalchemy import (
+    JSON,
+    Boolean,
+    CheckConstraint,
+    DateTime,
+    Float,
+    ForeignKey,
+    Index,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
+    func,
+)
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from db.base import Base, SoftDeleteMixin, TimestampMixin, UUIDPrimaryKeyMixin
@@ -29,8 +42,8 @@ class ArticleCategory(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     sort_order: Mapped[int] = mapped_column(Integer, default=100, nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
-    articles: Mapped[list["Article"]] = relationship(back_populates="category")
-    daily_tips: Mapped[list["DailyTip"]] = relationship(back_populates="category")
+    articles: Mapped[list[Article]] = relationship(back_populates="category")
+    daily_tips: Mapped[list[DailyTip]] = relationship(back_populates="category")
 
 
 class Article(UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin, Base):
@@ -46,19 +59,19 @@ class Article(UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin, Base):
     quote_author: Mapped[str | None] = mapped_column(String(255), nullable=True)
     tags: Mapped[list[str] | None] = mapped_column(JSON, nullable=True)
 
-    content_page: Mapped["ContentPage"] = relationship(back_populates="article")
-    category: Mapped["ArticleCategory | None"] = relationship(back_populates="articles")
-    sections: Mapped[list["ArticleSection"]] = relationship(
+    content_page: Mapped[ContentPage] = relationship(back_populates="article")
+    category: Mapped[ArticleCategory | None] = relationship(back_populates="articles")
+    sections: Mapped[list[ArticleSection]] = relationship(
         back_populates="article", cascade="all, delete-orphan", order_by="ArticleSection.position"
     )
-    takeaways: Mapped[list["ArticleTakeaway"]] = relationship(
+    takeaways: Mapped[list[ArticleTakeaway]] = relationship(
         back_populates="article", cascade="all, delete-orphan", order_by="ArticleTakeaway.position"
     )
-    key_figures: Mapped[list["ArticleKeyFigure"]] = relationship(
+    key_figures: Mapped[list[ArticleKeyFigure]] = relationship(
         back_populates="article", cascade="all, delete-orphan", order_by="ArticleKeyFigure.position"
     )
-    series_links: Mapped[list["SeriesArticle"]] = relationship(back_populates="article", cascade="all, delete-orphan")
-    view_logs: Mapped[list["ArticleViewLog"]] = relationship(back_populates="article", cascade="all, delete-orphan")
+    series_links: Mapped[list[SeriesArticle]] = relationship(back_populates="article", cascade="all, delete-orphan")
+    view_logs: Mapped[list[ArticleViewLog]] = relationship(back_populates="article", cascade="all, delete-orphan")
 
     __table_args__ = (
         CheckConstraint("view_count >= 0", name="article_view_count_positive"),
@@ -75,8 +88,8 @@ class ArticleSection(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     anchor: Mapped[str] = mapped_column(String(100), nullable=False)
     title: Mapped[str] = mapped_column(String(320), nullable=False)
 
-    article: Mapped["Article"] = relationship(back_populates="sections")
-    blocks: Mapped[list["ArticleSectionBlock"]] = relationship(
+    article: Mapped[Article] = relationship(back_populates="sections")
+    blocks: Mapped[list[ArticleSectionBlock]] = relationship(
         back_populates="section", cascade="all, delete-orphan", order_by="ArticleSectionBlock.position"
     )
 
@@ -96,7 +109,7 @@ class ArticleSectionBlock(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     attribution: Mapped[str | None] = mapped_column(String(255), nullable=True)
     metadata_json: Mapped[dict | None] = mapped_column(JSON, nullable=True)
 
-    section: Mapped["ArticleSection"] = relationship(back_populates="blocks")
+    section: Mapped[ArticleSection] = relationship(back_populates="blocks")
 
     __table_args__ = (UniqueConstraint("section_id", "position", name="uq_article_blocks_position"),)
 
@@ -108,7 +121,7 @@ class ArticleTakeaway(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     position: Mapped[int] = mapped_column(Integer, nullable=False)
     text: Mapped[str] = mapped_column(Text, nullable=False)
 
-    article: Mapped["Article"] = relationship(back_populates="takeaways")
+    article: Mapped[Article] = relationship(back_populates="takeaways")
 
     __table_args__ = (UniqueConstraint("article_id", "position", name="uq_article_takeaways_position"),)
 
@@ -123,7 +136,7 @@ class ArticleKeyFigure(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     prefix: Mapped[str | None] = mapped_column(String(10), nullable=True)
     suffix: Mapped[str | None] = mapped_column(String(10), nullable=True)
 
-    article: Mapped["Article"] = relationship(back_populates="key_figures")
+    article: Mapped[Article] = relationship(back_populates="key_figures")
 
     __table_args__ = (UniqueConstraint("article_id", "position", name="uq_article_key_figures_position"),)
 
@@ -136,7 +149,7 @@ class DailyTip(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     category_id: Mapped[str | None] = mapped_column(ForeignKey("article_categories.id", ondelete="SET NULL"), index=True, nullable=True)
 
-    category: Mapped["ArticleCategory | None"] = relationship(back_populates="daily_tips")
+    category: Mapped[ArticleCategory | None] = relationship(back_populates="daily_tips")
 
     __table_args__ = (
         UniqueConstraint("rotation_order", name="uq_daily_tips_rotation"),
@@ -154,7 +167,7 @@ class ArticleSeries(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     sort_order: Mapped[int] = mapped_column(Integer, default=100, nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
-    entries: Mapped[list["SeriesArticle"]] = relationship(
+    entries: Mapped[list[SeriesArticle]] = relationship(
         back_populates="series", cascade="all, delete-orphan", order_by="SeriesArticle.position"
     )
 
@@ -168,8 +181,8 @@ class SeriesArticle(Base):
     article_id: Mapped[str] = mapped_column(ForeignKey("articles.id", ondelete="CASCADE"), primary_key=True)
     position: Mapped[int] = mapped_column(Integer, nullable=False)
 
-    series: Mapped["ArticleSeries"] = relationship(back_populates="entries")
-    article: Mapped["Article"] = relationship(back_populates="series_links")
+    series: Mapped[ArticleSeries] = relationship(back_populates="entries")
+    article: Mapped[Article] = relationship(back_populates="series_links")
 
     __table_args__ = (
         UniqueConstraint("series_id", "article_id", name="uq_series_articles"),
@@ -187,7 +200,7 @@ class ArticleViewLog(UUIDPrimaryKeyMixin, Base):
     scroll_depth_percent: Mapped[int | None] = mapped_column(Integer, nullable=True)
     completed: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
-    article: Mapped["Article"] = relationship(back_populates="view_logs")
-    subscriber: Mapped["Subscriber | None"] = relationship()
+    article: Mapped[Article] = relationship(back_populates="view_logs")
+    subscriber: Mapped[Subscriber | None] = relationship()
 
     __table_args__ = (Index("ix_article_view_logs_article_date", "article_id", "viewed_at"),)

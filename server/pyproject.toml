@@ -20,5 +20,75 @@ dependencies = [
     "pytest>=8.0.0",
 ]
 
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-cov>=5.0.0",
+    "ruff>=0.6.0",
+]
+
+# Le projet est une application FastAPI executee depuis server/ (pythonpath
+# dans [tool.pytest.ini_options]), pas une librairie a installer. On desactive
+# l'auto-decouverte de setuptools qui echoue sur ce layout plat (api/, db/,
+# core/, models/, ... multiples packages top-level). L'editable install ne
+# sert qu'a poser les dependances dev (ruff, pytest-cov).
+[tool.setuptools]
+py-modules = []
+
 [tool.pytest.ini_options]
 pythonpath = ["."]
+markers = [
+    "admin_db: tests utilisant la base admin persistante (conftest_admin)",
+]
+
+[tool.coverage.run]
+source = ["api", "core", "db", "models", "services", "tasks"]
+omit = [
+    "tests/*",
+    ".venv/*",
+    "migrations/*",
+    "scripts/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+    "except ImportError:",
+    "if __name__ == .__main__.:",
+]
+
+[tool.ruff]
+line-length = 120
+target-version = "py311"
+
+[tool.ruff.lint]
+# E/W: pycodestyle, F: pyflakes, I: isort, B: bugbear, S: bandit(securite),
+# UP: pyupgrade, SIM: simplify, RUF: ruff-specific.
+select = ["E", "W", "F", "I", "B", "UP", "SIM", "RUF"]
+ignore = [
+    # Le code historique melange francais sans accents et anglais; on ne force
+    # pas une passe de renommage complete via les commentaires docstring.
+    "RUF001", "RUF002", "RUF003",
+    # Comparaisons de type string/enum volontairement laxistes cote API.
+    "RUF012",
+    # B008: `Depends(...)`/`Query(...)` en valeur par defaut d'argument est
+    # l'idiome FastAPI canonique (toutes les routes du projet l'utilisent).
+    "B008",
+    # E501: le projet depasse volontairement 120 col. sur les longues
+    # declarations SQLAlchemy; un reformatage mecanique casserait les diffs.
+    "E501",
+    # E402: certains modules historiques groupent des imports par section
+    # (routes "doublons", "import en masse"...) — restructuration a part.
+    "E402",
+    # UP037: les forward-refs SQLAlchemy ("JobOffer" dans models/admin.py)
+    # doivent RESTERER quotees — les dequoter declenche F821. Conflit de
+    # regles resolu en faveur des forward-refs.
+    "UP037",
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Les tests tolerent les asserts, les magic values et l'acces direct aux membres.
+"tests/*" = ["S101", "S105", "S106", "B011"]
+"migrations/versions/*" = ["E501"]

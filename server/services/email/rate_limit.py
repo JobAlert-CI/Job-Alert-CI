@@ -3,7 +3,7 @@ from __future__ import annotations
 import hashlib
 import logging
 from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from core.config import get_settings
 
@@ -108,8 +108,8 @@ def check_resend_quota(
     if last_email_sent_at is not None and cooldown_seconds > 0:
         reference = last_email_sent_at
         if reference.tzinfo is None:
-            reference = reference.replace(tzinfo=timezone.utc)
-        elapsed = datetime.now(timezone.utc) - reference
+            reference = reference.replace(tzinfo=UTC)
+        elapsed = datetime.now(UTC) - reference
         if elapsed < timedelta(seconds=cooldown_seconds):
             remaining = cooldown_seconds - int(elapsed.total_seconds())
             return RateLimitDecision(

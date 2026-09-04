@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
-from typing import Optional
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import select
@@ -16,6 +15,7 @@ from models.subscriptions import Subscriber, SubscriberFiliere, SubscriberStatus
 from schemas.sending import CustomSendCreate, EmailDigestRead
 from schemas.subscriptions import SubscriberAdminUpdate, SubscriberRead, SubscriberStatusUpdate
 from services.audit import log_admin_action
+from services.search_utils import safe_ilike
 
 router = APIRouter(
     prefix="/api/admin/subscribers",
@@ -45,9 +45,9 @@ def _require_subscriber(db: Session, subscriber_id: str) -> Subscriber:
 @router.get("", response_model=list[SubscriberRead])
 async def list_subscribers(
     db: Session = Depends(get_db),
-    q: Optional[str] = Query(None, description="Recherche email ou nom"),
-    status: Optional[str] = Query(None, description="Statut exact"),
-    filiere_id: Optional[str] = Query(None, description="ID de filière"),
+    q: str | None = Query(None, description="Recherche email ou nom"),
+    status: str | None = Query(None, description="Statut exact"),
+    filiere_id: str | None = Query(None, description="ID de filière"),
     limit: int = Query(20, ge=1, le=100),
     offset: int = Query(0, ge=0),
 ):
@@ -55,7 +55,9 @@ async def list_subscribers(
     stmt = select(Subscriber)
 
     if q:
-        stmt = stmt.where((Subscriber.email.ilike(f"%{q}%")) | (Subscriber.full_name.ilike(f"%{q}%")))
+            stmt = stmt.where(
+                safe_ilike(Subscriber.email, q) | safe_ilike(Subscriber.full_name, q)
+            )
     if status:
         if status not in STATUS_ALIASES:
             raise HTTPException(status_code=400, detail=f"Statut inconnu: {status}")
@@ -109,7 +111,7 @@ async def update_subscriber_status(
     subscriber = _require_subscriber(db, subscriber_id)
     subscriber.status = STATUS_ALIASES[payload.status]
     if payload.status == "unsubscribed":
-        subscriber.unsubscribed_at = datetime.now(timezone.utc)
+        subscriber.unsubscribed_at = datetime.now(UTC)
         subscriber.unsubscribe_reason = payload.reason
 
     log_admin_action(
@@ -153,7 +155,7 @@ async def send_custom_email(
     if missing:
         raise HTTPException(status_code=400, detail=f"Offres introuvables: {', '.join(missing)}")
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     digest = EmailDigest(
         subscriber_id=subscriber.id,
         digest_date=now.date(),
@@ -197,7 +199,7 @@ async def delete_subscriber(
     subscriber.city = None
     subscriber.admin_notes = None
     subscriber.status = SubscriberStatus.DELETED
-    subscriber.deleted_at = datetime.now(timezone.utc)
+    subscriber.deleted_at = datetime.now(UTC)
 
     log_admin_action(db, admin_id=admin.id, action=AdminAction.DELETE, target_table="subscribers", target_id=subscriber.id)
     db.commit()

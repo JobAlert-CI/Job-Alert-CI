@@ -3,28 +3,58 @@ from __future__ import annotations
 from fastapi import APIRouter
 
 from api.v1 import ingestion, internal_ai
-from api.v1.public import articles, contact, filieres, offers, referentials, sources, stats, subscriptions, webhooks_resend
-from api.v1.public import sitemap
 from api.v1.admin import (
-    aggregates as admin_aggregates,
-    ai as admin_ai,
-    ai_suggestions as admin_ai_suggestions,
-    companies as admin_companies,
     admins,
     auth,
     content,
     dashboard,
-    exports as admin_exports,
     logs,
-    offers as admin_offers,
-    referentials as admin_referentials,
     scraping,
     sending,
-    system_health as admin_system_health,
-    sending_preview as admin_sending_preview,
     settings,
     subscribers,
+)
+from api.v1.admin import (
+    aggregates as admin_aggregates,
+)
+from api.v1.admin import (
+    ai as admin_ai,
+)
+from api.v1.admin import (
+    ai_suggestions as admin_ai_suggestions,
+)
+from api.v1.admin import (
+    companies as admin_companies,
+)
+from api.v1.admin import (
+    exports as admin_exports,
+)
+from api.v1.admin import (
+    offers as admin_offers,
+)
+from api.v1.admin import (
+    referentials as admin_referentials,
+)
+from api.v1.admin import (
+    sending_preview as admin_sending_preview,
+)
+from api.v1.admin import (
+    system_health as admin_system_health,
+)
+from api.v1.admin import (
     transactional_emails as admin_transactional_emails,
+)
+from api.v1.public import (
+    articles,
+    contact,
+    filieres,
+    offers,
+    referentials,
+    sitemap,
+    sources,
+    stats,
+    subscriptions,
+    webhooks_resend,
 )
 
 api_router = APIRouter()

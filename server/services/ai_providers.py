@@ -90,10 +90,12 @@ def _extract_json_object(text: str) -> dict:
     try:
         parsed = json.loads(text)
     except json.JSONDecodeError:
+        # Pas du JSON pur: on tente d'extraire le premier objet JSON du texte
+        # (reponses IA qui entourent le JSON de prose).
         start = text.find("{")
         end = text.rfind("}")
         if start == -1 or end == -1 or end <= start:
-            raise AIResponseValidationError("AI provider returned invalid JSON")
+            raise AIResponseValidationError("AI provider returned invalid JSON") from None
         try:
             parsed = json.loads(text[start : end + 1])
         except json.JSONDecodeError as exc:

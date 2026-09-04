@@ -1,10 +1,29 @@
 from __future__ import annotations
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
+
 from api.deps import get_db
-from models import ContractType, EducationLevel, ExperienceLevel, Filiere, FiliereSpecialty, Location, Source, SourceStatus
-from schemas.referentials import ContractTypeRead, EducationLevelRead, ExperienceLevelRead, FiliereRead, FiliereSpecialtyRead, LocationRead, SourceRead
+from models import (
+    ContractType,
+    EducationLevel,
+    ExperienceLevel,
+    Filiere,
+    FiliereSpecialty,
+    Location,
+    Source,
+    SourceStatus,
+)
+from schemas.referentials import (
+    ContractTypeRead,
+    EducationLevelRead,
+    ExperienceLevelRead,
+    FiliereRead,
+    FiliereSpecialtyRead,
+    LocationRead,
+    SourceRead,
+)
 
 router = APIRouter(prefix="/api/referentials", tags=["referentials"])
 

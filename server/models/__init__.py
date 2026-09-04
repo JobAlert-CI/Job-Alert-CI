@@ -1,5 +1,5 @@
 from models.admin import AdminActionLog, Administrator, SiteSetting
-from models.ai import AIApiKey, AIAlert, AIFiliereSuggestion, AIJob, AIOfferAttempt, AiProcessingJob
+from models.ai import AIAlert, AIApiKey, AIFiliereSuggestion, AIJob, AIOfferAttempt, AiProcessingJob
 from models.content import (
     ContactMessage,
     ContentPage,
@@ -28,10 +28,10 @@ from models.enums import (
     AIJobStatus,
     AIJobTrigger,
     AIOfferAttemptStatus,
-    AIProviderType,
     AiOfferStatus,
     AiProcessingJobStatus,
     AiProcessingJobTrigger,
+    AIProviderType,
     ContactMessageStatus,
     ContentStatus,
     ContentType,
@@ -59,7 +59,7 @@ from models.referentials import (
     Location,
     Source,
 )
-from models.rejected_duplicates import RejectedDuplicatePair
+from models.rejected_duplicates import RejectedDuplicatePair as RejectedDuplicatePair  # re-export
 from models.scraping import ScrapeRun, SourceScrapeRun
 from models.subscriptions import (
     SavedOffer,
@@ -71,13 +71,9 @@ from models.subscriptions import (
 )
 
 __all__ = [
-    "AdminAction",
-    "AdminActionLog",
-    "AdminRole",
-    "Administrator",
-    "AIApiKey",
     "AIAlert",
     "AIAlertSeverity",
+    "AIApiKey",
     "AIErrorType",
     "AIFiliereSuggestion",
     "AIFiliereSuggestionStatus",
@@ -87,6 +83,10 @@ __all__ = [
     "AIOfferAttempt",
     "AIOfferAttemptStatus",
     "AIProviderType",
+    "AdminAction",
+    "AdminActionLog",
+    "AdminRole",
+    "Administrator",
     "AiOfferStatus",
     "AiProcessingJob",
     "AiProcessingJobStatus",
@@ -125,8 +125,8 @@ __all__ = [
     "JobOfferOrigin",
     "JobOfferStatus",
     "Location",
-    "NotificationChannel",
     "NoOfferEmailLog",
+    "NotificationChannel",
     "OfferFiliere",
     "OfferIngestionEvent",
     "SavedOffer",

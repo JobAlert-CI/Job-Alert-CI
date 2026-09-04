@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 
 def today_start_utc() -> datetime:
@@ -23,4 +23,4 @@ def today_start_utc() -> datetime:
       jours" en naïf : deux définitions différentes de "nouvelles offres"
       coexistaient, d'où les écarts constatés entre pages.
     """
-    return datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+    return datetime.now(UTC).replace(hour=0, minute=0, second=0, microsecond=0)

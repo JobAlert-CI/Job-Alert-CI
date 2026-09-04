@@ -1,12 +1,15 @@
 from __future__ import annotations
 
+import time
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
-from api.v1.router import api_router
+from api.metrics import observe_request
+from api.metrics import router as metrics_router
 from api.system import routerSys
+from api.v1.router import api_router
 from core.config import get_settings
 from db.session import init_db
 
@@ -31,6 +34,10 @@ async def lifespan(app: FastAPI):
     yield
 
 
+# Audit P1 #27: en prod on durcit methodes/headers (evite le wildcard large).
+_cors_methods = ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"] if settings.is_production else ["*"]
+_cors_headers = ["Authorization", "Content-Type", "X-Requested-With", "X-Scraper-Token", "X-Internal-Token"] if settings.is_production else ["*"]
+
 app = FastAPI(
     title=settings.app_name,
     version=settings.app_version,
@@ -38,15 +45,34 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+
+# Audit P1 #32: middleware metriques pour Prometheus.
+@app.middleware("http")
+async def metrics_middleware(request: Request, call_next):
+    start = time.perf_counter()
+    response = await call_next(request)
+    duration = time.perf_counter() - start
+    route = request.scope.get("route")
+    path_template = getattr(route, "path", request.url.path)
+    observe_request(
+        method=request.method,
+        path=path_template,
+        status_code=response.status_code,
+        duration_seconds=duration,
+    )
+    return response
+
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=_cors_methods,
+    allow_headers=_cors_headers,
 )
 
 app.include_router(routerSys)
+app.include_router(metrics_router)
 
 # Toutes les routes passent par le router v1.
 app.include_router(api_router)

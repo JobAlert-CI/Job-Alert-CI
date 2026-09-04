@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from api.deps import get_current_admin, get_db, require_roles
 from core.security import hash_password
-from models.admin import AdminAction, AdminRole, Administrator
+from models.admin import AdminAction, Administrator, AdminRole
 from schemas.admin import AdminCreate, AdminRead, AdminRoleUpdate, AdminUpdate
 from services.audit import log_admin_action
 
@@ -59,9 +59,9 @@ async def create_admin(
     db.add(new_admin)
     try:
         db.flush()
-    except IntegrityError:
+    except IntegrityError as exc:
         db.rollback()
-        raise HTTPException(status_code=409, detail="Cet email est déjà utilisé")
+        raise HTTPException(status_code=409, detail="Cet email est déjà utilisé") from exc
 
     log_admin_action(db, admin_id=admin.id, action=AdminAction.CREATE, target_table="administrators", target_id=new_admin.id)
     db.commit()
@@ -95,9 +95,9 @@ async def update_admin(
 
     try:
         db.flush()
-    except IntegrityError:
+    except IntegrityError as exc:
         db.rollback()
-        raise HTTPException(status_code=409, detail="Cet email est déjà utilisé")
+        raise HTTPException(status_code=409, detail="Cet email est déjà utilisé") from exc
 
     log_admin_action(db, admin_id=admin.id, action=AdminAction.UPDATE, target_table="administrators", target_id=target.id)
     db.commit()

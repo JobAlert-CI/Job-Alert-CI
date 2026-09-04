@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
-from sqlalchemy import func, or_, select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session, selectinload
 
 from celery_app import celery_app
@@ -36,11 +36,11 @@ from tasks.locks import redis_lock
 
 logger = logging.getLogger(__name__)
 
-RAW_STATUSES = {JobOfferStatus.BRUT, JobOfferStatus.LEGACY_BRUTE}
+RAW_STATUSES = {JobOfferStatus.BRUT}
 
 
 def _now() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 def _trigger(value: str) -> AIJobTrigger:

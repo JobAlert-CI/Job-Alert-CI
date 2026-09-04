@@ -4,6 +4,7 @@ import base64
 import hashlib
 import hmac
 import logging
+import time
 from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
@@ -29,6 +30,7 @@ Regles:
 - si `RESEND_WEBHOOK_SECRET` n'est pas configure, le webhook renvoie 503
   (jamais d'acceptation aveugle d'evenements non signes);
 - comparaison en temps constant (`hmac.compare_digest`);
+- fenetre de tolerance sur le timestamp (5 min, audit P1 #17) anti-replay;
 - idempotent: un evenement deja applique ne change plus rien;
 - aucune donnee sensible dans la reponse (toujours `{"received": true}`).
 """
@@ -40,6 +42,9 @@ router = APIRouter(prefix="/api/webhooks", tags=["webhooks"])
 BOUNCE_EVENTS = {"email.bounced", "email.complained"}
 DELIVERED_EVENTS = {"email.delivered", "email.sent"}
 
+# Tolerance anti-replay (audit P1 #17): on rejette tout timestamp a +/- 5 min.
+SVIX_TIMESTAMP_TOLERANCE_SECONDS = 300
+
 
 def _verify_signature(secret: str, *, svix_id: str, svix_timestamp: str, signature_header: str, body: bytes) -> bool:
     key = secret.removeprefix("whsec_")
@@ -48,7 +53,7 @@ def _verify_signature(secret: str, *, svix_id: str, svix_timestamp: str, signatu
     except Exception:
         secret_bytes = key.encode("utf-8")
 
-    signed_payload = f"{svix_id}.{svix_timestamp}.".encode("utf-8") + body
+    signed_payload = f"{svix_id}.{svix_timestamp}.".encode() + body
     expected = base64.b64encode(hmac.new(secret_bytes, signed_payload, hashlib.sha256).digest()).decode("utf-8")
 
     for part in signature_header.split():
@@ -56,6 +61,20 @@ def _verify_signature(secret: str, *, svix_id: str, svix_timestamp: str, signatu
         if value and hmac.compare_digest(value, expected):
             return True
     return False
+
+
+def _verify_timestamp(svix_timestamp: str) -> bool:
+    """Verifie que le timestamp Svix est dans la fenetre de tolerance.
+
+    Anti-replay: un attaquant qui aurait rejoue une signature validee ne peut
+    pas la rejouer indefiniment (audit P1 #17).
+    """
+    try:
+        ts = int(svix_timestamp)
+    except (TypeError, ValueError):
+        return False
+    delta = abs(int(time.time()) - ts)
+    return delta <= SVIX_TIMESTAMP_TOLERANCE_SECONDS
 
 
 @router.post("/resend", status_code=status.HTTP_200_OK)
@@ -77,6 +96,10 @@ async def resend_webhook(request: Request, db: Session = Depends(get_db)) -> dic
         body=body,
     ):
         raise HTTPException(status_code=401, detail="Signature invalide")
+
+    # Audit P1 #17: anti-replay via timestamp tolerance.
+    if not _verify_timestamp(svix_timestamp):
+        raise HTTPException(status_code=401, detail="Timestamp hors tolerance (anti-replay)")
 
     try:
         payload: dict[str, Any] = await request.json()

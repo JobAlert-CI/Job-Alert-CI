@@ -44,8 +44,8 @@ class Source(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
     is_primary: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
-    offers: Mapped[list["JobOffer"]] = relationship(back_populates="source")
-    scrape_runs: Mapped[list["SourceScrapeRun"]] = relationship(back_populates="source")
+    offers: Mapped[list[JobOffer]] = relationship(back_populates="source")
+    scrape_runs: Mapped[list[SourceScrapeRun]] = relationship(back_populates="source")
 
     __table_args__ = (
         CheckConstraint("priority >= 0", name="source_priority_positive"),
@@ -65,20 +65,20 @@ class Filiere(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     sort_order: Mapped[int] = mapped_column(Integer, default=100, nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
-    keywords: Mapped[list["FiliereKeyword"]] = relationship(
+    keywords: Mapped[list[FiliereKeyword]] = relationship(
         back_populates="filiere",
         cascade="all, delete-orphan",
         order_by="FiliereKeyword.weight.desc(), FiliereKeyword.keyword",
     )
-    specialties: Mapped[list["FiliereSpecialty"]] = relationship(
+    specialties: Mapped[list[FiliereSpecialty]] = relationship(
         back_populates="filiere",
         cascade="all, delete-orphan",
         order_by="FiliereSpecialty.sort_order, FiliereSpecialty.label",
     )
-    companies: Mapped[list["Company"]] = relationship(back_populates="primary_filiere")
-    offers: Mapped[list["JobOffer"]] = relationship(back_populates="primary_filiere")
-    offer_links: Mapped[list["OfferFiliere"]] = relationship(back_populates="filiere", cascade="all, delete-orphan")
-    subscriber_links: Mapped[list["SubscriberFiliere"]] = relationship(
+    companies: Mapped[list[Company]] = relationship(back_populates="primary_filiere")
+    offers: Mapped[list[JobOffer]] = relationship(back_populates="primary_filiere")
+    offer_links: Mapped[list[OfferFiliere]] = relationship(back_populates="filiere", cascade="all, delete-orphan")
+    subscriber_links: Mapped[list[SubscriberFiliere]] = relationship(
         back_populates="filiere", cascade="all, delete-orphan"
     )
 
@@ -94,7 +94,7 @@ class FiliereKeyword(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     weight: Mapped[int] = mapped_column(Integer, default=1, nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
-    filiere: Mapped["Filiere"] = relationship(back_populates="keywords")
+    filiere: Mapped[Filiere] = relationship(back_populates="keywords")
 
     __table_args__ = (
         UniqueConstraint("filiere_id", "normalized_keyword", name="uq_filiere_keywords_filiere_keyword"),
@@ -111,8 +111,8 @@ class FiliereSpecialty(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     sort_order: Mapped[int] = mapped_column(Integer, default=100, nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
-    filiere: Mapped["Filiere"] = relationship(back_populates="specialties")
-    offers: Mapped[list["JobOffer"]] = relationship(back_populates="specialty")
+    filiere: Mapped[Filiere] = relationship(back_populates="specialties")
+    offers: Mapped[list[JobOffer]] = relationship(back_populates="specialty")
 
     __table_args__ = (
         UniqueConstraint("filiere_id", "code", name="uq_filiere_specialties_filiere_code"),
@@ -128,8 +128,8 @@ class ContractType(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     sort_order: Mapped[int] = mapped_column(Integer, default=100, nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
-    offers: Mapped[list["JobOffer"]] = relationship(back_populates="contract_type")
-    subscriber_preferences: Mapped[list["SubscriberContractPreference"]] = relationship(back_populates="contract_type")
+    offers: Mapped[list[JobOffer]] = relationship(back_populates="contract_type")
+    subscriber_preferences: Mapped[list[SubscriberContractPreference]] = relationship(back_populates="contract_type")
 
 
 class ExperienceLevel(UUIDPrimaryKeyMixin, TimestampMixin, Base):
@@ -142,8 +142,8 @@ class ExperienceLevel(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     sort_order: Mapped[int] = mapped_column(Integer, default=100, nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
-    offers: Mapped[list["JobOffer"]] = relationship(back_populates="experience_level")
-    subscribers: Mapped[list["Subscriber"]] = relationship(back_populates="experience_level")
+    offers: Mapped[list[JobOffer]] = relationship(back_populates="experience_level")
+    subscribers: Mapped[list[Subscriber]] = relationship(back_populates="experience_level")
 
     __table_args__ = (
         CheckConstraint("min_years IS NULL OR min_years >= 0", name="experience_min_years_positive"),
@@ -160,7 +160,7 @@ class EducationLevel(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     sort_order: Mapped[int] = mapped_column(Integer, default=100, nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
-    offers: Mapped[list["JobOffer"]] = relationship(back_populates="education_level")
+    offers: Mapped[list[JobOffer]] = relationship(back_populates="education_level")
 
 
 class Location(UUIDPrimaryKeyMixin, TimestampMixin, Base):
@@ -174,4 +174,4 @@ class Location(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     is_remote: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
-    offers: Mapped[list["JobOffer"]] = relationship(back_populates="location")
+    offers: Mapped[list[JobOffer]] = relationship(back_populates="location")

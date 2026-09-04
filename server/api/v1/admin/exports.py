@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Literal, Optional
+from typing import Literal
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import StreamingResponse
@@ -16,7 +16,6 @@ from services.admin_exports import (
     iter_subscribers_for_export,
     stream_as,
 )
-
 
 router = APIRouter(
     prefix="/api/admin",
@@ -42,12 +41,12 @@ def export_offers(
     db: Session = Depends(get_db),
     _: object = Depends(require_roles("super_admin", "gestionnaire_offres")),
     format: str = Query("csv", description="csv ou json"),
-    status: Optional[str] = Query(None),
-    origin: Optional[str] = Query(None),
-    visible_site: Optional[bool] = Query(None),
-    filiere_id: Optional[str] = Query(None),
-    source_id: Optional[str] = Query(None),
-    q: Optional[str] = Query(None),
+    status: str | None = Query(None),
+    origin: str | None = Query(None),
+    visible_site: bool | None = Query(None),
+    filiere_id: str | None = Query(None),
+    source_id: str | None = Query(None),
+    q: str | None = Query(None),
 ):
     """Export streamant les offres au format CSV ou JSON.
 
@@ -78,9 +77,13 @@ def export_subscribers(
     db: Session = Depends(get_db),
     _: object = Depends(require_roles("super_admin", "gestionnaire_utilisateurs")),
     format: str = Query("csv"),
-    status: Optional[str] = Query(None),
-    city: Optional[str] = Query(None),
-    q: Optional[str] = Query(None),
+    status: str | None = Query(None),
+    city: str | None = Query(None),
+    q: str | None = Query(None),
+    to_email: str | None = Query(
+        None,
+        description="Filtre email exact, ou ilike si le motif contient %.",
+    ),
 ):
     """Export des abonnes (support, audit RGPD, communication).
 
@@ -88,7 +91,7 @@ def export_subscribers(
     `GET /api/admin/subscribers/{subscriber_id}`.
     """
     fmt = _validate_format(format)
-    filters = {"status": status, "city": city, "q": q}
+    filters = {"status": status, "city": city, "q": q, "to_email": to_email}
     body, media_type, filename = stream_as(
         format=fmt,
         rows=iter_subscribers_for_export(db, filters),
@@ -106,9 +109,13 @@ def export_sending(
     db: Session = Depends(get_db),
     _: object = Depends(require_roles("super_admin", "gestionnaire_utilisateurs")),
     format: str = Query("csv"),
-    status: Optional[str] = Query(None),
-    template_version: Optional[str] = Query(None),
-    match_tier: Optional[str] = Query(None),
+    status: str | None = Query(None),
+    template_version: str | None = Query(None),
+    match_tier: str | None = Query(None),
+    to_email: str | None = Query(
+        None,
+        description="Filtre email du destinataire exact, ou ilike si %.",
+    ),
 ):
     """Export des envois (digests + manuels) avec leur palier de matching.
 
@@ -116,7 +123,12 @@ def export_sending(
     existantes de `/api/admin/sending/*` (prepare, send, run, sends, stats, ...).
     """
     fmt = _validate_format(format)
-    filters = {"status": status, "template_version": template_version, "match_tier": match_tier}
+    filters = {
+        "status": status,
+        "template_version": template_version,
+        "match_tier": match_tier,
+        "to_email": to_email,
+    }
     body, media_type, filename = stream_as(
         format=fmt,
         rows=iter_digests_for_export(db, filters),

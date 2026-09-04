@@ -30,6 +30,7 @@ from schemas.referentials import (
     FiliereCreate,
     FiliereKeywordsUpdate,
     FiliereRead,
+    FiliereSpecialtyRead,
     FiliereUpdate,
     LocationCreate,
     LocationRead,
@@ -40,7 +41,6 @@ from schemas.referentials import (
     SourceUpdate,
     SpecialiteCreate,
     SpecialiteUpdate,
-    FiliereSpecialtyRead,
 )
 from services.audit import log_admin_action
 from services.normalization import normalize_text
@@ -109,7 +109,7 @@ async def update_filiere_keywords(
     admin: Administrator = Depends(get_current_admin),
 ):
     """Remplace entièrement les mots-clés de matching automatique d'une filière."""
-    filiere = _get_or_404(db, Filiere, filiere_id, "Filière")
+    _get_or_404(db, Filiere, filiere_id, "Filière")  # validation 404
 
     db.query(FiliereKeyword).filter(FiliereKeyword.filiere_id == filiere_id).delete()
     for entry in payload.keywords:
@@ -138,7 +138,7 @@ async def update_filiere_keywords(
 # ─── Simulation de filière (document 8 — 1.5) ─────────────────────────────
 
 from schemas.referentials import FiliereSimulationInput, FiliereSimulationResult
-from services.filiere_simulator import simulate_filiere_matching
+from services.filiere_simulator import FiliereSimulationError, simulate_filiere_matching
 
 
 @router.post("/filieres/simulate", response_model=FiliereSimulationResult)
@@ -148,7 +148,10 @@ async def simulate_filiere(
     admin: Administrator = Depends(get_current_admin),
 ) -> FiliereSimulationResult:
     """Simule l'impact d'une liste de mots-clés candidats SANS modifier la base."""
-    result = simulate_filiere_matching(db, payload.filiere_code, payload.keywords)
+    try:
+        result = simulate_filiere_matching(db, payload.filiere_code, payload.keywords)
+    except FiliereSimulationError as exc:
+        raise HTTPException(status_code=exc.status_code, detail=exc.message) from exc
     return FiliereSimulationResult(**result)
 
 # ─── Spécialités ────────────────────────────────────────

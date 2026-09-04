@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import secrets
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -74,7 +74,7 @@ def _as_aware(value: datetime | None) -> datetime | None:
 
     if value is None or value.tzinfo is not None:
         return value
-    return value.replace(tzinfo=timezone.utc)
+    return value.replace(tzinfo=UTC)
 
 
 def generate_raw_token() -> str:
@@ -95,7 +95,7 @@ def revoke_active_tokens(
     Retourne le nombre de tokens revoques.
     """
 
-    effective_now = now or datetime.now(timezone.utc)
+    effective_now = now or datetime.now(UTC)
     tokens = db.scalars(
         select(SubscriberToken).where(
             SubscriberToken.subscriber_id == subscriber_id,
@@ -132,7 +132,7 @@ def issue_token(
 
     raw_token = generate_raw_token()
     expires_at = (
-        datetime.now(timezone.utc) + timedelta(hours=resolved_ttl) if resolved_ttl and resolved_ttl > 0 else None
+        datetime.now(UTC) + timedelta(hours=resolved_ttl) if resolved_ttl and resolved_ttl > 0 else None
     )
 
     token = SubscriberToken(
@@ -195,7 +195,7 @@ def validate_token(
     un token deja `used`.
     """
 
-    effective_now = now or datetime.now(timezone.utc)
+    effective_now = now or datetime.now(UTC)
     token = get_token_by_raw_value(db, raw_token, purpose=purpose)
     expires_at = _as_aware(token.expires_at)
 
@@ -211,7 +211,7 @@ def validate_token(
 def mark_token_used(db: Session, token: SubscriberToken, *, now: datetime | None = None) -> None:
     """Marque un token comme consomme (usage unique)."""
 
-    token.used_at = now or datetime.now(timezone.utc)
+    token.used_at = now or datetime.now(UTC)
 
 
 __all__ = [

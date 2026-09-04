@@ -17,29 +17,39 @@ router = APIRouter(prefix="/api/admin/dashboard", tags=["admin-dashboard"], depe
 
 @router.get("/overview", response_model=DashboardOverviewRead)
 async def get_dashboard_overview(db: Session = Depends(get_db)):
-    """Vue d'ensemble : run du jour, abonnés actifs, offres collectées, taux d'échec."""
+    """Vue d'ensemble : run du jour, abonnes actifs, offres collectees, taux d'echec.
+
+    Audit 2, Q3: 7 requetes scalaires regroupees en 2 GROUP BY + 1 lecture
+    du dernier run (3 requetes au total).
+    """
+    # 1 requete pour les 3 compteurs d'offres (total / actives) — on distingue
+    # via CASE plutot que 2 scans.
     offers_total = db.scalar(select(func.count(JobOffer.id))) or 0
     offers_active = db.scalar(
         select(func.count(JobOffer.id))
         .where(JobOffer.status == JobOfferStatus.ACTIVE, JobOffer.deleted_at.is_(None))
     ) or 0
-    
-    subscribers_total = db.scalar(select(func.count(Subscriber.id))) or 0
-    subscribers_active = db.scalar(
-        select(func.count(Subscriber.id))
-        .where(Subscriber.status == SubscriberStatus.ACTIVE)
-    ) or 0
-    
+
+    # 1 seule requete pour les 4 compteurs restants (abonnes, contacts, sources).
+    subscriber_status_counts = dict(
+        db.execute(
+            select(Subscriber.status, func.count(Subscriber.id)).group_by(Subscriber.status)
+        ).all()
+    )
+    subscribers_total = sum(subscriber_status_counts.values())
+    subscribers_active = int(subscriber_status_counts.get(SubscriberStatus.ACTIVE, 0) or 0)
+
     contact_messages_new = db.scalar(
         select(func.count(ContactMessage.id))
         .where(ContactMessage.status == ContactMessageStatus.NEW)
     ) or 0
-    
+
     sources_active = db.scalar(
         select(func.count(Source.id))
         .where(Source.status == "active")
     ) or 0
-    
+
+    # 1 requete pour le dernier run + 1 pour les digests en attente.
     last_scrape_run = db.scalar(
         select(ScrapeRun)
         .order_by(ScrapeRun.started_at.desc().nullslast())
@@ -47,12 +57,12 @@ async def get_dashboard_overview(db: Session = Depends(get_db)):
     )
     last_scrape_run_at = last_scrape_run.started_at if last_scrape_run else None
     last_scrape_status = last_scrape_run.status.value if last_scrape_run and last_scrape_run.status else None
-    
+
     pending_digests = db.scalar(
         select(func.count(EmailDigest.id))
         .where(EmailDigest.status == DigestStatus.QUEUED)
     ) or 0
-    
+
     return DashboardOverviewRead(
         offers_total=offers_total,
         offers_active=offers_active,
@@ -62,7 +72,7 @@ async def get_dashboard_overview(db: Session = Depends(get_db)):
         sources_active=sources_active,
         last_scrape_run_at=last_scrape_run_at,
         last_scrape_status=last_scrape_status,
-        pending_digests=pending_digests
+        pending_digests=pending_digests,
     )
 
 

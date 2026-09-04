@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -20,7 +20,7 @@ from schemas.subscriptions import SubscriberCreate
 from services.email.email_provider import EmailMessage, EmailProviderProtocol, EmailSendResult
 from services.email.rate_limit import RateLimitDecision, check_resend_quota
 from services.email.templates import build_confirmation_context, render_confirmation_email
-from services.subscriptions import create_subscriber
+from services.subscriptions import CreatedToken, create_subscriber
 from services.token_service import (
     TokenAlreadyUsedError,
     TokenExpiredError,
@@ -118,6 +118,9 @@ class SubscriptionRegistration:
     requires_confirmation: bool
     message: str | None
     pending: PendingConfirmationEmail | None = None
+    # Audit P1 #21: la valeur brute du MANAGE_ALERT est exposee pour que
+    # l'appelant puisse batir /preferences/{token}.
+    manage_alert_token: CreatedToken | None = None
 
 
 @dataclass(slots=True)
@@ -298,7 +301,7 @@ def send_confirmation_email_now(
     )
 
     if result.success:
-        subscriber.last_email_sent_at = datetime.now(timezone.utc)
+        subscriber.last_email_sent_at = datetime.now(UTC)
 
     _record_attempt(db, event, result)
     return result
@@ -339,11 +342,18 @@ def register_subscriber(
         )
 
     confirmation_required = resolved.email_confirmation_required and not already_confirmed
-    subscriber = create_subscriber(db, payload, confirmation_required=confirmation_required)
+    subscriber, manage_alert_token = create_subscriber(
+        db, payload, confirmation_required=confirmation_required
+    )
 
     if not confirmation_required:
         message = MESSAGE_ALREADY_CONFIRMED if already_confirmed else None
-        return SubscriptionRegistration(subscriber=subscriber, requires_confirmation=False, message=message)
+        return SubscriptionRegistration(
+            subscriber=subscriber,
+            requires_confirmation=False,
+            message=message,
+            manage_alert_token=manage_alert_token,
+        )
 
     purpose = (
         TransactionalEmailPurpose.RESEND_CONFIRMATION
@@ -360,6 +370,7 @@ def register_subscriber(
         requires_confirmation=True,
         message=message,
         pending=pending,
+        manage_alert_token=manage_alert_token,
     )
 
 
@@ -397,7 +408,7 @@ def confirm_email(db: Session, raw_token: str) -> ConfirmationOutcome:
     if subscriber.status in (SubscriberStatus.BOUNCED, SubscriberStatus.DELETED):
         raise SubscriptionRefusedError("Ce compte ne peut pas être confirmé. Contactez le support.")
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     mark_token_used(db, token, now=now)
     if subscriber.confirmed_at is None:
         subscriber.confirmed_at = now
@@ -469,15 +480,15 @@ def resend_confirmation(
 
 
 __all__ = [
-    "ConfirmationOutcome",
-    "EmailConfirmationError",
-    "ExpiredConfirmationTokenError",
-    "InvalidConfirmationTokenError",
     "MESSAGE_ALREADY_CONFIRMED",
     "MESSAGE_CONFIRMATION_RESENT",
     "MESSAGE_CONFIRMATION_SENT",
     "MESSAGE_CONFIRMED",
     "MESSAGE_GENERIC_RESEND",
+    "ConfirmationOutcome",
+    "EmailConfirmationError",
+    "ExpiredConfirmationTokenError",
+    "InvalidConfirmationTokenError",
     "PendingConfirmationEmail",
     "ResendOutcome",
     "ResendRateLimitedError",

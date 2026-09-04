@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from dataclasses import dataclass
+from datetime import UTC, datetime
 from secrets import token_urlsafe
 
 from sqlalchemy import select
@@ -20,6 +21,15 @@ from models import (
 )
 from schemas.subscriptions import SubscriberCreate
 from services.normalization import normalize_text, token_hash
+
+
+@dataclass(slots=True)
+class CreatedToken:
+    """Valeur brute d'un token emis (pour permettre a l'appelant de
+    construire l'URL /preferences/{token})."""
+
+    purpose: TokenPurpose
+    raw_token: str
 
 
 def _lookup_by_code_or_label(db: Session, model, value: str | None):
@@ -98,32 +108,19 @@ def create_subscriber(
     payload: SubscriberCreate,
     *,
     confirmation_required: bool | None = None,
-) -> Subscriber:
+) -> tuple[Subscriber, CreatedToken | None]:
     """Cree ou remet a jour un abonne.
 
-    Les emails sont dedoublonnes en minuscule. Les preferences sont remplacees
-    a chaque inscription pour que le formulaire puisse servir aussi de mise a
-    jour simple.
-
-    `confirmation_required` (defaut: `EMAIL_CONFIRMATION_REQUIRED`) pilote le
-    statut final:
-    - `True`  -> l'abonne reste/passe `pending`, `confirmed_at` reste null et
-      l'appelant doit emettre un token + envoyer l'email
-      (cf. services/email_confirmation_service.py);
-    - `False` -> l'abonne est directement `active` avec `confirmed_at = now`
-      (mode pratique en dev/test).
-
-    Le token `confirm_email` n'est plus emis ici: sa valeur brute doit etre
-    retournee a l'appelant pour construire le lien de l'email, ce que fait
-    `services.token_service.issue_confirmation_token`.
+    Renvoie `(subscriber, manage_alert_token)` : la valeur brute du token
+    MANAGE_ALERT est exposee a l'appelant pour qu'il puisse construire
+    l'URL /preferences/{token} (audit P1 #21).
     """
-
     settings = get_settings()
     if confirmation_required is None:
         confirmation_required = settings.email_confirmation_required
 
     email_normalized = payload.email.strip().lower()
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     subscriber = db.scalar(select(Subscriber).where(Subscriber.email_normalized == email_normalized))
 
     if subscriber is None:
@@ -135,7 +132,6 @@ def create_subscriber(
         )
         db.add(subscriber)
     elif subscriber.deleted_at is not None:
-        # Soft delete annule: on repart comme pour un nouvel email.
         subscriber.deleted_at = None
         subscriber.confirmed_at = None
 
@@ -169,9 +165,6 @@ def create_subscriber(
             raise ValueError(f"Filiere inconnue: {filiere_code}")
         filiere_ids_with_priority.append((filiere.id, index))
 
-    # Remplacement sur (delete -> flush -> insert): aucune violation possible
-    # des contraintes UNIQUE(subscriber_id, priority) et UNIQUE(subscriber_id,
-    # filiere_id), meme quand les memes filieres sont re-soumises.
     replace_subscriber_filieres(db, subscriber=subscriber, filiere_ids_with_priority=filiere_ids_with_priority)
 
     contract_type_ids: list[str] = []
@@ -181,16 +174,24 @@ def create_subscriber(
             contract_type_ids.append(contract_type.id)
     replace_subscriber_contract_preferences(db, subscriber=subscriber, contract_type_ids=contract_type_ids)
 
-    # Token de gestion des preferences: un seul actif par abonne.
+    # Audit P1 #21: token MANAGE_ALERT, valeur brute retournee a l'appelant.
     existing_purposes = {token.purpose for token in subscriber.tokens if token.revoked_at is None}
+    manage_alert_raw: str | None = None
     if TokenPurpose.MANAGE_ALERT not in existing_purposes:
+        manage_alert_raw = token_urlsafe(32)
         subscriber.tokens.append(
             SubscriberToken(
                 purpose=TokenPurpose.MANAGE_ALERT,
-                token_hash=token_hash(token_urlsafe(32)),
+                token_hash=token_hash(manage_alert_raw),
             )
         )
 
     db.commit()
     db.refresh(subscriber)
-    return subscriber
+
+    manage_alert_token = (
+        CreatedToken(purpose=TokenPurpose.MANAGE_ALERT, raw_token=manage_alert_raw)
+        if manage_alert_raw
+        else None
+    )
+    return subscriber, manage_alert_token

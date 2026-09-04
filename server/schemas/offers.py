@@ -124,12 +124,12 @@ JobOfferStatusLiteral = Literal[
     "expired",
     "filled",
     "archived",
+    "en_relecture",
     "duplicate",
     "hidden",
     "brut",
     "ai_processing",
     "pending_review",
-    "brute",
     "processing",
     "rejected",
 ]

@@ -7,7 +7,6 @@ n'a besoin que d'un resume (top, recherche globale...).
 """
 
 from datetime import datetime
-from typing import Optional
 
 from pydantic import BaseModel, Field
 
@@ -17,7 +16,7 @@ class CompanySummary(BaseModel):
 
     id: str
     name: str
-    slug: Optional[str] = None
+    slug: str | None = None
 
 
 class OfferSummaryRead(BaseModel):
@@ -35,9 +34,9 @@ class OfferSummaryRead(BaseModel):
     visible_site: bool
     view_count: int
     save_count: int
-    published_at: Optional[datetime] = None
+    published_at: datetime | None = None
     company: CompanySummary
-    primary_filiere_id: Optional[str] = None
+    primary_filiere_id: str | None = None
 
 
 class SearchResultsRead(BaseModel):
@@ -50,8 +49,8 @@ class SearchResultsRead(BaseModel):
     query: str = Field(description="La chaine recherchee, renvoyee telle quelle pour echo cote UI")
     per_type_limit: int = Field(description="Le plafond applique a chaque groupe")
     offers: list[OfferSummaryRead] = Field(default_factory=list)
-    subscribers: list["SubscriberSummaryRead"] = Field(default_factory=list)
-    companies: list["CompanySummary"] = Field(default_factory=list)
+    subscribers: list[SubscriberSummaryRead] = Field(default_factory=list)
+    companies: list[CompanySummary] = Field(default_factory=list)
 
 
 class SubscriberSummaryRead(BaseModel):
@@ -59,9 +58,9 @@ class SubscriberSummaryRead(BaseModel):
 
     id: str
     email: str
-    full_name: Optional[str] = None
+    full_name: str | None = None
     status: str
-    city: Optional[str] = None
+    city: str | None = None
 
 
 __all__ = [

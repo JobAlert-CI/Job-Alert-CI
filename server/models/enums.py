@@ -19,6 +19,14 @@ class ScrapeRunStatus(StrEnum):
 
 
 class JobOfferStatus(StrEnum):
+    """Statuts possibles d'une offre d'emploi.
+
+    Note: les valeurs ``brut`` et ``brute`` designent historiquement le
+    meme etat ("donnees brutes pre-AI"). La valeur canonique est ``brut``.
+    Les anciens enregistrements ``brute`` ou ``legacy_brute`` sont migres
+    en ``brut`` par la migration 0010 (cf. audit P0 #3).
+    """
+
     ACTIVE = "active"
     EXPIRED = "expired"
     FILLED = "filled"
@@ -27,8 +35,6 @@ class JobOfferStatus(StrEnum):
     DUPLICATE = "duplicate"
     HIDDEN = "hidden"
     BRUT = "brut"
-    BRUTE = "brut"
-    LEGACY_BRUTE = "brute"
     AI_PROCESSING = "ai_processing"
     PENDING_REVIEW = "pending_review"
     PROCESSING = "processing"
@@ -152,6 +158,8 @@ class TokenPurpose(StrEnum):
     CONFIRM_EMAIL = "confirm_email"
     MANAGE_ALERT = "manage_alert"
     UNSUBSCRIBE = "unsubscribe"
+    ADMIN_REFRESH = "admin_refresh"
+    RESET_PASSWORD = "reset_password"
 
 
 class DigestStatus(StrEnum):
@@ -177,6 +185,7 @@ class TransactionalEmailPurpose(StrEnum):
     RESEND_CONFIRMATION = "resend_confirmation"
     MANAGE_ALERT = "manage_alert"
     UNSUBSCRIBE = "unsubscribe"
+    RESET_PASSWORD = "reset_password"
 
 
 class TransactionalEmailStatus(StrEnum):

@@ -1,8 +1,5 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
-from typing import Optional
-
 from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
 
@@ -32,7 +29,7 @@ def top_viewed_offers(
     *,
     days: int = 7,
     limit: int = 10,
-    include_statuses: Optional[list[str]] = None,
+    include_statuses: list[str] | None = None,
 ) -> list[OfferSummaryRead]:
     """Top N offres par `view_count` sur une fenetre temporelle.
 
@@ -155,4 +152,4 @@ def _to_subscriber_summary(subscriber: Subscriber) -> SubscriberSummaryRead:
     )
 
 
-__all__ = ["top_viewed_offers", "global_search"]
+__all__ = ["global_search", "top_viewed_offers"]

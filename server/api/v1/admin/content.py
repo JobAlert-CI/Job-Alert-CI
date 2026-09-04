@@ -1,8 +1,7 @@
 # Crée schema ContentPageCreate et ContentPageUpdate
 from __future__ import annotations
 
-from datetime import datetime, timezone
-from typing import Optional
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import select
@@ -47,6 +46,7 @@ from schemas.editorial import (
 )
 from services.audit import log_admin_action
 from services.normalization import slugify
+from services.search_utils import safe_ilike
 
 # Le contenu editorial (articles, pages, FAQ) est pilote par les moderateurs.
 router = APIRouter(
@@ -110,9 +110,9 @@ def _require_article(db: Session, article_id: str) -> Article:
 @router.get("/articles", response_model=list[ArticleListItem])
 async def list_articles_admin(
     db: Session = Depends(get_db),
-    status: Optional[str] = None,
-    category_id: Optional[str] = None,
-    q: Optional[str] = None,
+    status: str | None = None,
+    category_id: str | None = None,
+    q: str | None = None,
     limit: int = Query(20, ge=1, le=100),
     offset: int = Query(0, ge=0),
 ):
@@ -122,7 +122,7 @@ async def list_articles_admin(
     if category_id:
         stmt = stmt.where(Article.category_id == category_id)
     if q:
-        stmt = stmt.where(ContentPage.title.ilike(f"%{q}%"))
+            stmt = stmt.where(safe_ilike(ContentPage.title, q))
     stmt = stmt.order_by(ContentPage.published_at.desc().nullslast(), ContentPage.created_at.desc())
     articles = db.scalars(stmt.limit(limit).offset(offset)).unique()
     return [_build_article_item(a) for a in articles]
@@ -203,7 +203,7 @@ async def update_article_status(
     article = _require_article(db, article_id)
     article.content_page.status = ContentStatus(payload.status)
     if payload.status == "published" and article.content_page.published_at is None:
-        article.content_page.published_at = datetime.now(timezone.utc)
+        article.content_page.published_at = datetime.now(UTC)
     article.content_page.updated_by_admin_id = admin.id
 
     log_admin_action(
@@ -237,7 +237,7 @@ async def toggle_article_featured(
 @router.delete("/articles/{article_id}", status_code=204)
 async def delete_article(article_id: str, db: Session = Depends(get_db), admin: Administrator = Depends(get_current_admin)):
     article = _require_article(db, article_id)
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     article.deleted_at = now
     article.content_page.deleted_at = now
     log_admin_action(db, admin_id=admin.id, action=AdminAction.DELETE, target_table="articles", target_id=article_id)
@@ -564,6 +564,6 @@ async def delete_page(page_id: str, db: Session = Depends(get_db), admin: Admini
     page = db.get(ContentPage, page_id)
     if not page:
         raise HTTPException(status_code=404, detail="Page introuvable")
-    page.deleted_at = datetime.now(timezone.utc)
+    page.deleted_at = datetime.now(UTC)
     log_admin_action(db, admin_id=admin.id, action=AdminAction.DELETE, target_table="content_pages", target_id=page_id)
     db.commit()

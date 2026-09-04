@@ -66,9 +66,15 @@ def session_scope() -> Iterator[Session]:
 
 
 def init_db() -> None:
+    import models  # noqa: F401  (side-effect: enregistre les tables dans Base.metadata)
     from db.base import Base
-    import models  # noqa: F401
 
+    settings = get_settings()
+    # Audit P1 #22: defense en profondeur, on refuse drop_all en prod.
+    if settings.is_production:
+        raise RuntimeError(
+            "init_db() refuse de dropper en production. "
+            "Utilisez Alembic (alembic upgrade head)."
+        )
     Base.metadata.drop_all(bind=engine)
-
     Base.metadata.create_all(bind=engine)

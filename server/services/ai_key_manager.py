@@ -3,13 +3,13 @@ from __future__ import annotations
 import random
 import time
 from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 from sqlalchemy import nullsfirst, or_, select
 from sqlalchemy.orm import Session
 
-from models import AIApiKey, AIAlert
+from models import AIAlert, AIApiKey
 from models.enums import AIAlertSeverity, AIErrorType, AIProviderType
 from services.ai_crypto import decrypt_api_key
 from services.ai_errors import (
@@ -34,7 +34,7 @@ class AIProviderExecutionResult:
 
 
 def utc_now() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 def select_available_api_keys(db: Session, *, now: datetime | None = None, limit: int | None = None) -> list[AIApiKey]:

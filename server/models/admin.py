@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, JSON, String, Text, func
+from sqlalchemy import JSON, Boolean, DateTime, ForeignKey, String, Text, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from db.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
@@ -22,8 +22,9 @@ class Administrator(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     last_login_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
-    offers: Mapped[list["JobOffer"]] = relationship(back_populates="admin")
-    content_pages: Mapped[list["ContentPage"]] = relationship(back_populates="updated_by_admin")
+    # Forward-refs resolues par le registre ORM (pas d import explicite: cycle).
+    offers: Mapped[list["JobOffer"]] = relationship(back_populates="admin")  # noqa: F821
+    content_pages: Mapped[list["ContentPage"]] = relationship(back_populates="updated_by_admin")  # noqa: F821
 
 
 class AdminActionLog(UUIDPrimaryKeyMixin, Base):
@@ -36,7 +37,7 @@ class AdminActionLog(UUIDPrimaryKeyMixin, Base):
     details: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False, index=True)
 
-    admin: Mapped["Administrator"] = relationship()
+    admin: Mapped[Administrator] = relationship()
 
 
 class SiteSetting(Base):
@@ -49,3 +50,24 @@ class SiteSetting(Base):
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
     )
     updated_by_admin_id: Mapped[str | None] = mapped_column(ForeignKey("administrators.id", ondelete="SET NULL"), nullable=True)
+
+
+class AdminRefreshToken(Base):
+    """Refresh tokens JWT admin (audit #13: rotation effective).
+
+    On persiste le hash SHA-256 du token brut (jamais le brut). Quand un refresh
+    est consomme, on le marque `used_at`; tout reuse detecte -> revocation
+    immediate de TOUTE la famille de refresh de cet admin.
+    """
+
+    __tablename__ = "admin_refresh_tokens"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    admin_id: Mapped[str] = mapped_column(ForeignKey("administrators.id", ondelete="CASCADE"), nullable=False, index=True)
+    token_hash: Mapped[str] = mapped_column(String(128), unique=True, nullable=False, index=True)
+    used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    revoked_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+
+    admin: Mapped[Administrator] = relationship()

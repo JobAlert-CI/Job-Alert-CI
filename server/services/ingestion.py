@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from zoneinfo import ZoneInfo
 
 from sqlalchemy import func, or_, select
@@ -64,7 +64,7 @@ def compute_offer_hash(
 
 
 def _now() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 def _abidjan_date() -> datetime.date:
@@ -114,7 +114,7 @@ def _unique_slug(db: Session, model, value: str, *, current_id: str | None = Non
             stmt = stmt.where(model.id != current_id)
         if db.scalar(stmt) is None:
             return candidate
-        digest = hashlib.sha1(f"{base}|{suffix}".encode("utf-8")).hexdigest()[:6]
+        digest = hashlib.sha1(f"{base}|{suffix}".encode()).hexdigest()[:6]
         candidate = f"{base}-{digest}"[:max_length]
         suffix += 1
 
@@ -218,6 +218,10 @@ def ingest_offer_batch(db: Session, payload: IngestBatchCreate) -> IngestBatchSu
             canonical_url=canonical_url,
         )
 
+        # Audit 2, Q4 (heritage P1 #16): SAVEPOINT par offre. Un doublon en
+        # fin de batch n'annule plus tout le batch — on journalise l'offre
+        # fautive (FAILED) et on continue.
+        nested = db.begin_nested()
         try:
             company = _get_or_create_company(db, item.company_name)
             filiere = _resolve_optional_code(db, Filiere, item.filiere_code, "Filiere")
@@ -240,6 +244,8 @@ def ingest_offer_batch(db: Session, payload: IngestBatchCreate) -> IngestBatchSu
                     reason="hash_unique_or_source_reference_exists",
                     raw_payload=raw_payload,
                 )
+                # Le SAVEPOINT doit etre cloture AVANT le continue.
+                nested.commit()
                 continue
 
             offer = JobOffer(
@@ -297,7 +303,9 @@ def ingest_offer_batch(db: Session, payload: IngestBatchCreate) -> IngestBatchSu
                 raw_url=source_url,
                 raw_payload=raw_payload,
             )
+            nested.commit()
         except IngestionError as exc:
+            nested.rollback()
             invalid += 1
             _event(
                 db,
@@ -309,9 +317,25 @@ def ingest_offer_batch(db: Session, payload: IngestBatchCreate) -> IngestBatchSu
                 raw_payload=raw_payload,
             )
         except IntegrityError as exc:
-            db.rollback()
-            raise exc
+            # Audit 2, Q4: le SAVEPOINT absorbe l'erreur d'integrite — le
+            # reste du batch (et le scrape_run lui-meme) restent intacts.
+            nested.rollback()
+            errors += 1
+            logger.warning(
+                "IntegrityError sur une offre du batch (isolee, batch preserve)",
+                extra={"source_code": source.code, "batch_id": str(payload.batch_id), "hash": hash_unique},
+            )
+            _event(
+                db,
+                source_run=source_run,
+                action=IngestionAction.FAILED,
+                hash_unique=hash_unique,
+                raw_url=source_url,
+                reason=f"integrity_error: {str(exc.orig)[:200]}",
+                raw_payload=raw_payload,
+            )
         except Exception as exc:
+            nested.rollback()
             errors += 1
             logger.exception("Erreur ingestion offre", extra={"source_code": source.code, "batch_id": str(payload.batch_id)})
             _event(

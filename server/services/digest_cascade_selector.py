@@ -34,7 +34,7 @@ par defaut, ou `<Tmax>_INSUFFICIENT` si `max_tier` plafonne).
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import TYPE_CHECKING
 
 from sqlalchemy import and_, exists, or_, select
@@ -42,28 +42,23 @@ from sqlalchemy.orm import Session
 
 from core.config import Settings, get_settings
 from models import (
-    ContractType,
-    EmailDigest,
-    EmailDigestOffer,
-    ExperienceLevel,
     JobOffer,
-    JobOfferStatus,
     Location,
     OfferFiliere,
     Subscriber,
 )
 from services.digest_builder_service import (
+    _build_scoring_context,
+    _freshness_window,
     _hard_filter_conditions,
     _resolve_city,
-    _freshness_window,
-    select_candidate_offers,
     is_subscriber_eligible,
-    _build_scoring_context,
+    select_candidate_offers,
 )
 from services.scoring_service import compute_offer_score, rank_offers
 
 if TYPE_CHECKING:
-    from services.city_matching_service import CityResolution
+    pass
 
 # Ordre canonique des paliers (chaque entree = nom + fonction qui produit
 # le match_kind de l'offre selon ce palier). Le selector les tente dans
@@ -131,7 +126,7 @@ def select_with_cascade(
             break
         last_tier_tried = tier
         offers, kinds = _select_for_tier(db, subscriber, tier=tier, settings=resolved)
-        for offer, kind in zip(offers, kinds):
+        for offer, kind in zip(offers, kinds, strict=False):
             if offer.id not in accumulated:
                 accumulated[offer.id] = kind
         # On s'arrete des qu'on a assez d'offres.
@@ -181,7 +176,7 @@ def _rank_offers(
         return []
     resolution = _resolve_city(db, subscriber)
     context = _build_scoring_context(subscriber, resolution)
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     scored = [(offer, compute_offer_score(offer, context, now)) for offer in offers]
     return rank_offers(scored)
 
@@ -310,13 +305,13 @@ def _select_with_relaxed_freshness(
     settings: Settings,
 ) -> tuple[list[JobOffer], list[str]]:
     """Tier T3: on elargit la fenetre de fraÃƒÂ®cheur."""
-    from datetime import datetime, timedelta, timezone
+    from datetime import datetime, timedelta
     resolution = _resolve_city(db, subscriber)
-    window_start = _freshness_window(db, subscriber) or datetime.now(timezone.utc)
+    window_start = _freshness_window(db, subscriber) or datetime.now(UTC)
     # On elargit: max(window_start, now - N jours).
     new_window = min(
         window_start,
-        datetime.now(timezone.utc) - timedelta(days=settings.digest_cascade_freshness_days),
+        datetime.now(UTC) - timedelta(days=settings.digest_cascade_freshness_days),
     )
     conditions = _hard_filter_conditions(
         db,
@@ -340,6 +335,7 @@ def _select_with_relaxed_experience(
     # On construit des conditions hard avec un settings "virtuel" a tolerance x2.
     # Le plus simple: on elargit les bornes en SQL directement.
     from sqlalchemy import and_, or_
+
     from models import ExperienceLevel as EL
     resolution = _resolve_city(db, subscriber)
     window_start = _freshness_window(db, subscriber)

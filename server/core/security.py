@@ -96,7 +96,7 @@ def decode_token(token: str, *, expected_type: str | None = None) -> TokenPayloa
     expected_signature = _sign(signing_input, settings.admin_jwt_secret)
     try:
         provided_signature = _b64url_decode(signature_b64)
-    except Exception as exc:  # noqa: BLE001 - base64 errors vary
+    except Exception as exc:
         raise TokenError("Signature illisible") from exc
 
     if not hmac.compare_digest(expected_signature, provided_signature):
@@ -104,7 +104,7 @@ def decode_token(token: str, *, expected_type: str | None = None) -> TokenPayloa
 
     try:
         payload = json.loads(_b64url_decode(payload_b64))
-    except Exception as exc:  # noqa: BLE001
+    except Exception as exc:
         raise TokenError("Payload illisible") from exc
 
     if int(payload.get("exp", 0)) < int(time.time()):

@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import Optional
-
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
@@ -26,16 +24,16 @@ router = APIRouter(
 def list_transactional_emails(
     db: Session = Depends(get_db),
     _: object = Depends(get_current_admin),
-    purpose: Optional[TransactionalEmailPurpose] = Query(
+    purpose: TransactionalEmailPurpose | None = Query(
         None, description="Filtrer par motif (confirm_email, resend_confirmation, manage_alert, unsubscribe)"
     ),
-    status: Optional[TransactionalEmailStatus] = Query(
+    status: TransactionalEmailStatus | None = Query(
         None, description="Filtrer par statut (queued, sent, failed)"
     ),
-    to_email: Optional[str] = Query(
+    to_email: str | None = Query(
         None, description="Filtre exact (ou ilike si prefixe %) sur l'adresse destinataire"
     ),
-    subscriber_id: Optional[str] = Query(None, description="Limiter aux events d'un abonne"),
+    subscriber_id: str | None = Query(None, description="Limiter aux events d'un abonne"),
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
 ):
@@ -66,8 +64,8 @@ def list_transactional_emails(
 def count_transactional_emails(
     db: Session = Depends(get_db),
     _: object = Depends(get_current_admin),
-    status: Optional[TransactionalEmailStatus] = Query(None, description="Filtrer par statut"),
-    purpose: Optional[TransactionalEmailPurpose] = Query(None, description="Filtrer par motif"),
+    status: TransactionalEmailStatus | None = Query(None, description="Filtrer par statut"),
+    purpose: TransactionalEmailPurpose | None = Query(None, description="Filtrer par motif"),
 ):
     """Compte rapide du nombre d'evenements, utile pour le tableau de bord.
 

@@ -7,7 +7,6 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from schemas.base import TimestampRead
 
-
 # ─── Catégories ─────────────────────────────────────────
 
 class ArticleCategoryRead(TimestampRead):

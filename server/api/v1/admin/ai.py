@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from api.deps import get_current_admin, get_db, require_roles
-from models import AIApiKey, AIAlert, AIJob, AiProcessingJob
+from models import AIAlert, AIApiKey, AIJob, AiProcessingJob
 from models.admin import AdminAction, Administrator
 from models.enums import AIAlertSeverity, AiProcessingJobStatus, AiProcessingJobTrigger
 from schemas.ai import (
@@ -93,6 +93,26 @@ def update_ai_key(
     item = _require_key(db, key_id)
     data = payload.model_dump(exclude_unset=True)
     api_key = data.pop("api_key", None)
+
+    # Audit P1 #29: empecher la desactivation de la derniere cle IA active.
+    will_be_inactive = (
+        ("is_active" in data and data["is_active"] is False)
+        or ("max_concurrent_requests" in data and data["max_concurrent_requests"] == 0)
+    )
+    if will_be_inactive:
+        other_active_count = db.scalar(
+            select(func.count(AIApiKey.id)).where(
+                AIApiKey.id != item.id,
+                AIApiKey.is_active.is_(True),
+                AIApiKey.deleted_at.is_(None),
+            )
+        )
+        if (other_active_count or 0) == 0:
+            raise HTTPException(
+                status_code=400,
+                detail="Impossible de desactiver la derniere cle IA active.",
+            )
+
     for field_name, value in data.items():
         setattr(item, field_name, value)
     if api_key is not None:
@@ -118,7 +138,23 @@ def delete_ai_key(
     admin: Administrator = Depends(get_current_admin),
 ):
     item = _require_key(db, key_id)
-    item.deleted_at = datetime.now(timezone.utc)
+
+    # Audit P1 #29: ne pas supprimer la derniere cle active.
+    if item.is_active:
+        other_active_count = db.scalar(
+            select(func.count(AIApiKey.id)).where(
+                AIApiKey.id != item.id,
+                AIApiKey.is_active.is_(True),
+                AIApiKey.deleted_at.is_(None),
+            )
+        )
+        if (other_active_count or 0) == 0:
+            raise HTTPException(
+                status_code=400,
+                detail="Impossible de supprimer la derniere cle IA active.",
+            )
+
+    item.deleted_at = datetime.now(UTC)
     item.is_active = False
     log_admin_action(db, admin_id=admin.id, action=AdminAction.DELETE, target_table="ai_api_keys", target_id=item.id)
     db.commit()
@@ -132,7 +168,7 @@ def test_ai_key(key_id: str, db: Session = Depends(get_db)):
         result = provider.test_connection()
         return AITestConnectionRead(ok=bool(result.get("ok")), provider=result.get("provider"), model=result.get("model"))
     except AIProviderError as exc:
-        item.last_error_at = datetime.now(timezone.utc)
+        item.last_error_at = datetime.now(UTC)
         db.commit()
         return AITestConnectionRead(ok=False, message=str(exc))
 
@@ -211,7 +247,7 @@ def acknowledge_ai_alert(
     if alert is None:
         raise HTTPException(status_code=404, detail="Alerte IA introuvable")
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     if alert.acknowledged_at is None:
         alert.acknowledged_at = now
         alert.acknowledged_by_admin_id = admin.id

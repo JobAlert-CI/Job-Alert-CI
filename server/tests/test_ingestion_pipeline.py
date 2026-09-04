@@ -134,7 +134,7 @@ def test_valid_offer_is_inserted_as_brute_and_triggers_ai_job(client, db_session
 
     offer = db_session.scalar(select(JobOffer))
     assert offer is not None
-    assert offer.status == JobOfferStatus.BRUTE
+    assert offer.status == JobOfferStatus.BRUT
     assert offer.visible_site is False
     assert offer.ai_status == AiOfferStatus.PENDING
     assert offer.source_scrape_run_id is not None
@@ -257,7 +257,7 @@ def test_noop_ai_job_activates_valid_brute_offer(db_session, monkeypatch):
         company_id=company.id,
         source_id=source.id,
         source_scrape_run_id=source_run.id,
-        status=JobOfferStatus.BRUTE,
+        status=JobOfferStatus.BRUT,
         visible_site=False,
         source_url="https://example.com/job",
         hash_unique="abc",
@@ -286,3 +286,64 @@ def test_noop_ai_job_activates_valid_brute_offer(db_session, monkeypatch):
     assert offer.status == JobOfferStatus.ACTIVE
     assert offer.visible_site is True
     assert offer.ai_status == AiOfferStatus.NOOP
+
+
+def test_integrity_error_on_one_offer_does_not_lose_the_batch(client, db_session, monkeypatch):
+    """Audit 2, Q4: un conflit d'integrite sur UNE offre n'annule plus le batch.
+
+    Scenario: 3 offres valides, mais la 2e se voit attribuer un `public_id`
+    deja pris (UNIQUE). Grace au SAVEPOINT par offre, les 2 autres sont
+    persistees et l'offre fautive est journalisee FAILED — le batch
+    n'explose plus en IntegrityError global.
+    """
+    import services.ingestion as ingestion_mod
+    from models.jobs import JobOffer as _JO
+
+    real_next_public_id = ingestion_mod._next_public_id
+    consumed = {"count": 0}
+
+    def fake_next_public_id(db):
+        consumed["count"] += 1
+        if consumed["count"] == 2:
+            # 2e offre du batch: on force un public_id deja occupe.
+            return 1
+        return real_next_public_id(db)
+
+    monkeypatch.setattr(ingestion_mod, "_next_public_id", fake_next_public_id)
+
+    now = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+    payload = {
+        "batch_id": str(uuid4()),
+        "source_code": "emploi-dakar",
+        "run_reference": "pytest-savepoint",
+        "scraped_at": now,
+        "offers": [
+            {"source_reference": "REF-OK-1", "title": "Valide Un",
+             "company_name": "Acme CI", "source_url": "https://example.com/ok-1",
+             "filiere_code": "tech-dev"},
+            {"source_reference": "REF-OK-2", "title": "Valide Deux",
+             "company_name": "Acme CI", "source_url": "https://example.com/ok-2",
+             "filiere_code": "tech-dev"},
+            {"source_reference": "REF-OK-3", "title": "Valide Trois",
+             "company_name": "Acme CI", "source_url": "https://example.com/ok-3",
+             "filiere_code": "tech-dev"},
+        ],
+    }
+
+    response = client.post("/api/ingest/offers", json=payload, headers={"X-Scraper-Token": "test-token"})
+    assert response.status_code == 201
+    summary = response.json()
+    assert summary["received"] == 3
+    assert summary["new"] == 2, "Les 2 offres valides doivent etre inserees"
+    assert summary["errors"] == 1, "L'offre en conflit doit etre comptee en erreur"
+
+    # Les deux offres non fautive sont bien en base.
+    refs = {
+        o.source_reference
+        for o in db_session.scalars(
+            select(_JO).where(_JO.source_reference.in_(["REF-OK-1", "REF-OK-2", "REF-OK-3"]))
+        ).all()
+    }
+    # Celle qui a eu le public_id en conflit depend de l'ordre du batch: on
+    # verifie simplement qu'au moins 2 des 3 ont survecu (le batch n'est pas perdu).
+    assert len(refs & {"REF-OK-1", "REF-OK-2", "REF-OK-3"}) >= 2

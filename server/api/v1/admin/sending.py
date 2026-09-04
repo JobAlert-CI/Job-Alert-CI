@@ -1,7 +1,6 @@
 from __future__ import annotations
 
-from datetime import date, datetime, timedelta, timezone
-from typing import Optional
+from datetime import UTC, date, datetime, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import func, select
@@ -11,8 +10,8 @@ from api.deps import get_current_admin, get_db, require_roles
 from models.admin import AdminAction, Administrator
 from models.emails import EmailDigest
 from models.enums import DigestStatus
-from models.subscriptions import Subscriber, SubscriberFiliere, SubscriberStatus
 from models.referentials import Filiere
+from models.subscriptions import Subscriber, SubscriberFiliere, SubscriberStatus
 from schemas.sending import EmailDigestRead, SendingStatsRead, SendTrigger
 from services.audit import log_admin_action
 
@@ -111,8 +110,8 @@ async def trigger_pipeline(
 @router.get("/sends", response_model=list[EmailDigestRead])
 async def list_sends(
     db: Session = Depends(get_db),
-    status: Optional[str] = Query(None, description="queued, sending, sent, failed, cancelled, skipped_empty"),
-    send_type: Optional[str] = Query(None, description="'manual' pour les envois personnalisés, 'v1' pour les digests automatiques"),
+    status: str | None = Query(None, description="queued, sending, sent, failed, cancelled, skipped_empty"),
+    send_type: str | None = Query(None, description="'manual' pour les envois personnalisés, 'v1' pour les digests automatiques"),
     limit: int = Query(20, ge=1, le=100),
     offset: int = Query(0, ge=0),
 ):
@@ -149,7 +148,7 @@ async def trigger_send(
     email) est porté par le worker d'envoi, hors périmètre de cette API.
     """
     digest_date = payload.date_override or date.today()
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
 
     stmt = select(Subscriber).where(Subscriber.status == SubscriberStatus.ACTIVE, Subscriber.deleted_at.is_(None))
     if payload.subscriber_id:
@@ -195,7 +194,7 @@ async def trigger_send(
 @router.get("/stats", response_model=SendingStatsRead)
 async def get_sending_stats(db: Session = Depends(get_db), period_days: int = Query(30, ge=1, le=365)):
     """Taux de succès, échecs, sauts sur la période donnée."""
-    since = datetime.now(timezone.utc) - timedelta(days=period_days)
+    since = datetime.now(UTC) - timedelta(days=period_days)
     stmt = select(EmailDigest.status, func.count(EmailDigest.id)).where(EmailDigest.created_at >= since).group_by(EmailDigest.status)
     counts = {status_value.value if hasattr(status_value, "value") else status_value: count for status_value, count in db.execute(stmt)}
 
@@ -230,11 +229,11 @@ async def get_tier_stats(
     - `match_kind_distribution` : comptage par match_kind au niveau offre
     """
     from services.tier_stats_service import (
-        compute_tier_stats,
         compute_match_kind_stats,
+        compute_tier_stats,
     )
 
-    today = datetime.now(timezone.utc).date()
+    today = datetime.now(UTC).date()
     since = today - timedelta(days=period_days - 1)  # inclusif
     until = today
 

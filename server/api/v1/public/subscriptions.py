@@ -1,11 +1,22 @@
 from __future__ import annotations
-from datetime import datetime, timezone
+
+from datetime import UTC, datetime
+
 from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
+
 from api.deps import get_db
-from models import ContractType, Filiere, Subscriber, SubscriberContractPreference, SubscriberFiliere, SubscriberStatus, SubscriberToken, TokenPurpose, UnsubscribeEvent
+from models import (
+    ContractType,
+    Filiere,
+    Subscriber,
+    SubscriberStatus,
+    SubscriberToken,
+    TokenPurpose,
+    UnsubscribeEvent,
+)
 from schemas.subscriptions import (
     EmailConfirmationResult,
     ResendConfirmationCreate,
@@ -16,35 +27,48 @@ from schemas.subscriptions import (
     SubscriptionCreateResponse,
 )
 from services.email_confirmation_service import (
-    EmailConfirmationError,
     MESSAGE_ALREADY_CONFIRMED,
     MESSAGE_CONFIRMED,
+    EmailConfirmationError,
     ResendRateLimitedError,
     confirm_email,
     dispatch_confirmation_email,
     register_subscriber,
     resend_confirmation,
 )
-from services.normalization import token_hash
+from services.rate_limit import check_ip_rate_limit
 
 router = APIRouter(prefix="/api/subscriptions", tags=["subscriptions"])
 
 
 def _get_subscriber_by_token(db: Session, raw_token: str, purpose: TokenPurpose) -> tuple[SubscriberToken, Subscriber]:
-    """Valide un token et retourne (token_obj, subscriber). Lève 404 si invalide."""
-    hashed = token_hash(raw_token)
-    token = db.scalar(
-        select(SubscriberToken).where(
-            SubscriberToken.token_hash == hashed,
-            SubscriberToken.purpose == purpose,
-            SubscriberToken.revoked_at.is_(None),
-        )
+    """Valide un token (revoked/expiry/used) et retourne (token_obj, subscriber).
+
+    Avant l'audit #9, on ne filtrait que `revoked_at IS NULL`, donc un
+    `manage_alert` deja consomme restait utilisable (devoir le detecter
+    explicitement dans la route). On aligne sur la meme logique que
+    `unsubscribe` / `confirm_email`.
+    """
+    from services.token_service import (
+        TokenAlreadyUsedError,
+        TokenExpiredError,
+        TokenNotFoundError,
+        TokenRevokedError,
+        validate_token,
     )
-    if token is None:
-        raise HTTPException(status_code=404, detail="Lien invalide ou expiré")
+
+    try:
+        token = validate_token(db, raw_token, purpose=purpose)
+    except TokenNotFoundError as exc:
+        raise HTTPException(status_code=404, detail="Lien invalide ou expire") from exc
+    except TokenExpiredError as exc:
+        raise HTTPException(status_code=410, detail="Lien expire") from exc
+    except (TokenAlreadyUsedError, TokenRevokedError) as exc:
+        raise HTTPException(status_code=410, detail="Lien deja utilise ou revoque") from exc
+
     subscriber = db.scalar(select(Subscriber).where(Subscriber.id == token.subscriber_id, Subscriber.deleted_at.is_(None)))
     if subscriber is None:
-        raise HTTPException(status_code=404, detail="Abonné introuvable")
+        raise HTTPException(status_code=404, detail="Abonne introuvable")
     return token, subscriber
 
 
@@ -56,22 +80,35 @@ def _client_ip(request: Request) -> str | None:
 
 
 @router.post("", response_model=SubscriptionCreateResponse, status_code=status.HTTP_201_CREATED)
-def subscribe(payload: SubscriberCreate, db: Session = Depends(get_db)):
-    """Inscription email + 1 à 3 filières + préférences optionnelles.
+def subscribe(payload: SubscriberCreate, request: Request, db: Session = Depends(get_db)):
+    """Inscription email + 1 a 3 filieres + preferences optionnelles.
 
-    Si `EMAIL_CONFIRMATION_REQUIRED=true`, l'abonné est créé en `pending` et un
-    email de confirmation est mis en file d'envoi (Celery, non bloquant).
-    La réponse reste un sur-ensemble de `SubscriberRead` (aucune rupture).
+    Rate-limit applicatif par IP (5 inscriptions/minute, cooldown 5s) en
+    complement du rate-limit metier cote `resend-confirmation` (audit P0 #8).
     """
+    client_ip = _client_ip(request)
+    decision = check_ip_rate_limit(
+        scope="subscribe",
+        client_ip=client_ip or "unknown",
+        limit_per_minute=5,
+        cooldown_seconds=5,
+    )
+    if not decision.allowed:
+        raise HTTPException(
+            status_code=429,
+            detail="Trop d'inscriptions depuis cette IP. Merci de patienter.",
+            headers={"Retry-After": str(decision.retry_after_seconds or 60)},
+        )
+
     try:
         registration = register_subscriber(db, payload)
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
     except EmailConfirmationError as exc:
         raise HTTPException(status_code=exc.status_code, detail=exc.detail) from exc
-    except IntegrityError:
+    except IntegrityError as exc:
         db.rollback()
-        raise HTTPException(status_code=409, detail="Cet email est déjà inscrit")
+        raise HTTPException(status_code=409, detail="Cet email est déjà inscrit") from exc
 
     # Publication après commit: le worker doit retrouver token et événement en base.
     if registration.pending is not None:
@@ -82,6 +119,11 @@ def subscribe(payload: SubscriberCreate, db: Session = Depends(get_db)):
         update={
             "requires_confirmation": registration.requires_confirmation,
             "confirmation_message": registration.message,
+            "manage_alert_token": (
+                registration.manage_alert_token.raw_token
+                if registration.manage_alert_token
+                else None
+            ),
         }
     )
 
@@ -155,7 +197,7 @@ def unsubscribe(token: str, reason: str | None = None, db: Session = Depends(get
     if subscriber is None:
         raise HTTPException(status_code=404, detail="Abonné introuvable")
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     already_unsubscribed = subscriber.status == SubscriberStatus.UNSUBSCRIBED
     if not already_unsubscribed:
         subscriber.status = SubscriberStatus.UNSUBSCRIBED

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -25,7 +25,7 @@ from schemas.ai import AIInternalResultSubmission, AIValidationErrorItem, AIVali
 
 
 def _now() -> datetime:
-    return datetime.now(timezone.utc)
+    return datetime.now(UTC)
 
 
 def _optional_code(db: Session, model, code: str | None, label: str):

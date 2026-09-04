@@ -1007,6 +1007,12 @@ def test_compute_tier_stats_distribution_par_tier_et_par_jour(db) -> None:
     sub2 = _make_subscriber(db, ref, city="Abidjan")
     sub2.email = "sub2@example.com"
     sub2.email_normalized = "sub2@example.com"
+    # Isolation entre abonnes (audit 2, Q1): les offres "Dev 1..3" creees pour
+    # sub1 restent visibles pour sub2 (meme filiere/ville/fenetre) et feraient
+    # basculer son digest en T0. On les masque avant de construire sub2.
+    for off in db.query(JobOffer).filter(JobOffer.title.in_(["Dev 1", "Dev 2", "Dev 3"])).all():
+        off.visible_site = False
+    db.commit()
     _make_offer(db, ref, title="Dev principal 2")
     _make_offer(db, ref, title="Marketer 1", primary_filiere=other_filiere)
     _make_offer(db, ref, title="Marketer 2", primary_filiere=other_filiere)
@@ -1015,20 +1021,23 @@ def test_compute_tier_stats_distribution_par_tier_et_par_jour(db) -> None:
     db.commit()
     build_and_queue_digest_sync(db, subscriber_id=sub2.id, digest_day=today, force=False)
 
-    # Abonne 3: skipped_empty car il n'a AUCUNE filiere (donc 0 candidat).
+    # Abonne 3: skipped_empty. Il a bien une filiere (condition d'eligibilite,
+    # cf. is_subscriber_eligible) mais aucune offre ne matche: ville isolee sans
+    # offre locale. (Audit 2, Q1: l'ancienne version le creait sans filiere,
+    # ce qui le rendait 'ineligible' — aucun digest n'etait produit.)
     sub3 = Subscriber(
         email="sub3@example.com",
         email_normalized="sub3@example.com",
         full_name="Sub3",
         status=SubscriberStatus.ACTIVE,
         experience_level_id=ref["experience"].id,
-        city="Abidjan",
+        city="Bouake",
         subscribed_at=datetime.now(timezone.utc) - timedelta(days=30),
         confirmed_at=datetime.now(timezone.utc) - timedelta(days=29),
     )
     db.add(sub3)
     db.flush()
-    # PAS de SubscriberFiliere => le filtre dure "aucune filiere" rejette tout.
+    db.add(SubscriberFiliere(subscriber_id=sub3.id, filiere_id=ref["filiere"].id, priority=1))
     db.commit()
     build_and_queue_digest_sync(db, subscriber_id=sub3.id, digest_day=today, force=False)
     db.commit()

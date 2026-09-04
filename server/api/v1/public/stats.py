@@ -1,13 +1,13 @@
-from datetime import datetime, timezone
-from typing import Optional
 from fastapi import APIRouter, Depends, Query
+from pydantic import BaseModel
 from sqlalchemy import case, func, select
 from sqlalchemy.orm import Session
-from pydantic import BaseModel
+
 from api.deps import get_db
-from models import ContractType, Filiere, JobOffer, JobOfferStatus, Source, ScrapeRun, Subscriber, SubscriberStatus
 from api.v1.public.offers import _public_filters
+from models import ContractType, Filiere, JobOffer, JobOfferStatus, ScrapeRun, Source, Subscriber, SubscriberStatus
 from schemas.offer_stats import OfferStatsBucketRead, OfferStatsSummaryRead
+
 from ._time_utils import today_start_utc
 
 router = APIRouter(prefix="/api/stats", tags=["stats"])
@@ -20,8 +20,8 @@ _get_today_start = today_start_utc
 @router.get("/offers", response_model=OfferStatsSummaryRead)
 def get_offer_stats(
     db: Session = Depends(get_db),
-    filiere_id: Optional[str] = None,
-    source_id: Optional[str] = None,
+    filiere_id: str | None = None,
+    source_id: str | None = None,
     visible_only: bool = True,
     active_only: bool = True,
 ):
@@ -29,7 +29,7 @@ def get_offer_stats(
     today_start = _get_today_start()
     # new_offers = offres vues pour la première fois aujourd'hui (depuis minuit)
     new_expr = func.coalesce(func.sum(case((JobOffer.first_seen_at >= today_start, 1), else_=0)), 0)
-    
+
     filters = []
     if visible_only:
         filters.append(JobOffer.visible_site.is_(True))
@@ -40,26 +40,26 @@ def get_offer_stats(
         filters.append(JobOffer.primary_filiere_id == filiere_id)
     if source_id:
         filters.append(JobOffer.source_id == source_id)
-        
+
     stmt = select(func.count(JobOffer.id), new_expr).where(*filters)
     total_offers, new_offers = db.execute(stmt).one()
-    
+
     return OfferStatsSummaryRead(total_offers=total_offers, new_offers=new_offers)
 
 @router.get("/offers/by-filiere", response_model=list[OfferStatsBucketRead])
 def get_offer_stats_by_filiere(
     db: Session = Depends(get_db),
-    source_id: Optional[str] = None,
+    source_id: str | None = None,
     limit: int = Query(50, ge=1, le=500),
 ):
     """Répartition par filière : total + nouvelles (Aujourd'hui)."""
     today_start = _get_today_start()
     new_expr = func.coalesce(func.sum(case((JobOffer.first_seen_at >= today_start, 1), else_=0)), 0)
-    
+
     filters = list(_public_filters())
     if source_id:
         filters.append(JobOffer.source_id == source_id)
-        
+
     stmt = (
         select(Filiere.id, Filiere.code, Filiere.label, Filiere.color_hex, func.count(JobOffer.id), new_expr)
         .join(JobOffer, JobOffer.primary_filiere_id == Filiere.id)
@@ -76,17 +76,17 @@ def get_offer_stats_by_filiere(
 @router.get("/offers/by-source", response_model=list[OfferStatsBucketRead])
 def get_offer_stats_by_source(
     db: Session = Depends(get_db),
-    filiere_id: Optional[str] = None,
+    filiere_id: str | None = None,
     limit: int = Query(50, ge=1, le=500),
 ):
     """Répartition par source : total + nouvelles (Aujourd'hui)."""
     today_start = _get_today_start()
     new_expr = func.coalesce(func.sum(case((JobOffer.first_seen_at >= today_start, 1), else_=0)), 0)
-    
+
     filters = list(_public_filters())
     if filiere_id:
         filters.append(JobOffer.primary_filiere_id == filiere_id)
-        
+
     stmt = (
         select(Source.id, Source.code, Source.name, func.count(JobOffer.id), new_expr)
         .join(JobOffer, JobOffer.source_id == Source.id)
@@ -125,23 +125,23 @@ class GlobalStatsRead(BaseModel):
 def get_global_stats(db: Session = Depends(get_db)):
     """Stats homepage : offres actives, nouvelles ce matin, abonnés, sources."""
     active_offers = db.scalar(select(func.count(JobOffer.id)).where(*_public_filters())) or 0
-    
+
     today_start = _get_today_start()
     new_today = db.scalar(
         select(func.count(JobOffer.id))
         .where(JobOffer.first_seen_at >= today_start, *_public_filters())
     ) or 0
-    
+
     subscribers = db.scalar(
         select(func.count(Subscriber.id))
         .where(Subscriber.status == SubscriberStatus.ACTIVE)
     ) or 0
-    
+
     sources = db.scalar(
         select(func.count(Source.id))
         .where(Source.status == "active")
     ) or 0
-    
+
     return GlobalStatsRead(
         active_offers=active_offers,
         new_today=new_today,

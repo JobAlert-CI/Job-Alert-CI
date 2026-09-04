@@ -24,5 +24,13 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
+    # Audit P1 #23: defense en profondeur, on refuse de dropper en prod.
+    from core.config import get_settings
+
+    if get_settings().is_production:
+        raise RuntimeError(
+            "downgrade 0001 refuse de dropper en production. "
+            "Utilisez une migration dediee (alembic downgrade -1 avec une migration non destructive)."
+        )
     # Drop dans l'ordre inverse des dependances SQLAlchemy.
     Base.metadata.drop_all(bind=op.get_bind())

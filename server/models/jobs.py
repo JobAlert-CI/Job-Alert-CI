@@ -3,7 +3,20 @@ from __future__ import annotations
 from datetime import datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import Boolean, CheckConstraint, DateTime, Float, ForeignKey, Index, Integer, JSON, String, Text, UniqueConstraint, func
+from sqlalchemy import (
+    JSON,
+    Boolean,
+    CheckConstraint,
+    DateTime,
+    Float,
+    ForeignKey,
+    Index,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
+    func,
+)
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from db.base import Base, SoftDeleteMixin, TimestampMixin, UUIDPrimaryKeyMixin
@@ -21,7 +34,15 @@ if TYPE_CHECKING:
     from models.admin import Administrator
     from models.ai import AiProcessingJob
     from models.emails import EmailDigestOffer
-    from models.referentials import ContractType, EducationLevel, ExperienceLevel, Filiere, FiliereSpecialty, Location, Source
+    from models.referentials import (
+        ContractType,
+        EducationLevel,
+        ExperienceLevel,
+        Filiere,
+        FiliereSpecialty,
+        Location,
+        Source,
+    )
     from models.scraping import SourceScrapeRun
     from models.subscriptions import SavedOffer
 
@@ -37,8 +58,8 @@ class Company(UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin, Base):
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     primary_filiere_id: Mapped[str | None] = mapped_column(ForeignKey("filieres.id", ondelete="SET NULL"), nullable=True)
 
-    primary_filiere: Mapped["Filiere | None"] = relationship(back_populates="companies")
-    offers: Mapped[list["JobOffer"]] = relationship(back_populates="company")
+    primary_filiere: Mapped[Filiere | None] = relationship(back_populates="companies")
+    offers: Mapped[list[JobOffer]] = relationship(back_populates="company")
 
 
 class JobOffer(UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin, Base):
@@ -105,23 +126,23 @@ class JobOffer(UUIDPrimaryKeyMixin, TimestampMixin, SoftDeleteMixin, Base):
     requires_admin_review: Mapped[bool] = mapped_column(Boolean, default=False, index=True, nullable=False)
     suggested_filiere_payload: Mapped[dict | None] = mapped_column(JSON, nullable=True)
 
-    company: Mapped["Company"] = relationship(back_populates="offers")
-    source: Mapped["Source"] = relationship(back_populates="offers")
-    location: Mapped["Location | None"] = relationship(back_populates="offers")
-    primary_filiere: Mapped["Filiere | None"] = relationship(back_populates="offers")
-    specialty: Mapped["FiliereSpecialty | None"] = relationship(back_populates="offers")
-    contract_type: Mapped["ContractType | None"] = relationship(back_populates="offers")
-    experience_level: Mapped["ExperienceLevel | None"] = relationship(back_populates="offers")
-    education_level: Mapped["EducationLevel | None"] = relationship(back_populates="offers")
-    admin: Mapped["Administrator | None"] = relationship(back_populates="offers")
-    source_scrape_run: Mapped["SourceScrapeRun | None"] = relationship(back_populates="offers")
-    ai_processing_job: Mapped["AiProcessingJob | None"] = relationship(back_populates="offers")
-    duplicate_of: Mapped["JobOffer | None"] = relationship(remote_side="JobOffer.id")
-    detail: Mapped["JobOfferDetail | None"] = relationship(back_populates="offer", cascade="all, delete-orphan", uselist=False)
-    filiere_links: Mapped[list["OfferFiliere"]] = relationship(back_populates="offer", cascade="all, delete-orphan")
-    ingestion_events: Mapped[list["OfferIngestionEvent"]] = relationship(back_populates="offer")
-    digest_links: Mapped[list["EmailDigestOffer"]] = relationship(back_populates="offer")
-    saved_by: Mapped[list["SavedOffer"]] = relationship(back_populates="offer")
+    company: Mapped[Company] = relationship(back_populates="offers")
+    source: Mapped[Source] = relationship(back_populates="offers")
+    location: Mapped[Location | None] = relationship(back_populates="offers")
+    primary_filiere: Mapped[Filiere | None] = relationship(back_populates="offers")
+    specialty: Mapped[FiliereSpecialty | None] = relationship(back_populates="offers")
+    contract_type: Mapped[ContractType | None] = relationship(back_populates="offers")
+    experience_level: Mapped[ExperienceLevel | None] = relationship(back_populates="offers")
+    education_level: Mapped[EducationLevel | None] = relationship(back_populates="offers")
+    admin: Mapped[Administrator | None] = relationship(back_populates="offers")
+    source_scrape_run: Mapped[SourceScrapeRun | None] = relationship(back_populates="offers")
+    ai_processing_job: Mapped[AiProcessingJob | None] = relationship(back_populates="offers")
+    duplicate_of: Mapped[JobOffer | None] = relationship(remote_side="JobOffer.id")
+    detail: Mapped[JobOfferDetail | None] = relationship(back_populates="offer", cascade="all, delete-orphan", uselist=False)
+    filiere_links: Mapped[list[OfferFiliere]] = relationship(back_populates="offer", cascade="all, delete-orphan")
+    ingestion_events: Mapped[list[OfferIngestionEvent]] = relationship(back_populates="offer")
+    digest_links: Mapped[list[EmailDigestOffer]] = relationship(back_populates="offer")
+    saved_by: Mapped[list[SavedOffer]] = relationship(back_populates="offer")
 
     __table_args__ = (
         UniqueConstraint("source_id", "source_reference", name="uq_job_offers_source_reference"),
@@ -146,7 +167,7 @@ class JobOfferDetail(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     source_text: Mapped[str | None] = mapped_column(Text, nullable=True)
     is_manual: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
 
-    offer: Mapped["JobOffer"] = relationship(back_populates="detail")
+    offer: Mapped[JobOffer] = relationship(back_populates="detail")
 
 
 class OfferFiliere(UUIDPrimaryKeyMixin, TimestampMixin, Base):
@@ -158,8 +179,8 @@ class OfferFiliere(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     is_primary: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     matched_keywords: Mapped[list[str] | None] = mapped_column(JSON, nullable=True)
 
-    offer: Mapped["JobOffer"] = relationship(back_populates="filiere_links")
-    filiere: Mapped["Filiere"] = relationship(back_populates="offer_links")
+    offer: Mapped[JobOffer] = relationship(back_populates="filiere_links")
+    filiere: Mapped[Filiere] = relationship(back_populates="offer_links")
 
     __table_args__ = (
         UniqueConstraint("offer_id", "filiere_id", name="uq_offer_filieres_offer_filiere"),
@@ -178,5 +199,5 @@ class OfferIngestionEvent(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     reason: Mapped[str | None] = mapped_column(String(255), nullable=True)
     raw_payload: Mapped[dict | None] = mapped_column(JSON, nullable=True)
 
-    offer: Mapped["JobOffer | None"] = relationship(back_populates="ingestion_events")
-    source_scrape_run: Mapped["SourceScrapeRun | None"] = relationship(back_populates="ingestion_events")
+    offer: Mapped[JobOffer | None] = relationship(back_populates="ingestion_events")
+    source_scrape_run: Mapped[SourceScrapeRun | None] = relationship(back_populates="ingestion_events")

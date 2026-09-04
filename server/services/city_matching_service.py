@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Iterable
 from dataclasses import dataclass, field
-from typing import Iterable, Literal
+from typing import Literal
 
 from services.normalization import normalize_city, normalize_text
 

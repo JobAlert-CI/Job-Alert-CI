@@ -2,15 +2,14 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from datetime import date, datetime, time, timedelta, timezone
+from datetime import UTC, date, datetime, time
 from zoneinfo import ZoneInfo
 
-from sqlalchemy import Date, and_, exists, func, or_, select
+from sqlalchemy import and_, exists, func, or_, select
 from sqlalchemy.orm import Session, selectinload
 
 from core.config import Settings, get_settings
 from models import (
-    ContractType,
     DigestStatus,
     EmailDigest,
     EmailDigestOffer,
@@ -19,7 +18,6 @@ from models import (
     JobOfferStatus,
     Location,
     Subscriber,
-    SubscriberContractPreference,
     SubscriberFiliere,
     SubscriberStatus,
 )
@@ -73,19 +71,19 @@ def scheduled_send_time(digest_day: date, *, settings: Settings | None = None) -
         time(hour=resolved.daily_digest_send_hour, minute=resolved.daily_digest_send_minute),
         tzinfo=tz,
     )
-    return local_send.astimezone(timezone.utc)
+    return local_send.astimezone(UTC)
 
 
 def _as_aware(value: datetime | None) -> datetime | None:
     if value is None or value.tzinfo is not None:
         return value
-    return value.replace(tzinfo=timezone.utc)
+    return value.replace(tzinfo=UTC)
 
 
 def is_subscriber_eligible(subscriber: Subscriber, now: datetime | None = None) -> bool:
     """Elibilite partagee par la preparation ET l'envoi (derniere verification)."""
 
-    effective_now = _as_aware(now) or datetime.now(timezone.utc)
+    effective_now = _as_aware(now) or datetime.now(UTC)
     if subscriber.status != SubscriberStatus.ACTIVE:
         return False
     if getattr(subscriber, "deleted_at", None) is not None:
@@ -319,7 +317,7 @@ def select_candidate_offers(
     """
 
     resolved_settings = settings or get_settings()
-    effective_now = _as_aware(now) or datetime.now(timezone.utc)
+    effective_now = _as_aware(now) or datetime.now(UTC)
 
     resolution = _resolve_city(db, subscriber)
     window_start = _freshness_window(db, subscriber)
@@ -451,6 +449,7 @@ def build_and_queue_digest_sync(
             digest._pending_match_kinds = dict(zip(
                 [o.id for o in outcome.selected_offers],
                 outcome.match_kinds,
+                strict=False,  # match_kinds peut etre plus court (troncature)
             ))
             # On reaffecte aussi le resolution pour la trace.
             if not subscriber_has_reliable_city(resolution):

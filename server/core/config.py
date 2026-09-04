@@ -1,8 +1,8 @@
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass, field
 from functools import lru_cache
-import os
 from os import getenv
 from pathlib import Path
 from urllib.parse import quote_plus
@@ -201,12 +201,18 @@ class Settings:
     )
 
     @property
-    def is_sqlite(self) -> bool:
-        return self.database_url.startswith("sqlite")
+    def is_production(self) -> bool:
+        """Tout environnement non local est considere production.
+
+        Aligne sur l'audit P0 #7: on refuse le demarrage avec un JWT
+        secret par defaut pour `staging`, `qa`, etc. (anciennement `is_production`
+        etait limite a APP_ENV in {"prod", "production"}).
+        """
+        return self.environment.lower() not in {"development", "dev", "test", "testing", "staging"}
 
     @property
-    def is_production(self) -> bool:
-        return self.environment.lower() in {"prod", "production"}
+    def is_sqlite(self) -> bool:
+            return self.database_url.startswith("sqlite")
 
 
 @lru_cache

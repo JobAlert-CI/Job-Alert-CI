@@ -3,12 +3,14 @@ from __future__ import annotations
 import csv
 import io
 import json
-from typing import Any, Callable, Iterable, Iterator
+from collections.abc import Iterable, Iterator
+from typing import Any
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from models import Company, EmailDigest, JobOffer, Subscriber
+from models import EmailDigest, JobOffer, Subscriber
+from services.search_utils import raw_ilike, safe_ilike
 
 
 def _stream_csv(rows: Iterable[dict[str, Any]], columns: list[str]) -> Iterator[str]:
@@ -100,9 +102,9 @@ def iter_offers_for_export(db: Session, filters: dict[str, Any]) -> Iterator[dic
     if sid := filters.get("source_id"):
         stmt = stmt.where(JobOffer.source_id == sid)
     if q := filters.get("q"):
-        stmt = stmt.where(JobOffer.title.ilike(f"%{q}%"))
+            stmt = stmt.where(safe_ilike(JobOffer.title, q))
 
-    # `yield_per` declenche le streaming cote SQLAlchemy : on recupere les
+        # `yield_per` declenche le streaming cote SQLAlchemy : on recupere les
     # resultats par batch, pas tout d'un coup.
     for offer in db.scalars(stmt.execution_options(yield_per=500)):
         yield _offer_to_row(offer)
@@ -150,9 +152,16 @@ def iter_subscribers_for_export(db: Session, filters: dict[str, Any]) -> Iterato
     if f := filters.get("status"):
         stmt = stmt.where(Subscriber.status == f)
     if cid := filters.get("city"):
-        stmt = stmt.where(Subscriber.city.ilike(f"%{cid}%"))
+        stmt = stmt.where(safe_ilike(Subscriber.city, cid))
     if q := filters.get("q"):
-        stmt = stmt.where(Subscriber.email.ilike(f"%{q}%"))
+        stmt = stmt.where(safe_ilike(Subscriber.email, q))
+    # Audit 2, Q1: filtre to_email (exact ou ilike avec %) aligne sur le
+    # vocabulaire de /api/admin/emails (transactional_emails).
+    if to_email := filters.get("to_email"):
+        if "%" in to_email:
+            stmt = stmt.where(raw_ilike(Subscriber.email, to_email))
+        else:
+            stmt = stmt.where(Subscriber.email == to_email.lower())
     for subscriber in db.scalars(stmt.execution_options(yield_per=500)):
         yield _subscriber_to_row(subscriber)
 
@@ -195,6 +204,16 @@ def iter_digests_for_export(db: Session, filters: dict[str, Any]) -> Iterator[di
         stmt = stmt.where(EmailDigest.template_version == tv)
     if tier := filters.get("match_tier"):
         stmt = stmt.where(EmailDigest.match_tier == tier)
+    # Audit 2, Q1: filtre to_email sur l'email du subscriber du digest
+    # (jointure), exact ou ilike avec %.
+    if to_email := filters.get("to_email"):
+        from models import Subscriber as _Subscriber
+
+        stmt = stmt.join(_Subscriber, _Subscriber.id == EmailDigest.subscriber_id)
+        if "%" in to_email:
+            stmt = stmt.where(raw_ilike(_Subscriber.email, to_email))
+        else:
+            stmt = stmt.where(_Subscriber.email == to_email.lower())
     for digest in db.scalars(stmt.execution_options(yield_per=500)):
         yield _digest_to_row(digest)
 
@@ -240,11 +259,11 @@ def stream_as(
 
 
 __all__ = [
+    "DIGEST_EXPORT_COLUMNS",
     "OFFER_EXPORT_COLUMNS",
     "SUBSCRIBER_EXPORT_COLUMNS",
-    "DIGEST_EXPORT_COLUMNS",
+    "iter_digests_for_export",
     "iter_offers_for_export",
     "iter_subscribers_for_export",
-    "iter_digests_for_export",
     "stream_as",
 ]

@@ -9,10 +9,10 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
 from models import (
+    AIJob,
     ContractType,
     EducationLevel,
     ExperienceLevel,
-    AIJob,
     Filiere,
     JobOffer,
 )

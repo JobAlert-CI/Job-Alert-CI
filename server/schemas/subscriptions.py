@@ -109,6 +109,10 @@ class SubscriptionCreateResponse(SubscriberRead):
 
     requires_confirmation: bool = False
     confirmation_message: str | None = None
+    # Audit P1 #21: valeur brute du token MANAGE_ALERT emis a l'inscription
+    # (None si l'abonne avait deja un token actif). Permet de construire
+    # /preferences/{manage_alert_token}.
+    manage_alert_token: str | None = None
 
 
 class EmailConfirmationResult(BaseModel):
