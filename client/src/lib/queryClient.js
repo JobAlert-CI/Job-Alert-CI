@@ -18,3 +18,21 @@ export const queryClient = new QueryClient({
     },
   },
 })
+
+/* ─── Session admin révoquée : signal transverse ──────────────────────
+   Quand axiosAdmin subit un 401 que même la rotation de refresh ne
+   résout pas (famille révoquée serveur, cf. api/v1/admin/auth.py N10),
+   l'intercepteur purge les tokens. Les requêtes admin en vol échouent
+   alors en chaîne. On écoute un événement DOM dédié émis par
+   l'intercepteur — plus simple et plus découplé que de coupler
+   queryClient au contexte React (le client vit hors de l'arbre).
+
+   L'événement "jobalert:admin-session-revoquee" est écouté par le
+   AdminLayout pour afficher le message dédié. */
+if (typeof window !== "undefined") {
+  window.addEventListener("jobalert:admin-session-revoquee", () => {
+    // Purge complète : aucune donnée admin ne doit survivre à une
+    // session révoquée (convention prompt §4 "Cache").
+    queryClient.clear()
+  })
+}

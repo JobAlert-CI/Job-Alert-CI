@@ -100,6 +100,11 @@ adminApi.interceptors.response.use(
       return adminApi(original);
     } catch (refreshError) {
       clearStoredTokens();
+      // Session invalide même après rotation (famille révoquée serveur) :
+      // on signale le layout admin pour le message dédié avant purge du cache.
+      try {
+        window.dispatchEvent(new CustomEvent("jobalert:admin-session-revoquee"));
+      } catch { /* environnement sans DOM : silencieux */ }
       return Promise.reject(refreshError);
     }
   },

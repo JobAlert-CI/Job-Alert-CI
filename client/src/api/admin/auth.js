@@ -1,4 +1,4 @@
-import { adminApi, clearStoredTokens, getStoredTokens, setStoredTokens } from "../axiosAdmin";
+import { adminApi, clearStoredTokens, getStoredTokens, setStoredTokens } from "./axiosAdmin";
 
 const API_URL = "/api/admin/auth";
 

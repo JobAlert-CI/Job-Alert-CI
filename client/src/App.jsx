@@ -4,6 +4,7 @@ import { MotionConfig } from "framer-motion";
 // Home reste en import statique (chunk d'entrée) pour préserver le LCP.
 import Home from "./Pages/Home";
 import { TooltipProvider } from "./components/ui/tooltip";
+import { NotifyProvider } from "@/contexts/Notify.context";
 import Header from "./components/layouts/Header";
 import Footer from "./components/layouts/Footer";
 import FallbackPage from "./components/shared/FallbackPage";
@@ -28,6 +29,16 @@ const PageIntrouvable = lazy(() => import("./Pages/PageIntrouvable"));
 const Faq = lazy(() => import("./Pages/Support/FAQ"));
 const MentionsLegales = lazy(() => import("./Pages/Support/MentionsLegales"));
 const Contact = lazy(() => import("./Pages/Support/Contact"));
+
+/* ─── Back-office admin (lazy, layout + guard dédiés) ─────────────────
+   Le layout admin vit hors du layout public : pas de Header/Footer.
+   RequireAdmin protège TOUTES les pages sous /admin sauf /admin/connexion
+   (publique). L'ordre des routes importe : /admin/connexion AVANT la
+   route layout pour ne pas être captée par le guard. */
+const AdminConnexion = lazy(() => import("./Pages/Admin/ConnexionAdmin"));
+const AdminLayout = lazy(() => import("./components/admin/AdminLayout"));
+const RequireAdmin = lazy(() => import("./components/admin/AdminGuard"));
+import { AdminAuthProvider } from "@/contexts/AdminAuth.context";
 import { prefetchHome } from "./features/home.tools";
 import { prefetchHowItWorks } from "./features/ccm.tools";
 
@@ -64,40 +75,75 @@ const Layout = () => {
   );
 };
 
+/* Layout admin : provider d'auth + guard + layout. Monté en dehors du
+   layout public. Le provider vit au-dessus du guard pour que le guard
+   (et toutes les pages) puissent consommer useAdminAuth. */
+const AdminLayoutRoute = () => (
+  <AdminAuthProvider>
+    <RequireAdmin>
+      <AdminLayout />
+    </RequireAdmin>
+  </AdminAuthProvider>
+);
+
 const App = () => (
   <TooltipProvider>
     {/* Reduced motion global : respecte prefers-reduced-motion de l'OS. Cf. Audit.md P1-8. */}
     <MotionConfig reducedMotion="user">
-    <BrowserRouter>
-      <ScrollToTop />
-        <Suspense fallback={<FallbackPage />}>
-        <Routes>
-            <Route path="/" element={<Layout />}>
-              <Route index element={<Home />} />
-              <Route path="comment-ca-marche" element={<HowItWorks />} />
-              <Route path="sources" element={<Sources />} />
-              <Route path="inscription" element={<Registered />} />
-              <Route path="inscription/confirmation/:token" element={<ConfirmationInscription />} />
-              <Route path="/preferences/:token" element={<GestionPreferences />} />
-              <Route path="/desinscription/:token" element={<Desinscription />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/faq" element={<Faq />} />
-              <Route path="/mentions-legales" element={<MentionsLegales />} />
+      <BrowserRouter>
+        <ScrollToTop />
+        <NotifyProvider>
+          <Suspense fallback={<FallbackPage />}>
+            <Routes>
+              {/* ═══════════════════════════════════════════════════════════════
+                  ROUTES PUBLIQUES (site public, navigation libre)
+                  ═══════════════════════════════════════════════════════════════ */}
+              <Route path="/" element={<Layout />}>
+                <Route index element={<Home />} />
+                <Route path="comment-ca-marche" element={<HowItWorks />} />
+                <Route path="sources" element={<Sources />} />
+                <Route path="inscription" element={<Registered />} />
+                <Route path="inscription/confirmation/:token" element={<ConfirmationInscription />} />
+                <Route path="preferences/:token" element={<GestionPreferences />} />
+                <Route path="desinscription/:token" element={<Desinscription />} />
+                <Route path="contact" element={<Contact />} />
+                <Route path="faq" element={<Faq />} />
+                <Route path="mentions-legales" element={<MentionsLegales />} />
+                <Route path="offres" element={<Offres />} />
+                <Route path="filieres" element={<Filieres />} />
+                <Route path="filieres/:filiere" element={<DetailsFiliere />} />
+                <Route path="offres/:id" element={<DetailsOffre />} />
+                <Route path="conseils" element={<Conseils />} />
+                <Route path="conseils/:slug" element={<DetailsConseil />} />
+                <Route path="test" element={<FallbackPage />} />
+                {/* Toute URL inconnue → page 404 explicite (noindex). */}
+                <Route path="*" element={<PageIntrouvable />} />
+              </Route>
 
-              <Route path="offres" element={<Offres />} />
-              <Route path="filieres" element={<Filieres />} />
-              <Route path="filieres/:filiere" element={<DetailsFiliere />} />
-              <Route path="/offres/:id" element={<DetailsOffre />} />
-              <Route path="/conseils" element={<Conseils />} />
-              <Route path="/conseils/:slug" element={<DetailsConseil />} />
+              {/* ═══════════════════════════════════════════════════════════════
+                  ROUTES ADMIN (espace d'administration, authentification requise)
+                  ═══════════════════════════════════════════════════════════════ */}
+              <Route
+                path="/admin"
+                element={
+                  <AdminAuthProvider>
+                    <Outlet />
+                  </AdminAuthProvider>
+                }
+              >
+                {/* Page de connexion (hors AdminLayout, pas de sidebar) */}
+                <Route path="connexion" element={<AdminConnexion />} />
 
-              <Route path="/test" element={<FallbackPage />} />
-              {/* Toute URL inconnue → page 404 explicite (noindex). */}
-              <Route path="*" element={<PageIntrouvable />} />
-            </Route>
-        </Routes>
-        </Suspense>
-    </BrowserRouter>
+                {/* Toutes les autres routes admin sont sous AdminLayout (avec sidebar) */}
+                <Route element={<AdminLayoutRoute />}>
+                  {/* <Route index element={<AdminDashboardPage />} /> */}
+                  {/* Autres routes admin à ajouter ici */}
+                </Route>
+              </Route>
+            </Routes>
+          </Suspense>
+        </NotifyProvider>
+      </BrowserRouter>
     </MotionConfig>
   </TooltipProvider>
 );

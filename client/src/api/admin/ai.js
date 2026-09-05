@@ -25,7 +25,7 @@ const createKey = async (data, { signal } = {}) => {
   return response.data;
 };
 
-/** PUT /api/admin/ai/keys/{key_id} — champs fournis uniquement (api_key rotative incluse). */
+/** PATCH /api/admin/ai/keys/{key_id} — champs fournis uniquement (api_key rotative incluse). */
 const updateKey = async (keyId, data, { signal } = {}) => {
   const response = await adminApi.patch(`${API_URL}/keys/${encodeURIComponent(keyId)}`, data, { signal });
   return response.data;
