@@ -18,7 +18,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "
 import { useNotify } from "@/contexts/Notify.context"
 import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem,
-  DropdownMenuLabel, DropdownMenuSeparator,
+  DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu"
 
 /* ─────────────────────────────────────────────────────────────────────
@@ -300,10 +300,13 @@ const CompteMenu = ({ profile, onLogout }) => {
         }
       />
       <DropdownMenuContent align="end" side="bottom" className="min-w-48">
-        <DropdownMenuLabel>
-          <span className="block truncate">{profile?.email}</span>
-          <span className="block text-[10px] text-muted-foreground">{roleLabel}</span>
-        </DropdownMenuLabel>
+        {/* base-ui : label de groupe TOUJOURS dans <DropdownMenuGroup>. */}
+        <DropdownMenuGroup>
+          <DropdownMenuLabel>
+            <span className="block truncate">{profile?.email}</span>
+            <span className="block text-[10px] text-muted-foreground">{roleLabel}</span>
+          </DropdownMenuLabel>
+        </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem variant="destructive" onClick={onLogout} className="cursor-pointer">
           <LogOut className="size-3.5" aria-hidden />

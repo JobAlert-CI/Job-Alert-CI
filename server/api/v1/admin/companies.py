@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from api.deps import get_current_admin, get_db, require_roles
@@ -13,11 +12,11 @@ from services.audit import log_admin_action
 from services.companies import (
     CompanyServiceError,
     create_company,
+    list_companies_with_counts,
     merge_companies,
     soft_delete_company,
     top_recruiters,
 )
-from services.search_utils import safe_ilike
 
 # Les entreprises impactent directement les offres exposees publiquement:
 # on reserve la gestion au super_admin (defense en profondeur, cf. audit P0 #1).
@@ -36,12 +35,33 @@ def list_companies(
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
 ):
-    """Liste paginee des entreprises avec recherche LIKE echappee (cf. audit P0 #4)."""
-    stmt = select(Company)
-    if q:
-        stmt = stmt.where(safe_ilike(Company.name, q))
-    stmt = stmt.order_by(Company.name.asc()).limit(limit).offset(offset)
-    return list(db.scalars(stmt).unique())
+    """Liste paginee des entreprises avec recherche LIKE echappee (cf. audit P0 #4).
+
+    Les entreprises soft-deletees (fusionnees ou desactivees) sont exclues :
+    sinon une entreprise absorbee par une fusion reapparait dans la liste,
+    ce qui rend la fusion trompeuse pour l'admin.
+
+    active_offers_count est calcule par le service (GROUP BY en une seule
+    requete) : renvoyer l'ORM brut serialisait 0 partout (champ calcule
+    absent du modele, defaut Pydantic 0).
+    """
+    rows = list_companies_with_counts(db, q=q, limit=limit, offset=offset)
+    return [
+        CompanyAdminRead(
+            id=company.id,
+            name=company.name,
+            normalized_name=company.normalized_name,
+            slug=company.slug,
+            website_url=company.website_url,
+            logo_url=company.logo_url,
+            description=company.description,
+            primary_filiere_id=company.primary_filiere_id,
+            created_at=company.created_at,
+            updated_at=company.updated_at,
+            active_offers_count=active_count,
+        )
+        for company, active_count in rows
+    ]
 
 
 @router.get("/top-recruiters", response_model=list[CompanyAdminRead])

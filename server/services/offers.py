@@ -97,6 +97,7 @@ def create_offer(db: Session, payload: OfferCreate, admin_id: str | None = None)
         first_seen_at=now,
         expires_at=payload.expires_at,
         application_deadline_at=payload.application_deadline_at,
+        salary_raw=payload.salary_raw,
     )
     offer.detail = JobOfferDetail(
         intro=payload.intro,
@@ -144,7 +145,9 @@ def update_offer(db: Session, offer: JobOffer, payload: OfferUpdate) -> JobOffer
         education_level = _get_optional_by_code(db, EducationLevel, data["education_level_code"])
         offer.education_level_id = education_level.id if education_level else None
 
-    for field_name in ("source_url", "canonical_url", "published_at", "expires_at", "application_deadline_at", "visible_site"):
+    # salary_raw : null vide explicitement la valeur (semantique
+    # exclude_unset : absence = inchange, null = effacement).
+    for field_name in ("source_url", "canonical_url", "published_at", "expires_at", "application_deadline_at", "visible_site", "salary_raw"):
         if field_name in data:
             setattr(offer, field_name, data[field_name])
 

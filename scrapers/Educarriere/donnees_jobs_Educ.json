@@ -1,1 +1,640 @@
-[]
+[
+    {
+        "title": "UN ASSISTANT ADMINISTRATIF",
+        "source_url": "https://emploi.educarriere.ci/offre-154825-recrutement-d-un-assistant-administratif.html",
+        "canonical_url": "https://emploi.educarriere.ci/offre-154825-recrutement-d-un-assistant-administratif.html",
+        "location_raw": "ABIDJAN , COCODY , RIVIERA CIAD",
+        "salary_raw": null,
+        "published_at": "2026-09-04T00:00:00.000Z",
+        "collected_at": "2026-09-05T20:15:49.376Z",
+        "first_seen_at": "2026-09-05T20:15:49.376Z",
+        "last_seen_at": "2026-09-05T20:15:49.376Z",
+        "expires_at": "2026-09-11T00:00:00.000Z",
+        "application_deadline_at": "2026-09-11T00:00:00.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": "Cocody",
+            "label": "ABIDJAN , COCODY , RIVIERA CIAD"
+        },
+        "specialty": {
+            "code": "commerce et administration des entreprises, finances/comptabilite",
+            "label": "Commerce et Administration des Entreprises, Finances/Comptabilité"
+        },
+        "contract_type": {
+            "code": "INCONNU",
+            "label": "Emploi"
+        },
+        "experience_level": {
+            "code": "INCONNU",
+            "label": null,
+            "min_years": null,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_1",
+            "label": "BAC+1",
+            "rank": 1
+        },
+        "description": "Détails de l'offre Dans le cadre du renforcement de notre équipe, nous recherchons un Assistant Administratif sérieux, organisé et dynamique. Missions principales : * Assurer l’accueil physique et téléphonique ; * Gérer les courriers, e-mails et documents administratifs ; * Effectuer le classement et l’archivage des dossiers ; * Préparer et suivre les documents administratifs ; * Assurer la saisie et la mise à jour des données ; * Organiser les rendez-vous et réunions ; * Assurer diverses tâches administratives selon les besoins de l’entreprise. Profil recherché : * Être titulaire d’un diplôme en administration, gestion, secrétariat ou domaine similaire ; * Avoir une bonne maîtrise de l’outil informatique, notamment Word et Excel ; * Être organisé, rigoureux, ponctuel et discret ; * Avoir un bon sens de la communication et du service ; * Une première expérience dans un poste similaire serait un atout. NB: transmettre vos CV et lettre de motivation par mail",
+        "company_name": "Une importante entreprise",
+        "company": {
+            "name": "Une importante entreprise",
+            "website_url": null,
+            "type": null,
+            "description": null
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": null,
+        "raw_fields": {
+            "contract_raw": "Emploi",
+            "experience_raw": null,
+            "education_raw": "BAC, BAC+1, BAC+2, BAC+3, BAC+4, BAC+5",
+            "published_raw": "Publiée le 04/09/2026",
+            "expires_raw": "11/09/2026",
+            "secteur_raw": "Commerce et Administration des Entreprises, Finances/Comptabilité"
+        },
+        "secteur": {
+            "code": "commerce et administration des entreprises, finances/comptabilite",
+            "label": "Commerce et Administration des Entreprises, Finances/Comptabilité"
+        },
+        "active": "2026-09-04T00:00:00.000Z"
+    },
+    {
+        "title": "TECHNICIEN MAINTENANCE",
+        "source_url": "https://emploi.educarriere.ci/offre-154824-technicien-maintenance.html",
+        "canonical_url": "https://emploi.educarriere.ci/offre-154824-technicien-maintenance.html",
+        "location_raw": "ABIDJAN",
+        "salary_raw": null,
+        "published_at": "2026-09-04T00:00:00.000Z",
+        "collected_at": "2026-09-05T20:16:03.233Z",
+        "first_seen_at": "2026-09-05T20:16:03.233Z",
+        "last_seen_at": "2026-09-05T20:16:03.233Z",
+        "expires_at": "2026-09-14T00:00:00.000Z",
+        "application_deadline_at": "2026-09-14T00:00:00.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": null,
+            "label": "ABIDJAN"
+        },
+        "specialty": {
+            "code": "electromecanique, electronique, electrotechnique/electricite",
+            "label": "Electromécanique, Electronique, Electrotechnique/Electricité"
+        },
+        "contract_type": {
+            "code": "CDD",
+            "label": "Emploi (CDD)"
+        },
+        "experience_level": {
+            "code": "INCONNU",
+            "label": null,
+            "min_years": null,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_2",
+            "label": "BAC+2",
+            "rank": 2
+        },
+        "description": "Détails de l'offre Tâches principales - Assurer toutes les interventions dans le cadre de l'entretien préventif, des réparations, des visites journalières hebdomadaires et de la révision annuelle des machines - Exécuter les bons de travail émis par la production et renseigner la partie compte rendu après les travaux - Informer sa hiérarchie de tous les dysfonctionnements constatés sur le terrain afin d'y apporter des solutions - Sous la supervision du Chef Maintenance , participer aux travaux visant à améliorer le fonctionnement des équipements initiés par celui-ci - participer personnellement à l'entretien spécifique de certaines machines - Tenir à jour les fiches techniques des machines et remettre au chef Maintenance les rapports d'activité journalières et mensuels - exprimer à temps au Chef de maintenance ses besoins en pièces de rechanges Équipements et matériaux industriels",
+        "company_name": "SIPRA",
+        "company": {
+            "name": "SIPRA",
+            "website_url": null,
+            "type": null,
+            "description": null
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": null,
+        "raw_fields": {
+            "contract_raw": "Emploi (CDD)",
+            "experience_raw": null,
+            "education_raw": "BAC+2",
+            "published_raw": "Publiée le 04/09/2026",
+            "expires_raw": "14/09/2026",
+            "secteur_raw": "Electromécanique, Electronique, Electrotechnique/Electricité"
+        },
+        "secteur": {
+            "code": "electromecanique, electronique, electrotechnique/electricite",
+            "label": "Electromécanique, Electronique, Electrotechnique/Electricité"
+        },
+        "active": "2026-09-04T00:00:00.000Z"
+    },
+    {
+        "title": "COMMERCIALE",
+        "source_url": "https://emploi.educarriere.ci/offre-154823-commerciale.html",
+        "canonical_url": "https://emploi.educarriere.ci/offre-154823-commerciale.html",
+        "location_raw": "Abidjan, Cocody",
+        "salary_raw": null,
+        "published_at": "2026-09-04T00:00:00.000Z",
+        "collected_at": "2026-09-05T20:16:16.768Z",
+        "first_seen_at": "2026-09-05T20:16:16.768Z",
+        "last_seen_at": "2026-09-05T20:16:16.768Z",
+        "expires_at": "2026-09-13T00:00:00.000Z",
+        "application_deadline_at": "2026-09-13T00:00:00.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": "Cocody",
+            "label": "Abidjan, Cocody"
+        },
+        "specialty": {
+            "code": "electrotechnique/electricite, energetique, generaliste",
+            "label": "Electrotechnique/Electricité, Energétique, Généraliste"
+        },
+        "contract_type": {
+            "code": "CDD",
+            "label": "Emploi (CDD)"
+        },
+        "experience_level": {
+            "code": "INCONNU",
+            "label": null,
+            "min_years": null,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_2",
+            "label": "BAC+2",
+            "rank": 2
+        },
+        "description": "Détails de l'offre Nous sommes une entreprise spécialisée dans les solutions d'énergie solaire en Côte d'Ivoire. Dans le cadre du développement de nos activités, nous recrutons une Commerciale dynamique et motivé(e). Missions Sous la responsabilité du Directeur, vous serez chargé(e) de : Développement commercial Prospection de nouveaux clients (particuliers et entreprises). Visites commerciales sur le terrain. Organiser des rendez-vous avec les prospects. Développer et fidéliser un portefeuille clients. Identifier les besoins des clients. Conseiller les clients sur les solutions solaires adaptées. Élaborer et présenter les devis. Assurer le suivi des négociations jusqu'à la signature. Suivi commercial Relancer les devis en attente. Assurer le suivi des clients après-vente. Mettre à jour la base de données clients. Produire un rapport d'activité régulier. Profil recherché BAC + 2 et plus en Commerce, Marketing ou Gestion. Une première expérience commerciale est un atout. Bonne présentation. Excellente communication. Sens de la négociation. Dynamique, autonome et organisé(e). Maîtrise des outils informatiques (Word, Excel). La connaissance des solutions solaires serait un avantage. Qualités recherchées Nous recherchons une personne : Ambitieuse ; persévérante ; orientée résultats ; ayant le goût du terrain ; capable de travailler sous objectifs ; ayant un excellent sens du relationnel. Objectifs Le commercial sera notamment évalué sur : Nombre de nouveaux prospects obtenus. Nombre de rendez-vous réalisés. Nombre de devis établis. Nombre de relances effectuées. Nombre de ventes conclues. Chiffre d'affaires réalisé. Conditions Contrat : CDD avec période d'essai préalable, évolutif selon les performances. Lieu de travail : Riviera Bonoumin. Déplacements fréquents sur le terrain. Former Vos Managers",
+        "company_name": "Une entreprise",
+        "company": {
+            "name": "Une entreprise",
+            "website_url": null,
+            "type": null,
+            "description": null
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": null,
+        "raw_fields": {
+            "contract_raw": "Emploi (CDD)",
+            "experience_raw": null,
+            "education_raw": "BAC+2, BAC+3, BAC+4",
+            "published_raw": "Publiée le 04/09/2026",
+            "expires_raw": "13/09/2026",
+            "secteur_raw": "Electrotechnique/Electricité, Energétique, Généraliste"
+        },
+        "secteur": {
+            "code": "electrotechnique/electricite, energetique, generaliste",
+            "label": "Electrotechnique/Electricité, Energétique, Généraliste"
+        },
+        "active": "2026-09-04T00:00:00.000Z"
+    },
+    {
+        "title": "Community manager",
+        "source_url": "https://emploi.educarriere.ci/offre-154821-community-manager.html",
+        "canonical_url": "https://emploi.educarriere.ci/offre-154821-community-manager.html",
+        "location_raw": "ABIDJAN",
+        "salary_raw": null,
+        "published_at": "2026-09-04T00:00:00.000Z",
+        "collected_at": "2026-09-05T20:16:29.207Z",
+        "first_seen_at": "2026-09-05T20:16:29.207Z",
+        "last_seen_at": "2026-09-05T20:16:29.207Z",
+        "expires_at": "2026-10-09T00:00:00.000Z",
+        "application_deadline_at": "2026-10-09T00:00:00.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": null,
+            "label": "ABIDJAN"
+        },
+        "specialty": {
+            "code": "communication",
+            "label": "Communication"
+        },
+        "contract_type": {
+            "code": "CDD",
+            "label": "Emploi (CDD)"
+        },
+        "experience_level": {
+            "code": "INCONNU",
+            "label": null,
+            "min_years": null,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_2",
+            "label": "BAC+2",
+            "rank": 2
+        },
+        "description": "Détails de l'offre Offre d’emploi – Community Manager / Créateur de Contenu Digital Nous recherchons un(e) Community Manager / Créateur(trice) de Contenu Digital dynamique, créatif(ve) et autonome pour renforcer notre présence sur les réseaux sociaux et valoriser l’image de notre entreprise. Missions principales • Réaliser des prises de vue photo et vidéo de nos projets, activités et réalisations • Assurer le montage et l’édition de vidéos destinées à nos différents réseaux sociaux • Concevoir des visuels attractifs : affiches, flyers, publications et autres contenus graphiques • Gérer et animer nos pages Facebook, TikTok et Instagram • Planifier, publier et suivre les contenus sur les différentes plateformes • Proposer des idées de contenus innovants et engageants pour améliorer notre visibilité digitale Profil recherché • Diplôme en communication visuelle, marketing digital ou tout autre domaine connexe • Minimum 3 ans d’expérience dans un poste similaire • Excellente maîtrise des stratégies digitales et des outils de gestion des réseaux sociaux • Bonne connaissance des logiciels de création graphique et de montage vidéo • Forte capacité créative et sens artistique développé • Excellentes compétences en communication écrite et orale • Curieux(se), innovant(e) et force de proposition • Capacité à travailler de manière autonome avec rigueur et organisation",
+        "company_name": "Une entreprise",
+        "company": {
+            "name": "Une entreprise",
+            "website_url": null,
+            "type": null,
+            "description": null
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": null,
+        "raw_fields": {
+            "contract_raw": "Emploi (CDD)",
+            "experience_raw": null,
+            "education_raw": "BAC+2, BAC+3",
+            "published_raw": "Publiée le 04/09/2026",
+            "expires_raw": "09/10/2026",
+            "secteur_raw": "Communication"
+        },
+        "secteur": {
+            "code": "communication",
+            "label": "Communication"
+        },
+        "active": "2026-09-04T00:00:00.000Z"
+    },
+    {
+        "title": "TECHNICIEN MAINTENANCE MÉCANIQUE (SITE MINIER)",
+        "source_url": "https://emploi.educarriere.ci/offre-154820-technicien-maintenance-mecanique-site-minier.html",
+        "canonical_url": "https://emploi.educarriere.ci/offre-154820-technicien-maintenance-mecanique-site-minier.html",
+        "location_raw": "Abidjan, Cote d'ivoire",
+        "salary_raw": null,
+        "published_at": "2026-09-04T00:00:00.000Z",
+        "collected_at": "2026-09-05T20:16:44.126Z",
+        "first_seen_at": "2026-09-05T20:16:44.126Z",
+        "last_seen_at": "2026-09-05T20:16:44.126Z",
+        "expires_at": "2026-10-04T00:00:00.000Z",
+        "application_deadline_at": "2026-10-04T00:00:00.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": null,
+            "label": "Abidjan, Cote d'ivoire"
+        },
+        "specialty": {
+            "code": "actuariat",
+            "label": "Actuariat"
+        },
+        "contract_type": {
+            "code": "INCONNU",
+            "label": "Emploi"
+        },
+        "experience_level": {
+            "code": "INCONNU",
+            "label": null,
+            "min_years": null,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_2",
+            "label": "BAC+2",
+            "rank": 2
+        },
+        "description": "Détails de l'offre TECHNICIEN MAINTENANCE MÉCANIQUE (SITE MINIER) H/F Lieu : Abidjan, Côte d'Ivoire Type de contrat : Présentation du cabinet YSED GROUP CONSULTING est un cabinet de conseil en ressources humaines qui accompagne les entreprises dans leurs enjeux de recrutement , de développement des compétences, de structuration organisationnelle et de performance stratégique. Le cabinet se distingue par une approche orientée résultats, innovation RH et intégration progressive des outils digitaux par l’Intelligence Artificielle. Nous recherchons pour le compte de l'un de nos clients, un(e) Technicien(e) Maintenance Mécanique. Le/la Technicien(e) Maintenance Mécanique assure l'entretien préventif et curatif des équipements et engins mécaniques du site (foreuses, engins de chargement et de transport, convoyeurs, concasseurs). Il/elle garantit la disponibilité et la fiabilité des équipements, dans le respect des délais, des normes de sécurité et des procédures industrielles. Missions : • Réaliser les opérations de maintenance préventive selon le planning établi (graissage, contrôles, remplacement de pièces d'usure) • Diagnostiquer les pannes mécaniques et procéder aux réparations sur les engins et équipements • Intervenir en urgence sur les pannes pour limiter les temps d'immobilisation des équipements • Assurer la maintenance des équipements spécifiques au site minier (concasseurs, convoyeurs, engins lourds) • Contrôler le bon fonctionnement des systèmes hydrauliques et pneumatiques • Renseigner les fiches d'intervention, rapports de maintenance et historiques d'équipements (GMAO) • Participer aux arrêts programmés et aux opérations de maintenance lourde • Proposer des améliorations techniques pour réduire les pannes récurrentes • Veiller à la disponibilité des pièces de rechange et signaler les besoins d'approvisionnement • Respecter et faire respecter les consignes de sécurité sur le site. Profil recherché : • BT/BTS en Maintenance Industrielle, Mécanique, Électromécanique ou domaine équivalent • Expérience minimale de 2 à 3 ans en maintenance mécanique industrielle, idéalement en secteur minier • Bonne connaissance des équipements industriels lourds (engins miniers, concasseurs, convoyeurs) • Maîtrise de la lecture de plans mécaniques et hydrauliques • Disponibilité pour horaires postés (3x8) et interventions d'urgence. Qualités : • Rigueur et réactivité face aux pannes et situations d'urgence • Sens aigu de la sécurité et respect strict des consignes • Résistance physique et capacité à travailler dans des conditions industrielles exigeantes • Esprit d'analyse et de résolution de problèmes techniques • Autonomie et sens de l'initiative • Esprit d'équipe et bonne communication avec les équipes de production Compétences techniques • Maintenance mécanique et hydraulique d'équipements industriels lourds • Connaissance des équipements miniers (engins de chargement, concasseurs, convoyeurs) • Diagnostic de pannes et techniques de dépannage industriel • Utilisation d'outils de GMAO (Gestion de Maintenance Assistée par Ordinateur) • Connaissance des normes de sécurité industrielle (HSE) • Lecture de schémas mécaniques et hydrauliques Dossier de candidature : Merci d’adresser votre votre CV, une lettre de motivation, ainsi que toute attestation ou certification justifiant votre expérience et vos habilitations à l’adresse suivante : recrutementysed@gmail.com En mentionnant dans l’objet « Technicien Maintenance Mécanique ». Date limite de Candidature : 03/10/2026",
+        "company_name": "YSED Group Consulting",
+        "company": {
+            "name": "YSED Group Consulting",
+            "website_url": null,
+            "type": null,
+            "description": null
+        },
+        "company_hint": null,
+        "application_email": "recrutementysed@gmail.com",
+        "application_emails": [
+            "recrutementysed@gmail.com"
+        ],
+        "remote_work": null,
+        "raw_fields": {
+            "contract_raw": "Emploi",
+            "experience_raw": null,
+            "education_raw": "BAC+2, BT, CAP",
+            "published_raw": "Publiée le 04/09/2026",
+            "expires_raw": "04/10/2026",
+            "secteur_raw": "Actuariat"
+        },
+        "secteur": {
+            "code": "actuariat",
+            "label": "Actuariat"
+        },
+        "active": "2026-09-04T00:00:00.000Z"
+    },
+    {
+        "title": "ASSISTANT RH BILINGUE CHARGE DE PAIE",
+        "source_url": "https://emploi.educarriere.ci/offre-154819-assistant-rh-bilingue-charge-de-paie.html",
+        "canonical_url": "https://emploi.educarriere.ci/offre-154819-assistant-rh-bilingue-charge-de-paie.html",
+        "location_raw": "Côte d'Ivoire",
+        "salary_raw": null,
+        "published_at": "2026-09-04T00:00:00.000Z",
+        "collected_at": "2026-09-05T20:17:01.843Z",
+        "first_seen_at": "2026-09-05T20:17:01.843Z",
+        "last_seen_at": "2026-09-05T20:17:01.843Z",
+        "expires_at": "2026-09-10T00:00:00.000Z",
+        "application_deadline_at": "2026-09-10T00:00:00.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": null,
+            "district": null,
+            "label": "Côte d'Ivoire"
+        },
+        "specialty": {
+            "code": "ressources humaines",
+            "label": "Ressources Humaines"
+        },
+        "contract_type": {
+            "code": "CDD",
+            "label": "Emploi (CDD)"
+        },
+        "experience_level": {
+            "code": "INCONNU",
+            "label": null,
+            "min_years": null,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_3",
+            "label": "BAC+3",
+            "rank": 3
+        },
+        "description": "Détails de l'offre Résumé du poste Sous l'autorité de la Direction, le/la Chargé(e) des Ressources Humaines assure la gestion complète du cycle RH de l'entreprise : recrutement et intégration des talents, suivi des parcours de carrière, conformité sociale et fiscale en lien avec la comptabilité. Doté(e) d'une véritable fibre commerciale et de compétences en intelligence artificielle, il/elle contribue à moderniser et fiabiliser les pratiques RH de l'entreprise tout en soutenant les objectifs de développement commercial. Missions principales • Recrutement — Rédiger, diffuser et gérer les offres d'emploi sur les canaux appropriés (jobboards, réseaux sociaux, cabinets). • Présélectionner les candidatures, conduire les entretiens d'embauche et évaluer l'adéquation des profils avec les postes. • Administrer et interpréter les tests psychotechniques et outils d'évaluation dans le processus de sélection. • Utiliser des outils RH de gestion du recrutement (ATS) pour piloter et fiabiliser le processus d'embauche. • Gestion de carrière — Suivre les parcours professionnels, les évaluations de performance et les plans de mobilité interne. • Utiliser des outils RH de gestion de carrière pour cartographier les compétences et anticiper les besoins en développement. • Accompagner les collaborateurs et les managers dans les projets d'évolution professionnelle. • Administration sociale & fiscale — Suivre, en coordination avec la comptabilité, les déclarations sociales et fiscales liées au personnel (cotisations sociales, charges fiscales, échéances légales). • Veiller au respect de la réglementation du travail et des obligations légales de l'entreprise. • Assurer la fiabilité et la mise à jour des dossiers administratifs du personnel. • Digitalisation & innovation RH — Exploiter des outils et solutions d'intelligence artificielle pour optimiser les processus RH (tri de CV, reporting, automatisation des tâches administratives). • Assurer une veille active sur les nouvelles technologies et outils RH afin de proposer des améliorations continues. • Fibre commerciale — Développer une approche orientée résultats dans la gestion des relations internes et externes (candidats, partenaires, prestataires RH). • Contribuer à la promotion de la marque employeur et à l'image de l'entreprise auprès des candidats et partenaires. Profil recherché Formation : Bac+3 (Licence) minimum en Ressources Humaines, Gestion, Psychologie du travail ou domaine équivalent Langues : Bilingue (Français / Anglais), à l'oral comme à l'écrit Expérience : 3ans — expérience confirmée en gestion RH généraliste, recrutement et gestion de carrière Compétences techniques • Connaissances avancées en intelligence artificielle et ses applications RH. • Maîtrise des outils RH de gestion du recrutement • Capacité à conduire des entretiens d'embauche et à administrer des tests psychotechniques. • Bonne connaissance des déclarations sociales et fiscales et de leur articulation avec la comptabilité. • Maîtrise des outils bureautiques et des plateformes de communication professionnelle. Qualités personnelles • Fibre commerciale et sens du relationnel. • Rigueur, discrétion et sens de la confidentialité. • Excellentes capacités d'analyse, d'écoute et de communication. • Autonomie, proactivité et esprit d'initiative. • Capacité d'adaptation aux outils numériques et aux nouvelles technologies. Ressources humaines",
+        "company_name": "Une importante entreprise",
+        "company": {
+            "name": "Une importante entreprise",
+            "website_url": null,
+            "type": null,
+            "description": null
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": null,
+        "raw_fields": {
+            "contract_raw": "Emploi (CDD)",
+            "experience_raw": null,
+            "education_raw": "BAC+3, BAC+4, BAC+5",
+            "published_raw": "Publiée le 04/09/2026",
+            "expires_raw": "10/09/2026",
+            "secteur_raw": "Ressources Humaines"
+        },
+        "secteur": {
+            "code": "ressources humaines",
+            "label": "Ressources Humaines"
+        },
+        "active": "2026-09-04T00:00:00.000Z"
+    },
+    {
+        "title": "RESPONSABLE HSE MINE",
+        "source_url": "https://emploi.educarriere.ci/offre-154816-responsable-hse-mine.html",
+        "canonical_url": "https://emploi.educarriere.ci/offre-154816-responsable-hse-mine.html",
+        "location_raw": "Abidjan, Cote d'ivoire",
+        "salary_raw": null,
+        "published_at": "2026-09-04T00:00:00.000Z",
+        "collected_at": "2026-09-05T20:17:15.402Z",
+        "first_seen_at": "2026-09-05T20:17:15.402Z",
+        "last_seen_at": "2026-09-05T20:17:15.402Z",
+        "expires_at": "2026-10-03T00:00:00.000Z",
+        "application_deadline_at": "2026-10-03T00:00:00.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": null,
+            "label": "Abidjan, Cote d'ivoire"
+        },
+        "specialty": {
+            "code": "actuariat, mines/geologie/petrole , qualite",
+            "label": "Actuariat, Mines/Géologie/Pétrole , Qualité"
+        },
+        "contract_type": {
+            "code": "INCONNU",
+            "label": "Emploi"
+        },
+        "experience_level": {
+            "code": "INCONNU",
+            "label": null,
+            "min_years": null,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_4",
+            "label": "BAC+4",
+            "rank": 4
+        },
+        "description": "Détails de l'offre RESPONSABLE HSE MINE H/F Lieu : Abidjan, Côte d'Ivoire Type de contrat : Présentation du cabinet YSED GROUP CONSULTING est un cabinet de conseil en ressources humaines qui accompagne les entreprises dans leurs enjeux de recrutement , de développement des compétences, de structuration organisationnelle et de performance stratégique. Le cabinet se distingue par une approche orientée résultats, innovation RH et intégration progressive des outils digitaux par l’Intelligence Artificielle. Nous recherchons pour le compte de l'un de nos clients, un(e) Responsable HSE Mine. Le/la Responsable HSE Mine définit, déploie et pilote la politique Hygiène, Sécurité et Environnement du site minier. Il/elle garantit la protection des collaborateurs, la maîtrise des risques industriels et environnementaux, ainsi que la conformité du site à la réglementation minière et environnementale en vigueur. Missions : • Élaborer, déployer et actualiser la politique HSE du site en cohérence avec la stratégie de l'entreprise • Identifier, évaluer et cartographier les risques professionnels, industriels et environnementaux liés à l'activité minière • Concevoir et animer les programmes de formation et de sensibilisation HSE des équipes (inductions, causeries sécurité) • Réaliser des audits, inspections et contrôles réguliers de conformité sur le terrain (zones d'extraction, ateliers, base vie) • Piloter les enquêtes suite aux incidents, accidents et presqu'accidents, et proposer des actions correctives • Assurer le suivi des indicateurs HSE (taux de fréquence, taux de gravité, non-conformités) • Veiller à la conformité du site aux normes et certifications en vigueur (ISO 45001, ISO 14001) • Superviser la gestion des déchets, rejets, eaux et impacts environnementaux du site minier • Élaborer et mettre à jour les plans d'urgence, de gestion de crise et d'évacuation • Gérer les relations avec les organismes de contrôle, l'inspection du travail et les autorités environnementales et minières • Assurer une veille réglementaire HSE et anticiper les évolutions normatives du secteur minier. Profil recherché : • Diplôme Bac+4/5 en HSE, QHSE, Génie Minier, Environnement ou équivalent • Expérience minimale de 5 ans en gestion HSE dans le secteur minier ou industriel • Bonne connaissance de la réglementation ivoirienne du travail, minière et environnementale • Maîtrise des référentiels et normes HSE internationales (ISO 45001, ISO 14001) • Certifications HSE appréciées (auditeur interne, formateur SST, gestion des explosifs, etc.). Qualités : • Leadership et autorité pour faire respecter les règles HSE à tous les niveaux • Rigueur, méthode et sens de l'analyse • Pédagogie et capacité à sensibiliser et former les équipes • Sang-froid et réactivité en situation de crise ou d'urgence • Intégrité et exemplarité • Excellentes capacités de communication avec la Direction, les équipes et les organismes externes Compétences techniques • Élaboration et pilotage de systèmes de management HSE (ISO 45001, ISO 14001) • Analyse et gestion des risques professionnels, industriels et environnementaux propres au secteur minier • Techniques d'audit, d'inspection et d'enquête accident • Connaissance de la réglementation minière, environnementale et du travail en Côte d'Ivoire • Gestion de projets HSE et animation de programmes de formation/sensibilisation • Gestion des risques liés aux explosifs et aux opérations de minage Dossier de candidature : Merci d’adresser votre votre CV, une lettre de motivation, ainsi que toute attestation ou certification justifiant votre expérience et vos habilitations à l’adresse suivante : recrutementysed@gmail.com En mentionnant dans l’objet « Responsable HSE Mine ». Date limite de Candidature : 03/10/2026 Étudier L'Éthique",
+        "company_name": "YSED Group Consulting",
+        "company": {
+            "name": "YSED Group Consulting",
+            "website_url": null,
+            "type": null,
+            "description": null
+        },
+        "company_hint": null,
+        "application_email": "recrutementysed@gmail.com",
+        "application_emails": [
+            "recrutementysed@gmail.com"
+        ],
+        "remote_work": null,
+        "raw_fields": {
+            "contract_raw": "Emploi",
+            "experience_raw": null,
+            "education_raw": "BAC+4, BAC+5, BAC+6",
+            "published_raw": "Publiée le 04/09/2026",
+            "expires_raw": "03/10/2026",
+            "secteur_raw": "Actuariat, Mines/Géologie/Pétrole , Qualité"
+        },
+        "secteur": {
+            "code": "actuariat, mines/geologie/petrole , qualite",
+            "label": "Actuariat, Mines/Géologie/Pétrole , Qualité"
+        },
+        "active": "2026-09-04T00:00:00.000Z"
+    },
+    {
+        "title": "CHEF COMPTABLE",
+        "source_url": "https://emploi.educarriere.ci/offre-154815-chef-comptable.html",
+        "canonical_url": "https://emploi.educarriere.ci/offre-154815-chef-comptable.html",
+        "location_raw": "ABIDJAN MARCORY ZONE 4",
+        "salary_raw": null,
+        "published_at": "2026-09-04T00:00:00.000Z",
+        "collected_at": "2026-09-05T20:17:34.666Z",
+        "first_seen_at": "2026-09-05T20:17:34.666Z",
+        "last_seen_at": "2026-09-05T20:17:34.666Z",
+        "expires_at": "2026-09-30T00:00:00.000Z",
+        "application_deadline_at": "2026-09-30T00:00:00.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": "Marcory",
+            "label": "ABIDJAN MARCORY ZONE 4"
+        },
+        "specialty": {
+            "code": "commerce/ventes",
+            "label": "Commerce/Ventes"
+        },
+        "contract_type": {
+            "code": "CDI",
+            "label": "Emploi (CDI)"
+        },
+        "experience_level": {
+            "code": "INCONNU",
+            "label": null,
+            "min_years": null,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_4",
+            "label": "BAC+4",
+            "rank": 4
+        },
+        "description": "Détails de l'offre • Contrôler la mise en œuvre du plan comptable appliqué, fixer les objectifs de l’équipe, suivre ses performances, organiser le travail, distribuer et déléguer des tâches. • faire saisir les opérations et Superviser au quotidien son équipe dans ses tâches de comptabilité générale, auxiliaire et analytique, en particulier dans la tenue des comptes, la saisie, la numérotation et le classement des pièces comptables, dans les travaux d’inventaire, la clôture des comptes annuels, l’établissement des états financiers définitifs. Contrôle de conformité aux obligations réglementaires • Définir le plan comptable appliqué (plan comptable général [PCG] ou de l’entreprise), suivre sa mise en œuvre. • Veiller à l’application du processus comptable, des procédures et des normes comptables en vigueur. • Contrôler le respect des obligations légales et réglementaires, des délais de clôt. *faire ses déclarations mensuelles • Réaliser des diagnostics financiers, définir la stratégie comptable et suivre son application. • Préparer l’audit annuel de l’entreprise. • Produire le prévisionnel financier (tableaux de synthèse, outils de reporting, tableaux prévisionnels), optimiser les outils décisionnels. • Informer, conseiller les dirigeants dans leurs décisions stratégiques.",
+        "company_name": "Une entreprise",
+        "company": {
+            "name": "Une entreprise",
+            "website_url": null,
+            "type": null,
+            "description": null
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": null,
+        "raw_fields": {
+            "contract_raw": "Emploi (CDI)",
+            "experience_raw": null,
+            "education_raw": "BAC+4",
+            "published_raw": "Publiée le 04/09/2026",
+            "expires_raw": "30/09/2026",
+            "secteur_raw": "Commerce/Ventes"
+        },
+        "secteur": {
+            "code": "commerce/ventes",
+            "label": "Commerce/Ventes"
+        },
+        "active": "2026-09-04T00:00:00.000Z"
+    },
+    {
+        "title": "GÉOLOGUE MINE",
+        "source_url": "https://emploi.educarriere.ci/offre-154814-geologue-mine.html",
+        "canonical_url": "https://emploi.educarriere.ci/offre-154814-geologue-mine.html",
+        "location_raw": "Abidjan",
+        "salary_raw": null,
+        "published_at": "2026-09-04T00:00:00.000Z",
+        "collected_at": "2026-09-05T20:17:47.005Z",
+        "first_seen_at": "2026-09-05T20:17:47.005Z",
+        "last_seen_at": "2026-09-05T20:17:47.005Z",
+        "expires_at": "2026-10-03T00:00:00.000Z",
+        "application_deadline_at": "2026-10-03T00:00:00.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": null,
+            "label": "Abidjan"
+        },
+        "specialty": {
+            "code": "actuariat, mines/geologie/petrole",
+            "label": "Actuariat, Mines/Géologie/Pétrole"
+        },
+        "contract_type": {
+            "code": "INCONNU",
+            "label": "Emploi"
+        },
+        "experience_level": {
+            "code": "INCONNU",
+            "label": null,
+            "min_years": null,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_4",
+            "label": "BAC+4",
+            "rank": 4
+        },
+        "description": "Détails de l'offre GÉOLOGUE MINE H/F Lieu : Abidjan, Côte d'Ivoire Type de contrat : Présentation du cabinet YSED GROUP CONSULTING est un cabinet de conseil en ressources humaines qui accompagne les entreprises dans leurs enjeux de recrutement , de développement des compétences, de structuration organisationnelle et de performance stratégique. Le cabinet se distingue par une approche orientée résultats, innovation RH et intégration progressive des outils digitaux par l’Intelligence Artificielle. Nous recherchons pour le compte de l'un de nos clients, un(e) Géologue Mine. Le/la Géologue Mine réalise les études géologiques nécessaires à l'exploration, à l'évaluation et à l'exploitation des gisements. Il/elle contribue à la connaissance du sous-sol, à l'estimation des ressources minérales et à l'optimisation du plan d'exploitation, dans le respect des normes techniques et environnementales. Missions : • Réaliser les campagnes de reconnaissance géologique et de cartographie du gisement • Superviser les campagnes de sondage, de carottage et d'échantillonnage • Analyser et interpréter les données géologiques et les résultats d'analyses de laboratoire • Modéliser les gisements et estimer les ressources et réserves minérales • Participer à l'élaboration du plan d'exploitation en collaboration avec les équipes techniques • Assurer le suivi géologique de l'avancement de l'exploitation (contrôle de teneur, cartographie de front) • Rédiger les rapports géologiques et techniques destinés à la Direction et aux partenaires • Contribuer aux études de faisabilité et à l'évaluation économique des gisements • Veiller à la conformité des activités d'exploration avec la réglementation minière et environnementale • Collaborer avec les géomètres, ingénieurs miniers et équipes d'exploitation. Profil recherché : • Diplôme d'Ingénieur ou Master en Géologie, Géologie Minière ou domaine équivalent • Expérience minimale de 3 à 5 ans en exploration ou géologie minière • Bonne maîtrise des logiciels de modélisation géologique (Surpac, Datamine, Micromine ou équivalent) • Connaissance des techniques de sondage, d'échantillonnage et d'estimation de ressources • Disponibilité pour missions terrain et déplacements sur sites d'exploration. Qualités : • Rigueur scientifique et esprit d'analyse • Autonomie et capacité de travail sur le terrain • Curiosité intellectuelle et sens de l'observation • Bonne capacité de synthèse et de rédaction technique • Résistance physique et adaptabilité aux conditions de terrain • Esprit d'équipe et bonne communication avec les autres services techniques Compétences : • Cartographie géologique et interprétation de données de sondage • Modélisation de gisements et estimation de ressources/réserves (Surpac, Datamine, Micromine) • Techniques d'échantillonnage, de carottage et d'analyse minéralogique • Connaissance des méthodes de contrôle de teneur et de suivi géologique d'exploitation • Rédaction de rapports géologiques et techniques Dossier de candidature : Merci d’adresser votre votre CV, une lettre de motivation, ainsi que toute attestation ou certification justifiant votre expérience et vos habilitations à l’adresse suivante : recrutementysed@gmail.com En mentionnant dans l’objet « Géologue Mine ». Date limite de Candidature : 03/10/2026 Analyser Des Minéraux",
+        "company_name": "YSED Group Consulting",
+        "company": {
+            "name": "YSED Group Consulting",
+            "website_url": null,
+            "type": null,
+            "description": null
+        },
+        "company_hint": null,
+        "application_email": "recrutementysed@gmail.com",
+        "application_emails": [
+            "recrutementysed@gmail.com"
+        ],
+        "remote_work": null,
+        "raw_fields": {
+            "contract_raw": "Emploi",
+            "experience_raw": null,
+            "education_raw": "BAC+4, BAC+5, BAC+6",
+            "published_raw": "Publiée le 04/09/2026",
+            "expires_raw": "03/10/2026",
+            "secteur_raw": "Actuariat, Mines/Géologie/Pétrole"
+        },
+        "secteur": {
+            "code": "actuariat, mines/geologie/petrole",
+            "label": "Actuariat, Mines/Géologie/Pétrole"
+        },
+        "active": "2026-09-04T00:00:00.000Z"
+    },
+    {
+        "title": "ASSISTANT (E) RESSOURCES HUMAINES",
+        "source_url": "https://emploi.educarriere.ci/offre-154813-assistant-e-ressources-humaines.html",
+        "canonical_url": "https://emploi.educarriere.ci/offre-154813-assistant-e-ressources-humaines.html",
+        "location_raw": "Côte d'Ivoire",
+        "salary_raw": null,
+        "published_at": "2026-09-04T00:00:00.000Z",
+        "collected_at": "2026-09-05T20:18:00.673Z",
+        "first_seen_at": "2026-09-05T20:18:00.673Z",
+        "last_seen_at": "2026-09-05T20:18:00.673Z",
+        "expires_at": "2026-09-21T00:00:00.000Z",
+        "application_deadline_at": "2026-09-21T00:00:00.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": null,
+            "district": null,
+            "label": "Côte d'Ivoire"
+        },
+        "specialty": {
+            "code": "industrie agro-alimentaire",
+            "label": "Industrie Agro-alimentaire"
+        },
+        "contract_type": {
+            "code": "CDI",
+            "label": "Emploi (CDI)"
+        },
+        "experience_level": {
+            "code": "INCONNU",
+            "label": null,
+            "min_years": null,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_2",
+            "label": "BAC+2",
+            "rank": 2
+        },
+        "description": "Détails de l'offre Dans le cadre du renforcement de ses effectifs, FRUINOV -CI évoluant dans le secteur agroalimentaire recherche un(e) Assistant(e) Ressources Humaines pour rejoindre l’équipe de sa filiale ANADABOU. Missions et responsabilités - Assurer la gestion administrative du personnel de l'embauche jusqu'au départ des collaborateurs. - Participer à l'ensemble du processus de recrutement , de la diffusion des offres à l'intégration des nouveaux employés. - Constituer, mettre à jour et archiver les dossiers du personnel dans le respect des procédures internes. - Préparer les documents administratifs relatifs à la vie du salarié, notamment les contrats de travail, avenants, attestations et correspondances RH. - Assurer le suivi des congés, absences, sanctions disciplinaires, visites médicales et autres obligations administratives. - Participer à la collecte, à la vérification et à la transmission des éléments variables nécessaires à l'élaboration de la paie. - Veiller à l'application des procédures RH ainsi qu'au respect de la législation du travail et des dispositions réglementaires en vigueur. - Produire et mettre à jour les tableaux de bord, statistiques et reportings RH destinés au département des Ressources Humaines. - Répondre aux demandes des collaborateurs relatives à l'administration du personnel et assurer un accompagnement de proximité. - Contribuer à la mise en œuvre des projets RH et participer à toute activité visant l'amélioration de la gestion des ressources humaines au sein de l'entreprise. Profil recherché Titulaire d'un diplôme de niveau BAC+2/3 en Gestion des Ressources Humaines, Gestion des Entreprises ou dans une discipline équivalente. Vous justifiez d'une expérience professionnelle minimale de trois (03) années dans une fonction similaire, idéalement acquise au sein d'une entreprise du secteur agricole. Vous possédez une bonne connaissance de l'administration du personnel, des procédures de recrutement ainsi que de la réglementation sociale et du droit du travail. Vous maîtrisez les outils bureautiques, notamment Microsoft Word, Excel et PowerPoint, et démontrez une excellente capacité d'organisation. Doté d'un sens élevé de la confidentialité, vous faites preuve de rigueur, de fiabilité, d'autonomie et d'un excellent relationnel. Votre capacité à travailler sous pression, à gérer plusieurs dossiers simultanément, à communiquer efficacement et à collaborer avec les différents services de l'entreprise constitue un atout essentiel pour réussir à ce poste. Dossier de candidature Les candidats intéressés sont invités à transmettre leur curriculum vitae, leur lettre de motivation, avant la date du 22 septembre à l’adresse suivante : recrutement.fruinov@fruinov.ci Production alimentaire",
+        "company_name": "FRUINOV CI",
+        "company": {
+            "name": "FRUINOV CI",
+            "website_url": null,
+            "type": null,
+            "description": null
+        },
+        "company_hint": null,
+        "application_email": "recrutement.fruinov@fruinov.ci",
+        "application_emails": [
+            "recrutement.fruinov@fruinov.ci"
+        ],
+        "remote_work": null,
+        "raw_fields": {
+            "contract_raw": "Emploi (CDI)",
+            "experience_raw": null,
+            "education_raw": "BAC+2, BAC+3",
+            "published_raw": "Publiée le 04/09/2026",
+            "expires_raw": "21/09/2026",
+            "secteur_raw": "Industrie Agro-alimentaire"
+        },
+        "secteur": {
+            "code": "industrie agro-alimentaire",
+            "label": "Industrie Agro-alimentaire"
+        },
+        "active": "2026-09-04T00:00:00.000Z"
+    }
+]

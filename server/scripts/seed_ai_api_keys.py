@@ -28,8 +28,8 @@ AI_KEYS: tuple[AIKeySeed, ...] = (
         env_var="OPENROUTER_API_KEY",
         provider_type=AIProviderType.OPENAI_COMPATIBLE,
         base_url="https://openrouter.ai/api/v1",
-        models=["deepseek/deepseek-chat"],
-        priority=10,
+        models=["z-ai/glm-5.2:free", "minimax/minimax-m3:free", "nvidia/nemotron-3-ultra-550b-a55b:free", "google/gemma-4-31b-it:free" "deepseek/deepseek-chat"],
+        priority=30,
         notes="Seed admin IA: OpenRouter (repere fourni: sk-or-v1-b...a192).",
     ),
     AIKeySeed(
@@ -47,7 +47,7 @@ AI_KEYS: tuple[AIKeySeed, ...] = (
         provider_type=AIProviderType.OPENAI_COMPATIBLE,
         base_url="https://api.deepseek.com",
         models=["deepseek-chat"],
-        priority=30,
+        priority=10,
         notes="Seed admin IA: DeepSeek (repere fourni: sk-708...8c).",
     ),
 )

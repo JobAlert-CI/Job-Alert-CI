@@ -91,6 +91,8 @@ class OfferCreate(ORMModel):
     profile_requirements: list[str] | None = None
     benefits: list[str] | None = None
     tags: list[str] | None = None
+    # Salaire brut saisi manuellement (texte libre : "400 000 - 600 000 FCFA").
+    salary_raw: str | None = Field(default=None, max_length=255)
 
 
 class OfferUpdate(ORMModel):
@@ -113,6 +115,8 @@ class OfferUpdate(ORMModel):
     benefits: list[str] | None = None
     tags: list[str] | None = None
     visible_site: bool | None = None
+    # Salaire brut (texte libre) : null vide la valeur, absence = inchangé.
+    salary_raw: str | None = Field(default=None, max_length=255)
 
 
 class OfferVisibilityUpdate(ORMModel):

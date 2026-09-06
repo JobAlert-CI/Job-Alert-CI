@@ -7,6 +7,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from models.jobs import Company, JobOffer, JobOfferStatus
+from services.search_utils import safe_ilike
 
 
 class CompanyServiceError(Exception):
@@ -107,9 +108,43 @@ def top_recruiters(db: Session, *, limit: int = 10) -> list[tuple[Company, int]]
     return [(row[0], int(row[1] or 0)) for row in rows]
 
 
+def list_companies_with_counts(
+    db: Session,
+    *,
+    q: str | None = None,
+    limit: int = 50,
+    offset: int = 0,
+) -> list[tuple[Company, int]]:
+    """Liste paginee (ordre alphabetique) avec compte d'offres actives.
+
+    Meme agregat SQL que top_recruiters (GROUP BY + LEFT JOIN, une seule
+    requete) mais ordre alphabetique + recherche LIKE echappee + offset.
+    Renvoie des tuples (Company, active_offers_count) pour que la route
+    construise des CompanyAdminRead avec le VRAI compte — renvoyer l'ORM
+    brut faisait serialiser active_offers_count=0 partout (champ calcule
+    absent du modele, defaut Pydantic 0).
+    """
+    stmt = (
+        select(Company, func.count(JobOffer.id).label("active_offers_count"))
+        .join(JobOffer, JobOffer.company_id == Company.id, isouter=True)
+        .where(
+            Company.deleted_at.is_(None),
+            (JobOffer.id.is_(None)) | (JobOffer.status == JobOfferStatus.ACTIVE.value),
+            safe_ilike(Company.name, q) if q else True,
+        )
+        .group_by(Company.id)
+        .order_by(Company.name.asc())
+        .limit(limit)
+        .offset(offset)
+    )
+    rows = db.execute(stmt).all()
+    return [(row[0], int(row[1] or 0)) for row in rows]
+
+
 __all__ = [
     "CompanyServiceError",
     "create_company",
+    "list_companies_with_counts",
     "merge_companies",
     "soft_delete_company",
     "top_recruiters",

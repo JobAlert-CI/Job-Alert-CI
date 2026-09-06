@@ -36,6 +36,12 @@ const Contact = lazy(() => import("./Pages/Support/Contact"));
    (publique). L'ordre des routes importe : /admin/connexion AVANT la
    route layout pour ne pas être captée par le guard. */
 const AdminConnexion = lazy(() => import("./Pages/Admin/ConnexionAdmin"));
+const AdminTableauDeBord = lazy(() => import("./Pages/Admin/TableauDeBord"));
+const AdminOffres = lazy(() => import("./Pages/Admin/Offres"));
+const AdminFormulaireOffre = lazy(() => import("./Pages/Admin/FormulaireOffre"));
+const AdminDoublons = lazy(() => import("./Pages/Admin/Offres/sections/DoublonsPage"));
+const AdminEntreprises = lazy(() => import("./Pages/Admin/Entreprises"));
+const AdminAbonnes = lazy(() => import("./Pages/Admin/Abonnes"));
 const AdminLayout = lazy(() => import("./components/admin/AdminLayout"));
 const RequireAdmin = lazy(() => import("./components/admin/AdminGuard"));
 import { AdminAuthProvider } from "@/contexts/AdminAuth.context";
@@ -78,12 +84,13 @@ const Layout = () => {
 /* Layout admin : provider d'auth + guard + layout. Monté en dehors du
    layout public. Le provider vit au-dessus du guard pour que le guard
    (et toutes les pages) puissent consommer useAdminAuth. */
+/* Layout admin : guard + layout. Le provider AdminAuthProvider est
+   monté UNE seule fois au niveau de la route /admin (voir Routes) —
+   il enveloppe déjà la connexion ET les pages protégées. */
 const AdminLayoutRoute = () => (
-  <AdminAuthProvider>
-    <RequireAdmin>
-      <AdminLayout />
-    </RequireAdmin>
-  </AdminAuthProvider>
+  <RequireAdmin>
+    <AdminLayout />
+  </RequireAdmin>
 );
 
 const App = () => (
@@ -136,7 +143,36 @@ const App = () => (
 
                 {/* Toutes les autres routes admin sont sous AdminLayout (avec sidebar) */}
                 <Route element={<AdminLayoutRoute />}>
-                  {/* <Route index element={<AdminDashboardPage />} /> */}
+                  <Route index element={<AdminTableauDeBord />} />
+                  <Route
+                    path="offres"
+                    element={
+                      <RequireAdmin roles={["super_admin", "gestionnaire_offres"]}>
+                        <Outlet />
+                      </RequireAdmin>
+                    }
+                  >
+                    <Route index element={<AdminOffres />} />
+                    <Route path="nouvelle" element={<AdminFormulaireOffre />} />
+                    <Route path="doublons" element={<AdminDoublons />} />
+                    <Route path=":id" element={<AdminFormulaireOffre />} />
+                  </Route>
+                  <Route
+                    path="entreprises"
+                    element={
+                      <RequireAdmin roles={["super_admin"]}>
+                        <AdminEntreprises />
+                      </RequireAdmin>
+                    }
+                  />
+                  <Route
+                    path="utilisateurs"
+                    element={
+                      <RequireAdmin roles={["super_admin", "gestionnaire_utilisateurs"]}>
+                        <AdminAbonnes />
+                      </RequireAdmin>
+                    }
+                  />
                   {/* Autres routes admin à ajouter ici */}
                 </Route>
               </Route>

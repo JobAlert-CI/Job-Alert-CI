@@ -9,6 +9,7 @@ from models.admin import AdminAction
 from models.jobs import JobOffer, JobOfferStatus
 from models.rejected_duplicates import RejectedDuplicatePair
 from services.audit import log_admin_action
+from services.normalization import normalize_text
 
 
 class DuplicateServiceError(Exception):
@@ -25,6 +26,46 @@ MAX_OFFERS_FOR_DUPLICATE_SCAN = 1000
 # Audit 2, R3: profondeur maximale du parcours anti-cycles.
 MAX_DUPLICATE_CHAIN_DEPTH = 10
 
+# Mots trop frequents pour distinguer deux titres d'offres.
+_STOPWORDS_FR = frozenset(
+    ["a", "au", "aux", "avec", "ce", "cet", "cette", "des", "du", "en", "et", "il", "elle", "je", "la", "le", "les", "leur", "lui", "ma", "mes", "mon", "nos", "notre", "on", "ou", "par", "pour", "qu", "que", "qui", "sa", "se", "ses", "sur", "te", "tes", "ton", "tous", "tout", "trop", "tu", "un", "une", "vos", "votre", "vous", "d", "l", "m", "n", "s", "t", "y", "etre", "afrique", "africaine", "ci", "cote", "d", "ivoire", "offre", "emploi", "poste", "job", "mission", "missions"]
+)
+
+
+def _similarity_tokens(title: str | None) -> set[str]:
+    """Tokens normalises et significatifs d'un titre (stopwords retires)."""
+
+    tokens = normalize_text(title).split()
+    return {t for t in tokens if len(t) > 1 and t not in _STOPWORDS_FR}
+
+
+def _title_similarity(title_a: str | None, title_b: str | None) -> int:
+    """Score de similarite 0-100 entre deux titres (Dice sur tokens).
+
+    Formule: 2 x |A n B| / (|A| + |B|) — le coefficient de Dice, qui
+    recompense les quasi-subsets: « Developpeur React » vs « Developpeur
+    React Junior » donne ~80 (vs 67 en Jaccard pur), plus proche de
+    l'intuition d'un doublon reposte avec un detail en plus.
+    100 = titres identiques apres normalisation. Retourne un entier:
+    c'est ce score qui est affiche et compare au seuil admin.
+    """
+
+    ta, tb = _similarity_tokens(title_a), _similarity_tokens(title_b)
+    if not ta or not tb:
+        return 0
+    inter = len(ta & tb)
+    total = len(ta) + len(tb)
+    if total == 0 or inter == 0:
+        return 0
+    return round(2 * inter / total * 100)
+
+
+def _pair_key(offer_a_id: str, offer_b_id: str) -> tuple[str, str]:
+    """Cle ordonnee d'une paire d'IDs (canonique, insensible au sens A/B)."""
+
+    a, b = offer_a_id, offer_b_id
+    return (a, b) if a < b else (b, a)
+
 
 def find_potential_duplicates(
     db: Session,
@@ -34,7 +75,15 @@ def find_potential_duplicates(
 ) -> tuple[list[dict], bool]:
     """Renvoie (paires potentiellement doublons, scan_tronque).
 
-    Strategie simplifiee: memes entreprise normalisee + premier mot du titre.
+    Strategie en deux temps:
+    1. Groupes candidats = memes entreprise normalisee + premier mot du
+       titre (pre-filtre peu couteux qui limite les comparaisons).
+    2. Score reel de similarite (Jaccard sur tokens) calcule par paire;
+       seules les paires au-dessus du seuil demandees sont renvoyees.
+
+    Paires explicitement rejetees par un admin (RejectedDuplicatePair):
+    filtrees en amont — une paire jugée non-doublon ne reapparait pas
+    dans les scans suivants (promesse de la doc v3 section 5).
 
     Corrections audit 2:
     - R2: plus de dict `_warning` melange aux candidates — un bool
@@ -56,6 +105,13 @@ def find_potential_duplicates(
     ).all()
     truncated = len(rows) >= MAX_OFFERS_FOR_DUPLICATE_SCAN
 
+    # Paires rejetees par un admin: chargees une seule fois, comparees
+    # par cle ordonnee (le rejet est stocke trié, insensible au sens).
+    rejected = {
+        _pair_key(p.offer_a_id, p.offer_b_id)
+        for p in db.scalars(select(RejectedDuplicatePair)).all()
+    }
+
     groups: dict = {}
     for o in rows:
         company = o.company
@@ -75,6 +131,12 @@ def find_potential_duplicates(
         for i in range(len(group)):
             a = group[i]
             for b in group[i + 1 :]:
+                pair = _pair_key(a.id, b.id)
+                if pair in rejected:
+                    continue
+                score = _title_similarity(a.normalized_title or a.title, b.normalized_title or b.title)
+                if score < min_similarity:
+                    continue
                 candidates.append(
                     {
                         "offer_a_id": a.id,
@@ -82,10 +144,12 @@ def find_potential_duplicates(
                         "offer_a_title": a.title,
                         "offer_b_title": b.title,
                         "offer_a_company": a.company.normalized_name if a.company else None,
-                        "similarity_score": min_similarity,
+                        "similarity_score": score,
                         "reason": f"Meme entreprise ({a.company.normalized_name if a.company else 'N/A'}) et titre proche",
                     }
                 )
+    # Tri par score decroissant: l'admin traite d'abord les cas evidents.
+    candidates.sort(key=lambda c: c["similarity_score"], reverse=True)
     return candidates, truncated
 
 
