@@ -47,7 +47,6 @@ copy .env.example .env          # puis renseigner DATABASE_URL etc.
 ```powershell
 cd client
 npm install
-npm run dev                     # http://localhost:5173, proxy /api → :8000
 ```
 
 ### Tout lancer en une commande

@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import date
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import select
+from sqlalchemy import case, func, select
 from sqlalchemy.orm import Session, selectinload
 
 from api.deps import get_current_admin, get_db, require_roles
@@ -13,7 +13,7 @@ from models.jobs import OfferIngestionEvent
 from models.referentials import Source
 from models.scraping import ScrapeRun, SourceScrapeRun
 from schemas.logs import EventLogRead
-from schemas.scraping import ScrapeRunRead, ScrapingStatusRead, ScrapingTrigger
+from schemas.scraping import ScrapeRunRead, ScrapingStatusRead, ScrapingSummaryRead, ScrapingTrigger
 from services.audit import log_admin_action
 
 # Le pilotage du scraping reste une operation sensible: super_admin uniquement.
@@ -100,6 +100,39 @@ async def list_scraping_runs(db: Session = Depends(get_db), limit: int = Query(3
         .offset(offset)
     )
     return list(db.scalars(stmt))
+
+
+@router.get("/stats/summary", response_model=ScrapingSummaryRead)
+async def scraping_stats_summary(db: Session = Depends(get_db)) -> None:
+    """Agrégats all-time sur les runs (compteurs du haut de la page Scraping).
+
+    Une seule requête GROUP BY virtuel (SUM + COUNT en une passe) :
+    - total_runs : tous les runs, y compris pending/running ;
+    - success_rate : success / runs TERMINÉS (success, partial_failure,
+      failed) — pending/running exclus du dénominateur, sinon le taux
+      serait artificiellement basé sur des runs non conclus ;
+    - total_raw/inserted_all_time : cumul des volumes collectés.
+    """
+    finished = (ScrapeRunStatus.SUCCESS, ScrapeRunStatus.PARTIAL_FAILURE, ScrapeRunStatus.FAILED)
+    row = db.execute(
+        select(
+            func.count(ScrapeRun.id),
+            func.sum(case((ScrapeRun.status == ScrapeRunStatus.SUCCESS, 1), else_=0)),
+            func.sum(case((ScrapeRun.status.in_(finished), 1), else_=0)),
+            func.coalesce(func.sum(ScrapeRun.total_raw), 0),
+            func.coalesce(func.sum(ScrapeRun.total_inserted), 0),
+        )
+    ).one()
+
+    total_runs, successes, finished_runs, total_raw, total_inserted = (
+        int(v) if v is not None else 0 for v in row
+    )
+    return ScrapingSummaryRead(
+        total_runs=total_runs,
+        success_rate=round(100.0 * successes / finished_runs, 1) if finished_runs else None,
+        total_raw_all_time=total_raw,
+        total_inserted_all_time=total_inserted,
+    )
 
 
 @router.get("/runs/{run_id}", response_model=ScrapeRunRead)

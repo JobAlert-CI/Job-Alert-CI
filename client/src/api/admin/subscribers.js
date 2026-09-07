@@ -73,6 +73,16 @@ const deleteSubscriber = async (subscriberId, { signal } = {}) => {
   return true;
 };
 
+/**
+ * POST /api/admin/subscribers/bulk-status — action groupée.
+ * body { subscriber_ids: string[] (1-500), status, reason? }.
+ * "deleted" refusé (RGPD unitaire) → { updated, not_found, status }.
+ */
+const updateSubscribersBulkStatus = async (data, { signal } = {}) => {
+  const response = await adminApi.post(`${API_URL}/bulk-status`, data, { signal });
+  return response.data;
+};
+
 export {
   getSubscribers,
   getSubscriber,
@@ -81,6 +91,7 @@ export {
   getSubscriberSends,
   sendCustomEmail,
   deleteSubscriber,
+  updateSubscribersBulkStatus,
 };
 
 export default {
@@ -91,4 +102,5 @@ export default {
   getSubscriberSends,
   sendCustomEmail,
   deleteSubscriber,
+  updateSubscribersBulkStatus,
 };

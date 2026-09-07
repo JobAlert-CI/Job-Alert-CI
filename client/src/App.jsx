@@ -42,6 +42,15 @@ const AdminFormulaireOffre = lazy(() => import("./Pages/Admin/FormulaireOffre"))
 const AdminDoublons = lazy(() => import("./Pages/Admin/Offres/sections/DoublonsPage"));
 const AdminEntreprises = lazy(() => import("./Pages/Admin/Entreprises"));
 const AdminAbonnes = lazy(() => import("./Pages/Admin/Abonnes"));
+const AdminDetailAbonne = lazy(() => import("./Pages/Admin/Abonnes/DetailAbonne"));
+const AdminEnvoyerSelection = lazy(() => import("./Pages/Admin/Abonnes/EnvoyerSelection"));
+const AdminScraping = lazy(() => import("./Pages/Admin/Scraping"));
+const AdminDetailRun = lazy(() => import("./Pages/Admin/Scraping/DetailRun"));
+const AdminFilieres = lazy(() => import("./Pages/Admin/Filieres"));
+const AdminSources = lazy(() => import("./Pages/Admin/Sources"));
+const AdminContenu = lazy(() => import("./Pages/Admin/Contenu"));
+const AdminAdministrateurs = lazy(() => import("./Pages/Admin/Administrateurs"));
+const AdminPremiereConnexion = lazy(() => import("./Pages/Admin/PremiereConnexion"));
 const AdminLayout = lazy(() => import("./components/admin/AdminLayout"));
 const RequireAdmin = lazy(() => import("./components/admin/AdminGuard"));
 import { AdminAuthProvider } from "@/contexts/AdminAuth.context";
@@ -141,6 +150,11 @@ const App = () => (
                 {/* Page de connexion (hors AdminLayout, pas de sidebar) */}
                 <Route path="connexion" element={<AdminConnexion />} />
 
+                {/* Cycle 15 : changement de mot de passe obligatoire après
+                    création avec temporaire — publique comme la connexion,
+                    l'écran redirige vers la connexion si pas de session. */}
+                <Route path="premiere-connexion" element={<AdminPremiereConnexion />} />
+
                 {/* Toutes les autres routes admin sont sous AdminLayout (avec sidebar) */}
                 <Route element={<AdminLayoutRoute />}>
                   <Route index element={<AdminTableauDeBord />} />
@@ -153,13 +167,54 @@ const App = () => (
                     }
                   >
                     <Route index element={<AdminOffres />} />
-                    <Route path="nouvelle" element={<AdminFormulaireOffre />} />
-                    <Route path="doublons" element={<AdminDoublons />} />
-                    <Route path=":id" element={<AdminFormulaireOffre />} />
-                  </Route>
+                      <Route path="nouvelle" element={<AdminFormulaireOffre />} />
+                      <Route path="doublons" element={<AdminDoublons />} />
+                      <Route path=":id" element={<AdminFormulaireOffre />} />
+                    </Route>
+                    {/* Scraping : super_admin uniquement (doc v3 §10) —
+                        route parente avec Outlet pour accueillir le
+                        détail de run (page 11, cycle suivant). */}
+                    <Route
+                      path="scraping"
+                      element={
+                        <RequireAdmin roles={["super_admin"]}>
+                          <Outlet />
+                        </RequireAdmin>
+                      }
+                    >
+                      <Route index element={<AdminScraping />} />
+                      <Route path="runs/:id" element={<AdminDetailRun />} />
+                    </Route>
+                  {/* Filières : super_admin uniquement (doc v3 §12). */}
                   <Route
-                    path="entreprises"
+                    path="filieres"
                     element={
+                      <RequireAdmin roles={["super_admin"]}>
+                        <AdminFilieres />
+                      </RequireAdmin>
+                    }
+                  />
+                  {/* Contenu : super_admin + moderateur (doc v3 §14). */}
+                  <Route
+                    path="contenu"
+                    element={
+                      <RequireAdmin roles={["super_admin", "moderateur"]}>
+                        <AdminContenu />
+                      </RequireAdmin>
+                    }
+                  />
+                  {/* Sources : super_admin uniquement (doc v3 §13). */}
+                  <Route
+                    path="sources"
+                    element={
+                      <RequireAdmin roles={["super_admin"]}>
+                        <AdminSources />
+                      </RequireAdmin>
+                    }
+                  />
+                  <Route
+                      path="entreprises"
+                      element={
                       <RequireAdmin roles={["super_admin"]}>
                         <AdminEntreprises />
                       </RequireAdmin>
@@ -169,7 +224,20 @@ const App = () => (
                     path="utilisateurs"
                     element={
                       <RequireAdmin roles={["super_admin", "gestionnaire_utilisateurs"]}>
-                        <AdminAbonnes />
+                        <Outlet />
+                      </RequireAdmin>
+                    }
+                  >
+                    <Route index element={<AdminAbonnes />} />
+                    <Route path=":id" element={<AdminDetailAbonne />} />
+                    <Route path=":id/envoyer" element={<AdminEnvoyerSelection />} />
+                  </Route>
+                  {/* Administrateurs : super_admin uniquement (doc v3 §15). */}
+                  <Route
+                    path="administrateurs"
+                    element={
+                      <RequireAdmin roles={["super_admin"]}>
+                        <AdminAdministrateurs />
                       </RequireAdmin>
                     }
                   />

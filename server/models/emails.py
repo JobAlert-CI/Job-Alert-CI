@@ -3,7 +3,19 @@ from __future__ import annotations
 from datetime import date, datetime
 from typing import TYPE_CHECKING
 
-from sqlalchemy import JSON, CheckConstraint, Date, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint
+from sqlalchemy import (
+    JSON,
+    CheckConstraint,
+    Date,
+    DateTime,
+    ForeignKey,
+    Index,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
+    text,
+)
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from db.base import Base, TimestampMixin, UUIDPrimaryKeyMixin
@@ -49,7 +61,18 @@ class EmailDigest(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     )
 
     __table_args__ = (
-        UniqueConstraint("subscriber_id", "digest_date", name="uq_email_digests_subscriber_date"),
+        # Unicite (subscriber, date) pour le digest AUTOMATIQUE seulement :
+        # les envois manuels (template_version='manual', doc v3 section 9)
+        # peuvent etre multiples par jour — index unique partiel PostgreSQL
+        # (cf. migration 0014). SQLite (tests) ne supporte pas les index
+        # partiels : la garde d'unicite applicative reste au pipeline auto.
+        Index(
+            "uq_email_digests_subscriber_date_auto",
+            "subscriber_id",
+            "digest_date",
+            unique=True,
+            postgresql_where=text("template_version <> 'manual'"),
+        ),
         CheckConstraint("offer_count >= 0", name="email_digest_offer_count_positive"),
     )
 

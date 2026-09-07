@@ -1,10 +1,9 @@
 # Crée schema ContentPageCreate et ContentPageUpdate
 from __future__ import annotations
-
 from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import select
+from sqlalchemy import func, select, update
 from sqlalchemy.orm import Session, joinedload
 
 from api.deps import get_current_admin, get_db, require_roles
@@ -13,9 +12,11 @@ from models.content import ContentPage
 from models.editorial import (
     Article,
     ArticleCategory,
+    ArticleKeyFigure,
     ArticleSection,
     ArticleSectionBlock,
     ArticleSeries,
+    ArticleTakeaway,
     DailyTip,
     SeriesArticle,
 )
@@ -29,6 +30,8 @@ from schemas.editorial import (
     ArticleCategoryUpdate,
     ArticleCreate,
     ArticleFeaturedUpdate,
+    ArticleKeyFigureCreate,
+    ArticleKeyFigureRead,
     ArticleListItem,
     ArticleRead,
     ArticleSectionCreate,
@@ -37,7 +40,11 @@ from schemas.editorial import (
     ArticleSeriesRead,
     ArticleSeriesUpdate,
     ArticleStatusUpdate,
+    ArticleTakeawayCreate,
+    ArticleTakeawayRead,
     ArticleUpdate,
+    ContentPageCreate,
+    ContentPageUpdate,
     DailyTipCreate,
     DailyTipRead,
     DailyTipUpdate,
@@ -69,6 +76,11 @@ def _build_article_item(article: Article) -> dict:
         "id": article.id,
         "content_page_id": article.content_page_id,
         "category_id": article.category_id,
+        # FIX (remonté utilisateur cycle 14) : la liste affichait category=null
+        # — le schéma ArticleListItem a le champ, la route détail le remplit,
+        # la liste non (même famille que active_offers_count cycle 6).
+        # joinedload déjà présent dans _article_query : zéro coût.
+        "category": article.category,
         "reading_minutes": article.reading_minutes,
         "view_count": article.view_count,
         "is_featured": article.is_featured,
@@ -358,6 +370,119 @@ async def reorder_sections(
     return {"message": "Ordre des sections mis à jour"}
 
 
+# ─── Points clés (takeaways) & chiffres clés (doc v3 §14.1) ──────────────
+
+
+def _next_position(db: Session, model, article_id: str) -> int:
+    """Position suivante pour un élément d'article (fin de liste)."""
+    max_pos = db.scalar(select(func.max(model.position)).where(model.article_id == article_id))
+    return (max_pos or 0) + 1
+
+
+def _shift_positions(db: Session, model, article_id: str, from_pos: int) -> None:
+    """Décale d'une position vers la fin tout élément >= from_pos (insertion).
+
+    Passe par des positions NEGATIVES temporaires (même astuce que le
+    reorder des sections) : un UPDATE direct position+1 violerait la
+    contrainte UNIQUE (article_id, position) car SQLite/Postgres
+    appliquent les UPDATE en une passe.
+    """
+    # 1. Positions temporaires négatives (1..N → -(1..N)) : jamais en conflit.
+    db.execute(
+        update(model.__table__)
+        .where(model.article_id == article_id, model.position >= from_pos)
+        .values(position=-model.position)
+    )
+    # 2. Retour en positif, décalé de +1 (-(p) → p+1).
+    db.execute(
+        update(model.__table__)
+        .where(model.article_id == article_id, model.position < 0)
+        .values(position=-model.position + 1)
+    )
+
+
+def _compact_positions(db: Session, model, article_id: str) -> None:
+    """Recompacte les positions 1..N après suppression (contrainte d'unicité article+position)."""
+    lignes = list(db.scalars(select(model).where(model.article_id == article_id).order_by(model.position)))
+    # Détecter AVANT de modifier : une fois ligne.position réécrite, la
+    # comparaison après coup serait toujours fausse.
+    a_bouge = any(ligne.position != i for i, ligne in enumerate(lignes, start=1))
+    if not a_bouge:
+        return
+    for i, ligne in enumerate(lignes, start=1):
+        ligne.position = i
+    db.commit()
+
+
+@router.post("/articles/{article_id}/takeaways", status_code=201, response_model=ArticleRead)
+async def add_takeaway(
+    article_id: str,
+    payload: ArticleTakeawayCreate,
+    db: Session = Depends(get_db),
+    admin: Administrator = Depends(get_current_admin),
+) -> dict:
+    """Ajoute un point clé — en fin de liste, ou inséré à `position` (décalage des suivants)."""
+    article = _require_article(db, article_id)
+    position = payload.position or _next_position(db, ArticleTakeaway, article.id)
+    if payload.position:
+        _shift_positions(db, ArticleTakeaway, article.id, payload.position)
+    db.add(ArticleTakeaway(article_id=article.id, position=position, text=payload.text))
+    log_admin_action(db, admin_id=admin.id, action=AdminAction.CREATE, target_table="article_takeaways", target_id=article.id)
+    db.commit()
+    return _build_article_read(_require_article(db, article_id))
+
+
+@router.delete("/takeaways/{takeaway_id}", status_code=204)
+async def delete_takeaway(takeaway_id: str, db: Session = Depends(get_db), admin: Administrator = Depends(get_current_admin)) -> None:
+    takeaway = db.get(ArticleTakeaway, takeaway_id)
+    if not takeaway:
+        raise HTTPException(status_code=404, detail="Point clé introuvable")
+    article_id = takeaway.article_id
+    db.delete(takeaway)
+    log_admin_action(db, admin_id=admin.id, action=AdminAction.DELETE, target_table="article_takeaways", target_id=takeaway_id)
+    db.commit()
+    _compact_positions(db, ArticleTakeaway, article_id)
+
+
+@router.post("/articles/{article_id}/key-figures", status_code=201, response_model=ArticleRead)
+async def add_key_figure(
+    article_id: str,
+    payload: ArticleKeyFigureCreate,
+    db: Session = Depends(get_db),
+    admin: Administrator = Depends(get_current_admin),
+) -> dict:
+    """Ajoute un chiffre clé — en fin de liste, ou inséré à `position`."""
+    article = _require_article(db, article_id)
+    position = payload.position or _next_position(db, ArticleKeyFigure, article.id)
+    if payload.position:
+        _shift_positions(db, ArticleKeyFigure, article.id, payload.position)
+    db.add(
+        ArticleKeyFigure(
+            article_id=article.id,
+            position=position,
+            value=payload.value,
+            label=payload.label,
+            prefix=payload.prefix,
+            suffix=payload.suffix,
+        )
+    )
+    log_admin_action(db, admin_id=admin.id, action=AdminAction.CREATE, target_table="article_key_figures", target_id=article.id)
+    db.commit()
+    return _build_article_read(_require_article(db, article_id))
+
+
+@router.delete("/key-figures/{figure_id}", status_code=204)
+async def delete_key_figure(figure_id: str, db: Session = Depends(get_db), admin: Administrator = Depends(get_current_admin)) -> None:
+    figure = db.get(ArticleKeyFigure, figure_id)
+    if not figure:
+        raise HTTPException(status_code=404, detail="Chiffre clé introuvable")
+    article_id = figure.article_id
+    db.delete(figure)
+    log_admin_action(db, admin_id=admin.id, action=AdminAction.DELETE, target_table="article_key_figures", target_id=figure_id)
+    db.commit()
+    _compact_positions(db, ArticleKeyFigure, article_id)
+
+
 # ─── Catégories d'articles ─────────────────────────────
 @router.get("/categories", response_model=list[ArticleCategoryRead])
 async def list_categories_admin(db: Session = Depends(get_db)):
@@ -405,10 +530,10 @@ async def list_daily_tips(db: Session = Depends(get_db)):
 
 
 @router.post("/daily-tips", status_code=201, response_model=DailyTipRead)
-async def create_daily_tip(payload: DailyTipCreate, db: Session = Depends(get_db), admin: Administrator = Depends(get_current_admin)):
-    existing = db.scalar(select(DailyTip).where(DailyTip.rotation_order == payload.rotation_order))
-    if existing:
-        raise HTTPException(status_code=409, detail="Un conseil existe déjà pour cet ordre de rotation")
+async def create_daily_tip(payload: DailyTipCreate, db: Session = Depends(get_db), admin: Administrator = Depends(get_current_admin)) -> DailyTip:
+    # 409 supprimé (migration 0015, feu vert cycle 14) : plusieurs conseils
+    # peuvent désormais partager un créneau — le choix du tip affiché est
+    # déterministe côté route publique (day_of_year % nb).
     tip = DailyTip(**payload.model_dump())
     db.add(tip)
     db.flush()
@@ -524,10 +649,20 @@ async def list_pages(db: Session = Depends(get_db)):
 
 
 @router.post("/pages", status_code=201, response_model=ContentPageRead)
-async def create_page(payload: ContentPageRead, db: Session = Depends(get_db), admin: Administrator = Depends(get_current_admin)):
+async def create_page(payload: ContentPageCreate, db: Session = Depends(get_db), admin: Administrator = Depends(get_current_admin)) -> ContentPage:
+    """Crée une page statique/légale — statut initial DRAFT (publication via PATCH /{id}/status)."""
+    try:
+        content_type = ContentType(payload.content_type)
+    except ValueError:
+        raise HTTPException(status_code=422, detail="Type de page invalide (attendu : static_page, legal_page…)") from None
+    if content_type not in (ContentType.STATIC_PAGE, ContentType.LEGAL_PAGE):
+        raise HTTPException(status_code=422, detail="Type réservé aux pages statiques/légales (static_page, legal_page)")
+    if db.scalar(select(ContentPage).where(ContentPage.slug == payload.slug)):
+        raise HTTPException(status_code=409, detail="Une page existe déjà avec ce slug")
+
     page = ContentPage(
-        content_type=ContentType(payload.content_type),
-        slug=payload.slug or slugify(payload.title),
+        content_type=content_type,
+        slug=payload.slug,
         title=payload.title,
         excerpt=payload.excerpt,
         body=payload.body,
@@ -545,8 +680,29 @@ async def create_page(payload: ContentPageRead, db: Session = Depends(get_db), a
     return page
 
 
+@router.patch("/pages/{page_id}/status")
+async def update_page_status(
+    page_id: str,
+    payload: ArticleStatusUpdate,
+    db: Session = Depends(get_db),
+    admin: Administrator = Depends(get_current_admin),
+) -> dict:
+    """Publication/dépublication d'une page — published_at figé à la 1re publication (même règle que les articles)."""
+    page = db.get(ContentPage, page_id)
+    if not page:
+        raise HTTPException(status_code=404, detail="Page introuvable")
+    page.status = ContentStatus(payload.status)
+    if payload.status == "published" and page.published_at is None:
+        page.published_at = datetime.now(UTC)
+    page.updated_by_admin_id = admin.id
+    log_admin_action(db, admin_id=admin.id, action=AdminAction.UPDATE, target_table="content_pages", target_id=page.id, details={"status": payload.status})
+    db.commit()
+    return {"message": "Statut mis à jour", "status": page.status.value}
+
+
 @router.put("/pages/{page_id}", response_model=ContentPageRead)
-async def update_page(page_id: str, payload: ContentPageRead, db: Session = Depends(get_db), admin: Administrator = Depends(get_current_admin)):
+async def update_page(page_id: str, payload: ContentPageUpdate, db: Session = Depends(get_db), admin: Administrator = Depends(get_current_admin)) -> ContentPage:
+    """Met à jour les champs fournis uniquement (exclude_unset) — le slug et le type ne bougent pas."""
     page = db.get(ContentPage, page_id)
     if not page:
         raise HTTPException(status_code=404, detail="Page introuvable")

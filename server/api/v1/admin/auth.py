@@ -93,6 +93,8 @@ def _issue_tokens(db: Session, admin: Administrator) -> TokenRead:
         refresh_token=refresh_token,
         admin_id=admin.id,
         role=role,
+        # Cycle 15: le front force l'ecran de changement si temporaire en cours.
+        must_change_password=admin.must_change_password,
     )
 
 
@@ -231,6 +233,8 @@ async def change_password(
         raise HTTPException(status_code=400, detail="Mot de passe actuel incorrect")
 
     admin.password_hash = hash_password(payload.new_password)
+    # Cycle 15: le mot de passe temporaire est officiellement remplace.
+    admin.must_change_password = False
     # Invalider toutes les sessions existantes (defense en profondeur).
     for tok in db.scalars(
         select(AdminRefreshToken).where(

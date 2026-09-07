@@ -13,7 +13,12 @@ from models.enums import DigestStatus
 from models.jobs import JobOffer
 from models.subscriptions import Subscriber, SubscriberFiliere, SubscriberStatus
 from schemas.sending import CustomSendCreate, EmailDigestRead
-from schemas.subscriptions import SubscriberAdminUpdate, SubscriberRead, SubscriberStatusUpdate
+from schemas.subscriptions import (
+    SubscriberAdminUpdate,
+    SubscriberBulkStatusUpdate,
+    SubscriberRead,
+    SubscriberStatusUpdate,
+)
 from services.audit import log_admin_action
 from services.search_utils import safe_ilike
 
@@ -33,6 +38,11 @@ STATUS_ALIASES = {
     "pending": SubscriberStatus.PENDING,
     "deleted": SubscriberStatus.DELETED,
 }
+
+# Statuts acceptes par le bulk (action groupée) : on exclut volontairement
+# "deleted" — l'anonymisation RGPD ne doit JAMAIS etre declenchee en masse
+# (doc v3 section 8 : action irreversible, confirmation individuelle).
+BULK_STATUS_ALLOWED = {"active", "unsubscribed", "bouncing", "paused"}
 
 
 def _require_subscriber(db: Session, subscriber_id: str) -> Subscriber:
@@ -124,6 +134,62 @@ async def update_subscriber_status(
     )
     db.commit()
     return {"message": "Statut mis à jour", "status": subscriber.status.value}
+
+
+@router.post("/bulk-status")
+async def bulk_update_subscriber_status(
+    payload: SubscriberBulkStatusUpdate,
+    db: Session = Depends(get_db),
+    admin: Administrator = Depends(get_current_admin),
+):
+    """Action groupée : applique un statut a une selection d'abonnés.
+
+    Même garanties que le PATCH unitaire (traduction bouncing->BOUNCED),
+    mais en masse :
+    - "deleted" REFUSE (l'anonymisation RGPD reste strictement unitaire
+      avec confirmation individuelle — doc v3 section 8) ;
+    - les IDs inexistants sont ignores (compte `not_found`), pas d'echec
+      global ;
+    - une seule action d'audit pour la serie.
+    """
+    if payload.status not in BULK_STATUS_ALLOWED:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Statut non autorisé en masse: {payload.status}",
+        )
+
+    subscribers = list(
+        db.scalars(select(Subscriber).where(Subscriber.id.in_(payload.subscriber_ids))).unique()
+    )
+    trouves = {s.id for s in subscribers}
+    applied = 0
+    for subscriber in subscribers:
+        subscriber.status = STATUS_ALIASES[payload.status]
+        if payload.status == "unsubscribed":
+            subscriber.unsubscribed_at = datetime.now(UTC)
+            subscriber.unsubscribe_reason = payload.reason
+        applied += 1
+
+    if applied:
+        log_admin_action(
+            db,
+            admin_id=admin.id,
+            action=AdminAction.UPDATE,
+            target_table="subscribers",
+            target_id=",".join(sorted(trouves)[:5]),
+            details={
+                "bulk_status": payload.status,
+                "count": applied,
+                "reason": payload.reason,
+            },
+        )
+    db.commit()
+    return {
+        "message": f"{applied} abonné(s) mis à jour",
+        "updated": applied,
+        "not_found": len(payload.subscriber_ids) - applied,
+        "status": payload.status,
+    }
 
 
 @router.get("/{subscriber_id}/sends", response_model=list[EmailDigestRead])

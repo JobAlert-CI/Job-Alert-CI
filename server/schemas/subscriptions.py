@@ -72,6 +72,12 @@ class SubscriberRead(TimestampRead):
     wants_career_tips: bool
     source: str | None = None
     subscribed_at: datetime
+    # Champs administratifs (doc v3 section 8) : notes internes et trace
+    # de desinscription exposes au back-office — l'edition existe deja
+    # (SubscriberAdminUpdate), la lecture manquait.
+    admin_notes: str | None = None
+    unsubscribe_reason: str | None = None
+    unsubscribed_at: datetime | None = None
     filiere_links: list[SubscriberFiliereRead] = []
     contract_preferences: list[SubscriberContractPreferenceRead] = []
 
@@ -92,6 +98,18 @@ class SubscriberAdminUpdate(BaseModel):
 
 
 class SubscriberStatusUpdate(BaseModel):
+    status: Literal["active", "unsubscribed", "bouncing", "paused"]
+    reason: str | None = Field(default=None, max_length=500)
+
+
+class SubscriberBulkStatusUpdate(BaseModel):
+    """Action groupée de statut (doc v3 section 7 : mini-onglet Actions).
+
+    "deleted" est exclu du Literal : l'anonymisation RGPD ne doit jamais
+    être déclenchée en masse (cf. router).
+    """
+
+    subscriber_ids: list[str] = Field(min_length=1, max_length=500)
     status: Literal["active", "unsubscribed", "bouncing", "paused"]
     reason: str | None = Field(default=None, max_length=500)
 

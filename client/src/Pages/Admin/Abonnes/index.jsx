@@ -1,11 +1,11 @@
 import { useState } from "react"
 import { Link } from "react-router-dom"
-import { Eye, MoreHorizontal, Search } from "lucide-react"
+import { Eye, FileDown, MoreHorizontal, Search } from "lucide-react"
 import { cn } from "cn"
 import { FiltresAbonnesAdminProvider, useFiltresAbonnesAdmin } from "@/contexts/FiltresAbonnesAdmin.context"
 import {
   STATUTS_ABONNE, useAdminSubscribersQuery,
-  useChangerStatutAbonne, useAnonymiserAbonne, messageErreurAbonne,
+  useChangerStatutAbonne, useAnonymiserAbonne, useActionGroupeeAbonnes, messageErreurAbonne,
 } from "@/features/admin-abonnes.tools"
 import { useRechercheDebouncee } from "@/hooks/use-recherche-debouncee"
 import { useReferentialsQuery } from "@/lib/referentiels-query"
@@ -29,6 +29,8 @@ import {
 } from "@/components/ui/table"
 import PaginationListe from "@/components/admin/PaginationListe"
 import { SectionErreur, SectionVide, SectionAucunResultat } from "./components/EtatsSection"
+import CompteursAbonnes from "./sections/CompteursAbonnes"
+import ChartsAbonnes from "./sections/ChartsAbonnes"
 
 /* ─────────────────────────────────────────────────────────────────────
    Page Gestion des utilisateurs (abonnés) — /admin/utilisateurs.
@@ -69,9 +71,12 @@ const ListeAbonnes = () => {
   const { data: abonnes, isLoading, isError, refetch } = useAdminSubscribersQuery(paramsApi)
 
   const [anonymCible, setAnonymCible] = useState(null) // confirmation RGPD
+  const [selection, setSelection] = useState(() => new Set())
+  const [exportEnCours, setExportEnCours] = useState(false)
 
   const statutMutation = useChangerStatutAbonne()
   const anonymiserMutation = useAnonymiserAbonne()
+  const groupeeMutation = useActionGroupeeAbonnes()
 
   const { valeurLocale, setValeurLocale } = useRechercheDebouncee({
     valeurUrl: query,
@@ -104,6 +109,57 @@ const ListeAbonnes = () => {
     })
   }
 
+  const basculerSelection = (id) => {
+    setSelection((prev) => {
+      const suivant = new Set(prev)
+      suivant.has(id) ? suivant.delete(id) : suivant.add(id)
+      return suivant
+    })
+  }
+
+  const toutSelectionner = () => {
+    setSelection((prev) => {
+      if (abonnes?.length && prev.size === abonnes.length) return new Set()
+      return new Set((abonnes ?? []).map((a) => a.id))
+    })
+  }
+
+  const actionGroupee = (statut) => {
+    if (!selection.size) return
+    groupeeMutation.mutate(
+      { subscriberIds: [...selection], status: statut },
+      {
+        onSuccess: (res) => {
+          notify(res?.message || `${selection.size} abonné(s) mis à jour`, "success")
+          setSelection(new Set())
+        },
+        onError: (err) => notify(messageErreurAbonne(err) || "Action groupée impossible", "error"),
+      }
+    )
+  }
+
+  const lancerExport = async (format) => {
+    setExportEnCours(true)
+    try {
+      const { exportSubscribers } = await import("@/api/admin/system")
+      const { blob, filename } = await exportSubscribers(
+        { q: paramsApi.q, status: paramsApi.status, filiere_id: paramsApi.filiere_id },
+        format
+      )
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.href = url
+      a.download = filename
+      a.click()
+      URL.revokeObjectURL(url)
+      notify(`Export ${format.toUpperCase()} téléchargé (${filename})`, "success")
+    } catch (err) {
+      notify(messageErreurAbonne(err) || "Export impossible", "error")
+    } finally {
+      setExportEnCours(false)
+    }
+  }
+
   if (isError) {
     return <SectionErreur onRetry={refetch} message="Impossible de charger les abonnés." />
   }
@@ -111,12 +167,36 @@ const ListeAbonnes = () => {
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-4">
       {/* En-tête */}
-      <div>
-        <h1 className="font-heading text-lg font-bold">Utilisateurs (abonnés)</h1>
-        <p className="text-xs text-muted-foreground">
-          Base d'abonnés au digest — actifs, désinscrits, rebonds, pauses.
-        </p>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <h1 className="font-heading text-lg font-bold">Utilisateurs (abonnés)</h1>
+          <p className="text-xs text-muted-foreground">
+            Base d'abonnés au digest — actifs, désinscrits, rebonds, pauses.
+          </p>
+        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger
+            render={
+              <Button size="sm" variant="outline" disabled={exportEnCours}>
+                <FileDown aria-hidden /> Exporter
+              </Button>
+            }
+          />
+          <DropdownMenuContent align="end">
+            <DropdownMenuGroup>
+              <DropdownMenuLabel>Format</DropdownMenuLabel>
+            </DropdownMenuGroup>
+            <DropdownMenuItem onClick={() => lancerExport("csv")} className="cursor-pointer">CSV</DropdownMenuItem>
+            <DropdownMenuItem onClick={() => lancerExport("json")} className="cursor-pointer">JSON</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
+
+      {/* Compteurs + KPI + chips de filtre rapide */}
+      <CompteursAbonnes />
+
+      {/* Charts (recharts confiné au chunk lazy de la page) */}
+      <ChartsAbonnes />
 
       {/* Barre de filtres */}
       <div className="flex flex-col gap-2">
@@ -167,6 +247,39 @@ const ListeAbonnes = () => {
         </div>
       </div>
 
+      {/* Barre actions groupées (visible avec sélection) */}
+      {selection.size > 0 && (
+        <div className="flex flex-wrap items-center gap-2 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2">
+          <span className="text-xs font-semibold">
+            {selection.size} abonné{selection.size > 1 ? "s" : ""} sélectionné{selection.size > 1 ? "s" : ""}
+          </span>
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              render={<Button size="sm" disabled={groupeeMutation.isPending}>Action groupée</Button>}
+            />
+            <DropdownMenuContent align="start" className="min-w-44">
+              <DropdownMenuGroup>
+                <DropdownMenuLabel>Appliquer à la sélection</DropdownMenuLabel>
+              </DropdownMenuGroup>
+              <DropdownMenuItem onClick={() => actionGroupee("active")} className="cursor-pointer">Réactiver</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => actionGroupee("paused")} className="cursor-pointer">Mettre en pause</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => actionGroupee("unsubscribed")} className="cursor-pointer">Marquer désinscrits</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => actionGroupee("bouncing")} className="cursor-pointer">Marquer en rebond</DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => setSelection(new Set())} className="cursor-pointer">
+                Vider la sélection
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Button variant="ghost" size="sm" onClick={toutSelectionner}>
+            {selection.size === abonnes?.length && abonnes?.length > 0 ? "Tout désélectionner" : "Tout sélectionner (page)"}
+          </Button>
+          <p className="ml-auto hidden text-[10px] text-muted-foreground sm:block">
+            L'anonymisation RGPD reste strictement individuelle.
+          </p>
+        </div>
+      )}
+
       {/* Table */}
       {isLoading ? (
         <div className="flex flex-col gap-2">
@@ -186,6 +299,15 @@ const ListeAbonnes = () => {
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="w-8">
+                  <input
+                    type="checkbox"
+                    className="size-3.5 accent-primary"
+                    checked={!!abonnes?.length && selection.size === abonnes.length}
+                    onChange={toutSelectionner}
+                    aria-label="Sélectionner tous les abonnés de la page"
+                  />
+                </TableHead>
                 <TableHead>Abonné</TableHead>
                 <TableHead>Statut</TableHead>
                 <TableHead className="hidden md:table-cell">Filières</TableHead>
@@ -199,6 +321,15 @@ const ListeAbonnes = () => {
                   statutMutation.isPending && statutMutation.variables?.subscriberId === abonne.id
                 return (
                   <TableRow key={abonne.id} className={cn(enCours && "opacity-60")}>
+                    <TableCell className="pr-0">
+                      <input
+                        type="checkbox"
+                        className="size-3.5 accent-primary"
+                        checked={selection.has(abonne.id)}
+                        onChange={() => basculerSelection(abonne.id)}
+                        aria-label={`Sélectionner ${abonne.email}`}
+                      />
+                    </TableCell>
                     <TableCell className="max-w-56">
                       <Link
                         to={`/admin/utilisateurs/${abonne.id}`}

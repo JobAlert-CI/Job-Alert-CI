@@ -11,6 +11,12 @@ const getScrapingStatus = async ({ signal } = {}) => {
   return response.data;
 };
 
+/** GET /api/admin/scraping/stats/summary — agregats all-time (runs, taux de reussite, volumes). */
+const getScrapingSummary = async ({ signal } = {}) => {
+  const response = await adminApi.get(`${API_URL}/stats/summary`, { signal });
+  return response.data;
+};
+
 /**
  * POST /api/admin/scraping/trigger → 201 — declenchement manuel.
  * @param {Object} data { source_code? (sinon toutes les sources actives), notes? (max 1000) }
@@ -42,6 +48,6 @@ const getRunLogs = async (runId, { signal } = {}) => {
   return response.data;
 };
 
-export { getScrapingStatus, triggerScraping, getRuns, getRunDetail, getRunLogs };
+export { getScrapingStatus, getScrapingSummary, triggerScraping, getRuns, getRunDetail, getRunLogs };
 
-export default { getScrapingStatus, triggerScraping, getRuns, getRunDetail, getRunLogs };
+export default { getScrapingStatus, getScrapingSummary, triggerScraping, getRuns, getRunDetail, getRunLogs };

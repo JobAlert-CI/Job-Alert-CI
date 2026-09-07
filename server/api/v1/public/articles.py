@@ -126,18 +126,26 @@ async def get_featured_articles(db: Session = Depends(get_db)):
 
 
 @router.get("/daily-tip", response_model=DailyTipRead)
-async def get_daily_tip(db: Session = Depends(get_db)):
-    """Conseil du jour (rotation déterministe 7 jours)."""
-    # Dummy rotation based on day of year
+async def get_daily_tip(db: Session = Depends(get_db)) -> DailyTip:
+    """Conseil du jour (rotation déterministe 7 jours).
+
+    Depuis la migration 0015, un créneau peut contenir PLUSIEURS tips :
+    on choisit déterministement dedans via day_of_year % nb — chaque tip
+    du créneau s'affiche à son tour au fil des jours (pas de hasard,
+    pas d'état à stocker).
+    """
     import datetime
 
     day_of_year = datetime.datetime.now().timetuple().tm_yday
     rotation_order = day_of_year % 7
-    tip = db.scalar(
-        select(DailyTip).where(
-            DailyTip.is_active.is_(True), DailyTip.rotation_order == rotation_order
+    tips = list(
+        db.scalars(
+            select(DailyTip)
+            .where(DailyTip.is_active.is_(True), DailyTip.rotation_order == rotation_order)
+            .order_by(DailyTip.created_at)
         )
     )
+    tip = tips[day_of_year % len(tips)] if tips else None
     if not tip:
         # Fallback to any tip
         tip = db.scalar(select(DailyTip).where(DailyTip.is_active.is_(True)).limit(1))

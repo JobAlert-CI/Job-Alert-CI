@@ -44,6 +44,25 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
         return False
 
 
+# Cycle 15: alphabet sans caracteres ambigus (pas de 0/O/1/l/I) — le mot de
+# passe temporaire est recopie a la main depuis l'ecran de creation.
+_TEMP_PASSWORD_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789"
+
+
+def generate_temporary_password(length: int = 16) -> str:
+    """Mot de passe temporaire cryptosecure (secrets, sans caracteres ambigus).
+
+    Sert a la creation d'un compte admin sans mot de passe fourni : le
+    temporaire est affiche UNE seule fois au super_admin createur, et le
+    compte porte must_change_password=True jusqu'au premier changement.
+    """
+    import secrets
+
+    if length < 8:
+        raise ValueError("Un mot de passe temporaire doit faire au moins 8 caracteres")
+    return "".join(secrets.choice(_TEMP_PASSWORD_ALPHABET) for _ in range(length))
+
+
 def _b64url_encode(data: bytes) -> str:
     return base64.urlsafe_b64encode(data).rstrip(b"=").decode("ascii")
 

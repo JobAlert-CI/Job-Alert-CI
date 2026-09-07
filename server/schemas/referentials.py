@@ -43,6 +43,7 @@ class FiliereSpecialtyRead(TimestampRead):
 
 
 class FiliereRead(TimestampRead):
+    """Filière telle qu'exposée PUBliquement (sans mots-clés de matching)."""
     id: str
     code: str
     label: str
@@ -53,6 +54,13 @@ class FiliereRead(TimestampRead):
     sort_order: int
     is_active: bool
     specialties: list[FiliereSpecialtyRead] = []
+
+
+class FiliereAdminRead(FiliereRead):
+    """Filière côté ADMIN : expose aussi les mots-clés de matching
+    (l'éditeur de la page Filières doit charger l'existant AVANT
+    sauvegarde — le PUT keywords remplace la liste entière)."""
+    keywords: list[FiliereKeywordRead] = []
 
 
 class ContractTypeRead(TimestampRead):

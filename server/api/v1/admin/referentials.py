@@ -29,7 +29,7 @@ from schemas.referentials import (
     ExperienceLevelUpdate,
     FiliereCreate,
     FiliereKeywordsUpdate,
-    FiliereRead,
+    FiliereAdminRead,
     FiliereSpecialtyRead,
     FiliereUpdate,
     LocationCreate,
@@ -66,31 +66,42 @@ def _apply_updates(item, payload) -> None:
 
 
 # ─── Filières ───────────────────────────────────────────
-@router.get("/filieres", response_model=list[FiliereRead])
-async def list_filieres_admin(db: Session = Depends(get_db)):
-    stmt = select(Filiere).options(selectinload(Filiere.specialties)).order_by(Filiere.sort_order, Filiere.label)
+@router.get("/filieres", response_model=list[FiliereAdminRead])
+async def list_filieres_admin(db: Session = Depends(get_db)) -> None:
+    # keywords + specialites precharges : la page admin les affiche
+    # (l'editeur de mots-cles doit charger l'existant AVANT sauvegarde).
+    stmt = (
+        select(Filiere)
+        .options(selectinload(Filiere.keywords), selectinload(Filiere.specialties))
+        .order_by(Filiere.sort_order, Filiere.label)
+    )
     return list(db.scalars(stmt))
 
 
-@router.post("/filieres", status_code=201, response_model=FiliereRead)
-async def create_filiere(payload: FiliereCreate, db: Session = Depends(get_db), admin: Administrator = Depends(get_current_admin)):
+@router.post("/filieres", status_code=201, response_model=FiliereAdminRead)
+async def create_filiere(payload: FiliereCreate, db: Session = Depends(get_db), admin: Administrator = Depends(get_current_admin)) -> Filiere:
     filiere = Filiere(**payload.model_dump())
     db.add(filiere)
     db.flush()
     log_admin_action(db, admin_id=admin.id, action=AdminAction.CREATE, target_table="filieres", target_id=filiere.id)
     db.commit()
     db.refresh(filiere)
-    return filiere
+    # Recharger avec les relations (keywords/specialties vides a la creation,
+    # mais le schema FiliereRead les attend).
+    stmt = select(Filiere).options(selectinload(Filiere.keywords), selectinload(Filiere.specialties)).where(Filiere.id == filiere.id)
+    return db.scalar(stmt)
 
 
-@router.put("/filieres/{filiere_id}", response_model=FiliereRead)
-async def update_filiere(filiere_id: str, payload: FiliereUpdate, db: Session = Depends(get_db), admin: Administrator = Depends(get_current_admin)):
+@router.put("/filieres/{filiere_id}", response_model=FiliereAdminRead)
+async def update_filiere(filiere_id: str, payload: FiliereUpdate, db: Session = Depends(get_db), admin: Administrator = Depends(get_current_admin)) -> Filiere:
     filiere = _get_or_404(db, Filiere, filiere_id, "Filière")
     _apply_updates(filiere, payload)
     log_admin_action(db, admin_id=admin.id, action=AdminAction.UPDATE, target_table="filieres", target_id=filiere.id)
     db.commit()
     db.refresh(filiere)
-    return filiere
+    # Recharger les relations pour la reponse (keywords + specialites).
+    stmt = select(Filiere).options(selectinload(Filiere.keywords), selectinload(Filiere.specialties)).where(Filiere.id == filiere_id)
+    return db.scalar(stmt)
 
 
 @router.delete("/filieres/{filiere_id}", status_code=204)

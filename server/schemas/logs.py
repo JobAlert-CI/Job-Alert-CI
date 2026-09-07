@@ -10,7 +10,9 @@ from schemas.base import TimestampRead
 
 class AdminActionLogRead(BaseModel):
     id: str
-    admin_id: str
+    # Cycle 15: nullable — supprimer un admin preserve ses entrees du
+    # journal (FK SET NULL) : les lignes orphelines portent admin_id NULL.
+    admin_id: str | None = None
     action: str
     target_table: str
     target_id: str | None = None

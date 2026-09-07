@@ -7,7 +7,7 @@ const API_URL = "/api/admin/admins";
 
 /**
  * GET /api/admin/admins
- * @param {Object} params role ("super_admin"|"gestionnaire_offres"|"gestionnaire_utilisateurs"|"moderateur"),
+ * @param {Object} params q (recherche email/nom, cycle 15), role ("super_admin"|"gestionnaire_offres"|"gestionnaire_utilisateurs"|"moderateur"),
  *   is_active (bool), limit (1-200, defaut 50), offset (>= 0)
  */
 const getAdmins = async (params = {}, { signal } = {}) => {
@@ -17,7 +17,10 @@ const getAdmins = async (params = {}, { signal } = {}) => {
 
 /**
  * POST /api/admin/admins → 201.
- * @param {Object} data { email, password (8-128), full_name (2-180), role? (defaut "moderateur") }
+ * @param {Object} data { email, password? (8-128 ; absent = mot de passe
+ *   TEMPORAIRE genere serveur, renvoye une seule fois dans
+ *   `temporary_password`, changement obligatoire a la premiere connexion),
+ *   full_name (2-180), role? (defaut "moderateur") }
  */
 const createAdmin = async (data, { signal } = {}) => {
   const response = await adminApi.post(API_URL, data, { signal });

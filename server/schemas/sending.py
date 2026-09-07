@@ -11,6 +11,11 @@ class EmailDigestOfferRead(TimestampRead):
     id: str
     offer_id: str
     position: int
+    # Comment l'offre a été récupérée pour ce digest (doc v3 §8 :
+    # afficher le palier de matching atteint). Valeurs du modèle :
+    # primary | secondary | fallback_contract | fallback_freshness |
+    # fallback_experience | fallback_city.
+    match_kind: str = "primary"
 
 
 class EmailDigestRead(TimestampRead):

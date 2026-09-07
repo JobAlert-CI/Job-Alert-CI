@@ -364,7 +364,7 @@ Pour chaque page :
 
 **Ce qu'on y voit** : à construire en 4 onglets distincts.
 
-### 12.1 Onglet Articles
+### 14.1 Onglet Articles
 
 **Fonctionnalités à intégrer** :
 - Liste avec filtres (statut, catégorie, recherche titre).
@@ -377,25 +377,25 @@ Pour chaque page :
 - La publication (`PATCH /articles/{id}/status`) fixe automatiquement `published_at` à la première mise en `published` — cette date **ne bouge plus** ensuite même si l'article repasse en brouillon puis republié.
 - Le réordonnancement des sections (`PUT /articles/{id}/sections/reorder`) passe par une astuce technique interne (positions temporaires négatives) pour éviter un conflit de contrainte — transparent pour le frontend, qui envoie simplement la liste d'IDs dans le nouvel ordre.
 
-### 12.2 Onglet Catégories & séries
+### 14.2 Onglet Catégories & séries
 
 **Fonctionnalités à intégrer** : CRUD des catégories d'articles ; CRUD des séries + composition d'une série (sélection et ordre des articles qui la composent).
 
 **Comment ça fonctionne** : `PUT /series/{id}/articles` remplace intégralement la composition d'une série — même logique de remplacement total que les mots-clés de filière.
 
-### 12.3 Onglet Conseils du jour
+### 14.3 Onglet Conseils du jour
 
 **Fonctionnalités à intégrer** : CRUD sur les conseils, avec un sélecteur de créneau de rotation (0 à 6, un par jour de la semaine).
 
 **Comment ça fonctionne** : `rotation_order` est **unique** — créer un conseil sur un créneau déjà pris renvoie une erreur `409` explicite, à afficher clairement (« Ce créneau est déjà occupé par tel conseil »).
 
-### 12.4 Onglet Pages statiques
+### 14.4 Onglet Pages statiques
 
 **Fonctionnalités à intégrer** : CRUD simple (titre, contenu, statut) pour les mentions légales, la politique de confidentialité, etc.
 
 **⚠️ À ne pas construire tel quel** : le backend a un TODO non résolu — les routes `POST`/`PUT /pages` n'ont pas de schéma de validation dédié (`ContentPageCreate`/`ContentPageUpdate` sont référencés en commentaire mais n'existent pas). **Il faut demander la création de ces schémas côté backend avant de construire cet onglet**, sous peine de formulaire non validé côté serveur.
 
-### 12.5 FAQ *(non disponible actuellement)*
+### 14.5 FAQ *(non disponible actuellement)*
 
 Les modèles `FaqCategory` et `FaqItem` existent en base, mais **aucune route admin ne les expose**. Cet onglet ne peut pas être construit tant que les routes correspondantes n'ont pas été ajoutées au backend — à signaler comme prérequis, pas comme bug à corriger dans l'existant.
 

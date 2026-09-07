@@ -146,8 +146,14 @@ const ConnexionAdmin = () => {
     if (loginMutation.isPending) return
     setErreur(null)
     try {
+      const reponse = await loginMutation.mutateAsync({ email: email.trim(), password })
+      // Cycle 15 : compte créé avec mot de passe temporaire → changement
+      // OBLIGATOIRE avant toute navigation (TokenRead.must_change_password).
+      if (reponse?.must_change_password) {
+        navigate("/admin/premiere-connexion", { replace: true })
+        return
+      }
       const destination = location.state?.from || "/admin"
-      await loginMutation.mutateAsync({ email: email.trim(), password })
       navigate(destination, { replace: true })
     } catch (err) {
       setErreur(messageErreurLogin(err))

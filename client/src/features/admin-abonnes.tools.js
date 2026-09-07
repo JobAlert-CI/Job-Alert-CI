@@ -1,8 +1,15 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import {
   getSubscribers, getSubscriber, getSubscriberSends,
-  updateSubscriber, updateSubscriberStatus, deleteSubscriber,
+  updateSubscriber, updateSubscriberStatus, deleteSubscriber, sendCustomEmail,
 } from "@/api/admin/subscribers"
+import {
+  getSubscribersOverview, getSubscriptionsByDay, getTopFilieres,
+  getSubscribersGrowth, getSubscribersByCity, getTopContractTypes, getSendsByDay,
+  getMatchingOffersCount,
+} from "@/api/admin/subscriber-stats"
+import { getTransactionalEmails } from "@/api/admin/system"
+import { previewDigest } from "@/api/admin/sending"
 import { isCanceledError } from "@/api/errors"
 
 /* ─────────────────────────────────────────────────────────────────────
@@ -50,6 +57,15 @@ export const adminSubscribersKeys = {
   liste: (params) => ["admin", "subscribers", "liste", params],
   detail: (id) => ["admin", "subscribers", "detail", id],
   sends: (id, params) => ["admin", "subscribers", "sends", id, params],
+  stats: {
+    overview: ["admin", "subscribers", "stats", "overview"],
+    byDay: (params) => ["admin", "subscribers", "stats", "by-day", params],
+    topFilieres: (params) => ["admin", "subscribers", "stats", "top-filieres", params],
+    growth: (params) => ["admin", "subscribers", "stats", "growth", params],
+    byCity: (params) => ["admin", "subscribers", "stats", "by-city", params],
+    topContrats: (params) => ["admin", "subscribers", "stats", "top-contrats", params],
+    sendsByDay: (params) => ["admin", "subscribers", "stats", "sends-by-day", params],
+  },
 }
 
 /* ─── Liste (filtres serveur, pagination heuristique) ───────────────── */
@@ -119,6 +135,169 @@ export const useAnonymiserAbonne = () => {
     onSuccess: () => qc.invalidateQueries({ queryKey: adminSubscribersKeys.root }),
   })
 }
+
+/**
+ * Action groupée — POST /bulk-status { subscriber_ids (max 500), status,
+ * reason? }. Refuse "deleted" (422 schema + 400 route : double garde) :
+ * l'anonymisation RGPD reste strictement unitaire.
+ */
+export const useActionGroupeeAbonnes = () => {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ subscriberIds, status, raison }) => {
+      const body = { subscriber_ids: subscriberIds, status }
+      if (raison) body.reason = raison
+      // POST sur /subscribers/bulk-status via le module existant.
+      return import("@/api/admin/subscribers").then((m) =>
+        m.default.updateSubscribersBulkStatus(body)
+      )
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: adminSubscribersKeys.root }),
+  })
+}
+
+/* ─── Stats & charts (router /subscribers/stats, cycle 7) ──────────── */
+
+/** Vue d'ensemble : total, by_status (API), by_source, without_filiere. */
+export const useStatsAbonnesOverview = () =>
+  useQuery({
+    queryKey: adminSubscribersKeys.stats.overview,
+    queryFn: ({ signal }) => getSubscribersOverview({ signal }),
+    staleTime: 60 * 1000,
+    retry: 1,
+  })
+
+/** Inscriptions par jour — jours sans inscription omis (axe complété côté UI). */
+export const useStatsInscriptionsParJour = (params = { days: 30 }) =>
+  useQuery({
+    queryKey: adminSubscribersKeys.stats.byDay(params),
+    queryFn: ({ signal }) => getSubscriptionsByDay(params, { signal }),
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
+  })
+
+/** Filières les plus choisies (par liens, 1-3 par abonné). */
+export const useStatsTopFilieres = (params = { limit: 10 }) =>
+  useQuery({
+    queryKey: adminSubscribersKeys.stats.topFilieres(params),
+    queryFn: ({ signal }) => getTopFilieres(params, { signal }),
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
+  })
+
+/** Croissance cumulée — part du total historique avant la fenêtre. */
+export const useStatsCroissance = (params = { days: 90 }) =>
+  useQuery({
+    queryKey: adminSubscribersKeys.stats.growth(params),
+    queryFn: ({ signal }) => getSubscribersGrowth(params, { signal }),
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
+  })
+
+/** Répartition par ville (« Non renseignee » regroupé). */
+export const useStatsParVille = (params = { limit: 10 }) =>
+  useQuery({
+    queryKey: adminSubscribersKeys.stats.byCity(params),
+    queryFn: ({ signal }) => getSubscribersByCity(params, { signal }),
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
+  })
+
+/** Types de contrat préférés. */
+export const useStatsTopContrats = (params = { limit: 10 }) =>
+  useQuery({
+    queryKey: adminSubscribersKeys.stats.topContrats(params),
+    queryFn: ({ signal }) => getTopContractTypes(params, { signal }),
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
+  })
+
+/** Digests par jour ventilés sent/failed/skipped/queued. */
+export const useStatsEnvoisParJour = (params = { days: 30 }) =>
+  useQuery({
+    queryKey: adminSubscribersKeys.stats.sendsByDay(params),
+    queryFn: ({ signal }) => getSendsByDay(params, { signal }),
+    staleTime: 60 * 1000,
+    retry: 1,
+  })
+
+/**
+ * Emails transactionnels d'un abonné — GET /transactional-emails
+ * ?subscriber_id={id} (même route que la page 16/cycle 17, filtrée).
+ * Vocabulaires API : purpose (confirm_email…) et status (queued/sent/
+ * failed) — cf. TransactionalEmailEventRead.
+ */
+export const useAdminAbonneEmailsTx = (subscriberId, params = { limit: 50 }) =>
+  useQuery({
+    queryKey: ["admin", "transactional-emails", "abonne", subscriberId, params],
+    queryFn: ({ signal }) => getTransactionalEmails({ ...params, subscriber_id: subscriberId }, { signal }),
+    enabled: !!subscriberId,
+    staleTime: 60 * 1000,
+    retry: 1,
+  })
+
+/**
+ * Offres actives correspondant aux filières de l'abonné —
+ * GET /stats/matching-offers-count/{id} → { total, by_filiere }.
+ * Cas support : digest vide + total 0 = pas d'offres sur ses filières,
+ * pas un bug d'envoi.
+ */
+export const useCompteOffresActivesFiliere = (subscriberId) =>
+  useQuery({
+    queryKey: ["admin", "subscribers", "stats", "matching-offers", subscriberId],
+    queryFn: ({ signal }) => getMatchingOffersCount(subscriberId, { signal }),
+    enabled: !!subscriberId,
+    staleTime: 5 * 60 * 1000,
+    retry: 1,
+  })
+
+/**
+ * Envoi personnalisé — POST /subscribers/{id}/send
+ * { offer_ids (min 1), subject? (max 255, défaut serveur
+ * « Sélection personnalisée JobAlert CI ») } → 201 EmailDigest queued.
+ * ⚠ Mise en FILE, pas envoyé : le worker asynchrone traite le digest
+ * — le message UI doit dire « en file d'attente » (doc v3 §9).
+ * Refuse 400 si des IDs sont introuvables (détail dans la réponse).
+ */
+export const useEnvoyerSelection = () => {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ subscriberId, offerIds, sujet }) =>
+      sendCustomEmail(subscriberId, {
+        offer_ids: offerIds,
+        ...(sujet ? { subject: sujet } : {}),
+      }),
+    onSuccess: () => {
+      // Invalide détail + sends (le digest queued apparaît dans
+      // l'historique) + liste abonnés.
+      qc.invalidateQueries({ queryKey: adminSubscribersKeys.root })
+    },
+  })
+}
+
+/**
+ * Aperçu du digest SANS envoi — POST /sending/preview
+ * ?subscriber_id=&offer_ids=... → { preview: { subscriber_name,
+ * subscriber_email, offer_titles, offer_count, subject_preview,
+ * html_snippet }, message }.
+ * Sans offer_ids : les 5 premières offres des filières de l'abonné
+ * (cascade auto — doc v3 §9).
+ * `actif` contrôle le déclenchement : la query ne part qu'à l'ouverture
+ * de l'aperçu (et re-part quand le mode change via la clé du hook).
+ */
+export const useApercuDigest = (subscriberId, offerIds = [], { actif = true } = {}) =>
+  useQuery({
+    queryKey: ["admin", "sending", "preview", subscriberId, offerIds],
+    queryFn: ({ signal }) => {
+      const params = { subscriber_id: subscriberId }
+      if (offerIds.length) params.offer_ids = offerIds
+      return previewDigest(params, { signal })
+    },
+    enabled: !!subscriberId && actif,
+    staleTime: 0,
+    gcTime: 0,
+    retry: 1,
+  })
 
 /** Erreur mutation formatée (annulations ignorées). */
 export const messageErreurAbonne = (err) =>

@@ -186,6 +186,10 @@ class TransactionalEmailPurpose(StrEnum):
     MANAGE_ALERT = "manage_alert"
     UNSUBSCRIBE = "unsubscribe"
     RESET_PASSWORD = "reset_password"
+    # Cycle 15 (option B validee) : bienvenue envoyee a la creation d'un
+    # compte admin — porte le mot de passe TEMPORAIRE (jamais stocke en
+    # payload), changement obligatoire a la premiere connexion.
+    ADMIN_WELCOME = "admin_welcome"
 
 
 class TransactionalEmailStatus(StrEnum):

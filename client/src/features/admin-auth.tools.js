@@ -72,7 +72,27 @@ export const useAdminSessionQuery = () =>
 export const useAdminLoginMutation = () =>
   useMutation({
     mutationFn: ({ email, password }) => apiLogin({ email, password }),
-    onSuccess: () => {
+    onSuccess: async () => {
+      // FIX connexion (signalé cycle 15) : la query session du provider
+      // est montée avec enabled=false (aucun token au chargement de
+      // /admin/connexion) et une INVALIDATION NE RÉVEILLE PAS une query
+      // désactivée — le profil n'était jamais chargé, status restait
+      // "loading" et il fallait recharger la page pour atteindre le
+      // dashboard. `fetchQuery` est impératif : il lit /me (Bearer
+      // désormais en localStorage), écrit le profil au cache, et les
+      // observers du provider re-render → status="authenticated".
+      // Un échec /me après un login RÉUSSI ne doit pas rejeter la
+      // mutation (sinon soumettre afficherait une erreur de connexion
+      // mensongère) : la session est ouverte, la query retentera seule.
+      try {
+        await queryClient.fetchQuery({
+          queryKey: adminAuthKeys.session,
+          queryFn: ({ signal }) => getProfile({ signal }),
+          staleTime: 5 * 60 * 1000,
+        })
+      } catch {
+        /* /me indisponible : session quand même ouverte, pas d'erreur. */
+      }
       queryClient.invalidateQueries({ queryKey: adminAuthKeys.root })
     },
   })

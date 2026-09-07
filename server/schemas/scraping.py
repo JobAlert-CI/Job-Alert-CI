@@ -60,3 +60,15 @@ class ScrapingStatusRead(BaseModel):
     last_duration_ms: int | None = None
     last_error: str | None = None
     total_runs: int
+
+
+class ScrapingSummaryRead(BaseModel):
+    """Agrégats all-time sur scrape_runs (compteurs du haut de page 10)."""
+
+    total_runs: int = Field(description="Nombre total de runs terminés ou non.")
+    success_rate: float | None = Field(
+        default=None,
+        description="Taux de réussite en % (success / runs terminés). None si aucun run terminé.",
+    )
+    total_raw_all_time: int
+    total_inserted_all_time: int

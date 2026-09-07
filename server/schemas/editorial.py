@@ -90,6 +90,21 @@ class SectionsReorder(BaseModel):
     section_ids: list[str] = Field(min_length=1)
 
 
+# ─── Points clés & chiffres clés (doc v3 §14.1) ────────────────────────
+
+class ArticleTakeawayCreate(BaseModel):
+    text: str = Field(min_length=2, max_length=500)
+    position: int | None = Field(default=None, ge=1, description="1 = fin ; sinon inséré à cette position.")
+
+
+class ArticleKeyFigureCreate(BaseModel):
+    value: float
+    label: str = Field(min_length=2, max_length=160)
+    prefix: str | None = Field(default=None, max_length=10)
+    suffix: str | None = Field(default=None, max_length=10)
+    position: int | None = Field(default=None, ge=1)
+
+
 # ─── Takeaways & Key Figures ────────────────────────────
 
 class ArticleTakeawayRead(TimestampRead):

@@ -152,7 +152,9 @@ class DailyTip(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     category: Mapped[ArticleCategory | None] = relationship(back_populates="daily_tips")
 
     __table_args__ = (
-        UniqueConstraint("rotation_order", name="uq_daily_tips_rotation"),
+        # uq_daily_tips_rotation SUPPRIMÉ (migration 0015, feu vert cycle 14) :
+        # plusieurs conseils peuvent partager un créneau ; le choix du tip
+        # affiché est déterministe côté route publique (day_of_year % nb).
         CheckConstraint("rotation_order >= 0 AND rotation_order <= 6", name="daily_tips_rotation_range"),
     )
 

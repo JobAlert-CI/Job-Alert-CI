@@ -327,6 +327,17 @@ const AdminLayout = () => {
   const [menuMobileOuvert, setMenuMobileOuvert] = useState(false)
   const [sessionRevoquee, setSessionRevoquee] = useState(false)
 
+  // Cycle 15 : compte créé avec mot de passe temporaire → barrière de
+  // sécurité. /me expose must_change_password (vérifié serveur) : tant
+  // qu'il est true, AUCUNE page admin n'est accessible — l'écran de
+  // changement de mot de passe est le seul chemin. Couvre le cas d'un
+  // onglet déjà ouvert ou d'un refresh token encore valide.
+  useEffect(() => {
+    if (profile?.must_change_password) {
+      navigate("/admin/premiere-connexion", { replace: true })
+    }
+  }, [profile?.must_change_password, navigate])
+
   // Détection transverse : axiosAdmin émet "jobalert:admin-session-revoquee"
   // quand le refresh échoue (famille révoquée serveur). queryClient.clear()
   // est déjà déclenché côté queryClient.js — ici on n'affiche que le message.

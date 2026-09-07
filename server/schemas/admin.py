@@ -37,6 +37,10 @@ class TokenRead(BaseModel):
     token_type: str = "bearer"
     admin_id: str
     role: str
+    # Cycle 15: True si le compte porte encore son mot de passe temporaire
+    # (creation admin sans mot de passe fourni) — le front doit alors forcer
+    # l'ecran de changement de mot de passe avant toute autre navigation.
+    must_change_password: bool = False
 
 
 class RefreshTokenRequest(BaseModel):
@@ -59,6 +63,8 @@ class AdminRead(TimestampRead):
     role: str
     is_active: bool
     last_login_at: datetime | None = None
+    # Cycle 15: True tant que le mot de passe temporaire n'a pas ete change.
+    must_change_password: bool = False
 
 
 AdminRoleLiteral = Literal[
@@ -67,10 +73,33 @@ AdminRoleLiteral = Literal[
 
 
 class AdminCreate(BaseModel):
+    """Corps de POST /api/admin/admins (cycle 15).
+
+    password absent => le serveur genere un mot de passe TEMPORAIRE
+    cryptosecure, le renvoie UNE seule fois dans AdminCreatedRead et marque
+    le compte must_change_password=True (changement obligatoire).
+    """
+
     email: str = Field(min_length=5, max_length=320)
-    password: str = Field(min_length=8, max_length=128)
+    password: str | None = Field(default=None, min_length=8, max_length=128)
     full_name: str = Field(min_length=2, max_length=180)
     role: AdminRoleLiteral = "moderateur"
+
+
+class AdminCreatedRead(AdminRead):
+    """Reponse de la creation (201) : expose le mot de passe temporaire.
+
+    Le mot de passe n'apparait QUE la, une seule fois, au super_admin qui
+    vient de creer le compte — jamais dans les lectures suivantes.
+
+    Cycle 15 (option B) : `welcome_email_sent` dit si l'email de bienvenue
+    (avec le temporaire) est parti via le provider — False si Resend n'est
+    pas configure : le super_admin doit alors transmettre le temporaire
+    par un autre canal.
+    """
+
+    temporary_password: str | None = None
+    welcome_email_sent: bool = False
 
 
 class AdminUpdate(BaseModel):

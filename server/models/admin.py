@@ -21,6 +21,9 @@ class Administrator(UUIDPrimaryKeyMixin, TimestampMixin, Base):
     role: Mapped[AdminRole] = mapped_column(enum_column(AdminRole), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     last_login_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    # Cycle 15: compte cree avec mot de passe temporaire -> changement
+    # obligatoire a la premiere connexion (remis a False par PUT /me/password).
+    must_change_password: Mapped[bool] = mapped_column(Boolean, default=False, server_default="0", nullable=False)
 
     # Forward-refs resolues par le registre ORM (pas d import explicite: cycle).
     offers: Mapped[list["JobOffer"]] = relationship(back_populates="admin")  # noqa: F821
@@ -30,7 +33,9 @@ class Administrator(UUIDPrimaryKeyMixin, TimestampMixin, Base):
 class AdminActionLog(UUIDPrimaryKeyMixin, Base):
     __tablename__ = "admin_action_logs"
 
-    admin_id: Mapped[str] = mapped_column(ForeignKey("administrators.id", ondelete="CASCADE"), nullable=False, index=True)
+    # Cycle 15: SET NULL au lieu de CASCADE — supprimer un admin ne doit
+    # JAMAIS effacer ses entrees du journal d'activite (demande explicite).
+    admin_id: Mapped[str | None] = mapped_column(ForeignKey("administrators.id", ondelete="SET NULL"), nullable=True, index=True)
     action: Mapped[AdminAction] = mapped_column(enum_column(AdminAction), nullable=False)
     target_table: Mapped[str] = mapped_column(String(100), nullable=False)
     target_id: Mapped[str | None] = mapped_column(String(36), nullable=True)

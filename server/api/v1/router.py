@@ -13,6 +13,7 @@ from api.v1.admin import (
     sending,
     settings,
     subscribers,
+    subscribers_stats,
 )
 from api.v1.admin import (
     aggregates as admin_aggregates,
@@ -78,6 +79,7 @@ api_router.include_router(auth.router)
 api_router.include_router(dashboard.router)
 api_router.include_router(admin_offers.router)
 api_router.include_router(subscribers.router)
+api_router.include_router(subscribers_stats.router)
 api_router.include_router(admin_referentials.router)
 api_router.include_router(content.router)
 api_router.include_router(scraping.router)
