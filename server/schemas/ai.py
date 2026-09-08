@@ -53,7 +53,7 @@ class AIApiKeyRead(TimestampRead):
     provider_type: AIProviderType
     base_url: str | None = None
     models: list[str] | dict[str, Any] | None = None
-    api_key_last4: str | None = Field(default=None, exclude=True)
+    api_key_last4: str | None = None  # cycle 19 : masque affichable (****ab12) — la doc v3 §19 l'exige, suffixe non secret posé pour l'affichage
     priority: int
     is_active: bool
     max_concurrent_requests: int
@@ -271,6 +271,45 @@ AIProcessingJobStatusLiteral = Annotated[
     str,
     StringConstraints(pattern=r"^(pending|running|completed|failed|skipped|locked)$"),
 ]
+
+
+# ─── Stats pipeline IA (cycle 19) ──────────────────────────────────────
+
+
+class AIStatsRead(BaseModel):
+    """Stats du pipeline IA (cycle 19) pour /admin/ia — onglet Statistiques.
+
+    Un seul appel alimente les compteurs IA1-IA6 et les charts C1-C5 :
+    - jobs_* : fenetre `days` (volumes traités) ;
+    - backlog brut, cles, suggestions, alertes : globaux.
+
+    Compteurs coalesce-style : COUNT renvoie 0 sur base vide ; les SUM
+    de volumes passent par le Python (base petite) avec fallback 0.
+    """
+
+    # IA1 : offres brutes en attente (backlog global).
+    backlog_brut: int
+    # IA2 : jobs sur la fenetre + detail par statut (chart C2 + compteur).
+    jobs_fenetre: int
+    jobs_par_statut: dict[str, int] = {}
+    # IA3 : taux d'activation sur la fenetre (None si aucun job terminé).
+    taux_activation: float | None = None
+    # IA4 : suggestions par statut (pending/approved/rejected).
+    suggestions_par_statut: dict[str, int] = {}
+    # IA5 : alertes NON acquittees par severite (chart C5 + compteur).
+    alertes_non_acquittees: dict[str, int] = {}
+    # IA6 : cles API actives / total (soft-deleted exclus).
+    cles_actives: int
+    cles_total: int
+    # C1 : volumes/jour sur la fenetre, empilables — les 4 compteurs
+    # d'AIJob (activees / rejetees / revue / retraiter).
+    jobs_par_jour: list[dict] = []
+    # C3 : duree moyenne des jobs termines par jour (secondes).
+    duree_moyenne_par_jour: list[dict] = []
+    # C4 : jobs par trigger sur la fenetre.
+    jobs_par_trigger: dict[str, int] = {}
+    # fenetre effective (echo).
+    days: int
 
 
 # ─── Suggestions IA (admin review) ───────────────────────────────────────

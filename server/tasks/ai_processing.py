@@ -285,6 +285,9 @@ def process_raw_offers(
                     legacy.finished_at = _now()
                 return {"status": "failed", "processed": 0, "error": str(exc), "ai_job_id": job.id}
             except AIProviderError as exc:
+                # AINoAvailableKeyError (et toute AIConfigurationError) passe
+                # ici : sans la mise a jour du legacy, un AiProcessingJob reste
+                # RUNNING a vie (jobs zombies observes en live cycle 19).
                 job.status = AIJobStatus.FAILED
                 job.error_message = str(exc)[:1000]
                 job.finished_at = _now()
@@ -293,6 +296,10 @@ def process_raw_offers(
                     offer.visible_site = False
                     offer.ai_status = AiOfferStatus.FAILED
                     offer.ai_error_message = str(exc)[:1000]
+                if legacy is not None:
+                    legacy.status = AiProcessingJobStatus.FAILED
+                    legacy.error_message = str(exc)[:1000]
+                    legacy.finished_at = _now()
                 return {"status": "failed", "processed": 0, "error": str(exc), "ai_job_id": job.id}
 
 

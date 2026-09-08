@@ -67,20 +67,35 @@ def _seed_ai_pipeline(admin_db) -> tuple[str, str, str, str]:
 def test_queue_aggregate_counts(admin_client, admin_db):
     """GET /ai/queue renvoie les compteurs PENDING/RUNNING + le dernier sweep.
 
-    Cas passant : on seed 2 AiProcessingJob et on verifie que les compteurs
-    remontent bien, et que last_sweep_at est le plus recent des sweeps.
+    Cycle 19 : le last_sweep lit desormais AIJob (ai_jobs) — c'est la table
+    que le sweep ecrit reellement (le task sans ai_job_id ne touche jamais
+    AiProcessingJob ; avant ce fix, last_sweep_at etait systematiquement
+    null en production). On verifie les compteurs AiProcessingJob ET le
+    last_sweep servi depuis un AIJob sweep.
     """
+    import uuid
+
     before = admin_client.get("/api/admin/ai/queue").json()
     _, _, pending_id, running_id = _seed_ai_pipeline(admin_db)
+    # AIJob sweep : c'est LUI que la queue doit designer comme dernier sweep.
+    admin_db.add(
+        AIJob(
+            id=str(uuid.uuid4()),
+            trigger_type=AIJobTrigger.SWEEP,
+            status=AIJobStatus.FAILED,
+            started_at=datetime.now(timezone.utc),
+            finished_at=datetime.now(timezone.utc),
+        )
+    )
+    admin_db.commit()
 
     after = admin_client.get("/api/admin/ai/queue").json()
     # Increments = apres - avant (la base est partagee entre tests du module).
     assert after["pending"] - before["pending"] == 1
     assert after["running"] - before["running"] == 1
-    # Le sweep qu'on a insere est PENDING -> last_sweep_status doit etre 'pending' ou 'running'
-    assert after["last_sweep_status"] in ("pending", "running", "completed", "failed", "skipped", "locked")
-    # last_sweep_at peut etre None si started_at n'est pas renseigne : c'est OK
-    assert after.get("last_sweep_at") is None or isinstance(after["last_sweep_at"], str)
+    # Le dernier sweep est l'AIJob pose ci-dessus : statut serve par ai_jobs.
+    assert after["last_sweep_status"] == "failed"
+    assert after.get("last_sweep_at") is not None and isinstance(after["last_sweep_at"], str)
 
 
 def test_queue_compteurs_non_negatifs(admin_client, admin_db):

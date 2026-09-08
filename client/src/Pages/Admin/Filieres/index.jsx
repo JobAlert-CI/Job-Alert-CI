@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react"
 import { KeyRound, Plus, ChevronDown, ChevronRight, Pencil, Trash2 } from "lucide-react"
+import { useSearchParams } from "react-router-dom"
 import { ErrorBoundary } from "react-error-boundary"
 import { useNotify } from "@/contexts/Notify.context"
 import AdminSectionFallback from "@/components/admin/AdminSectionFallback"
@@ -68,7 +69,13 @@ const FilierePage = () => {
     [statsAbonnes]
   )
 
-  const [etendue, setEtendue] = useState(null)          // UN SEUL panneau ouvert à la fois
+  // Cycle 19 (F4) : atterrissage post-approbation d'une suggestion IA —
+  // ?etendue=<id> ouvre DIRECTEMENT le panneau mots-clés de la nouvelle
+  // filière. Lecture UNE fois au montage (initialiseur paresseux : zéro
+  // setState-in-effect) ; l'état local reprend ensuite la main — un clic
+  // referme normalement, un refresh ré-ouvre (lien partageable).
+  const [searchParams] = useSearchParams()
+  const [etendue, setEtendue] = useState(() => searchParams.get("etendue"))  // UN SEUL panneau ouvert à la fois
   const [edition, setEdition] = useState(null)           // null = fermé ; {} = création
   const [suppression, setSuppression] = useState(null)    // confirmation
 

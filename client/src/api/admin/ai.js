@@ -8,7 +8,9 @@ const API_URL = "/api/admin/ai";
 
 /* ─── Cles API ───────────────────────────────────────────────────────── */
 
-/** GET /api/admin/ai/keys — cles actives (api_key_last4 exclu de la reponse). */
+/** GET /api/admin/ai/keys — cles actives. Cycle 19 : api_key_last4 EST
+ *  desormais expose (masque ****ab12 affichable, suffixe non secret).
+ *  La cle complete/chiffree n'est JAMAIS renvoyee. */
 const getKeys = async ({ signal } = {}) => {
   const response = await adminApi.get(`${API_URL}/keys`, { signal });
   return response.data;
@@ -63,6 +65,19 @@ const getQueue = async ({ signal } = {}) => {
   return response.data;
 };
 
+/**
+ * GET /api/admin/ai/stats?days=30 — stats du pipeline IA (cycle 19).
+ * @param {Object} params days (1-365, defaut 30) : fenetre des axes jobs.
+ *   Réponse : { backlog_brut, jobs_fenetre, jobs_par_statut, taux_activation
+ *   (null si aucun job terminé), suggestions_par_statut, alertes_non_acquittees,
+ *   cles_actives, cles_total, jobs_par_jour [{jour,activees,rejetees,revue,retraiter,jobs}],
+ *   duree_moyenne_par_jour [{jour,secondes}], jobs_par_trigger, days }
+ */
+const getStats = async (params = {}, { signal } = {}) => {
+  const response = await adminApi.get(`${API_URL}/stats`, { params: cleanParams(params), signal });
+  return response.data;
+};
+
 /* ─── Alertes ────────────────────────────────────────────────────────── */
 
 /**
@@ -85,7 +100,8 @@ const acknowledgeAlert = async (alertId, { signal } = {}) => {
 
 /**
  * POST /api/admin/ai/run → 202 — declenche le traitement IA des offres brutes.
- * @param {Object} data { force?: bool, trigger_type?: "manual"|"sweep"|"api" }
+ * @param {Object} data { force?: bool, trigger_type?: "manual" (defaut) | "auto" | "delayed_check" | "sweep" }
+ *   (enum serveur AIJobTrigger reel — l'ancienne doc disait "api" a tort)
  * → { status: "queued", task_id, triggered_by }
  */
 const runProcessing = async (data = {}, { signal } = {}) => {
@@ -125,6 +141,7 @@ export {
   testKey,
   getJobs,
   getQueue,
+  getStats,
   getAlerts,
   acknowledgeAlert,
   runProcessing,
@@ -140,6 +157,7 @@ export default {
   testKey,
   getJobs,
   getQueue,
+  getStats,
   getAlerts,
   acknowledgeAlert,
   runProcessing,

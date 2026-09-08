@@ -54,6 +54,8 @@ const AdminPremiereConnexion = lazy(() => import("./Pages/Admin/PremiereConnexio
 const AdminJournal = lazy(() => import("./Pages/Admin/Journal"));
 const AdminLogs = lazy(() => import("./Pages/Admin/LogsPage"));
 const AdminParametres = lazy(() => import("./Pages/Admin/Parametres"));
+const AdminIa = lazy(() => import("./Pages/Admin/Ia"));
+const AdminSysteme = lazy(() => import("./Pages/Admin/Systeme"));
 const AdminLayout = lazy(() => import("./components/admin/AdminLayout"));
 const RequireAdmin = lazy(() => import("./components/admin/AdminGuard"));
 import { AdminAuthProvider } from "@/contexts/AdminAuth.context";
@@ -212,6 +214,24 @@ const App = () => (
                     element={
                       <RequireAdmin roles={["super_admin"]}>
                         <AdminSources />
+                      </RequireAdmin>
+                    }
+                  />
+                  {/* Normalisation IA : super_admin uniquement (doc v3 §19). */}
+                  <Route
+                    path="ia"
+                    element={
+                      <RequireAdmin roles={["super_admin"]}>
+                        <AdminIa />
+                      </RequireAdmin>
+                    }
+                  />
+                  {/* Santé du système : super_admin uniquement (doc v3 §20). */}
+                  <Route
+                    path="systeme"
+                    element={
+                      <RequireAdmin roles={["super_admin"]}>
+                        <AdminSysteme />
                       </RequireAdmin>
                     }
                   />
