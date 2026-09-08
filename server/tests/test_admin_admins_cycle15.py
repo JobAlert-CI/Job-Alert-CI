@@ -206,8 +206,10 @@ def test_journal_lecture_ne_plante_pas_sur_admin_null(admin_client, admin_db):
     try:
         resp = admin_client.get("/api/admin/logs/audit?limit=200")
         assert resp.status_code == 200
-        # La ligne orpheline est presente avec admin_id null.
-        assert any(entry.get("admin_id") is None for entry in resp.json())
+        # Cycle 16 : la route renvoie une ENVELOPPE {items, total, ...} —
+        # la ligne orpheline est presente avec admin_id null.
+        body = resp.json()
+        assert any(entry.get("admin_id") is None for entry in body["items"])
     finally:
         for log in admin_db.scalars(
             select(AdminActionLog).where(AdminActionLog.admin_id.is_(None))

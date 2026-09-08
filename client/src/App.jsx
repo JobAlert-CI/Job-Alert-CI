@@ -51,6 +51,9 @@ const AdminSources = lazy(() => import("./Pages/Admin/Sources"));
 const AdminContenu = lazy(() => import("./Pages/Admin/Contenu"));
 const AdminAdministrateurs = lazy(() => import("./Pages/Admin/Administrateurs"));
 const AdminPremiereConnexion = lazy(() => import("./Pages/Admin/PremiereConnexion"));
+const AdminJournal = lazy(() => import("./Pages/Admin/Journal"));
+const AdminLogs = lazy(() => import("./Pages/Admin/LogsPage"));
+const AdminParametres = lazy(() => import("./Pages/Admin/Parametres"));
 const AdminLayout = lazy(() => import("./components/admin/AdminLayout"));
 const RequireAdmin = lazy(() => import("./components/admin/AdminGuard"));
 import { AdminAuthProvider } from "@/contexts/AdminAuth.context";
@@ -238,6 +241,33 @@ const App = () => (
                     element={
                       <RequireAdmin roles={["super_admin"]}>
                         <AdminAdministrateurs />
+                      </RequireAdmin>
+                    }
+                  />
+                  {/* Journal d'activité : super_admin uniquement (doc v3 §16). */}
+                  <Route
+                    path="journal"
+                    element={
+                      <RequireAdmin roles={["super_admin"]}>
+                        <AdminJournal />
+                      </RequireAdmin>
+                    }
+                  />
+                  {/* Logs & emails transactionnels : super_admin (doc v3 §17). */}
+                  <Route
+                    path="logs"
+                    element={
+                      <RequireAdmin roles={["super_admin"]}>
+                        <AdminLogs />
+                      </RequireAdmin>
+                    }
+                  />
+                  {/* Paramètres du site : super_admin (doc v3 §18). */}
+                  <Route
+                    path="parametres"
+                    element={
+                      <RequireAdmin roles={["super_admin"]}>
+                        <AdminParametres />
                       </RequireAdmin>
                     }
                   />

@@ -74,6 +74,22 @@ const getTransactionalEmails = async (params = {}, { signal } = {}) => {
 };
 
 /**
+ * GET /api/admin/transactional-emails/stats — stats des emails
+ * transactionnels (cycle 17) pour les compteurs et charts de /admin/logs.
+ * @param {Object} params days (1-365, defaut 30) : fenetre des axes par_jour
+ *   et du badge echecs_fenetre (days=1 = « aujourd'hui »).
+ *   Réponse : { total, par_statut {queued,sent,failed}, par_motif (6 valeurs),
+ *   echecs_fenetre, par_jour [{jour,total,par_statut}], days }
+ */
+const getTransactionalEmailStats = async (params = {}, { signal } = {}) => {
+  const response = await adminApi.get("/api/admin/transactional-emails/stats", {
+    params: cleanParams(params),
+    signal,
+  });
+  return response.data;
+};
+
+/**
  * GET /api/admin/transactional-emails/count — total (meme filtres status/purpose)
  * → { count }
  */
@@ -91,6 +107,7 @@ export {
   exportSubscribers,
   exportSending,
   getTransactionalEmails,
+  getTransactionalEmailStats,
   countTransactionalEmails,
 };
 
@@ -100,5 +117,6 @@ export default {
   exportSubscribers,
   exportSending,
   getTransactionalEmails,
+  getTransactionalEmailStats,
   countTransactionalEmails,
 };

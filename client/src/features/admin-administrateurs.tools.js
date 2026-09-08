@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import {
   getAdmins, createAdmin, updateAdmin, updateAdminRole, toggleAdminStatus, deleteAdmin,
 } from "@/api/admin/admins"
+import { formatApiError } from "@/api/errors"
 
 /* ─────────────────────────────────────────────────────────────────────
    Page Gestion des administrateurs (/admin/administrateurs) — hooks
@@ -30,9 +31,8 @@ export const adminAdministrateursKeys = {
   root: ["admin", "administrateurs"],
 }
 
-/** Message d'erreur lisible (détail serveur 400/409…). */
-export const messageErreurAdmin = (err) =>
-  err?.response?.data?.detail || err?.message || "Action impossible"
+/** Message d'erreur lisible — via formatApiError (422 FastAPI = tableau, jamais un objet brut dans React ; bug latent documenté cycle 15). */
+export const messageErreurAdmin = (err) => formatApiError(err) || "Action impossible"
 
 const useInvalidateAdministrateurs = () => {
   const queryClient = useQueryClient()

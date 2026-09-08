@@ -1,1 +1,570 @@
-[]
+[
+    {
+        "title": "ASSISTANT COMPTABLE OIIPC",
+        "source_url": "https://www.goafricaonline.com/ci/emploi/job-22023-assistant-comptable-oiipc",
+        "canonical_url": "https://www.goafricaonline.com/ci/emploi/job-22023-assistant-comptable-oiipc",
+        "location_raw": "03 ABIDJAN Abidjan - Côte d’Ivoire",
+        "salary_raw": "6,7 k/8,5 k F CFA / mois",
+        "published_at": "2026-09-02T00:00:00.000Z",
+        "collected_at": "2026-09-07T19:32:41.060Z",
+        "first_seen_at": "2026-09-07T19:32:41.060Z",
+        "last_seen_at": "2026-09-07T19:32:41.060Z",
+        "expires_at": "2026-10-01T00:00:00.000Z",
+        "application_deadline_at": "2026-10-01T00:00:00.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": null,
+            "label": "03 ABIDJAN Abidjan - Côte d’Ivoire"
+        },
+        "contract_type": {
+            "code": "CDI",
+            "label": "CDI"
+        },
+        "experience_level": {
+            "code": "INCONNU",
+            "label": "Sans expérience accepté",
+            "min_years": null,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_2",
+            "label": "BAC+2",
+            "rank": 2
+        },
+        "description": "Un ou une assistant(e) comptable soutient la Direction ou le chef comptable dans la gestion financière. Ses missions principales incluent la saisie des factures, le suivi des règlements clients/fournisseurs, les rapprochements bancaires et la préparation des déclarations fiscales. C'est un poste clé qui exige rigueur et maîtrise des outils numériques un assistant comptable doit élaborer des bilans comptables, tenir à jour un tableau de bord et suivre des stocks. En somme, les missions d'un assistant comptable varient en fonction de la taille de l'entreprise (PME, cabinet…), mais aussi de la relation que vous avez avec votre supérieur. Assistant comptable est le poste qui peut vous permettre de débuter rapidement dans le secteur de la comptabilité. Avec un bac+2 ou un bac+3 et quelques années d'expérience, vous pourrez vous tourner vers des postes de comptables. Dossiers de candidature: -Un curriculum vitae CV -Une lettre de motivation LM Adresse de candidature:service_recrutement@oiipca.org Site internet: http://oiipca.org/",
+        "company": {
+            "name": "IMICC",
+            "website_url": "https://www.goafricaonline.com/cf/1200077-imicc-agences-recrutement-bangui-republique-centrafricaine",
+            "type": "Emploi > Agences de recrutement",
+            "description": "L'Organisation pour l'Immigration et l'Insertion Professionnelle au Canada (OIIPC) est une organisation spécialisée dans l'accompagnement des talents internationaux, des travailleurs qualifiés et des étudiants souhaitant s'installer, travailler ou étudier légalement au Canada."
+        },
+        "company_hint": null,
+        "application_email": "service_recrutement@oiipca.org",
+        "application_emails": [
+            "service_recrutement@oiipca.org"
+        ],
+        "remote_work": "Télétravail complet",
+        "raw_fields": {
+            "contract_raw": "CDI",
+            "experience_raw": "Sans expérience accepté",
+            "education_raw": "Bac+2",
+            "published_raw": "Posté le 2 septembre 2026",
+            "expires_raw": "jeudi 1 octobre 2026 à 00:00"
+        },
+        "télétravail": "Télétravail complet",
+        "is_télétravail": true,
+        "active": "2026-09-02T00:00:00.000Z"
+    },
+    {
+        "title": "ASSISTANT MENAGER H/F",
+        "source_url": "https://www.goafricaonline.com/ci/emploi/job-22024-assistant-menager-hf",
+        "canonical_url": "https://www.goafricaonline.com/ci/emploi/job-22024-assistant-menager-hf",
+        "location_raw": "Riviera 3, Zone Cap Nord Bâtiment situé à l'arrière de Mr Bricolage, Rez-de-chaussée, Abidjan Abidjan - Côte d’Ivoire",
+        "salary_raw": "250 k/500 k F CFA / mois",
+        "published_at": "2026-09-02T00:00:00.000Z",
+        "collected_at": "2026-09-07T19:32:50.385Z",
+        "first_seen_at": "2026-09-07T19:32:50.385Z",
+        "last_seen_at": "2026-09-07T19:32:50.385Z",
+        "expires_at": "2026-09-10T00:00:00.000Z",
+        "application_deadline_at": "2026-09-10T00:00:00.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": "Riviera",
+            "label": "Riviera 3, Zone Cap Nord Bâtiment situé à l'arrière de Mr Bricolage, Rez-de-chaussée, Abidjan Abidjan - Côte d’Ivoire"
+        },
+        "contract_type": {
+            "code": "CDD",
+            "label": "CDD / Stage"
+        },
+        "experience_level": {
+            "code": "SENIOR",
+            "label": "+ de 5 ans d’expérience",
+            "min_years": 5,
+            "max_years": null
+        },
+        "education_level": {
+            "code": null,
+            "label": null,
+            "rank": null
+        },
+        "description": "ASSISTANT MENAGER H/F CONTEXTE : Société internationale, leader dans le secteur du service à la personne recrute des intervenants. Le salarié est employé de la société de service à la personne qui le missionne au domicile d’un ou de plusieurs clients. Il dépend hiérarchiquement du responsable de secteur et peut effectuer des déplacements d’un domicile à un autre. Les horaires de travail sont réguliers et liés aux besoins du client. TÂCHES À ACCOMPLIR : • Rafraîchir et ranger le domicile • Ménage du domicile • Assistance à l’entretien du linge • Assistance à la cuisine • Gérer les stocks de produits et prendre soin du matériel de service PRÉ-REQUIS : • Expérience avérée minimum de 3 ans dans le nettoyage • Expérience dans le ménage hôtelier souhaitable QUALITÉS CLÉS : • Discrétion, intégrité, politesse, courtoisie, ponctualité • Rigueur et minutie, sens du service et de l’organisation, Capacité d’initiative • Bonne présentation, maitrise du français. Merci de faire parvenir votre CV + prétentions salariales par mail à l’adresse suivante : recrutement@o2careservices.ci",
+        "company": {
+            "name": "O2 COTE D'IVOIRE",
+            "website_url": "https://www.goafricaonline.com/ci/811805-o2-prestation-service-abidjan-cote-ivoire",
+            "type": "Marketing & marketing digital > Prestation de service",
+            "description": "ASSISTANT MENAGER H/F CONTEXTE : Société internationale, leader dans le secteur du service à la personne recrute des intervenants. Le salarié est employé de la société de service à la personne qui le missionne au domicile d’un ou de plusieurs clients. Il dépend hiérarchiquement du responsable de secteur et peut effectuer des déplacements d’un domicile à un autre. Les horaires de travail sont réguliers et liés aux besoins du client. TÂCHES À ACCOMPLIR : • Rafraîchir et ranger le domicile •..."
+        },
+        "company_hint": null,
+        "application_email": "recrutement@o2careservices.ci",
+        "application_emails": [
+            "recrutement@o2careservices.ci"
+        ],
+        "remote_work": "Sans télétravail",
+        "raw_fields": {
+            "contract_raw": "CDD / Stage",
+            "experience_raw": "+ de 5 ans d’expérience",
+            "education_raw": null,
+            "published_raw": "Posté le 2 septembre 2026",
+            "expires_raw": "jeudi 10 septembre 2026 à 00:00"
+        },
+        "télétravail": "Sans télétravail",
+        "is_télétravail": false,
+        "active": "2026-09-02T00:00:00.000Z"
+    },
+    {
+        "title": "AUXILIAIRE DE VIE H/F",
+        "source_url": "https://www.goafricaonline.com/ci/emploi/job-22025-auxiliaire-de-vie-hf",
+        "canonical_url": "https://www.goafricaonline.com/ci/emploi/job-22025-auxiliaire-de-vie-hf",
+        "location_raw": "Riviera 3, Zone Cap Nord Bâtiment situé à l'arrière de Mr Bricolage, Rez-de-chaussée, Abidjan Abidjan - Côte d’Ivoire",
+        "salary_raw": "250 k/500 k F CFA / mois",
+        "published_at": "2026-09-02T00:00:00.000Z",
+        "collected_at": "2026-09-07T19:32:59.717Z",
+        "first_seen_at": "2026-09-07T19:32:59.717Z",
+        "last_seen_at": "2026-09-07T19:32:59.717Z",
+        "expires_at": "2026-09-10T00:00:00.000Z",
+        "application_deadline_at": "2026-09-10T00:00:00.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": "Riviera",
+            "label": "Riviera 3, Zone Cap Nord Bâtiment situé à l'arrière de Mr Bricolage, Rez-de-chaussée, Abidjan Abidjan - Côte d’Ivoire"
+        },
+        "contract_type": {
+            "code": "CDD",
+            "label": "CDD / Stage"
+        },
+        "experience_level": {
+            "code": "SENIOR",
+            "label": "+ de 5 ans d’expérience",
+            "min_years": 5,
+            "max_years": null
+        },
+        "education_level": {
+            "code": null,
+            "label": null,
+            "rank": null
+        },
+        "description": "AUXILIAIRE DE VIE H/F CONTEXTE Société internationale leader dans le secteur du service à la personne recrute des intervenants. Le salarié est employé de la société de service à la personne qui le missionne au domicile d’un ou de plusieurs clients. Il dépend hiérarchiquement du responsable de secteur et peut effectuer des déplacements d’un domicile à un autre. Les horaires de travail sont réguliers et liés aux besoins du client. TÂCHES À ACCOMPLIR : Toutes ces tâches se feront en prenant en considération le rythme et les besoins de la personne âgée : • Aider aux actes du quotidien nécessaires • Aider à la prise de repas • Aider aux prises de médicaments et au respect des recommandations du médecin • Veiller au respect des rendez-vous à l’hôpital • Tenir compagnie à la personne âgée • Proposer des loisirs • Ranger et entretenir l’espace de vie PRÉ-REQUIS : • Diplôme CAP, BEP sanitaire et social • Expérience de trois (3) années avérées dans le domaine sanitaire et social QUALITES CLÉS • Discrétion, intégrité, sociabilité, politesse, bienveillance. • Sens des responsabilités et du service, conscience professionnelle, respect des consignes. • Bonne condition physique, propreté et bonne présentation. • Maitrise du Français. Merci de faire parvenir votre CV + lettre de motivation + prétentions salariales par mail à l’adresse suivante : recrutement@o2careservices.ci avec en objet l’intitulé du poste",
+        "company": {
+            "name": "MG HOME SERVICES",
+            "website_url": "https://www.goafricaonline.com/ci/1190207-mg-home-prestation-service-services-abidjan-cote-ivoire",
+            "type": "Marketing & marketing digital > Prestation de service",
+            "description": null
+        },
+        "company_hint": null,
+        "application_email": "recrutement@o2careservices.ci",
+        "application_emails": [
+            "recrutement@o2careservices.ci"
+        ],
+        "remote_work": "Sans télétravail",
+        "raw_fields": {
+            "contract_raw": "CDD / Stage",
+            "experience_raw": "+ de 5 ans d’expérience",
+            "education_raw": null,
+            "published_raw": "Posté le 2 septembre 2026",
+            "expires_raw": "jeudi 10 septembre 2026 à 00:00"
+        },
+        "télétravail": "Sans télétravail",
+        "is_télétravail": false,
+        "active": "2026-09-02T00:00:00.000Z"
+    },
+    {
+        "title": "CHEF CUISINIER À DOMICILE H/F",
+        "source_url": "https://www.goafricaonline.com/ci/emploi/job-22026-chef-cuisinier-a-domicile-hf",
+        "canonical_url": "https://www.goafricaonline.com/ci/emploi/job-22026-chef-cuisinier-a-domicile-hf",
+        "location_raw": "Riviera 3, Zone Cap Nord Bâtiment situé à l'arrière de Mr Bricolage, Rez-de-chaussée, Abidjan Abidjan - Côte d’Ivoire",
+        "salary_raw": "250 k/500 k F CFA / mois",
+        "published_at": "2026-09-02T00:00:00.000Z",
+        "collected_at": "2026-09-07T19:33:08.747Z",
+        "first_seen_at": "2026-09-07T19:33:08.747Z",
+        "last_seen_at": "2026-09-07T19:33:08.747Z",
+        "expires_at": "2026-09-10T00:00:00.000Z",
+        "application_deadline_at": "2026-09-10T00:00:00.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": "Riviera",
+            "label": "Riviera 3, Zone Cap Nord Bâtiment situé à l'arrière de Mr Bricolage, Rez-de-chaussée, Abidjan Abidjan - Côte d’Ivoire"
+        },
+        "contract_type": {
+            "code": "CDD",
+            "label": "Stage / CDD"
+        },
+        "experience_level": {
+            "code": "SENIOR",
+            "label": "+ de 5 ans d’expérience",
+            "min_years": 5,
+            "max_years": null
+        },
+        "education_level": {
+            "code": null,
+            "label": null,
+            "rank": null
+        },
+        "description": "CHEF CUISINIER À DOMICILE H/F CONTEXTE : Société internationale, leader dans le secteur du service à la personne recrute des intervenants. L’employé est salarié de la société de service à la personne qui le missionne au domicile d’un ou de plusieurs clients. Il dépend hiérarchiquement du responsable de secteur et il peut effectuer des déplacements d’un domicile à un autre. Les horaires de travail sont réguliers et liés aux besoins du client. TÂCHES À ACCOMPLIR :  ORGANISATION ET PREPARATION DES REPAS QUOTIDIENS DU CLIENT. • Réaliser les menus en fonction des habitudes, préférences, du régime alimentaire des clients et de la saison. • Gérer les stocks • Réaliser et /ou organiser les courses et les achats auprès des détaillants spécialisés • Préparer les plats selon les règles d’hygiène et de sécurité alimentaire • Dresser les plats en fonction du type de service • Mettre la table et dresser le couvert • Nettoyer et prendre soin du matériel et de la cuisine PRÉ-REQUIS : • Le candidat doit pouvoir justifier d’une expérience de cinq (5) années dans le domaine de la restauration et/ou de l’hôtellerie. • Excellente cuisine (africaine, européenne et/ou asiatique) • Capacité à pouvoir réaliser des menus hebdomadaires et les archiver pour veiller au renouvellement des plats en tenant compte du régime et de l’équilibre alimentaire du client • Respecter les règles d’hygiène et de sécurité • Maitriser l’utilisation de différents matériels de cuisine et maitriser leurs techniques d’entretien QUALITES CLÉS : • Discrétion, intégrité. • Très bonne maitrise de la langue française • Créativité. • Ecoute, rigueur et minutie. • Capacité d’adaptation, sens du service. • Excellente présentation. Merci de faire parvenir 1 CV + 1 lettre de motivation par mail à l’adresse suivante : rh@mg-homeservices.com",
+        "company": {
+            "name": "MG HOME SERVICES",
+            "website_url": "https://www.goafricaonline.com/ci/1190207-mg-home-prestation-service-services-abidjan-cote-ivoire",
+            "type": "Marketing & marketing digital > Prestation de service",
+            "description": null
+        },
+        "company_hint": null,
+        "application_email": "rh@mg-homeservices.com",
+        "application_emails": [
+            "rh@mg-homeservices.com"
+        ],
+        "remote_work": "Sans télétravail",
+        "raw_fields": {
+            "contract_raw": "Stage / CDD",
+            "experience_raw": "+ de 5 ans d’expérience",
+            "education_raw": null,
+            "published_raw": "Posté le 2 septembre 2026",
+            "expires_raw": "jeudi 10 septembre 2026 à 00:00"
+        },
+        "télétravail": "Sans télétravail",
+        "is_télétravail": false,
+        "active": "2026-09-02T00:00:00.000Z"
+    },
+    {
+        "title": "CHEF CUISINIER H/F",
+        "source_url": "https://www.goafricaonline.com/ci/emploi/job-22027-chef-cuisinier-hf",
+        "canonical_url": "https://www.goafricaonline.com/ci/emploi/job-22027-chef-cuisinier-hf",
+        "location_raw": "Riviera 3, Zone Cap Nord Bâtiment situé à l'arrière de Mr Bricolage, Rez-de-chaussée, Abidjan Abidjan - Côte d’Ivoire",
+        "salary_raw": "250 k/500 k F CFA / mois",
+        "published_at": "2026-09-02T00:00:00.000Z",
+        "collected_at": "2026-09-07T19:33:17.430Z",
+        "first_seen_at": "2026-09-07T19:33:17.430Z",
+        "last_seen_at": "2026-09-07T19:33:17.430Z",
+        "expires_at": "2026-09-10T00:00:00.000Z",
+        "application_deadline_at": "2026-09-10T00:00:00.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": "Riviera",
+            "label": "Riviera 3, Zone Cap Nord Bâtiment situé à l'arrière de Mr Bricolage, Rez-de-chaussée, Abidjan Abidjan - Côte d’Ivoire"
+        },
+        "contract_type": {
+            "code": "STAGE",
+            "label": "Stage"
+        },
+        "experience_level": {
+            "code": "SENIOR",
+            "label": "+ de 5 ans d’expérience",
+            "min_years": 5,
+            "max_years": null
+        },
+        "education_level": {
+            "code": null,
+            "label": null,
+            "rank": null
+        },
+        "description": "CHEF CUISINIER H/F CONTEXTE : Société internationale, leader dans le secteur du service à la personne recrute des intervenants. L’employé est salarié de la société de service à la personne qui le missionne au domicile d’un ou de plusieurs clients. Il dépend hiérarchiquement du responsable de secteur et il peut effectuer des déplacements d’un domicile à un autre. Les horaires de travail sont réguliers et liés aux besoins du client. TÂCHES À ACCOMPLIR :  ORGANISATION ET PREPARATION DES REPAS QUOTIDIENS DU CLIENT. • Réaliser les menus en fonction des habitudes, préférences, du régime alimentaire des clients et de la saison. • Gérer les stocks • Tenir et gérer un budget • Réaliser et /ou organiser les courses et les achats auprès des détaillants spécialisés • Préparer les plats selon les règles d’hygiène et de sécurité alimentaire • Dresser les plats en fonction du type de service • Mettre la table et dresser le couvert • Effectuer le service à table • Nettoyer et prendre soin du matériel et de la cuisine PRÉ-REQUIS : • Diplôme et formation en cuisine • Expérience minimum de 5 ans dans le secteur de la cuisine et/ou de la restauration • Cuisine d’exception (africaine et européenne) • Maitrise du Français • Connaissance œnophile souhaitable QUALITÉS CLÉS : • Discrétion, intégrité. • Créativité. • Ecoute, rigueur et minutie. • Capacité d’adaptation, sens du service. • Bonne présentation. Merci de faire parvenir votre CV + prétentions salariales par mail à l’adresse suivante : recrutement@o2careservices.ci",
+        "company": {
+            "name": "MG HOME SERVICES",
+            "website_url": "https://www.goafricaonline.com/ci/1190207-mg-home-prestation-service-services-abidjan-cote-ivoire",
+            "type": "Marketing & marketing digital > Prestation de service",
+            "description": null
+        },
+        "company_hint": null,
+        "application_email": "recrutement@o2careservices.ci",
+        "application_emails": [
+            "recrutement@o2careservices.ci"
+        ],
+        "remote_work": "Sans télétravail",
+        "raw_fields": {
+            "contract_raw": "Stage",
+            "experience_raw": "+ de 5 ans d’expérience",
+            "education_raw": null,
+            "published_raw": "Posté le 2 septembre 2026",
+            "expires_raw": "jeudi 10 septembre 2026 à 00:00"
+        },
+        "télétravail": "Sans télétravail",
+        "is_télétravail": false,
+        "active": "2026-09-02T00:00:00.000Z"
+    },
+    {
+        "title": "GARDE D’ENFANTS H/F",
+        "source_url": "https://www.goafricaonline.com/ci/emploi/job-22028-garde-d-enfants-hf",
+        "canonical_url": "https://www.goafricaonline.com/ci/emploi/job-22028-garde-d-enfants-hf",
+        "location_raw": "Riviera 3, Zone Cap Nord Bâtiment situé à l'arrière de Mr Bricolage, Rez-de-chaussée, Abidjan Abidjan - Côte d’Ivoire",
+        "salary_raw": "250 k/500 k F CFA / mois",
+        "published_at": "2026-09-02T00:00:00.000Z",
+        "collected_at": "2026-09-07T19:33:27.715Z",
+        "first_seen_at": "2026-09-07T19:33:27.715Z",
+        "last_seen_at": "2026-09-07T19:33:27.715Z",
+        "expires_at": "2026-09-10T00:00:00.000Z",
+        "application_deadline_at": "2026-09-10T00:00:00.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": "Riviera",
+            "label": "Riviera 3, Zone Cap Nord Bâtiment situé à l'arrière de Mr Bricolage, Rez-de-chaussée, Abidjan Abidjan - Côte d’Ivoire"
+        },
+        "contract_type": {
+            "code": "STAGE",
+            "label": "Stage"
+        },
+        "experience_level": {
+            "code": "SENIOR",
+            "label": "+ de 5 ans d’expérience",
+            "min_years": 5,
+            "max_years": null
+        },
+        "education_level": {
+            "code": null,
+            "label": null,
+            "rank": null
+        },
+        "description": "GARDE D’ENFANTS H/F CONTEXTE : Société internationale, leader dans le secteur du service à la personne recrute des intervenants. Le salarié est employé de la société de service à la personne qui le missionne au domicile d’un ou de plusieurs clients. Il dépend hiérarchiquement du responsable de secteur et peut effectuer des déplacements d’un domicile à un autre. Les horaires de travail sont réguliers et liés aux besoins du client. TÂCHES À ACCOMPLIR : Toutes ces tâches se feront en prenant en considération le rythme et les besoins de l’enfant : • Effectuer les actes du quotidien nécessaires à l’enfant en respectant ses rythmes (toilette, habillage, sieste…) • Aider l’enfant dans son apprentissage de l’autonomie • Veiller sur l’état de santé général de l’enfant • Participer à l’éveil de l’enfant par des activités éducatives et ludiques adaptées à son âge • Ranger et entretenir l’espace de vie de l’enfant et le matériel utilisé • Préparer et donner les repas • Transmettre toutes les informations utiles aux parents et au responsable de secteur(cahier de suivi) PRÉ-REQUIS • Diplôme CAP, BEP dans le domaine sanitaire social et/ou éducatif • Expérience professionnelle de 3 ans minimum dans le domaine de la petite enfance, du sanitaire social et/ou préscolaire QUALITES CLÉS : • Discrétion, intégrité • Aisance avec les enfants, écoute, politesse, bienveillance et autonomie • Sens des responsabilités, conscience professionnelle, sens de la pédagogie • Sens du service, sens de l’observation et de l’anticipation • Capacité d’initiative, respect des consignes et bonne communication, • Propreté et bonne présentation • Maitrise du français. Merci de faire parvenir votre CV + prétentions salariales par mail à l’adresse suivante recrutement@o2careservices.ci",
+        "company": {
+            "name": "MG HOME SERVICES",
+            "website_url": "https://www.goafricaonline.com/ci/1190207-mg-home-prestation-service-services-abidjan-cote-ivoire",
+            "type": "Marketing & marketing digital > Prestation de service",
+            "description": null
+        },
+        "company_hint": null,
+        "application_email": "recrutement@o2careservices.ci",
+        "application_emails": [
+            "recrutement@o2careservices.ci"
+        ],
+        "remote_work": "Sans télétravail",
+        "raw_fields": {
+            "contract_raw": "Stage",
+            "experience_raw": "+ de 5 ans d’expérience",
+            "education_raw": null,
+            "published_raw": "Posté le 2 septembre 2026",
+            "expires_raw": "jeudi 10 septembre 2026 à 00:00"
+        },
+        "télétravail": "Sans télétravail",
+        "is_télétravail": false,
+        "active": "2026-09-02T00:00:00.000Z"
+    },
+    {
+        "title": "LINGER H/F",
+        "source_url": "https://www.goafricaonline.com/ci/emploi/job-22029-linger-hf",
+        "canonical_url": "https://www.goafricaonline.com/ci/emploi/job-22029-linger-hf",
+        "location_raw": "Riviera 3, Zone Cap Nord Bâtiment situé à l'arrière de Mr Bricolage, Rez-de-chaussée, Abidjan Abidjan - Côte d’Ivoire",
+        "salary_raw": "250 k/500 k F CFA / mois",
+        "published_at": "2026-09-02T00:00:00.000Z",
+        "collected_at": "2026-09-07T19:33:35.123Z",
+        "first_seen_at": "2026-09-07T19:33:35.123Z",
+        "last_seen_at": "2026-09-07T19:33:35.123Z",
+        "expires_at": "2026-09-10T00:00:00.000Z",
+        "application_deadline_at": "2026-09-10T00:00:00.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": "Riviera",
+            "label": "Riviera 3, Zone Cap Nord Bâtiment situé à l'arrière de Mr Bricolage, Rez-de-chaussée, Abidjan Abidjan - Côte d’Ivoire"
+        },
+        "contract_type": {
+            "code": "STAGE",
+            "label": "Stage"
+        },
+        "experience_level": {
+            "code": "SENIOR",
+            "label": "+ de 5 ans d’expérience",
+            "min_years": 5,
+            "max_years": null
+        },
+        "education_level": {
+            "code": null,
+            "label": null,
+            "rank": null
+        },
+        "description": "LINGER H/F CONTEXTE : Société internationale, leader dans le secteur du service à la personne recrute des intervenants. Le salarié est employé de la société de service à la personne qui le missionne au domicile d’un ou de plusieurs clients. Il dépend hiérarchiquement du responsable de secteur et peut effectuer des déplacements d’un domicile à un autre. TÂCHES À ACCOMPLIR :  ENTRETENIR LE LINGE • Effectuer le change du linge • Laver et sécher le linge de maison ainsi que les vêtements à la machine et / ou à la main selon un rythme et une technique bien définie. • Repasser et plier le linge selon des techniques bien définies • Détacher le linge • Ranger, ordonner et embellir le dressing • Gérer les stocks de produit • Prendre soin du matériel de service PRE-REQUIS : • Expérience avérée minimum de 5 (cinq) années dans le traitement du linge • Maitrise des techniques d’entretien de tous types de textiles • Maitrise des techniques de rangement de tous types de linges • Connaissance des techniques d’entretien de chaussures et accessoires souhaitable • Hygiène, propreté et bonne présentation QUALITÉS CLÉS : • Discrétion, intégrité, politesse, courtoisie, ponctualité • Rigueur et minutie, sens du service et de l’organisation, Capacité d’initiative • Bonne présentation • Maitrise du français Merci de faire parvenir votre CV + prétentions salariales par mail à l’adresse suivante : recrutement@o2careservices.ci",
+        "company": {
+            "name": "MG HOME SERVICES",
+            "website_url": "https://www.goafricaonline.com/ci/1190207-mg-home-prestation-service-services-abidjan-cote-ivoire",
+            "type": "Marketing & marketing digital > Prestation de service",
+            "description": null
+        },
+        "company_hint": null,
+        "application_email": "recrutement@o2careservices.ci",
+        "application_emails": [
+            "recrutement@o2careservices.ci"
+        ],
+        "remote_work": "Sans télétravail",
+        "raw_fields": {
+            "contract_raw": "Stage",
+            "experience_raw": "+ de 5 ans d’expérience",
+            "education_raw": null,
+            "published_raw": "Posté le 2 septembre 2026",
+            "expires_raw": "jeudi 10 septembre 2026 à 00:00"
+        },
+        "télétravail": "Sans télétravail",
+        "is_télétravail": false,
+        "active": "2026-09-02T00:00:00.000Z"
+    },
+    {
+        "title": "PUÉRICULTRICE H/F",
+        "source_url": "https://www.goafricaonline.com/ci/emploi/job-22030-puericultrice-hf",
+        "canonical_url": "https://www.goafricaonline.com/ci/emploi/job-22030-puericultrice-hf",
+        "location_raw": "Riviera 3, Zone Cap Nord Bâtiment situé à l'arrière de Mr Bricolage, Rez-de-chaussée, Abidjan Abidjan - Côte d’Ivoire",
+        "salary_raw": "250 k/500 k F CFA / mois",
+        "published_at": "2026-09-02T00:00:00.000Z",
+        "collected_at": "2026-09-07T19:33:42.435Z",
+        "first_seen_at": "2026-09-07T19:33:42.435Z",
+        "last_seen_at": "2026-09-07T19:33:42.435Z",
+        "expires_at": "2026-08-10T00:00:00.000Z",
+        "application_deadline_at": "2026-08-10T00:00:00.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": "Riviera",
+            "label": "Riviera 3, Zone Cap Nord Bâtiment situé à l'arrière de Mr Bricolage, Rez-de-chaussée, Abidjan Abidjan - Côte d’Ivoire"
+        },
+        "contract_type": {
+            "code": "STAGE",
+            "label": "Stage"
+        },
+        "experience_level": {
+            "code": "SENIOR",
+            "label": "+ de 5 ans d’expérience",
+            "min_years": 5,
+            "max_years": null
+        },
+        "education_level": {
+            "code": null,
+            "label": null,
+            "rank": null
+        },
+        "description": "PUÉRICULTRICE H/F CONTEXTE : Société internationale, leader dans le secteur du service à la personne recrute des puéricultrices. Le salarié est employé de la société de service à la personne qui le missionne au domicile d’un ou de plusieurs clients. Il dépend hiérarchiquement du responsable de secteur et peut effectuer des déplacements d’un domicile à un autre. Les horaires de travail sont réguliers et liés aux besoins du client. TÂCHES À ACCOMPLIR : Toutes ces tâches se feront en prenant en considération le rythme et les besoins de l’enfant : • Effectuer les actes du quotidien nécessaires à l’enfant en respectant ses rythmes (toilette, habillage, sieste…) • Aider l’enfant dans son apprentissage de l’autonomie • Veiller sur l’état de santé général de l’enfant • Participer à l’éveil de l’enfant par des activités éducatives et ludiques adaptées à son âge • Ranger et entretenir l’espace de vie de l’enfant et le matériel utilisé • Préparer et donner les repas • Transmettre toutes les informations utiles aux parents et au responsable de secteur (cahier de suivi) PRÉ-REQUIS • Diplôme en puériculture • Expérience professionnelle de 3 ans minimum dans le domaine de la petite enfance, du sanitaire social QUALITES CLÉS : • Discrétion, intégrité • Aisance avec les enfants, écoute, politesse, bienveillance et autonomie • Sens des responsabilités, conscience professionnelle, sens de la pédagogie • Sens du service, sens de l’observation et de l’anticipation • Capacité d’initiative, respect des consignes et bonne communication, • Propreté et bonne présentation • Maitrise du français. Merci de faire parvenir votre CV + prétentions salariales par mail à l’adresse suivante recrutement@o2careservices.ci",
+        "company": {
+            "name": "MG HOME SERVICES",
+            "website_url": "https://www.goafricaonline.com/ci/1190207-mg-home-prestation-service-services-abidjan-cote-ivoire",
+            "type": "Marketing & marketing digital > Prestation de service",
+            "description": null
+        },
+        "company_hint": null,
+        "application_email": "recrutement@o2careservices.ci",
+        "application_emails": [
+            "recrutement@o2careservices.ci"
+        ],
+        "remote_work": "Sans télétravail",
+        "raw_fields": {
+            "contract_raw": "Stage",
+            "experience_raw": "+ de 5 ans d’expérience",
+            "education_raw": null,
+            "published_raw": "Posté le 2 septembre 2026",
+            "expires_raw": "lundi 10 août 2026 à 00:00"
+        },
+        "télétravail": "Sans télétravail",
+        "is_télétravail": false,
+        "active": "2026-09-02T00:00:00.000Z"
+    },
+    {
+        "title": "PROFESSEUR EN LANGUE ITALIENNE",
+        "source_url": "https://www.goafricaonline.com/ci/emploi/job-22021-professeur-en-langue-italienne",
+        "canonical_url": "https://www.goafricaonline.com/ci/emploi/job-22021-professeur-en-langue-italienne",
+        "location_raw": "Abidjan Abidjan - Côte d’Ivoire",
+        "salary_raw": null,
+        "published_at": "2026-08-31T00:00:00.000Z",
+        "collected_at": "2026-09-07T19:33:51.660Z",
+        "first_seen_at": "2026-09-07T19:33:51.660Z",
+        "last_seen_at": "2026-09-07T19:33:51.660Z",
+        "expires_at": "2026-09-06T00:00:00.000Z",
+        "application_deadline_at": "2026-09-06T00:00:00.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": null,
+            "label": "Abidjan Abidjan - Côte d’Ivoire"
+        },
+        "contract_type": {
+            "code": "CDD",
+            "label": "CDD"
+        },
+        "experience_level": {
+            "code": "JUNIOR",
+            "label": "+ de 2 ans d’expérience",
+            "min_years": 2,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_3",
+            "label": "BAC+3",
+            "rank": 3
+        },
+        "description": "Dans le cadre du renforcement de son offre de formation professionnelle, MONPROFCHEZMOI recrute un(e) Formateur(trice) en langue Italienne pour animer des sessions de formation destinées à un public d'adultes. Objectif Comprendre et utiliser l’italien dans les situations de la vie quotidienne. Développer une bonne expression orale et écrite. Tenir des conversations avec des locuteurs italiens. Acquérir le vocabulaire utile au voyage : transport, hébergement, restauration, achats, orientation, démarches, etc. Se familiariser avec la culture et les habitudes italiennes. Atteindre progressivement un niveau B2 en italien. Profil recherché Excellent niveau d’italien, idéalement natif ou bilingue. Expérience dans l’ enseignement de l’italien. Bonne maîtrise des méthodes pédagogiques adaptées aux adultes. Capacité à proposer des cours pratiques, interactifs et orientés vers la communication. Ponctualité, patience, pédagogie et capacité d’adaptation. Une expérience de préparation au niveau B2 du CECRL serait un atout. Organisation Type de cours : cours particuliers Objectif : atteindre le niveau B2 Format : présentiel Lieu : Abidjan Conditions Type de collaboration : Prestataire. Lieu de formations : Abidjan Dossier de candidature Les candidats intéressés sont invités à transmettre par mail : rh@monprofchezmoi-ci.com -Un CV actualisé ; -Une copie des diplômes, certificats ou attestations de formation ; -Tout document justifiant de leur expérience professionnelle.",
+        "company": {
+            "name": "MONPROFCHEZMOI",
+            "website_url": "https://www.goafricaonline.com/ci/1204682-monprofchezmoi-centres-formation-abidjan-cote-ivoire",
+            "type": "Formations, éducation > Centres de formation",
+            "description": "MonProfChezMoi est une société spécialisée dans la formation professionnelle sur mesure et l’accompagnement personnalisé des adultes et des entreprises. Elle propose des formations finançables et prises en charge dans le cadre de la formation en entreprise. Elle intervient dans vos locaux, à domicile, en centre ou à distance, en s’adaptant aux besoins spécifiques de chaque apprenant ou de chaque structure."
+        },
+        "company_hint": null,
+        "application_email": "rh@monprofchezmoi-ci.com",
+        "application_emails": [
+            "rh@monprofchezmoi-ci.com"
+        ],
+        "remote_work": "Sans télétravail",
+        "raw_fields": {
+            "contract_raw": "CDD",
+            "experience_raw": "+ de 2 ans d’expérience",
+            "education_raw": "Bac+3",
+            "published_raw": "Posté le 31 août 2026",
+            "expires_raw": "dimanche 6 septembre 2026 à 00:00"
+        },
+        "télétravail": "Sans télétravail",
+        "is_télétravail": false,
+        "active": "2026-08-31T00:00:00.000Z"
+    },
+    {
+        "title": "INFIRMIER DU TRAVAIL",
+        "source_url": "https://www.goafricaonline.com/ci/emploi/job-22014-infirmier-du-travail",
+        "canonical_url": "https://www.goafricaonline.com/ci/emploi/job-22014-infirmier-du-travail",
+        "location_raw": "ABIDJAN Abidjan - Côte d’Ivoire",
+        "salary_raw": null,
+        "published_at": "2026-08-28T00:00:00.000Z",
+        "collected_at": "2026-09-07T19:34:00.856Z",
+        "first_seen_at": "2026-09-07T19:34:00.856Z",
+        "last_seen_at": "2026-09-07T19:34:00.856Z",
+        "expires_at": "2026-09-04T00:00:00.000Z",
+        "application_deadline_at": "2026-09-04T00:00:00.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": null,
+            "label": "ABIDJAN Abidjan - Côte d’Ivoire"
+        },
+        "contract_type": {
+            "code": "CDD",
+            "label": "CDD / CDI"
+        },
+        "experience_level": {
+            "code": "JUNIOR",
+            "label": "de 2 ans à 5 ans d’expérience",
+            "min_years": 2,
+            "max_years": 5
+        },
+        "education_level": {
+            "code": "BAC_PLUS_3",
+            "label": "BAC+3",
+            "rank": 3
+        },
+        "description": "Description du poste Rattaché(e) hiérarchiquement au Médecin du Travail, le/la titulaire à ce poste aura pour activité de : - Réaliser les soins infirmiers, d'hygiène et de confort selon le protocole médical et les règles d'hygiène et d'asepsie ; - Renseigner et assurer la tenue des documents médico-administratifs ; - Participer à la surveillance de la santé des salariés selon les protocoles établis par le Médecin du Travail ; - Faire le suivi des accidents de travail et maladies professionnelles ; - Assurer la permanence médicale ; - Organiser les visites médicales ; - Réaliser les examens et explorations fonctionnelles ; - Participer aux actions de sensibilisation sur le respect des règles d'hygiène et Santé Sécurité au travail ; Profil du poste Autonome, disponible, patient, organisé(e), discret et devant avoir un bon sens de l'écoute et du conseil, une bonne aptitude relationnelle, notre futur(e) collaborateur(trice) devra disposer d'un BAC +3 en Soins Infirmiers et Obstétricales ou toute formation jugée équivalente avec une expérience minimum de 03 ans dans cette fonction. Par ailleurs, il/elle devra avoir : - une bonne connaissance des soins infirmiers, d'hygiène et d'urgence ; - une bonne maitrise de la sensibilisation. Votre profil correspond-t-il à cette offre ? Si oui, prière transmettre votre candidature via le lien ci-après : https://forms.gle/ewwYfgfsp9L8QfeW9",
+        "company": {
+            "name": "IVOIRE TRANSPORT",
+            "website_url": "https://www.goafricaonline.com/ci/1365628-ivoire-hydrocarbure-transport-abidjan-cote-ivoire",
+            "type": "Energie > Hydrocarbure - Transport",
+            "description": "La société Ivoire Transport SA est un acteur de référence dans le transport d'hydrocarbures en Côte d’Ivoire depuis plus d’une décennie. Créée en 2013, elle est spécialisée dans le transport et la distribution des produits pétroliers (Gaz vrac, Gaz conditionné et le Carburant)."
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": "Sans télétravail",
+        "raw_fields": {
+            "contract_raw": "CDD / CDI",
+            "experience_raw": "de 2 ans à 5 ans d’expérience",
+            "education_raw": "Bac+3",
+            "published_raw": "Posté le 28 août 2026",
+            "expires_raw": "vendredi 4 septembre 2026 à 00:00"
+        },
+        "télétravail": "Sans télétravail",
+        "is_télétravail": false,
+        "active": "2026-08-28T00:00:00.000Z"
+    }
+]

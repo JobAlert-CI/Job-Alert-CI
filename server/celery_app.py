@@ -74,12 +74,12 @@ def _abidjan_crontab(local_hour: int, local_minute: int) -> crontab:
 
 if SCRAPER_BEAT_ENABLED:
     # Scrapers a 06:00, 06:05, 06:10 heure Abidjan (= 04:00 UTC toute l'annee).
-    scrape_hour_utc, _ = _hour_in_utc(6, 0)
+    scrape_hour_utc, _ = _hour_in_utc(19, 0)
     beat_schedule.update(
         {
             "scrape-goafrica-0600": {
                 "task": "tasks.scrapers.run_source_scraper",
-                "schedule": crontab(hour=scrape_hour_utc, minute=0),
+                "schedule": crontab(hour=scrape_hour_utc, minute=29),
                 "args": ("goafrica",),
                 "options": {"queue": "ingestion"},
             },
@@ -101,12 +101,12 @@ if SCRAPER_BEAT_ENABLED:
 # Digest: phase 1 (07:30 Abidjan) et phase 2 (08:00 Abidjan).
 beat_schedule["digest-prepare"] = {
     "task": "tasks.digests.prepare_daily_digests",
-    "schedule": _abidjan_crontab(settings.daily_digest_prepare_hour, settings.daily_digest_prepare_minute),
+    "schedule": crontab(hour=19, minute=32),  # _abidjan_crontab(settings.daily_digest_prepare_hour, settings.daily_digest_prepare_minute),
     "options": {"queue": "emails"},
 }
 beat_schedule["digest-send"] = {
     "task": "tasks.digests.send_daily_digests",
-    "schedule": _abidjan_crontab(settings.daily_digest_send_hour, settings.daily_digest_send_minute),
+    "schedule": crontab(hour=19, minute=34),  # _abidjan_crontab(settings.daily_digest_send_hour, settings.daily_digest_send_minute),
     "options": {"queue": "emails"},
 }
 

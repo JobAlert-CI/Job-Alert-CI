@@ -21,6 +21,7 @@ from models import (
 )
 from schemas.subscriptions import SubscriberCreate
 from services.normalization import normalize_text, token_hash
+from services.site_settings_service import resolve_runtime_settings
 
 
 @dataclass(slots=True)
@@ -115,7 +116,10 @@ def create_subscriber(
     MANAGE_ALERT est exposee a l'appelant pour qu'il puisse construire
     l'URL /preferences/{token} (audit P1 #21).
     """
-    settings = get_settings()
+    # Cycle 18 : les parametres admin (site_settings) previennent sur
+    # l'environnement — sans ce branchement, modifier la valeur dans
+    # /admin/parametres ne changeait RIEN au comportement.
+    settings = resolve_runtime_settings(db)
     if confirmation_required is None:
         confirmation_required = settings.email_confirmation_required
 

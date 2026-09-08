@@ -20,6 +20,7 @@ from schemas.subscriptions import SubscriberCreate
 from services.email.email_provider import EmailMessage, EmailProviderProtocol, EmailSendResult
 from services.email.rate_limit import RateLimitDecision, check_resend_quota
 from services.email.templates import build_confirmation_context, render_confirmation_email
+from services.site_settings_service import get_confirmation_subject, resolve_runtime_settings
 from services.subscriptions import CreatedToken, create_subscriber
 from services.token_service import (
     TokenAlreadyUsedError,
@@ -289,7 +290,9 @@ def send_confirmation_email_now(
         raw_token=raw_token,
         settings=resolved,
     )
-    rendered = render_confirmation_email(context)
+    # Cycle 18 : sujet pilotable depuis /admin/parametres (cle
+    # email_confirmation_subject) — fallback constante sinon.
+    rendered = render_confirmation_email(context, subject=get_confirmation_subject(db))
     result = provider.send(
         EmailMessage(
             to_email=subscriber.email,
@@ -327,8 +330,9 @@ def register_subscriber(
 
     Ne cree jamais de doublon: `email_normalized` reste la cle fonctionnelle.
     """
-
-    resolved = settings or get_settings()
+    # Cycle 18 : parametres admin (site_settings) > environnnement — la
+    # confirmation requise est pilotable depuis /admin/parametres.
+    resolved = settings or resolve_runtime_settings(db)
     email_normalized = payload.email.strip().lower()
     existing = db.scalar(select(Subscriber).where(Subscriber.email_normalized == email_normalized))
 

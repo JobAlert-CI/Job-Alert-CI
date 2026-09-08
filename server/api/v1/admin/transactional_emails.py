@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from datetime import UTC, datetime, timedelta
+
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
@@ -7,7 +9,7 @@ from sqlalchemy.orm import Session
 from api.deps import get_current_admin, get_db, require_roles
 from models import TransactionalEmailEvent
 from models.enums import TransactionalEmailPurpose, TransactionalEmailStatus
-from schemas.emails import TransactionalEmailEventRead
+from schemas.emails import TransactionalEmailEventRead, TransactionalEmailStatsRead
 
 # Historique des emails transactionnels : super_admin (toute la base) ou
 # gestionnaire_utilisateurs (support abonne).
@@ -58,6 +60,81 @@ def list_transactional_emails(
         stmt = stmt.where(TransactionalEmailEvent.subscriber_id == subscriber_id)
     stmt = stmt.limit(limit).offset(offset)
     return list(db.scalars(stmt))
+
+
+@router.get("/stats", response_model=TransactionalEmailStatsRead)
+def transactional_email_stats(
+    db: Session = Depends(get_db),
+    _: object = Depends(get_current_admin),
+    days: int = Query(30, ge=1, le=365, description="Fenetre des axes par_jour et echecs_fenetre"),
+):
+    """Stats des emails transactionnels pour /admin/logs (cycle 17).
+
+    Un seul appel alimente les compteurs M1-M6 : totaux par statut et par
+    motif (globaux), echecs sur la fenetre, envois par jour separes par
+    statut (le front empile sent/failed/queued).
+
+    `days=1` donne le badge « echecs du jour » de la doc v3 §17.3 (le /count
+    existant n'a pas de fenetre temporelle). Aucun payload n'est touche.
+    """
+    now = datetime.now(UTC)
+    depuis = now - timedelta(days=days)
+
+    # Compteurs globaux par statut et par motif : deux GROUP BY (colonnes
+    # separees et indexees, une passe chacun — un GROUP BY croise serait
+    # plus cher pour la meme information).
+    par_statut = {
+        statut.value if hasattr(statut, "value") else str(statut): total
+        for statut, total in db.execute(
+            select(TransactionalEmailEvent.status, func.count()).group_by(TransactionalEmailEvent.status)
+        ).all()
+    }
+    par_motif = {
+        motif.value if hasattr(motif, "value") else str(motif): total
+        for motif, total in db.execute(
+            select(TransactionalEmailEvent.purpose, func.count()).group_by(TransactionalEmailEvent.purpose)
+        ).all()
+    }
+    total = sum(par_statut.values())
+
+    # Echecs sur la fenetre demandee (COUNT cible, jamais NULL).
+    echecs_fenetre = (
+        db.scalar(
+            select(func.count(TransactionalEmailEvent.id)).where(
+                TransactionalEmailEvent.status == TransactionalEmailStatus.FAILED,
+                TransactionalEmailEvent.created_at >= depuis,
+            )
+        )
+        or 0
+    )
+
+    # Axe par jour x statut sur la fenetre : [{jour, total, par_statut}]
+    rows = db.execute(
+        select(
+            func.date(TransactionalEmailEvent.created_at),
+            TransactionalEmailEvent.status,
+            func.count(),
+        )
+        .where(TransactionalEmailEvent.created_at >= depuis)
+        .group_by(func.date(TransactionalEmailEvent.created_at), TransactionalEmailEvent.status)
+        .order_by(func.date(TransactionalEmailEvent.created_at))
+    ).all()
+    jours: dict[str, dict] = {}
+    for jour, statut, nb in rows:
+        cle = str(jour)
+        entree = jours.setdefault(cle, {"jour": cle, "total": 0, "par_statut": {}})
+        entree["total"] += nb
+        entree["par_statut"][statut.value if hasattr(statut, "value") else str(statut)] = nb
+    par_jour = list(jours.values())
+
+    return TransactionalEmailStatsRead(
+        total=total,
+        par_statut=par_statut,
+        par_motif=par_motif,
+        echecs_fenetre=echecs_fenetre,
+        par_jour=par_jour,
+        days=days,
+    )
 
 
 @router.get("/count")

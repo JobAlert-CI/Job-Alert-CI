@@ -38,3 +38,23 @@ class EmailSendResultRead(BaseModel):
     provider: str
     provider_email_id: str | None = None
     error_message: str | None = None
+
+
+class TransactionalEmailStatsRead(BaseModel):
+    """Stats des emails transactionnels (cycle 17) pour /admin/logs.
+
+    Compteurs globaux + fenetre temporelle pour le badge « echecs du jour »
+    et les graphiques. `echecs_aujourdhui` utilise la date SERVEUR (UTC) :
+    le front affiche tel quel, pas de re-fenetrage client.
+    """
+
+    total: int
+    par_statut: dict[str, int] = {}
+    par_motif: dict[str, int] = {}
+    # Echecs sur la fenetre demandee (defaut : 1 jour = « aujourd'hui »).
+    echecs_fenetre: int
+    # Envois par jour sur la fenetre graphique, separes par statut —
+    # le front empile sent/failed/queued en barres.
+    par_jour: list[dict] = []
+    # fenetre effective (echo).
+    days: int

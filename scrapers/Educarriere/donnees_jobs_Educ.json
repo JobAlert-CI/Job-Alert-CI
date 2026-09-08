@@ -1,1 +1,636 @@
-[]
+[
+    {
+        "title": "CHEF CUISINIER",
+        "source_url": "https://emploi.educarriere.ci/offre-154943-chef-cuisinier.html",
+        "canonical_url": "https://emploi.educarriere.ci/offre-154943-chef-cuisinier.html",
+        "location_raw": "CONAkRY",
+        "salary_raw": null,
+        "published_at": "2026-09-07T00:00:00.000Z",
+        "collected_at": "2026-09-07T19:29:56.638Z",
+        "first_seen_at": "2026-09-07T19:29:56.638Z",
+        "last_seen_at": "2026-09-07T19:29:56.638Z",
+        "expires_at": "2026-09-30T00:00:00.000Z",
+        "application_deadline_at": "2026-09-30T00:00:00.000Z",
+        "location": {
+            "country_code": null,
+            "city": null,
+            "district": null,
+            "label": "CONAkRY"
+        },
+        "specialty": {
+            "code": "hotellerie/restauration",
+            "label": "Hôtellerie/Restauration"
+        },
+        "contract_type": {
+            "code": "CDI",
+            "label": "Emploi (CDI)"
+        },
+        "experience_level": {
+            "code": "INCONNU",
+            "label": null,
+            "min_years": null,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "CAP",
+            "label": "CAP",
+            "rank": -1
+        },
+        "description": "Détails de l'offre • Commander les produits et matières premières auprès des différents fournisseurs et agriculteurs de sa région. • Réaliser des prévisions des approvisionnements en fonction des besoins en production. • Gérer l’approvisionnement des matières premières nécessaires en cuisine afin d’éviter les excédents ou la rupture de stock. • Dresser un inventaire des produits disponibles en réserve. • Organiser le stockage des denrées, en les triant par dates de péremption par exemple. • Rédiger des fiches techniques des différents plats proposés • Proposer et concevoir de nouveaux plats, ainsi que des améliorations des recettes déjà créées. • Goûter les préparations culinaires et ajuster leur assaisonnement, et prêter attention à l’esthétique des plats avant de les servir. • Analyser les possibles dysfonctionnements présents en cuisine, et proposer des mesures correctives afin d’y remédier. Formation et expérience ? Formation : CAP en cuisine ou équivalent ? Expérience : au moins 5 ans d’expérience professionnelle Compétences techniques • Connaissance des procédures spécifiques (approvisionnement, suivi des stocks…) • Très bonne connaissance des produits et des techniques de cuisine • Excellentes capacités culinaires • Bonnes connaissances de diététique • Bonne connaissance de la politique commerciale ou de la stratégie de l’enseigne/entreprise • Maîtrise des techniques d’animation et d’encadrement d’équipe • Excellentes connaissances des règles d’hygiène et de sécurité alimentaires Savoir-être et soft-skills • Aisance relationnelle et sens de l’écoute et de la communication • Anticipation, réactivité • Capacités à gérer les situations de crise",
+        "company_name": "WEWORK MANAGEMENT&CONSULTING",
+        "company": {
+            "name": "WEWORK MANAGEMENT&CONSULTING",
+            "website_url": null,
+            "type": null,
+            "description": null
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": null,
+        "raw_fields": {
+            "contract_raw": "Emploi (CDI)",
+            "experience_raw": null,
+            "education_raw": "BP, BT, CAP",
+            "published_raw": "Publiée le 07/09/2026",
+            "expires_raw": "30/09/2026",
+            "secteur_raw": "Hôtellerie/Restauration"
+        },
+        "secteur": {
+            "code": "hotellerie/restauration",
+            "label": "Hôtellerie/Restauration"
+        },
+        "active": "2026-09-07T00:00:00.000Z"
+    },
+    {
+        "title": "Trésorier / Gestionnaire de trésorerie",
+        "source_url": "https://emploi.educarriere.ci/offre-154942-tresorier-gestionnaire-de-tresorerie.html",
+        "canonical_url": "https://emploi.educarriere.ci/offre-154942-tresorier-gestionnaire-de-tresorerie.html",
+        "location_raw": "ABIDJAN",
+        "salary_raw": null,
+        "published_at": "2026-09-07T00:00:00.000Z",
+        "collected_at": "2026-09-07T19:30:13.737Z",
+        "first_seen_at": "2026-09-07T19:30:13.737Z",
+        "last_seen_at": "2026-09-07T19:30:13.737Z",
+        "expires_at": "2026-10-15T00:00:00.000Z",
+        "application_deadline_at": "2026-10-15T00:00:00.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": null,
+            "label": "ABIDJAN"
+        },
+        "specialty": {
+            "code": "assurance, banque, ressources humaines",
+            "label": "Assurance, Banque, Ressources Humaines"
+        },
+        "contract_type": {
+            "code": "INCONNU",
+            "label": "Emploi"
+        },
+        "experience_level": {
+            "code": "INCONNU",
+            "label": null,
+            "min_years": null,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_4",
+            "label": "BAC+4",
+            "rank": 4
+        },
+        "description": "Détails de l'offre Missions principales ? Gérer la liquidité et les positions de change ? Optimiser le placement des excédents de trésorerie ? Suivre les marchés financiers Compétences requises ? Maîtrise des marchés financiers ? Analyse de risques de change/taux ? Outils de gestion de trésorerie",
+        "company_name": "LAM'S GROUP",
+        "company": {
+            "name": "LAM'S GROUP",
+            "website_url": null,
+            "type": null,
+            "description": null
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": null,
+        "raw_fields": {
+            "contract_raw": "Emploi",
+            "experience_raw": null,
+            "education_raw": "BAC+4, BAC+5, BAC+6, BAC+7 et plus",
+            "published_raw": "Publiée le 07/09/2026",
+            "expires_raw": "15/10/2026",
+            "secteur_raw": "Assurance, Banque, Ressources Humaines"
+        },
+        "secteur": {
+            "code": "assurance, banque, ressources humaines",
+            "label": "Assurance, Banque, Ressources Humaines"
+        },
+        "active": "2026-09-07T00:00:00.000Z"
+    },
+    {
+        "title": "COMMERCIAL",
+        "source_url": "https://emploi.educarriere.ci/offre-154940-commercial.html",
+        "canonical_url": "https://emploi.educarriere.ci/offre-154940-commercial.html",
+        "location_raw": "Abidjan Cocody Angré",
+        "salary_raw": null,
+        "published_at": "2026-09-07T00:00:00.000Z",
+        "collected_at": "2026-09-07T19:30:26.939Z",
+        "first_seen_at": "2026-09-07T19:30:26.939Z",
+        "last_seen_at": "2026-09-07T19:30:26.939Z",
+        "expires_at": "2026-09-30T00:00:00.000Z",
+        "application_deadline_at": "2026-09-30T00:00:00.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": "Cocody",
+            "label": "Abidjan Cocody Angré"
+        },
+        "specialty": {
+            "code": "genie civil/travaux publics, geometre/topographe , immobilier, marketing, urbanisme",
+            "label": "Génie Civil/Travaux publics, Géomètre/Topographe , Immobilier, Marketing, Urbanisme"
+        },
+        "contract_type": {
+            "code": "CDD",
+            "label": "Emploi (CDD)"
+        },
+        "experience_level": {
+            "code": "INCONNU",
+            "label": null,
+            "min_years": null,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_2",
+            "label": "BAC+2",
+            "rank": 2
+        },
+        "description": "Détails de l'offre Nous recherchons un commercial dynamique et ayant une bonne expérience dans le domaine de l'immobilier, les bâtiments et travaux publics. Disponible pour travailler immédiatement Missions principales: Prospection : Identifier et démarcher de nouveaux clients (appels, e-mails, réseaux sociaux, visites terrain). Négociation et Vente : Présenter l'offre, analyser les besoins du client, élaborer les propositions commerciales et conclure les ventes. Gestion de portefeuille : Suivre, fidéliser et développer les comptes clients existants. Reporting : Renseigner les données d'activité et de suivi des ventes dans l'outil CRM de l'entreprise. Candidature à l'adresse suivante: rh.azbuildinginter@gmail.com",
+        "company_name": "A-Z BUILDING INTERNATIONAL",
+        "company": {
+            "name": "A-Z BUILDING INTERNATIONAL",
+            "website_url": null,
+            "type": null,
+            "description": null
+        },
+        "company_hint": null,
+        "application_email": "rh.azbuildinginter@gmail.com",
+        "application_emails": [
+            "rh.azbuildinginter@gmail.com"
+        ],
+        "remote_work": null,
+        "raw_fields": {
+            "contract_raw": "Emploi (CDD)",
+            "experience_raw": null,
+            "education_raw": "BAC+2, BAC+3, BAC+4, BAC+5",
+            "published_raw": "Publiée le 07/09/2026",
+            "expires_raw": "30/09/2026",
+            "secteur_raw": "Génie Civil/Travaux publics, Géomètre/Topographe , Immobilier, Marketing, Urbanisme"
+        },
+        "secteur": {
+            "code": "genie civil/travaux publics, geometre/topographe , immobilier, marketing, urbanisme",
+            "label": "Génie Civil/Travaux publics, Géomètre/Topographe , Immobilier, Marketing, Urbanisme"
+        },
+        "active": "2026-09-07T00:00:00.000Z"
+    },
+    {
+        "title": "Directeur(trice) d'agence",
+        "source_url": "https://emploi.educarriere.ci/offre-154939-directeur-trice-d-agence.html",
+        "canonical_url": "https://emploi.educarriere.ci/offre-154939-directeur-trice-d-agence.html",
+        "location_raw": "ABIDJAN",
+        "salary_raw": null,
+        "published_at": "2026-09-07T00:00:00.000Z",
+        "collected_at": "2026-09-07T19:30:38.778Z",
+        "first_seen_at": "2026-09-07T19:30:38.778Z",
+        "last_seen_at": "2026-09-07T19:30:38.778Z",
+        "expires_at": "2026-10-15T00:00:00.000Z",
+        "application_deadline_at": "2026-10-15T00:00:00.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": null,
+            "label": "ABIDJAN"
+        },
+        "specialty": {
+            "code": "assurance, banque, ressources humaines",
+            "label": "Assurance, Banque, Ressources Humaines"
+        },
+        "contract_type": {
+            "code": "INCONNU",
+            "label": "Emploi"
+        },
+        "experience_level": {
+            "code": "INCONNU",
+            "label": null,
+            "min_years": null,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_4",
+            "label": "BAC+4",
+            "rank": 4
+        },
+        "description": "Détails de l'offre Missions principales ? Piloter l'activité commerciale de l'agence ? Manager les équipes et fixer les objectifs ? Garantir la conformité et la qualité de service Compétences requises ? Leadership et management d'équipe ? Vision commerciale et stratégique ? Gestion budgétaire Bac+5 (École de commerce/Finance)",
+        "company_name": "LAM'S GROUP",
+        "company": {
+            "name": "LAM'S GROUP",
+            "website_url": null,
+            "type": null,
+            "description": null
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": null,
+        "raw_fields": {
+            "contract_raw": "Emploi",
+            "experience_raw": null,
+            "education_raw": "BAC+4, BAC+5, BAC+6, BAC+7 et plus",
+            "published_raw": "Publiée le 07/09/2026",
+            "expires_raw": "15/10/2026",
+            "secteur_raw": "Assurance, Banque, Ressources Humaines"
+        },
+        "secteur": {
+            "code": "assurance, banque, ressources humaines",
+            "label": "Assurance, Banque, Ressources Humaines"
+        },
+        "active": "2026-09-07T00:00:00.000Z"
+    },
+    {
+        "title": "Architecte/ Designer Interieur Bureau (office specialist)",
+        "source_url": "https://emploi.educarriere.ci/offre-154938-architecte-designer-interieur-bureau-office-specialist.html",
+        "canonical_url": "https://emploi.educarriere.ci/offre-154938-architecte-designer-interieur-bureau-office-specialist.html",
+        "location_raw": "Abidjan",
+        "salary_raw": null,
+        "published_at": "2026-09-07T00:00:00.000Z",
+        "collected_at": "2026-09-07T19:30:51.556Z",
+        "first_seen_at": "2026-09-07T19:30:51.556Z",
+        "last_seen_at": "2026-09-07T19:30:51.556Z",
+        "expires_at": "2026-09-21T00:00:00.000Z",
+        "application_deadline_at": "2026-09-21T00:00:00.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": null,
+            "label": "Abidjan"
+        },
+        "specialty": {
+            "code": "architecture",
+            "label": "Architecture"
+        },
+        "contract_type": {
+            "code": "INCONNU",
+            "label": "Emploi"
+        },
+        "experience_level": {
+            "code": "INCONNU",
+            "label": null,
+            "min_years": null,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_3",
+            "label": "BAC+3",
+            "rank": 3
+        },
+        "description": "Détails de l'offre L' Office Spécialist / Architecte d'Intérieur aura en charge la conception d'espaces de travail et le volé commercial. les activités principales liées au poste : -Conception d'espaces : Imaginer et concevoir des concepts d'aménagement de bureaux innovants, performants et adaptés aux nouvelles méthodes de travail (flex office, coworking, espaces collaboratifs). -Traitement des thématiques Office: Apporter des solutions concrètes sur l'ergonomie, l'acoustique, la luminosité et l'optimisation des surfaces tertiaires. -Identifier et démarcher de nouvelles entreprises, décideurs (DRH, Directeurs Immobiliers, DG) et porteurs de projets de rénovation ou d'aménagement. -Générer un flux régulier de nouveaux clients et de projets d'envergure pour l'agence. -Qualifier les attentes des prospects en matière de transformation de leurs espaces de travail. -être la vitrine et la voix de l'entreprise sur le terrain pour rassurer, convaincre et imposer la marque face aux décideurs. Exigences du poste -Maîtrise de la conception tertiaire: Connaissance parfaite des normes (respect des lois du travail et la sécurité du public) et aussi maîtriser le confort des employés (mobilier, lumière, acoustique etc) pour optimiser leur espace de travail. -Logiciels : Maîtrise avancée des logiciels de modélisation 2D/3D (ex. AutoCAD, SketchUp, Revit) et de rendu réaliste. -Autonomie : Capacité à gérer un projet de la prospection initiale jusqu'à la validation du concept architectural. -Capacité à s'imposer immédiatement comme le conseiller de confiance face à des directions générales. poste basé à la Riviera Faya Candidature: Intitulé du poste + Cv + lieu d'habitation à l'adresse e-mail suivante: cabinethr.candidature@gmail.com et par WhatsApp au 05 64 00 99 99",
+        "company_name": "HR BUSINESS CENTER",
+        "company": {
+            "name": "HR BUSINESS CENTER",
+            "website_url": null,
+            "type": null,
+            "description": null
+        },
+        "company_hint": null,
+        "application_email": "cabinethr.candidature@gmail.com",
+        "application_emails": [
+            "cabinethr.candidature@gmail.com"
+        ],
+        "remote_work": null,
+        "raw_fields": {
+            "contract_raw": "Emploi",
+            "experience_raw": null,
+            "education_raw": "BAC+3, BAC+5",
+            "published_raw": "Publiée le 07/09/2026",
+            "expires_raw": "21/09/2026",
+            "secteur_raw": "Architecture"
+        },
+        "secteur": {
+            "code": "architecture",
+            "label": "Architecture"
+        },
+        "active": "2026-09-07T00:00:00.000Z"
+    },
+    {
+        "title": "Auditeur interne / Contrôleur de conformité",
+        "source_url": "https://emploi.educarriere.ci/offre-154937-auditeur-interne-controleur-de-conformite.html",
+        "canonical_url": "https://emploi.educarriere.ci/offre-154937-auditeur-interne-controleur-de-conformite.html",
+        "location_raw": "ABIDJAN",
+        "salary_raw": null,
+        "published_at": "2026-09-07T00:00:00.000Z",
+        "collected_at": "2026-09-07T19:31:09.524Z",
+        "first_seen_at": "2026-09-07T19:31:09.524Z",
+        "last_seen_at": "2026-09-07T19:31:09.524Z",
+        "expires_at": "2026-10-15T00:00:00.000Z",
+        "application_deadline_at": "2026-10-15T00:00:00.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": null,
+            "label": "ABIDJAN"
+        },
+        "specialty": {
+            "code": "assurance, banque, ressources humaines",
+            "label": "Assurance, Banque, Ressources Humaines"
+        },
+        "contract_type": {
+            "code": "INCONNU",
+            "label": "Emploi"
+        },
+        "experience_level": {
+            "code": "INCONNU",
+            "label": null,
+            "min_years": null,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_2",
+            "label": "BAC+2",
+            "rank": 2
+        },
+        "description": "Détails de l'offre Missions principales ? Vérifier l'application des procédures internes ? Évaluer les risques opérationnels et réglementaires ? Proposer des plans d'action correctifs Compétences requises ? Maîtrise des normes réglementaires (Bâle, LBC-FT) ? Esprit d'analyse et d'objectivité ? Rédaction de rapports d'audit Bac+5 (Audit, Finance)",
+        "company_name": "LAM'S GROUP",
+        "company": {
+            "name": "LAM'S GROUP",
+            "website_url": null,
+            "type": null,
+            "description": null
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": null,
+        "raw_fields": {
+            "contract_raw": "Emploi",
+            "experience_raw": null,
+            "education_raw": "BAC+2, BAC+3, BAC+4, BAC+5",
+            "published_raw": "Publiée le 07/09/2026",
+            "expires_raw": "15/10/2026",
+            "secteur_raw": "Assurance, Banque, Ressources Humaines"
+        },
+        "secteur": {
+            "code": "assurance, banque, ressources humaines",
+            "label": "Assurance, Banque, Ressources Humaines"
+        },
+        "active": "2026-09-07T00:00:00.000Z"
+    },
+    {
+        "title": "Gestionnaire back-office / opérations bancaires",
+        "source_url": "https://emploi.educarriere.ci/offre-154936-gestionnaire-back-office-operations-bancaires.html",
+        "canonical_url": "https://emploi.educarriere.ci/offre-154936-gestionnaire-back-office-operations-bancaires.html",
+        "location_raw": "ABIDJAN",
+        "salary_raw": null,
+        "published_at": "2026-09-07T00:00:00.000Z",
+        "collected_at": "2026-09-07T19:31:21.714Z",
+        "first_seen_at": "2026-09-07T19:31:21.714Z",
+        "last_seen_at": "2026-09-07T19:31:21.714Z",
+        "expires_at": "2026-10-15T00:00:00.000Z",
+        "application_deadline_at": "2026-10-15T00:00:00.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": null,
+            "label": "ABIDJAN"
+        },
+        "specialty": {
+            "code": "assurance, banque, ressources humaines",
+            "label": "Assurance, Banque, Ressources Humaines"
+        },
+        "contract_type": {
+            "code": "INCONNU",
+            "label": "Emploi"
+        },
+        "experience_level": {
+            "code": "INCONNU",
+            "label": null,
+            "min_years": null,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_2",
+            "label": "BAC+2",
+            "rank": 2
+        },
+        "description": "Détails de l'offre Missions principales ? Traiter et vérifier les opérations bancaires ? Assurer la conformité des transactions ? Gérer les flux et la relation avec les autres services Compétences requises ? Rigueur et sens du détail ? Maîtrise des logiciels bancaires ? Connaissance des procédures réglementaires Bac+2/3",
+        "company_name": "LAM'S GROUP",
+        "company": {
+            "name": "LAM'S GROUP",
+            "website_url": null,
+            "type": null,
+            "description": null
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": null,
+        "raw_fields": {
+            "contract_raw": "Emploi",
+            "experience_raw": null,
+            "education_raw": "BAC+2, BAC+3, BAC+4",
+            "published_raw": "Publiée le 07/09/2026",
+            "expires_raw": "15/10/2026",
+            "secteur_raw": "Assurance, Banque, Ressources Humaines"
+        },
+        "secteur": {
+            "code": "assurance, banque, ressources humaines",
+            "label": "Assurance, Banque, Ressources Humaines"
+        },
+        "active": "2026-09-07T00:00:00.000Z"
+    },
+    {
+        "title": "Assistant(e) Technique en Santé de la Reproduction, Planification Familiale et Santé Communautaire",
+        "source_url": "https://emploi.educarriere.ci/offre-154935-assistant-e-technique-en-sante-de-la-reproduction-planification-familiale-et-sante-communautaire.html",
+        "canonical_url": "https://emploi.educarriere.ci/offre-154935-assistant-e-technique-en-sante-de-la-reproduction-planification-familiale-et-sante-communautaire.html",
+        "location_raw": "Côte d'Ivoire",
+        "salary_raw": null,
+        "published_at": "2026-09-07T00:00:00.000Z",
+        "collected_at": "2026-09-07T19:31:33.264Z",
+        "first_seen_at": "2026-09-07T19:31:33.264Z",
+        "last_seen_at": "2026-09-07T19:31:33.264Z",
+        "expires_at": "2026-09-21T00:00:00.000Z",
+        "application_deadline_at": "2026-09-21T00:00:00.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": null,
+            "district": null,
+            "label": "Côte d'Ivoire"
+        },
+        "specialty": {
+            "code": "medecine/sante",
+            "label": "Médecine/Santé"
+        },
+        "contract_type": {
+            "code": "CDD",
+            "label": "Emploi (CDD)"
+        },
+        "experience_level": {
+            "code": "INCONNU",
+            "label": null,
+            "min_years": null,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_3",
+            "label": "BAC+3",
+            "rank": 3
+        },
+        "description": "Détails de l'offre Pathfinder International est une organisation de premier plan à l’échelle mondiale dans le domaine de la santé sexuelle et reproductive. Notre engagement repose sur la conviction que chaque individu, indépendamment de sa localisation géographique, doit exercer pleinement son droit à décider si et quand avoir des enfants, vivre à l’abri de la peur et de la stigmatisation, et mener une vie conforme à ses aspirations. Depuis sa fondation en 1957, Pathfinder International a établi des partenariats stratégiques avec les administrations locales, les communautés et les systèmes de santé dans les pays en développement, en vue d’éliminer les obstacles entravant l’accès aux services essentiels en matière de santé sexuelle et reproductive. Notre action vise à élargir l’accès à la contraception, à promouvoir des grossesses sûres, à sauver la vie des femmes et à prévenir la transmission de nouvelles infections à VIH, en concentrant nos efforts dans les zones où le besoin est le plus urgent. Par ces initiatives, nous permettons à des millions de femmes, d’hommes et de jeunes de choisir leur propre trajectoire de vie. Dans le cadre de notre engagement, Pathfinder International est bénéficiaire du projet Accès Universel à la Contraception moderne en Côte d’Ivoire (AUCm-CI), financé par la Fondation Gates. Le projet AUCm-CI vise à soutenir le passage à l’échelle nationale de la gratuité de la planification familiale et couvre 90 sur 113 districts sanitaires en Côte d’Ivoire. Dans le cadre de la mise en oeuvre du projet AUCm-CI, Pathfinder International recrute Deux (02) Assistant(e)s Techniques en Santé de la Reproduction, Planification Familiale et Santé Communautaire Rend Compte au : ? Département : PROJET AUCm-CI Superviseur Direct : project lead Catégorie : ? Emploi Régulier à Temps Plein ? 10 mois, renouvelable ? CDD Grade : Diplôme Universitaire en Santé Publique, Soins Infirmiers, Soins Maternels ou Santé Communautaire Lieu d’affectation : ? Man : 1 poste ? Agboville : 1 poste Résumé : Sous la supervision directe du PROJECT LEAD, l’Assistant Technique apporte un appui technique aux région et district sanitaires pour la mise en oeuvre du projet AUCm-CI financé par la Fondation Gates et exécuté par Pathfinder International. Principaux Résultats de la Fonction : 1. Planification et Mise en OEuvre des activités : Travaille en étroite collaboration avec les ECD et les collectivités /communes dans la Compétences Minimales Requises Spécifiques au Poste : ? Système de Santé : Connaissance du système de santé publique du pays. ? Services de Santé et Droits Sexuels et Reproductifs : Bonne connaissance des planification, la mise en oeuvre et l'évaluation des activités du projet. 2. Prestation de Service : Bâtit et développe la capacité des prestataires à offrir une gamme variée de méthodes de planification familiale et d’intégration de la PF á la santé maternelle infantile et néonatale et la nutrition. 3. Suivi et Évaluation : Appui la supervision des formations sanitaires, Surveille les progrès réalisés par chaque formation sanitaire à travers les activités clés du projet : PFPP /PFPA, ISBC et propose des solutions. Participe aux réunions mensuelles de suivi organisées par l'ECD et les soutient. Assure le suivi des Comité Technique d’Appui au District (CTAD) pour la mise en oeuvre de leur plan de mobilisation des ressources et leur apporte un soutien pour la tenue de leur réunion régulière et la mise en oeuvre de leur plan d’action. 4. Inventaire : travaille en collaboration avec le Project Lead pour s'assurer de la disponibilité des produits contraceptifs, des intrants et des différents supports. Vérifie si le stock reçu correspond aux besoins de la population visée. 5. Appui la collecte, l’analyse et la validation de données. Travaille en étroite collaboration avec le Chargé du Suivi et Evaluation (CSE) sur la validation des données. 6. Rapports : Prépare le rapport technique mensuel et contribue à la préparation et transmission des rapports financiers des activités du projet. Soumet les rapports chaque mois au Project Lead 7. Amélioration Continue : participe à la documentation et la diffusion des leçons apprises et des meilleures pratiques. Participe à la mise en place principes, pratiques et services de planification familiale et de santé reproductive du programme assigné, y compris les stratégies et indicateurs du programme. ? Gestion de programmes pour enfants et soins de santé : Bonnes connaissances et aptitude avérée à gérer les activités associées aux programmes pour enfants et soins de santé ? Suivi et Évaluation : Connaissance des méthodes de suivi et évaluation des activités ? Supervision : Aptitude avérée à diriger et superviser le travail des autres. ? Vérification des Stocks : Aptitude à maintenir des niveaux d'inventaire appropriés selon les normes et les lignes directrices ? Contrôle de Données : Aptitude à collecter et analyser des données. ? Compétences Organisationnelles Minimales requises : ? Logiciels : Connaissance avancée de MS Excel, PowerPoint, Word et Outlook. ? Langues : Compétences avancées à écrire et parler la langue française et à s’exprimer en langue locale ? Communication : Aptitudes avancées à communiquer oralement et par écrit en utilisant différentes formes de médias, avec un accent mis sur la rédaction de rapports. ? Organisation, Planification et multitâches : Compétences avérée en 3 dans la supervision et la mise en oeuvre d’activités de planification familiale, de santé reproductive avec au moins 2 années dans une ONG internationale dans un poste similaire organisation et planification, Capacité avérée à fixer des priorités, à respecter les délais et à effectuer des tâches multiples sous supervision minimale. ? Autogestion et Travail en Équipe : Capacité à travailler de manière autonome ou en tant que membre d’équipe, aptitude d'un système de classement de tous les rapports, formulaires, outils de suivi et d'évaluation en collaboration avec le CSE. 8. Gestion des Activités et Participation : Assiste les équipes de projet dans les relations inter-fonctionnelles. 9. Mise à jour mensuelle du tableau de bord prévu : Assure mensuellement la mise à jour du tableau de bord et la production des rapports périodiques tel que requis 10. ? Représentation du projet : Représente le projet dans sa zone d’intervention et dans les groupes techniques de travail en rapport avec la planification familiale 11. Effectuer toute autre tâche à lui confier par la hiérarchie à être axé sur les détails, et capacité à gérer efficacement le stress dans un environnement dynamique. ? Gestion Matricielle : Capacité à prospérer dans une organisation matricielle. ? Confidentialité : Aptitude avérée à garder confidentielles les questions liées au travail. Éducation, Formation et Expérience Minimales Requises : ? Diplôme Universitaire en Santé Publique, Soins Infirmiers, Maternels ou Santé Communautair Emploi Entrepreneuriat",
+        "company_name": "Une organisation",
+        "company": {
+            "name": "Une organisation",
+            "website_url": null,
+            "type": null,
+            "description": null
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": null,
+        "raw_fields": {
+            "contract_raw": "Emploi (CDD)",
+            "experience_raw": null,
+            "education_raw": "BAC+3",
+            "published_raw": "Publiée le 07/09/2026",
+            "expires_raw": "21/09/2026",
+            "secteur_raw": "Médecine/Santé"
+        },
+        "secteur": {
+            "code": "medecine/sante",
+            "label": "Médecine/Santé"
+        },
+        "active": "2026-09-07T00:00:00.000Z"
+    },
+    {
+        "title": "Analyste crédit / risques",
+        "source_url": "https://emploi.educarriere.ci/offre-154934-analyste-credit-risques.html",
+        "canonical_url": "https://emploi.educarriere.ci/offre-154934-analyste-credit-risques.html",
+        "location_raw": "ABIDJAN",
+        "salary_raw": null,
+        "published_at": "2026-09-07T00:00:00.000Z",
+        "collected_at": "2026-09-07T19:31:44.024Z",
+        "first_seen_at": "2026-09-07T19:31:44.024Z",
+        "last_seen_at": "2026-09-07T19:31:44.024Z",
+        "expires_at": "2026-10-15T00:00:00.000Z",
+        "application_deadline_at": "2026-10-15T00:00:00.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": null,
+            "label": "ABIDJAN"
+        },
+        "specialty": {
+            "code": "assurance, banque, ressources humaines",
+            "label": "Assurance, Banque, Ressources Humaines"
+        },
+        "contract_type": {
+            "code": "INCONNU",
+            "label": "Emploi"
+        },
+        "experience_level": {
+            "code": "INCONNU",
+            "label": null,
+            "min_years": null,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_3",
+            "label": "BAC+3",
+            "rank": 3
+        },
+        "description": "Détails de l'offre Missions principales ? Étudier la solvabilité des emprunteurs ? Évaluer et noter les risques de crédit ? Rédiger les rapports d'analyse pour les comités Compétences requises ? Analyse financière approfondie ? Modélisation du risque ? Rigueur et esprit de synthèse Bac+5 (Finance, Économie)",
+        "company_name": "LAM'S GROUP",
+        "company": {
+            "name": "LAM'S GROUP",
+            "website_url": null,
+            "type": null,
+            "description": null
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": null,
+        "raw_fields": {
+            "contract_raw": "Emploi",
+            "experience_raw": null,
+            "education_raw": "BAC+3, BAC+4, BAC+5",
+            "published_raw": "Publiée le 07/09/2026",
+            "expires_raw": "15/10/2026",
+            "secteur_raw": "Assurance, Banque, Ressources Humaines"
+        },
+        "secteur": {
+            "code": "assurance, banque, ressources humaines",
+            "label": "Assurance, Banque, Ressources Humaines"
+        },
+        "active": "2026-09-07T00:00:00.000Z"
+    },
+    {
+        "title": "Maître d'hôtel Dans un restaurant",
+        "source_url": "https://emploi.educarriere.ci/offre-154933-maitre-d-hotel-dans-un-restaurant.html",
+        "canonical_url": "https://emploi.educarriere.ci/offre-154933-maitre-d-hotel-dans-un-restaurant.html",
+        "location_raw": "Abidjan",
+        "salary_raw": null,
+        "published_at": "2026-09-07T00:00:00.000Z",
+        "collected_at": "2026-09-07T19:31:56.793Z",
+        "first_seen_at": "2026-09-07T19:31:56.793Z",
+        "last_seen_at": "2026-09-07T19:31:56.793Z",
+        "expires_at": "2026-09-21T00:00:00.000Z",
+        "application_deadline_at": "2026-09-21T00:00:00.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": null,
+            "label": "Abidjan"
+        },
+        "specialty": {
+            "code": "hotellerie/restauration",
+            "label": "Hôtellerie/Restauration"
+        },
+        "contract_type": {
+            "code": "CDD",
+            "label": "Emploi (CDD)"
+        },
+        "experience_level": {
+            "code": "INCONNU",
+            "label": null,
+            "min_years": null,
+            "max_years": null
+        },
+        "education_level": {
+            "code": null,
+            "label": null,
+            "rank": null
+        },
+        "description": "Détails de l'offre Le maître d'hôtel aura pour tâche d'organiser et de superviser le service en salle, d'accueillir la clientèle et de veiller à la qualité et à la fluidité du service, dans le respect des standards du restaurant. MISSIONS PRINCIPALES Accueil et service ? Accueillir, installer et conseiller les clients ? Superviser le déroulement du service en salle et veiller à la satisfaction des clients ? Gérer les réservations et l'organisation du plan de salle ? Veiller à la bonne présentation de la salle et des tables ? Gérer les éventuelles réclamations avec courtoisie et efficacité Organisation et encadrement ? Encadrer, coordonner et répartir le travail de l'équipe de salle ? Assurer la coordination entre la salle et la cuisine ? Veiller au respect des normes d'hygiène et de sécurité ? Contrôler la mise en place avant et après le service ? Faire remonter les besoins et incidents à la direction PROFIL ? Expérience confirmée en restauration, idéalement en tant que maître d'hôtel ou chef de rang ? Excellente présentation et sens de l'accueil ? Leadership et capacité à encadrer une équipe ? Sens de l'organisation et rigueur ? Bon relationnel client et gestion du stress ? Disponibilité, ponctualité et sens du service Avantage : Rémunération : à partir de 150.000 FCFA Poste basé à la Riviera Faya Candidature: Intitulé du poste + Cv + lieu d'habitation via WhatsApp au 01 01 81 87 45",
+        "company_name": "HR BUSINESS CENTER",
+        "company": {
+            "name": "HR BUSINESS CENTER",
+            "website_url": null,
+            "type": null,
+            "description": null
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": null,
+        "raw_fields": {
+            "contract_raw": "Emploi (CDD)",
+            "experience_raw": null,
+            "education_raw": null,
+            "published_raw": "Publiée le 07/09/2026",
+            "expires_raw": "21/09/2026",
+            "secteur_raw": "Hôtellerie/Restauration"
+        },
+        "secteur": {
+            "code": "hotellerie/restauration",
+            "label": "Hôtellerie/Restauration"
+        },
+        "active": "2026-09-07T00:00:00.000Z"
+    }
+]

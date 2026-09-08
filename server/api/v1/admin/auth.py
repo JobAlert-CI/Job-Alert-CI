@@ -29,6 +29,7 @@ from core.security import (
     verify_password,
 )
 from models.admin import Administrator, AdminRefreshToken
+from models.enums import AdminAction
 from schemas.admin import (
     AdminChangePassword,
     AdminLogin,
@@ -42,6 +43,7 @@ from services.admin_password_reset import (
     consume_reset_token,
     request_password_reset,
 )
+from services.audit import log_admin_action
 from services.email.resend_provider import get_email_provider
 from services.normalization import token_hash
 from services.rate_limit import check_ip_rate_limit, clear_login_failures, is_login_blocked, register_login_failure
@@ -133,6 +135,18 @@ async def admin_login(payload: AdminLogin, request: Request, db: Session = Depen
     clear_login_failures(normalized_email)
 
     admin.last_login_at = datetime.now(UTC)
+    # Cycle 16 : journaliser la connexion (demande explicite — l'enum
+    # AdminAction.LOGIN existait mais aucune route ne l'utilisait, doc v3
+    # §16). Meme transaction que last_login_at : une session ouverte est
+    # toujours tracee dans le journal.
+    log_admin_action(
+        db,
+        admin_id=admin.id,
+        action=AdminAction.LOGIN,
+        target_table="administrators",
+        target_id=admin.id,
+        details={"email": admin.email},
+    )
     db.commit()
 
     return _issue_tokens(db, admin)

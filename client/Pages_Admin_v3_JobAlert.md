@@ -455,24 +455,24 @@ Les modèles `FaqCategory` et `FaqItem` existent en base, mais **aucune route ad
 
 **Ce qu'on y voit** : deux onglets distincts.
 
-### 15.1 Onglet Événements techniques
+### 17.1 Onglet Événements techniques
 Filtrable par niveau (info/warning/error) et par source. **Actuellement, la seule catégorie d'événements disponible est le scraping** — un filtre « module » qui proposerait d'autres valeurs (envoi, IA...) renverrait toujours une liste vide, puisque le backend ne construit ces événements qu'à partir du suivi d'ingestion des offres.
 
-### 15.2 Onglet Messages de contact
+### 17.2 Onglet Messages de contact
 Liste des messages envoyés via le formulaire public, avec changement de statut (nouveau / lu / répondu / archivé / spam).
 
 **Fonctionnalités à intégrer** :
 - Filtre par statut sur les deux onglets.
 - Action de changement de statut sur un message de contact.
 
-### 15.3 Onglet Emails transactionnels
+### 17.3 Onglet Emails transactionnels
 - Liste filtrable par motif (`confirm_email`, `resend_confirmation`, `manage_alert`, `unsubscribe`) et par statut (`queued`, `sent`, `failed`).
 - Recherche par adresse email destinataire.
 - Un badge de comptage (ex. « 12 échecs aujourd'hui ») visible sans ouvrir la liste complète.
 
 ### Comment ça fonctionne :
-- `GET /logs/events` reconstruit le journal à partir de `OfferIngestionEvent` — le filtrage par niveau se fait **après** la requête SQL (sur-fetch puis filtrage en mémoire), ce qui veut dire que la pagination peut être légèrement imprécise quand un filtre de niveau est actif sur un gros volume.
-- `GET /logs/contacts` / `PATCH /contacts/{id}/status` utilisent une table d'alias (`new`, `read`, `replied`, `archived`, `spam`) qui diffère des noms internes stockés (`NEW`, `IN_PROGRESS`, `REPLIED`, `CLOSED`, `SPAM`) — utiliser strictement les valeurs API côté frontend.
+- `GET /api/admin/logs/events` reconstruit le journal à partir de `OfferIngestionEvent` — le filtrage par niveau se fait **après** la requête SQL (sur-fetch puis filtrage en mémoire), ce qui veut dire que la pagination peut être légèrement imprécise quand un filtre de niveau est actif sur un gros volume.
+- `GET /api/admin/logs/contacts` / `PATCH /contacts/{id}/status` utilisent une table d'alias (`new`, `read`, `replied`, `archived`, `spam`) qui diffère des noms internes stockés (`NEW`, `IN_PROGRESS`, `REPLIED`, `CLOSED`, `SPAM`) — utiliser strictement les valeurs API côté frontend.
 - `GET /api/admin/transactional-emails` avec les filtres `purpose`, `status`, `to_email` (exact ou motif `%` pour une recherche partielle), `subscriber_id`.
 - `GET /api/admin/transactional-emails/count` — comptage rapide pour le badge, sans pagination, pensé pour un affichage dans le menu ou le tableau de bord.
 - **Sécurité** : le payload brut de la requête/réponse à Resend (`request_payload`/`response_payload`) n'est **jamais exposé** par cette route, par principe de sécurité — seuls le motif, le statut et les métadonnées sont visibles.
