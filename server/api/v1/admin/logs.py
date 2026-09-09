@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, date, datetime, time, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import func, select
@@ -49,7 +49,14 @@ _VALID_AUDIT_ACTIONS = {action.value for action in AdminAction}
 
 
 # ─── Journal d'audit admin ─────────────────────────────
-def _audit_filters(stmt, admin_id: str | None, action: str | None, target_table: str | None):
+def _audit_filters(
+    stmt,
+    admin_id: str | None,
+    action: str | None,
+    target_table: str | None,
+    date_debut: date | None = None,
+    date_fin: date | None = None,
+):
     """Filtres partages par /audit et /audit/stats (meme semantics)."""
     if admin_id:
         stmt = stmt.where(AdminActionLog.admin_id == admin_id)
@@ -59,7 +66,28 @@ def _audit_filters(stmt, admin_id: str | None, action: str | None, target_table:
         stmt = stmt.where(AdminActionLog.action == action)
     if target_table:
         stmt = stmt.where(AdminActionLog.target_table == target_table)
+    # Audit 4, A.7 : plage de dates optionnelle, appliquee cote SQL.
+    # Bornes inclusives : date_debut = debut de jour, date_fin = fin de jour.
+    if date_debut is not None:
+        stmt = stmt.where(AdminActionLog.created_at >= datetime.combine(date_debut, time.min, tzinfo=UTC))
+    if date_fin is not None:
+        stmt = stmt.where(AdminActionLog.created_at < datetime.combine(date_fin + timedelta(days=1), time.min, tzinfo=UTC))
     return stmt
+
+
+def _parse_date_param(value: str | None, param_name: str) -> date | None:
+    """Valide un parametre de date ISO (YYYY-MM-DD) cote route.
+
+    Audit 4, A.7 : Pydantic ne valide pas un `date` brut dans un Query
+    optionnel de la meme facon qu'un body — on renvoie un 400 explicite
+    plutot qu'une 422 Pydantic opaque sur une chaine mal formee.
+    """
+    if value is None:
+        return None
+    try:
+        return date.fromisoformat(value)
+    except ValueError:
+        raise HTTPException(status_code=400, detail=f"Parametre {param_name} invalide (format attendu: AAAA-MM-JJ)") from None
 
 
 @router.get("/audit", response_model=AuditLogPageRead)
@@ -68,6 +96,8 @@ async def list_audit_logs(
     admin_id: str | None = None,
     action: str | None = None,
     target_table: str | None = None,
+    date_debut: str | None = Query(None, description="Borne inferieure inclusive, format AAAA-MM-JJ"),
+    date_fin: str | None = Query(None, description="Borne superieure inclusive, format AAAA-MM-JJ"),
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
 ):
@@ -76,8 +106,13 @@ async def list_audit_logs(
     Cycle 16 : le total est calcule par un COUNT cible (meme WHERE que la
     page) — le front peut afficher « X sur N » et paginer honnetement.
     Le tri reste created_at DESC.
+
+    Audit 4, A.7 : filtre optionnel par plage de dates (bornes inclusives,
+    appliquees cote SQL — pas de pagination bruite pour cibler une periode).
     """
-    base = _audit_filters(select(AdminActionLog), admin_id, action, target_table)
+    debut = _parse_date_param(date_debut, "date_debut")
+    fin = _parse_date_param(date_fin, "date_fin")
+    base = _audit_filters(select(AdminActionLog), admin_id, action, target_table, debut, fin)
     total = db.scalar(select(func.count()).select_from(base.subquery())) or 0
     rows = list(
         db.scalars(
@@ -116,11 +151,20 @@ async def audit_stats(
     now = datetime.now(UTC)
     depuis = now - timedelta(days=days)
 
-    total = db.scalar(select(func.count()).select_from(AdminActionLog)) or 0
+    # Audit 4, K.1 : le total porte sur la MEME fenetre que les axes (le
+    # parametre days decrit la page, pas seulement le graphique) — sinon le
+    # COUNT(*) plein-table scanne admin_action_logs a chaque ouverture.
+    total = (
+        db.scalar(select(func.count()).select_from(AdminActionLog).where(AdminActionLog.created_at >= depuis)) or 0
+    )
 
     by_action = {
         row[0].value if hasattr(row[0], "value") else str(row[0]): row[1]
-        for row in db.execute(select(AdminActionLog.action, func.count()).group_by(AdminActionLog.action)).all()
+        for row in db.execute(
+            select(AdminActionLog.action, func.count())
+            .where(AdminActionLog.created_at >= depuis)
+            .group_by(AdminActionLog.action)
+        ).all()
     }
 
     # Axe par jour : GROUP BY date (jour ISO) sur la fenetre, toutes actions
@@ -196,10 +240,15 @@ async def logs_stats(
     depuis = now - timedelta(days=days)
 
     # ── Evenements d'ingestion ──
-    # Compteurs globaux : une seule passe GROUP BY action, puis agregation
-    # Python par niveau/action (5 actions possibles, pas de sur-fetch).
+    # Compteurs globaux : une seule passe GROUP BY action sur la MEME fenetre
+    # que les axes (audit 4, K.1 : le parametre days decrit la page entiere,
+    # pas seulement le graphique — plus de full scan de la table la plus
+    # grosse du systeme a chaque ouverture), puis agregation Python par
+    # niveau/action (5 actions possibles, pas de sur-fetch).
     par_action_rows = db.execute(
-        select(OfferIngestionEvent.action, func.count()).group_by(OfferIngestionEvent.action)
+        select(OfferIngestionEvent.action, func.count())
+        .where(OfferIngestionEvent.created_at >= depuis)
+        .group_by(OfferIngestionEvent.action)
     ).all()
     compteurs_action = {action: total for action, total in par_action_rows}
 
@@ -252,10 +301,15 @@ async def logs_stats(
     # Statuts en vocabulaire API : on inverse CONTACT_STATUS_ALIASES pour
     # traduire les valeurs internes (IN_PROGRESS -> "read", CLOSED ->
     # "archived") — le front ne connait QUE le vocabulaire API.
+    # Audit 4, K.1 : meme fenetrage que les compteurs events (le parametre
+    # days decrit la page entiere).
     inverse_aliases = {valeur: cle for cle, valeur in CONTACT_STATUS_ALIASES.items()}
     contacts_rows = db.execute(
         select(ContactMessage.status, func.count())
-        .where(ContactMessage.deleted_at.is_(None))
+        .where(
+            ContactMessage.deleted_at.is_(None),
+            ContactMessage.created_at >= depuis,
+        )
         .group_by(ContactMessage.status)
     ).all()
     contacts_par_statut: dict[str, int] = {}
@@ -285,6 +339,8 @@ async def list_event_logs(
     module: str | None = Query(None, description="Toujours 'scraping' pour l'instant (seule source d'evenements disponible)."),
     level: str | None = Query(None, description="info, warning ou error"),
     source_id: str | None = Query(None, description="ID de source, pour ne garder que ses runs"),
+    date_debut: str | None = Query(None, description="Borne inferieure inclusive, format AAAA-MM-JJ"),
+    date_fin: str | None = Query(None, description="Borne superieure inclusive, format AAAA-MM-JJ"),
     limit: int = Query(50, ge=1, le=200),
     offset: int = Query(0, ge=0),
 ):
@@ -292,6 +348,8 @@ async def list_event_logs(
 
     Audit P1 #14: on filtre SQL sur `level` (mapping _LEVEL_BY_ACTION inverse)
     pour eviter le sur-fetch * 3 + filtre Python.
+
+    Audit 4, A.7 : plage de dates optionnelle (bornes inclusives, cote SQL).
     """
     if module and module != "scraping":
         return []
@@ -304,6 +362,9 @@ async def list_event_logs(
         if not allowed_actions:
             return []
 
+    debut = _parse_date_param(date_debut, "date_debut")
+    fin = _parse_date_param(date_fin, "date_fin")
+
     stmt = select(OfferIngestionEvent).order_by(OfferIngestionEvent.created_at.desc())
     if source_id:
         stmt = (
@@ -312,6 +373,11 @@ async def list_event_logs(
         )
     if allowed_actions is not None:
         stmt = stmt.where(OfferIngestionEvent.action.in_(allowed_actions))
+    # Audit 4, A.7 : memes bornes inclusives que /audit.
+    if debut is not None:
+        stmt = stmt.where(OfferIngestionEvent.created_at >= datetime.combine(debut, time.min, tzinfo=UTC))
+    if fin is not None:
+        stmt = stmt.where(OfferIngestionEvent.created_at < datetime.combine(fin + timedelta(days=1), time.min, tzinfo=UTC))
     events = list(db.scalars(stmt.limit(limit).offset(offset)))
 
     return [

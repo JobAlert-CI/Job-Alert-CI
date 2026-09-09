@@ -437,8 +437,9 @@ def send_no_offer_emails(date_override: str | None = None) -> dict:
 def retry_failed_digests(date_override: str | None = None) -> dict:
     """Retente UNIQUEMENT les digests failed dont les tentatives ne sont pas
     epuisees (attempt_no < EMAIL_MAX_RETRIES). Ne duplique jamais le mecanisme
-    de retry automatique de send_digest: desactive par defaut
-    (RETRY_FAILED_DIGESTS_ENABLED=false), declenchement manuel sinon."""
+    de retry automatique de send_digest. Planifiee au beat horaire
+    09:00-18:00 (audit 4, M.2) : kill-switch RETRY_FAILED_DIGESTS_ENABLED
+    (false par defaut — la task est no-op tant que l'ops ne l'active pas)."""
 
     settings = get_settings()
     if not settings.retry_failed_digests_enabled:

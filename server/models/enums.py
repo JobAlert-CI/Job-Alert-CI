@@ -234,3 +234,6 @@ class AdminAction(StrEnum):
     SEND = "envoi"
     LOGIN = "connexion"
     SCRAPE = "scraping"
+    # Audit 4, A.2 : deconnexion serveur tracée au meme titre que la
+    # connexion (revocation de la famille de refresh tokens).
+    LOGOUT = "deconnexion"

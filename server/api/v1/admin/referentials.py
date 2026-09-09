@@ -249,10 +249,14 @@ async def update_source_status(
     admin: Administrator = Depends(get_current_admin),
 ):
     source = _get_or_404(db, Source, source_id, "Source")
+    # Audit 4, D.1 : l'ancien statut est journalise avec le nouveau —
+    # sans lui, impossible de reconstituer le sens d'un changement
+    # actif -> paused -> actif -> disabled a partir du seul journal.
+    ancien_status = source.status.value if hasattr(source.status, "value") else str(source.status)
     source.status = SourceStatus(payload.status)
     log_admin_action(
         db, admin_id=admin.id, action=AdminAction.UPDATE, target_table="sources", target_id=source.id,
-        details={"status": payload.status},
+        details={"status": payload.status, "ancien_status": ancien_status},
     )
     db.commit()
     return {"message": "Statut mis à jour", "status": source.status.value}

@@ -221,19 +221,24 @@ def test_stats_par_jour_et_top_auteurs(admin_client, admin_db):
 
 
 def test_stats_fenetre_days_limite_par_jour(admin_client, admin_db):
-    """days=1 : une action d'il y a 3 jours n'entre PAS dans par_jour/top
-    mais reste comptee dans total (global) et by_action (global)."""
+    """days=1 : une action d'il y a 3 jours n'entre NI dans par_jour/top NI
+    dans total/by_action — audit 4, K.1 : les compteurs suivent la MEME
+    fenetre que les axes (fini les full scans plein-table a chaque appel)."""
     _cleanup_logs(admin_db)
     vieux = datetime.now(UTC) - timedelta(days=3)
     _add_log(admin_db, admin_id=None, action=AdminActionEnum.SCRAPE, created=vieux)
     admin_db.commit()
     try:
         body = admin_client.get("/api/admin/logs/audit/stats?days=1").json()
-        assert body["total"] == 1
-        assert body["by_action"].get("scraping") == 1
-        # La fenetre par_jour ne contient PAS le jour d'il y a 3 jours.
+        # La fenetre de 1 jour ne voit pas l'action de 3 jours : compteurs
+        # et axes coherents (K.1) — elargir la fenetre la fait revenir.
+        assert body["total"] == 0
+        assert body["by_action"].get("scraping") is None
         assert body["par_jour"] == []
         assert body["top_auteurs"] == []
+        body90 = admin_client.get("/api/admin/logs/audit/stats?days=90").json()
+        assert body90["total"] == 1
+        assert body90["by_action"].get("scraping") == 1
     finally:
         _cleanup_logs(admin_db)
 

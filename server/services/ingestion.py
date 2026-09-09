@@ -83,6 +83,14 @@ def _event(
     reason: str | None = None,
     raw_payload: dict | None = None,
 ) -> None:
+    """Ecrit un evenement d'ingestion (audit 4, A.3 : payload seulement sur echec).
+
+    `raw_payload` n'est conserve QUE pour les evenements d'echec (offre non
+    creee : le JSON brut est le seul contexte de debug du scraper). Sur les
+    evenements de succes (INSERTED/DUPLICATE), l'offre existe et porte deja
+    `JobOffer.raw_payload` — l'event ne duplique plus plusieurs Ko par ligne,
+    le front recupere le payload via la FK offer_id si besoin.
+    """
     db.add(
         OfferIngestionEvent(
             offer_id=offer.id if offer else None,
@@ -91,7 +99,7 @@ def _event(
             hash_unique=hash_unique,
             raw_url=raw_url,
             reason=reason,
-            raw_payload=raw_payload,
+            raw_payload=raw_payload if action == IngestionAction.FAILED else None,
         )
     )
 

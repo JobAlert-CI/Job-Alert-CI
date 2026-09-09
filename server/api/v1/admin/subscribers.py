@@ -19,7 +19,7 @@ from schemas.subscriptions import (
     SubscriberRead,
     SubscriberStatusUpdate,
 )
-from services.audit import log_admin_action
+from services.audit import log_admin_action, summarize_ids
 from services.search_utils import safe_ilike
 
 router = APIRouter(
@@ -243,7 +243,9 @@ async def send_custom_email(
         action=AdminAction.SEND,
         target_table="email_digests",
         target_id=digest.id,
-        details={"subscriber_id": subscriber.id, "offer_ids": payload.offer_ids},
+        # Audit 4, A.4 : resume au lieu de la liste complete d'UUID (le
+        # digest porte deja la relation exacte via email_digest_offers).
+        details=summarize_ids("offer_ids", payload.offer_ids, subscriber_id=subscriber.id),
     )
     db.commit()
     db.refresh(digest)

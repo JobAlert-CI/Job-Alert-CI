@@ -30,7 +30,9 @@ AI_KEYS: tuple[AIKeySeed, ...] = (
         base_url="https://openrouter.ai/api/v1",
         models=["minimax/minimax-m3:free"], # "z-ai/glm-5.2:free", "nvidia/nemotron-3-ultra-550b-a55b:free", "google/gemma-4-31b-it:free" "deepseek/deepseek-chat"
         priority=30,
-        notes="Seed admin IA: OpenRouter (repere fourni: sk-or-v1-b...a192).",
+        # Audit 4, B.2 : jamais de fragment de cle dans les notes — seul
+        # last4 (deja stocke en colonne dediee) identifie la cle.
+        notes="Seed admin IA: OpenRouter (cle ****a192).",
     ),
     AIKeySeed(
         name="Groq",
@@ -39,7 +41,7 @@ AI_KEYS: tuple[AIKeySeed, ...] = (
         base_url="https://api.groq.com/openai/v1",
         models=["llama-3.3-70b-versatile"],
         priority=20,
-        notes="Seed admin IA: Groq (repere fourni: gsk_RIXueU...Erm).",
+        notes="Seed admin IA: Groq (cf. colonne api_key_last4).",
     ),
     AIKeySeed(
         name="DeepSeek",
@@ -48,7 +50,7 @@ AI_KEYS: tuple[AIKeySeed, ...] = (
         base_url="https://api.deepseek.com",
         models=["deepseek-chat"],
         priority=10,
-        notes="Seed admin IA: DeepSeek (repere fourni: sk-708...8c).",
+        notes="Seed admin IA: DeepSeek (cf. colonne api_key_last4).",
     ),
 )
 

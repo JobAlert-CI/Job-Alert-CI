@@ -140,6 +140,9 @@ class Settings:
     daily_digest_send_hour: int = field(default_factory=lambda: _int_env("DAILY_DIGEST_SEND_HOUR", 8))
     daily_digest_send_minute: int = field(default_factory=lambda: _int_env("DAILY_DIGEST_SEND_MINUTE", 0))
     digest_timezone: str = field(default_factory=lambda: _str_env("DIGEST_TIMEZONE", "Africa/Abidjan"))
+    # Audit 4, F.3 : heure de la tache purge nocturne (refresh tokens 03:00,
+    # alertes IA 03:15) — jusqu'ici 03:00 code en dur dans celery_app.py.
+    daily_purge_hour: int = field(default_factory=lambda: _int_env("DAILY_PURGE_HOUR", 3))
     digest_max_offers: int = field(default_factory=lambda: _int_env("DIGEST_MAX_OFFERS", 3))
     digest_send_if_below_min: bool = field(default_factory=lambda: _bool_env("DIGEST_SEND_IF_BELOW_MIN", True))
     digest_include_no_contract_offers: bool = field(
@@ -184,6 +187,11 @@ class Settings:
     ai_enabled: bool = field(default_factory=lambda: _bool_env("AI_ENABLED", False))
     ai_key_encryption_secret: str | None = field(default_factory=lambda: getenv("AI_KEY_ENCRYPTION_SECRET") or None)
     ai_circuit_breaker_minutes: int = field(default_factory=lambda: _int_env("AI_CIRCUIT_BREAKER_MINUTES", 15))
+    # Audit 4, K.5 : taille du lot traite par sweep (plafond historique 10
+    # code en dur). Bornes 1-500 : un lot trop grand consomme le context
+    # provider et multiplie les rejets de validation, un lot de 1 ralentit
+    # la file pour rien.
+    ai_batch_size: int = field(default_factory=lambda: _int_env("AI_BATCH_SIZE", 10))
     celery_broker_url: str = field(default_factory=lambda: _str_env("CELERY_BROKER_URL", "redis://localhost:6379/0"))
     celery_result_backend: str = field(default_factory=lambda: _str_env("CELERY_RESULT_BACKEND", "redis://localhost:6379/1"))
     redis_url: str = field(default_factory=lambda: _str_env("REDIS_URL", "redis://localhost:6379/2"))

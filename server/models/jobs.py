@@ -201,3 +201,11 @@ class OfferIngestionEvent(UUIDPrimaryKeyMixin, TimestampMixin, Base):
 
     offer: Mapped[JobOffer | None] = relationship(back_populates="ingestion_events")
     source_scrape_run: Mapped[SourceScrapeRun | None] = relationship(back_populates="ingestion_events")
+
+    __table_args__ = (
+        # Audit 4, A.3 : index sur created_at — les purges (15 j payload
+        # NULL / 90 j DELETE) et les agregations fenetrees /admin/logs
+        # filtrent sur cette colonne ; sans index, chaque purge est un scan
+        # complet de la table la plus grosse du systeme.
+        Index("ix_offer_ingestion_events_created_at", "created_at"),
+    )

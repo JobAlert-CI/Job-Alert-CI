@@ -264,14 +264,17 @@ pour ne pas laisser l'abonné sans nouvelles.
 
 ### 12.2 Orchestration
 
-La phase 2.5 envoie les no-offer à **08h15** (juste après la phase 2
-principale à 08h00) via la tâche `tasks.digests.send_no_offer_emails`,
-verrou Redis `lock:digest:no_offer:{date}` séparé, queue `emails`.
+La phase 2.5 envoie les no-offer **30 minutes après l'envoi principal**
+(défault 08h30 si la phase 2 est à 08h00) via la tâche
+`tasks.digests.send_no_offer_emails`, verrou Redis
+`lock:digest:no_offer:{date}` séparé, queue `emails`. L'heure est **dérivée
+de `DAILY_DIGEST_SEND_HOUR/MINUTE`** (audit 4, F.3) : décaler l'envoi
+principal décale le no-offer, impossible qu'il parte avant.
 
 ```python
 celery_app.conf.beat_schedule["digest-send-no-offer"] = {
     "task": "tasks.digests.send_no_offer_emails",
-    "schedule": crontab(hour=8, minute=15),
+    "schedule": _abidjan_crontab(...),  # derive de DAILY_DIGEST_SEND_* (+30 min)
     "options": {"queue": "emails"},
 }
 ```

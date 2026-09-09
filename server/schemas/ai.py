@@ -260,7 +260,8 @@ class AIQueueRead(BaseModel):
     running: int = Field(ge=0, description="Nombre de AiProcessingJob en statut RUNNING")
     pending_ai_jobs: int = Field(ge=0, description="Nombre de AIJob en statut PENDING")
     last_sweep_at: datetime | None = Field(
-        default=None, description="Horodatage du dernier AiProcessingJob de trigger SWEEP (tous status)"
+        default=None,
+        description="Horodatage du dernier AIJob (ai_jobs) de trigger SWEEP, tous status confondus (correction cycle 19 : la lecture se fait dans ai_jobs, plus dans AiProcessingJob)",
     )
     last_sweep_status: AIProcessingJobStatusLiteral | None = Field(
         default=None, description="Statut du dernier sweep"
@@ -331,6 +332,5 @@ class AIFiliereSuggestionRead(TimestampRead):
 
 class AIFiliereSuggestionUpdate(BaseModel):
     status: AIFiliereSuggestionStatus = Field(..., description="APPROVED ou REJECTED")
-    reviewed_by_admin_id: UUID | None = None
     reviewed_by_admin_id: UUID | None = None
     reviewed_at: datetime | None = None

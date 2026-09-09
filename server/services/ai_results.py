@@ -21,7 +21,35 @@ from models import (
     OfferFiliere,
     OfferIngestionEvent,
 )
-from schemas.ai import AIInternalResultSubmission, AIValidationErrorItem, AIValidationSummary
+from models.admin import SiteSetting
+from schemas.ai import AIInternalResultSubmission, AISuggestedFiliere, AIValidationErrorItem, AIValidationSummary
+
+# Audit 4, B.9 : cle du seuil de confiance IA, editable dans /admin/settings
+# sans redeploiement. Vide/absente = comportement inchange (la confiance du
+# provider est appliquee telle quelle).
+AI_MIN_FILIERE_CONFIDENCE_KEY = "ai_min_filiere_confidence"
+
+
+def _min_filiere_confidence(db: Session) -> float | None:
+    """Lit le seuil de confiance admin (SiteSetting), borne 0-1.
+
+    Robuste par design : valeur absente/invalide/hors bornes -> None
+    (aucun seuil), JAMAIS d'exception — un mauvais reglage admin ne doit
+    pas faire echouer l'application des resultats IA.
+    """
+    try:
+        ligne = db.scalar(select(SiteSetting).where(SiteSetting.key == AI_MIN_FILIERE_CONFIDENCE_KEY))
+    except Exception:  # pragma: no cover - base illisible : seuil desactive
+        return None
+    if ligne is None or not (ligne.value or "").strip():
+        return None
+    try:
+        seuil = float(ligne.value.strip())
+    except ValueError:
+        return None
+    if not 0 < seuil <= 1:
+        return None
+    return seuil
 
 
 def _now() -> datetime:
@@ -89,6 +117,11 @@ def apply_ai_results(db: Session, payload: AIInternalResultSubmission) -> AIVali
 
     job = db.get(AIJob, str(payload.job_id))
 
+    # Audit 4, B.9 : seuil de confiance admin (ai_min_filiere_confidence).
+    # Lu UNE fois par job (pas par offre) ; None = aucun seuil, comportement
+    # historique inchange.
+    min_confidence = _min_filiere_confidence(db)
+
     for result in payload.results:
         offer = db.get(JobOffer, str(result.offer_id))
         if offer is None:
@@ -109,6 +142,22 @@ def apply_ai_results(db: Session, payload: AIInternalResultSubmission) -> AIVali
             filiere = _optional_code(db, Filiere, result.primary_filiere_code, "Filiere")
             if not result.requires_admin_review and filiere is None:
                 raise ValueError("primary_filiere_code manquant alors que requires_admin_review est false")
+
+            # Audit 4, B.9 : sous le seuil admin, un resultat que le provider
+            # voulait activer part en revue humaine — un modele bavard qui
+            # renvoie 0.55 partout ne publie pas un matching faible.
+            if (
+                not result.requires_admin_review
+                and min_confidence is not None
+                and result.filiere_confidence is not None
+                and result.filiere_confidence < min_confidence
+            ):
+                suggestion = result.suggested_filiere or AISuggestedFiliere(
+                    code=filiere.code if filiere else "a-classer",
+                    label=filiere.label if filiere else "A classer",
+                    reason=f"Confiance {result.filiere_confidence:.2f} sous le seuil admin {min_confidence:.2f}",
+                )
+                result = result.model_copy(update={"requires_admin_review": True, "suggested_filiere": suggestion})
 
             specialty = _resolve_specialty(db, filiere, result.specialty_code)
             contract_type = _optional_code(db, ContractType, result.contract_type_code, "Type de contrat")

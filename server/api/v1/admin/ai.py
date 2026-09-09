@@ -162,14 +162,41 @@ def delete_ai_key(
 
 
 @router.post("/keys/{key_id}/test", response_model=AITestConnectionRead)
-def test_ai_key(key_id: str, db: Session = Depends(get_db)):
+def test_ai_key(
+    key_id: str,
+    db: Session = Depends(get_db),
+    admin: Administrator = Depends(get_current_admin),
+):
+    """Test de connexion d'une cle IA.
+
+    Audit 4, A.10: action de diagnostic journalisee — la route mute
+    `AIApiKey.last_error_at` en cas d'echec, elle doit laisser une trace
+    d'audit (qui a teste quelle cle, resultat ok/echec).
+    """
     item = _require_key(db, key_id)
     try:
         provider = AIProviderFactory.build(item, decrypt_api_key(item.api_key_encrypted) if item.provider_type.value != "mock" else "")
         result = provider.test_connection()
+        log_admin_action(
+            db,
+            admin_id=admin.id,
+            action=AdminAction.UPDATE,
+            target_table="ai_api_keys",
+            target_id=item.id,
+            details={"tested_connection": True, "result": "ok", "provider": result.get("provider"), "model": result.get("model")},
+        )
+        db.commit()
         return AITestConnectionRead(ok=bool(result.get("ok")), provider=result.get("provider"), model=result.get("model"))
     except AIProviderError as exc:
         item.last_error_at = datetime.now(UTC)
+        log_admin_action(
+            db,
+            admin_id=admin.id,
+            action=AdminAction.UPDATE,
+            target_table="ai_api_keys",
+            target_id=item.id,
+            details={"tested_connection": True, "result": "error"},
+        )
         db.commit()
         return AITestConnectionRead(ok=False, message=str(exc))
 
@@ -284,9 +311,13 @@ def ai_stats(
     taux_activation = round(100.0 * total_activees / total_offres, 1) if total_offres else None
 
     # ── IA4 : suggestions par statut ──
+    # Audit 4, K.1 : meme fenetre que le reste de la page (le parametre days
+    # decrit la page entiere, pas seulement les graphiques).
     suggestions_par_statut = {}
     for statut, total in db.execute(
-        select(AIFiliereSuggestion.status, func.count()).group_by(AIFiliereSuggestion.status)
+        select(AIFiliereSuggestion.status, func.count())
+        .where(AIFiliereSuggestion.created_at >= depuis)
+        .group_by(AIFiliereSuggestion.status)
     ).all():
         cle = statut.value if hasattr(statut, "value") else str(statut)
         suggestions_par_statut[cle] = total
@@ -450,12 +481,35 @@ def acknowledge_ai_alert(
 @router.post("/run", status_code=status.HTTP_202_ACCEPTED)
 def run_ai_processing(
     payload: AIRunRequest,
+    db: Session = Depends(get_db),
     admin: Administrator = Depends(get_current_admin),
 ):
+    """Declenchement manuel du pipeline IA.
+
+    Audit 4, A.10: qui a relance l'IA manuellement est desormais trace
+    (action SCRAPE — meme vocabulaire que le declenchement manuel du
+    scraping Lot 1 ; target_table "ai_jobs" comme la table du pipeline).
+    Journalisation APRES le dispatch: la ligne porte le task_id reel de
+    la tache partie (si le broker est injoignable, l'exception remonte
+    et rien n'est trace — l'action n'a pas eu lieu).
+    """
     from tasks.ai_processing import process_raw_offers
 
     async_result = process_raw_offers.apply_async(
         kwargs={"trigger_type": payload.trigger_type.value, "force": payload.force},
         queue="ai",
     )
+    log_admin_action(
+        db,
+        admin_id=admin.id,
+        action=AdminAction.SCRAPE,
+        target_table="ai_jobs",
+        target_id=str(async_result.id),
+        details={
+            "trigger_type": payload.trigger_type.value,
+            "force": payload.force,
+            "task_id": str(async_result.id),
+        },
+    )
+    db.commit()
     return {"status": "queued", "task_id": async_result.id, "triggered_by": admin.id}

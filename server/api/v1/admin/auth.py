@@ -217,6 +217,10 @@ async def admin_logout(
 
     L'access token reste valide jusqu'a expiration (JWT sans etat), mais
     aucun refresh ne pourra plus etre presente.
+
+    Audit 4, A.2: la deconnexion est journalisee (action LOGOUT) — sans
+    elle, la forensique d'une compromission ne verrait aucune trace des
+    sessions revoquees par la victime.
     """
     _guard_rate_limit(request, "admin-logout", limit_per_minute=30)
     for tok in db.scalars(
@@ -226,6 +230,14 @@ async def admin_logout(
         )
     ).all():
         tok.revoked_at = datetime.now(UTC)
+    log_admin_action(
+        db,
+        admin_id=admin.id,
+        action=AdminAction.LOGOUT,
+        target_table="administrators",
+        target_id=admin.id,
+        details={"email": admin.email, "revoked_refresh_tokens": True},
+    )
     db.commit()
     return {"message": "Deconnexion reussie"}
 
@@ -242,7 +254,11 @@ async def change_password(
     db: Session = Depends(get_db),
     admin: Administrator = Depends(get_current_admin),
 ):
-    """Changement de mot de passe de l'admin actuellement authentifie."""
+    """Changement de mot de passe de l'admin actuellement authentifie.
+
+    Audit 4, A.2: l'evenement de securite est journalise (qui a change
+    quel compte, quand) — jamais le secret lui-meme.
+    """
     if not verify_password(payload.current_password, admin.password_hash):
         raise HTTPException(status_code=400, detail="Mot de passe actuel incorrect")
 
@@ -257,6 +273,14 @@ async def change_password(
         )
     ).all():
         tok.revoked_at = datetime.now(UTC)
+    log_admin_action(
+        db,
+        admin_id=admin.id,
+        action=AdminAction.UPDATE,
+        target_table="administrators",
+        target_id=admin.id,
+        details={"password_changed": True, "must_change_password": False, "revoked_refresh_tokens": True},
+    )
     db.commit()
     return {"message": "Mot de passe modifie"}
 
@@ -270,10 +294,25 @@ async def forgot_password(payload: AdminLogin, request: Request, db: Session = D
 
     Reponse neutre que l'email existe ou non (anti-enumeration).
     Le service `admin_password_reset` ne leve jamais pour un email inconnu.
+
+    Audit 4, A.2: la demande est journalisee cote serveur uniquement —
+    la ligne n'est posee que si l'email correspond a un admin connu (pas
+    de journal d'emails inexistants a bruter), et la reponse HTTP reste
+    identique que la demande aboutisse ou non.
     """
     _guard_rate_limit(request, "admin-forgot", limit_per_minute=3, cooldown=30)
     provider = get_email_provider()
-    request_password_reset(db, email=payload.email, provider=provider)
+    result = request_password_reset(db, email=payload.email, provider=provider)
+    if result.admin_id is not None:
+        log_admin_action(
+            db,
+            admin_id=result.admin_id,
+            action=AdminAction.UPDATE,
+            target_table="administrators",
+            target_id=result.admin_id,
+            details={"reset_requested": True, "email": payload.email.strip().lower()},
+        )
+        db.commit()
     return {"message": "Si un compte existe, un email de reinitialisation a ete envoye."}
 
 
@@ -283,10 +322,22 @@ async def reset_password(payload: AdminResetPasswordRequest, request: Request, d
 
     Schema Pydantic: token >= 20 chars, new_password entre 8 et 128 chars
     (audit 2, N6 — plus de payload dict non valide).
+
+    Audit 4, A.2: le takeover via token est journalise (UPDATE sur
+    administrators, email du compte reinitialise — jamais le token).
     """
     _guard_rate_limit(request, "admin-reset", limit_per_minute=5, cooldown=5)
     try:
-        consume_reset_token(db, raw_token=payload.token, new_password_hash=hash_password(payload.new_password))
+        admin = consume_reset_token(db, raw_token=payload.token, new_password_hash=hash_password(payload.new_password))
     except AdminResetPasswordError as exc:
         raise HTTPException(status_code=exc.status_code, detail=exc.message) from exc
+    log_admin_action(
+        db,
+        admin_id=admin.id,
+        action=AdminAction.UPDATE,
+        target_table="administrators",
+        target_id=admin.id,
+        details={"password_reset_via_token": True, "email": admin.email},
+    )
+    db.commit()
     return {"message": "Mot de passe reinitialise"}

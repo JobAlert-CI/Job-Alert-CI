@@ -27,6 +27,16 @@ async def lifespan(app: FastAPI):
             "ADMIN_JWT_SECRET doit etre defini explicitement en production (APP_ENV=production)."
         )
 
+    # Audit 4, B.7 : pipeline IA actif en production sans secret de
+    # chiffrement = chaque tache IA levera AIConfigurationError au premier
+    # decrypt. Mieux vaut un boot rouge qu'un service "sain" au pipeline
+    # mort (on exige la non-nullite, jamais la valeur).
+    if settings.is_production and settings.ai_enabled and not settings.ai_key_encryption_secret:
+        raise RuntimeError(
+            "AI_KEY_ENCRYPTION_SECRET doit etre defini en production quand AI_ENABLED=true "
+            "(chiffrement des cles IA en base)."
+        )
+
     # En production, Alembic doit piloter le schema. Ce flag reste pratique pour
     # un dev local ou une CI ephemere sans migration prealable.
     if settings.auto_create_tables:

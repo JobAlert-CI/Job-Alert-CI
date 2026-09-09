@@ -43,6 +43,9 @@ from api.v1.admin import (
     system_health as admin_system_health,
 )
 from api.v1.admin import (
+    system_schedule as admin_system_schedule,
+)
+from api.v1.admin import (
     transactional_emails as admin_transactional_emails,
 )
 from api.v1.public import (
@@ -90,6 +93,7 @@ api_router.include_router(settings.router)
 api_router.include_router(admin_ai.router)
 api_router.include_router(admin_ai_suggestions.router)
 api_router.include_router(admin_system_health.router)
+api_router.include_router(admin_system_schedule.router)
 api_router.include_router(admin_sending_preview.router)
 api_router.include_router(admin_companies.router)
 api_router.include_router(admin_aggregates.router)

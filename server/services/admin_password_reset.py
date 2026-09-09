@@ -23,6 +23,7 @@ import logging
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from secrets import token_urlsafe
+from typing import TYPE_CHECKING
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -30,6 +31,11 @@ from sqlalchemy.orm import Session
 from models import TransactionalEmailEvent, TransactionalEmailPurpose, TransactionalEmailStatus
 from services.email.email_provider import EmailMessage, EmailProviderProtocol
 from services.normalization import token_hash
+
+if TYPE_CHECKING:
+    # Uniquement pour l'annotation de retour : l'import applicatif se fait
+    # en tardif dans `consume_reset_token` (evite le cycle au chargement).
+    from models.admin import Administrator
 
 logger = logging.getLogger(__name__)
 
@@ -52,6 +58,9 @@ class AdminResetRequest:
 
     token: str | None  # brut, uniquement en memoire pour l'email
     event_id: str | None
+    # Audit 4, A.2 : admin resolu (None si email inconnu) pour que la route
+    # puisse journaliser la demande sans lever le voile anti-enumeration.
+    admin_id: str | None = None
 
 
 def request_password_reset(
@@ -115,7 +124,7 @@ def request_password_reset(
         event.last_error = result.error_message
     db.commit()
 
-    return AdminResetRequest(token=raw_token, event_id=event.id)
+    return AdminResetRequest(token=raw_token, event_id=event.id, admin_id=admin.id)
 
 
 def _find_reset_event(db: Session, hashed: str) -> TransactionalEmailEvent | None:
@@ -161,12 +170,16 @@ def consume_reset_token(
     *,
     raw_token: str,
     new_password_hash: str,
-) -> None:
+) -> Administrator | None:
     """Valide le token (hash, TTL, usage unique) et applique le nouveau hash.
 
     Leve `AdminResetPasswordError` si le token est inconnu, expire ou deja
     consomme. L'appelant fournit deja le `new_password_hash` (bcrypt) pour
     que ce service reste agnostique du hachage.
+
+    Audit 4, A.2: retourne desormais l'admin reinitialise pour que la route
+    journalise l'evenement (UPDATE administrators) — le secret n'apparait
+    jamais dans la ligne d'audit.
     """
     # Import tardif pour eviter un cycle au chargement du module.
     from models.admin import Administrator
@@ -216,6 +229,7 @@ def consume_reset_token(
         "Mot de passe admin reinitialise via token",
         extra={"event_id": candidate.id, "admin_email": candidate.to_email},
     )
+    return admin
 
 
 __all__ = [

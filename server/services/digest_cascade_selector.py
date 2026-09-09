@@ -119,7 +119,11 @@ def select_with_cascade(
 
     # T1+ : on accumule (union) les resultats de chaque palier, puis on
     # prend les `digest_max_offers` mieux classes par le scoring.
-    accumulated: dict[str, str] = {}  # offer_id -> match_kind du plus petit palier qui l'a ajoute
+    # Audit 4, K.3 : on conserve les OBJETS JobOffer de la premiere passe
+    # (pas seulement les IDs) — l'ancienne reconstruction re-executait
+    # _select_for_tier pour chaque palier (T0 2x, T1 2x...), doublant le
+    # volume de requetes de la fenetre de preparation pour rien.
+    accumulated: dict[str, tuple[JobOffer, str]] = {}  # offer_id -> (offre, match_kind du plus petit palier)
     last_tier_tried: str = "T0"
     for tier in TIER_ORDER[1:]:  # T1..T5
         if TIER_ORDER.index(tier) > TIER_ORDER.index(effective_max_tier):
@@ -128,7 +132,7 @@ def select_with_cascade(
         offers, kinds = _select_for_tier(db, subscriber, tier=tier, settings=resolved)
         for offer, kind in zip(offers, kinds, strict=False):
             if offer.id not in accumulated:
-                accumulated[offer.id] = kind
+                accumulated[offer.id] = (offer, kind)
         # On s'arrete des qu'on a assez d'offres.
         if len(accumulated) >= resolved.digest_min_offers:
             break
@@ -139,22 +143,14 @@ def select_with_cascade(
             tier=f"{effective_max_tier}_INSUFFICIENT", insufficient=True
         )
 
-    # On recupere les objets JobOffer dans l'ordre d'apparition puis on
-    # les classe par score (autorite unique de classement).
-    offer_by_id: dict[str, JobOffer] = {}
-    for tier in TIER_ORDER:
-        if TIER_ORDER.index(tier) > TIER_ORDER.index(effective_max_tier):
-            break
-        offers, _ = _select_for_tier(db, subscriber, tier=tier, settings=resolved)
-        for offer in offers:
-            offer_by_id.setdefault(offer.id, offer)
-
-    final_offers = [offer_by_id[oid] for oid in accumulated if oid in offer_by_id]
-    final_kinds = [accumulated[oid] for oid in accumulated if oid in offer_by_id]
+    # Classement par score (autorite unique) — les offres viennent telles
+    # quelles de l'accumulation, plus aucune re-selection par palier.
+    final_offers = [offer for offer, _kind in accumulated.values()]
+    final_kinds = [kind for _offer, kind in accumulated.values()]
     ranked = _rank_offers(final_offers, db, subscriber, settings=resolved)  # scoring canonique
     rank_index = {offer.id: idx for idx, offer in enumerate(ranked)}
     final_offers.sort(key=lambda o: rank_index.get(o.id, 10**9))
-    final_kinds = [accumulated[o.id] for o in final_offers]
+    final_kinds = [accumulated[o.id][1] for o in final_offers]
     # On tronque a digest_max_offers.
     return CascadeOutcome(
         selected_offers=final_offers[: resolved.digest_max_offers],

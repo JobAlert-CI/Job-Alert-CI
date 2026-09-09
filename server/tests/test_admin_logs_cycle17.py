@@ -107,7 +107,9 @@ def test_logs_stats_compteurs_et_axes_events(admin_client, admin_db):
     vieux = datetime.now(UTC) - timedelta(days=40)
     try:
         # 2 erreurs (aujourd'hui), 1 warning (hier), 1 doublon (hier),
-        # 1 insertion vieille (hors fenetre 30j mais dans les compteurs globaux).
+        # 1 insertion vieille de 40 jours. Audit 4, K.1 : les compteurs
+        # suivent la MEME fenetre que les axes — la vieille insertion
+        # n'est plus comptee (plus de GROUP BY plein-table).
         _add_event(admin_db, action=IngestionAction.FAILED, reason="timeout")
         _add_event(admin_db, action=IngestionAction.FAILED, reason="http 500")
         _add_event(admin_db, action=IngestionAction.SKIPPED, created=hier)
@@ -116,10 +118,14 @@ def test_logs_stats_compteurs_et_axes_events(admin_client, admin_db):
         admin_db.commit()
 
         body = admin_client.get("/api/admin/logs/stats?days=30").json()
-        assert body["events_total"] == 5
+        assert body["events_total"] == 4
         assert body["events_errors"] == 2
         assert body["events_warnings"] == 1
         assert body["events_duplicates"] == 1
+
+        # Fenetre elargie : la vieille insertion revient dans les compteurs.
+        body90 = admin_client.get("/api/admin/logs/stats?days=90").json()
+        assert body90["events_total"] == 5
 
         # Axe par jour : 4 entrees dans la fenetre (le vieux est exclu).
         total_fenetre = sum(j["total"] for j in body["events_par_jour"])

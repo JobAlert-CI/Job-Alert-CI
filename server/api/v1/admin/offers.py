@@ -27,7 +27,7 @@ from schemas.offers import (
     PotentialDuplicateRead,
     RejectRequest,
 )
-from services.audit import log_admin_action
+from services.audit import log_admin_action, summarize_ids
 from services.duplicates import (
     DuplicateServiceError,
     find_potential_duplicates,
@@ -216,7 +216,8 @@ async def bulk_update_status(
         admin_id=admin.id,
         action=AdminAction.UPDATE,
         target_table="job_offers",
-        details={"offer_ids": payload.offer_ids, "status": payload.status, "count": result.rowcount},
+        # Audit 4, A.4 : resume au lieu de 500 UUID brutes en JSON.
+        details=summarize_ids("offer_ids", payload.offer_ids, status=payload.status, count=result.rowcount),
     )
     db.commit()
     return {"message": f"{result.rowcount} offres mises a jour"}

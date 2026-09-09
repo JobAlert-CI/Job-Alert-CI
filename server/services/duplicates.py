@@ -204,6 +204,24 @@ def mark_duplicate(
             status_code=409,
         )
 
+    # Audit 4, E.2: re-marquer une offre deja doublon doit etre explicite.
+    # - deja doublon de la MEME reference -> idempotent (double-clic admin),
+    #   succes sans nouvelle ligne d'audit (l'etat ne change pas) ;
+    # - deja doublon d'une AUTRE offre -> 409 : l'ancienne reference ne
+    #   doit pas etre ecrasee silencieusement (unmark d'abord).
+    if b.is_duplicate and b.duplicate_of_id is not None:
+        if b.duplicate_of_id == a.id:
+            return {
+                "message": f"Offre {offer_b_id} est deja marquee comme doublon de {duplicate_of_id}",
+                "duplicate_of_id": a.id,
+                "is_duplicate": True,
+                "already_marked": True,
+            }
+        raise DuplicateServiceError(
+            f"Offre {offer_b_id} est deja marquee comme doublon de {b.duplicate_of_id} — retirez d'abord ce marquage.",
+            status_code=409,
+        )
+
     b.duplicate_of_id = a.id
     b.is_duplicate = True
     b.duplicate_reason = reason or f"Doublon de {a.id}"

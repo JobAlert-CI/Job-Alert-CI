@@ -8,6 +8,7 @@ from pydantic import ValidationError
 from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
+from core.config import get_settings
 from models import (
     AIJob,
     ContractType,
@@ -233,6 +234,11 @@ def process_ai_batch_with_provider(
         prompt=prompt,
         schema_hint=batch_request.schema_hint,
         job_id=job_id,
+        # Audit 4, B.1 : le setting AI_CIRCUIT_BREAKER_MINUTES (config) est
+        # reellement lu ici — avant, la valeur etait codee en dur a 15 dans
+        # la signature malgre le champ Settings qui pretendait la rendre
+        # configurable.
+        circuit_breaker_minutes=get_settings().ai_circuit_breaker_minutes,
     )
     job = db.get(AIJob, job_id)
     if job is not None:

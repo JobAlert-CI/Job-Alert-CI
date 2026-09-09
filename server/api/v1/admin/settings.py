@@ -43,8 +43,14 @@ async def update_setting(
     db: Session = Depends(get_db),
     admin: Administrator = Depends(get_current_admin),
 ):
-    """Cree ou met a jour un parametre (heure d'envoi, textes, coordonnees...)."""
+    """Cree ou met a jour un parametre (heure d'envoi, textes, coordonnees...).
+
+    Audit 4, G.2c : l'ancienne valeur est journalisee avec la nouvelle —
+    sinon un parametre sensible change (ex. support_email) ne peut pas
+    etre reconstitue depuis le journal.
+    """
     setting = db.scalar(select(SiteSetting).where(SiteSetting.key == key))
+    ancienne_valeur = setting.value if setting is not None else None
     if setting is None:
         setting = SiteSetting(key=key, value=payload.value, description=payload.description)
         db.add(setting)
@@ -60,7 +66,7 @@ async def update_setting(
         action=AdminAction.UPDATE,
         target_table="site_settings",
         target_id=key,
-        details={"value": payload.value},
+        details={"value": payload.value, "ancienne_valeur": ancienne_valeur},
     )
     db.commit()
     db.refresh(setting)
@@ -73,10 +79,17 @@ async def bulk_update_settings(
     db: Session = Depends(get_db),
     admin: Administrator = Depends(get_current_admin),
 ):
-    """Mise a jour de plusieurs parametres en une fois."""
+    """Mise a jour de plusieurs parametres en une fois.
+
+    Audit 4, G.2c : l'ancienne valeur de chaque cle est journalisee
+    (None pour une creation — le front distingue creation et edition).
+    """
     existing = {
         setting.key: setting
         for setting in db.scalars(select(SiteSetting).where(SiteSetting.key.in_(payload.settings.keys())))
+    }
+    anciennes_valeurs: dict[str, str | None] = {
+        key: (existing[key].value if key in existing else None) for key in payload.settings
     }
     updated: list[SiteSetting] = []
     for key, value in payload.settings.items():
@@ -95,7 +108,7 @@ async def bulk_update_settings(
         action=AdminAction.UPDATE,
         target_table="site_settings",
         target_id=None,
-        details={"keys": list(payload.settings.keys())},
+        details={"keys": list(payload.settings.keys()), "anciennes_valeurs": anciennes_valeurs},
     )
     db.commit()
     for setting in updated:

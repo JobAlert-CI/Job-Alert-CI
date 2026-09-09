@@ -94,6 +94,41 @@ def _create_alert(
     message: str,
     payload: dict[str, Any] | None = None,
 ) -> AIAlert:
+    """Insere une alerte IA, AVEC cooldown par type (audit 4, B.4).
+
+    Avant : une panne fournisseur prolongee produisait 1 alerte identique
+    par sweep (toutes les 5 min) — ~288 alertes/jour qui noyaient la page
+    /admin/ia et rendaient l'acquittement inutile (la vague suivante
+    arrivait toujours).
+
+    Desormais : si une alerte NON acquittee du meme type existe deja, on la
+    RAFRAICHit (occurrences+1 dans payload, created_at rafraichi pour la
+    remonter en tete de tri) au lieu d'en creer une nouvelle. L'admin
+    acquitte une panne, pas 288 lignes.
+    """
+    existing = db.scalar(
+        select(AIAlert).where(
+            AIAlert.type == type_,
+            AIAlert.acknowledged_at.is_(None),
+        )
+    )
+    if existing is not None:
+        existing_payload = dict(existing.payload or {})
+        existing_payload["occurrences"] = int(existing_payload.get("occurrences", 1)) + 1
+        existing_payload["last_job_id"] = job_id
+        if payload is not None:
+            # Le detail de la derniere occurrence remplace l'ancien (ex.
+            # failures du dernier all_ai_providers_failed) — l'historique
+            # fin garde le compte, pas chaque paquet d'erreurs.
+            existing_payload["last_payload"] = payload
+        existing.payload = existing_payload
+        existing.message = message
+        # created_at porte server_default=func.now() : on le pose
+        # explicitement pour rafraichir la ligne sans INSERT supplementaire.
+        existing.created_at = utc_now()
+        db.flush()
+        return existing
+
     alert = AIAlert(
         job_id=job_id,
         type=type_,

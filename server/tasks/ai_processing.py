@@ -216,7 +216,11 @@ def process_raw_offers(
                 legacy.started_at = legacy.started_at or _now()
                 legacy.celery_task_id = self.request.id
 
-            offers = _query_raw_offers(db, scrape_run_id, external_batch_id, limit=10)
+            # Audit 4, K.5 : taille du lot configurable (AI_BATCH_SIZE, defaut
+            # 10 = plafond historique). Bornee 1-500 pour eviter un reglage
+            # absurde qui saturerait le context provider.
+            batch_size = max(1, min(500, settings.ai_batch_size))
+            offers = _query_raw_offers(db, scrape_run_id, external_batch_id, limit=batch_size)
             if legacy is not None:
                 legacy.offers_total = len(offers)
             if not offers:
