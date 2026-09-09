@@ -1,0 +1,15 @@
+Voici le backlog complet organisé en **7 lots cohérents par fichiers touchés** (plutôt que 16 domaines, beaucoup trop fins — plusieurs constats vivent dans les mêmes fichiers) :
+
+| Lot | Contenu | Constats | Fichiers principaux |
+|---|---|---|---|
+| **1. Pipeline scraping** 🔴 | Trigger fantôme → vrai lancement Celery, 409 double-trigger, PATCH notes, détection runs zombies, **échecs de scraping en base**, garde démo en prod, agrégation chord | **C.1, C.2, C.3, C.4** (Critiques) + M.1, A.1, E.4, E.5 | `scraping.py` (admin), `tasks/scrapers.py`, `tasks/maintenance.py`, `celery_app.py` |
+| **2. Journalisation & audit** | Password/reset/logout tracés, `/ai/run`+`/test` tracés, ancien statut/valeur dans les details, `mark_duplicate` idempotent, mapping partagé, filtres dates, `today_local` | A.2, A.10, D.1, G.2c, E.2, A.6, A.7, A.9 | `auth.py`, `ai.py`, `referentials.py`, `settings.py`, `duplicates.py`, `logs.py` |
+| **3. Clés IA** | Circuit-breaker câblé, fragments de clés seed, cooldown alertes + purge, secret via settings + longueur min + garde boot, doc schémas, seuil confiance, batch size configurable | B.1, B.2, B.4, B.5→B.9, K.5 | `ai_key_manager.py`, `ai_crypto.py`, `seed_ai_api_keys.py`, `main.py`, `schemas/ai.py` |
+| **4. Planification & Celery** | Source admin jamais scrapée (décision a/b), endpoint vue schedule, no-offer dérivé, garde DST, `acks_late`+`reject_on_worker_lost`, `result_expires`, `retry_failed_digests` au beat | F.1→F.4, P.1, P.2, M.2 | `celery_app.py`, route system |
+| **5. Rétention & perf** | Purge events 90j (payload d'abord), fenêtre compteurs globaux, COUNT SQL scraping/status, cascade sans re-sélection | A.3, K.1, K.2, K.3 (+A.4 à trancher) | `maintenance.py`, `logs.py`, `digest_cascade_selector.py` |
+| **6. Observabilité** | `SystemEventLog` + endpoint, santé email/IA dérivée (sans ping), vraies profondeurs LLEN, métriques métier `/metrics` | G.1, O.1, O.4, H.3 (+O.3 optionnel) | nouveau modèle+migration, `system_health.py`, `metrics.py` |
+| **7. Qualité, sécurité & docs** | `compare_digest`, longueur secrets au boot, contact sans `Request`, `core/clock.py`, ruff ciblé, tests non-régression (source PAUSED, fallback IA), `match_tier` Read, `days` top-viewed, README périmètre, règles AGENTS.md, `render.yaml`/doc | J.1, J.4, I.1, I.4, N.2→N.4, H.1, H.2, H.4, H.5, J.5, F.5, L.2/L.4, I.2 | petits fichiers + docs |
+
+**Je saute volontairement** (n'apportent rien ou statu quo assumé par l'audit) : J.3, K.4, L.1, L.3, E.1 (doc seulement), E.3, A.5 (je le mets de côté — émettre SKIPPED vs retirer le niveau warning est un choix produit ; je le signalerai au lot 2), C.5/C.5bis (choix produit, signalé au lot 1), mypy N.1 (defer, dette inconnue).
+
+Quelques décisions produit (B.3, F.1, H.2…) vous seront posées **au moment du lot concerné**, pas maintenant.

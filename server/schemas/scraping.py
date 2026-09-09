@@ -52,6 +52,12 @@ class ScrapingTrigger(BaseModel):
     notes: str | None = Field(default=None, max_length=1000)
 
 
+class ScrapeRunNotesUpdate(BaseModel):
+    """Annotation apres coup d'un run (audit 4, C.4) — notes libres."""
+
+    notes: str | None = Field(default=None, max_length=1000)
+
+
 class ScrapingStatusRead(BaseModel):
     source_code: str
     source_name: str

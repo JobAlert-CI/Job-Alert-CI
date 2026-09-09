@@ -1,12 +1,13 @@
 from __future__ import annotations
 
-from datetime import UTC, date, datetime, timedelta
+from datetime import UTC, datetime, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session, selectinload
 
 from api.deps import get_current_admin, get_db, require_roles
+from core.dates import today_local
 from models.admin import AdminAction, Administrator
 from models.emails import EmailDigest
 from models.enums import DigestStatus
@@ -147,7 +148,7 @@ async def trigger_send(
     Crée les `email_digests` en statut `queued`; l'envoi effectif (SMTP/API
     email) est porté par le worker d'envoi, hors périmètre de cette API.
     """
-    digest_date = payload.date_override or date.today()
+    digest_date = payload.date_override or today_local()
     now = datetime.now(UTC)
 
     stmt = select(Subscriber).where(Subscriber.status == SubscriberStatus.ACTIVE, Subscriber.deleted_at.is_(None))

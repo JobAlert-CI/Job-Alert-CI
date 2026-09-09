@@ -12,7 +12,12 @@ from typing import Any
 from uuid import uuid4
 
 import httpx
-from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_exponential
+from tenacity import (
+    retry,
+    retry_if_exception_type,
+    stop_after_attempt,
+    wait_exponential,
+)
 
 KNOWN_CONTRACT_CODES = {
     "cdi": "cdi",
@@ -253,7 +258,11 @@ def build_batch(source_code: str, jobs: list[dict[str, Any]], *, run_reference: 
         {
             "batch_id": os.getenv("SCRAPER_BATCH_ID") or str(uuid4()),
             "source_code": source_code,
-            "run_reference": run_reference or os.getenv("SCRAPER_RUN_REFERENCE") or f"scraper:{source_code}",
+            # Audit 4, C.3 : l'orchestrateur (SCRAPER_RUN_REFERENCE, pose par
+            # la task Celery) PRIME sur le defaut du script — c'est lui qui
+            # relie le batch au run admin a adopter. Le defaut hardcode ne
+            # sert qu'en execution manuelle du script hors orchestrateur.
+            "run_reference": os.getenv("SCRAPER_RUN_REFERENCE") or run_reference or f"scraper:{source_code}",
             "scraped_at": datetime.now(timezone.utc).isoformat(),
             "offers": offers,
         },

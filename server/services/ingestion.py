@@ -35,6 +35,7 @@ from models import (
 )
 from schemas.ingestion import IngestBatchCreate, IngestBatchSummaryRead, IngestOfferItemCreate
 from services.normalization import normalize_text, slugify
+from services.scrape_runs import TERMINAL_RUN_STATUSES, recompute_scrape_run_status, refresh_run_totals
 
 logger = logging.getLogger(__name__)
 
@@ -164,8 +165,59 @@ def _existing_duplicate(db: Session, source: Source, item: IngestOfferItemCreate
     return db.scalar(select(JobOffer).where(or_(*filters)))
 
 
+def _adopt_pending_run(db: Session, payload: IngestBatchCreate, source: Source) -> tuple[ScrapeRun, SourceScrapeRun] | None:
+    """Adopte le run admin correspondant (audit 4, C.3).
+
+    Le trigger admin cree ScrapeRun + SourceScrapeRun PENDING, puis dispatche
+    la task scraper avec le meme `run_reference`. Quand le batch d'ingestion
+    arrive, on fait vivre CES lignes (au lieu d'en creer des nouvelles qui
+    laisseraient les lignes admin zombies PENDING pour toujours).
+
+    Le statut accepte est PENDING (dispatch pas encore demarre) ou RUNNING
+    (la task a fait avancer les lignes via mark_source_run_running avant de
+    lancer le script). Retourne None si aucun run admin ne correspond
+    (chemin beat classique).
+    """
+    if not payload.run_reference:
+        return None
+    run = db.scalar(
+        select(ScrapeRun).where(
+            ScrapeRun.run_reference == payload.run_reference,
+            ScrapeRun.status.in_([ScrapeRunStatus.PENDING, ScrapeRunStatus.RUNNING]),
+        )
+    )
+    if run is None:
+        return None
+    source_run = db.scalar(
+        select(SourceScrapeRun).where(
+            SourceScrapeRun.scrape_run_id == run.id,
+            SourceScrapeRun.source_id == source.id,
+        )
+    )
+    if source_run is None:
+        # Le trigger n'a pas cree de sous-run pour cette source (ex. source
+        # desactivee entre-temps) : pas d'adoption, chemin classique.
+        return None
+    return run, source_run
+
+
 def _create_run(db: Session, payload: IngestBatchCreate, source: Source) -> tuple[ScrapeRun, SourceScrapeRun]:
     now = _now()
+    adopted = _adopt_pending_run(db, payload, source)
+    if adopted is not None:
+        run, source_run = adopted
+        # Le batch porte la verite : on complete les metadonnees du run adopte.
+        # external_batch_id est UNIQUE : seul le PREMIER batch adopte le pose
+        # (un run admin multi-sources recoit un batch par source — les suivants
+        # ne l'ecrasent pas, chaque SourceScrapeRun porte ses compteurs).
+        if run.external_batch_id is None:
+            run.external_batch_id = str(payload.batch_id)
+        if not run.run_reference:
+            run.run_reference = payload.run_reference
+        run.scraped_at = payload.scraped_at
+        source_run.started_at = source_run.started_at or now
+        return run, source_run
+
     scrape_run = ScrapeRun(
         run_date=_abidjan_date(),
         status=ScrapeRunStatus.RUNNING,
@@ -362,13 +414,15 @@ def ingest_offer_batch(db: Session, payload: IngestBatchCreate) -> IngestBatchSu
     source_run.duplicate_count = duplicates
     source_run.error_count = invalid + errors
 
-    scrape_run.status = status
-    scrape_run.finished_at = finished_at
-    scrape_run.total_raw = received
-    scrape_run.total_inserted = inserted
-    scrape_run.total_updated = 0
-    scrape_run.total_duplicates = duplicates
-    scrape_run.total_errors = invalid + errors
+    # Audit 4, C.3 : le parent n'est PAS ecrase direct — recompute depuis les
+    # sous-runs. Chemin classique (un seul sous-run) : comportement identique
+    # a l'ecriture directe historique. Chemin admin multi-sources : le parent
+    # ne passe terminal que quand TOUTES ses sources ont conclu, et agrege
+    # les compteurs de chaque source.
+    recompute_scrape_run_status(scrape_run)
+    refresh_run_totals(scrape_run)
+    if scrape_run.status in TERMINAL_RUN_STATUSES and scrape_run.finished_at is None:
+        scrape_run.finished_at = finished_at
 
     ai_job: AiProcessingJob | None = None
     if inserted > 0:

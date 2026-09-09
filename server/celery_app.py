@@ -48,6 +48,7 @@ task_routes = {
     "tasks.emails.send_confirmation_email_task": {"queue": "emails"},
     "tasks.scrapers.run_source_scraper": {"queue": "ingestion"},
     "tasks.scrapers.run_active_scrapers": {"queue": "ingestion"},
+    "tasks.maintenance.requalify_stale_runs": {"queue": "ingestion"},
     "tasks.digests.prepare_daily_digests": {"queue": "emails"},
     "tasks.digests.build_and_queue_digest": {"queue": "emails"},
     "tasks.digests.mark_preparation_completed": {"queue": "emails"},
@@ -74,12 +75,12 @@ def _abidjan_crontab(local_hour: int, local_minute: int) -> crontab:
 
 if SCRAPER_BEAT_ENABLED:
     # Scrapers a 06:00, 06:05, 06:10 heure Abidjan (= 04:00 UTC toute l'annee).
-    scrape_hour_utc, _ = _hour_in_utc(19, 0)
+    scrape_hour_utc, _ = _hour_in_utc(6, 0)
     beat_schedule.update(
         {
             "scrape-goafrica-0600": {
                 "task": "tasks.scrapers.run_source_scraper",
-                "schedule": crontab(hour=scrape_hour_utc, minute=29),
+                "schedule": crontab(hour=scrape_hour_utc, minute=0),
                 "args": ("goafrica",),
                 "options": {"queue": "ingestion"},
             },
@@ -101,12 +102,12 @@ if SCRAPER_BEAT_ENABLED:
 # Digest: phase 1 (07:30 Abidjan) et phase 2 (08:00 Abidjan).
 beat_schedule["digest-prepare"] = {
     "task": "tasks.digests.prepare_daily_digests",
-    "schedule": crontab(hour=19, minute=32),  # _abidjan_crontab(settings.daily_digest_prepare_hour, settings.daily_digest_prepare_minute),
+    "schedule": _abidjan_crontab(settings.daily_digest_prepare_hour, settings.daily_digest_prepare_minute),
     "options": {"queue": "emails"},
 }
 beat_schedule["digest-send"] = {
     "task": "tasks.digests.send_daily_digests",
-    "schedule": crontab(hour=19, minute=34),  # _abidjan_crontab(settings.daily_digest_send_hour, settings.daily_digest_send_minute),
+    "schedule": _abidjan_crontab(settings.daily_digest_send_hour, settings.daily_digest_send_minute),
     "options": {"queue": "emails"},
 }
 
@@ -129,6 +130,15 @@ beat_schedule["flush-offer-metrics"] = {
     "task": "tasks.maintenance.flush_offer_metrics",
     "schedule": 60.0,
     "options": {"queue": "emails"},
+}
+
+# Audit 4, M.1: requalification des runs de scraping zombies (PENDING/RUNNING
+# abandonnes depuis plus de 6 h — worker crashe, broker perdu...). Toutes les
+# 30 min, queue ingestion (meme univers que les scrapers).
+beat_schedule["requalify-stale-runs"] = {
+    "task": "tasks.maintenance.requalify_stale_runs",
+    "schedule": 1800.0,
+    "options": {"queue": "ingestion"},
 }
 
 celery_app.conf.update(

@@ -13,6 +13,7 @@ from models.enums import ContactMessageStatus, IngestionAction
 from models.jobs import OfferIngestionEvent
 from models.scraping import SourceScrapeRun
 from schemas.logs import (
+    INGESTION_LEVEL_BY_ACTION,
     AdminActionLogRead,
     AuditLogPageRead,
     AuditStatsRead,
@@ -30,13 +31,9 @@ router = APIRouter(
     dependencies=[Depends(require_roles("super_admin"))],
 )
 
-_LEVEL_BY_ACTION = {
-    IngestionAction.FAILED: "error",
-    IngestionAction.SKIPPED: "warning",
-    IngestionAction.DUPLICATE: "info",
-    IngestionAction.UPDATED: "info",
-    IngestionAction.INSERTED: "info",
-}
+# Audit 4, A.6 : le mapping action -> niveau vit desormais dans schemas/logs
+# (INGESTION_LEVEL_BY_ACTION), partage avec /admin/scraping/runs/{id}/logs.
+_LEVEL_BY_ACTION = INGESTION_LEVEL_BY_ACTION
 
 # Vocabulaire API (utilise a la fois par le filtre GET et par le PATCH) mappe
 # vers les valeurs reellement stockees dans ContactMessageStatus.

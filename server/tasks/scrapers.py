@@ -9,13 +9,21 @@ from pathlib import Path
 from uuid import uuid4
 
 import httpx
-from celery import chord, group
+from celery import Task, chord, group
 from sqlalchemy import select
 
 from celery_app import celery_app
 from core.config import get_settings
 from db.session import session_scope
-from models import Source, SourceStatus
+from models import (
+    IngestionAction,
+    ScrapeRun,
+    ScrapeRunStatus,
+    Source,
+    SourceScrapeRun,
+    SourceStatus,
+)
+from services.scrape_runs import finish_source_run, mark_source_run_running, record_run_event
 from tasks.locks import redis_lock
 
 logger = logging.getLogger(__name__)
@@ -78,7 +86,7 @@ def _demo_scrape(source_code: str, count: int = 2) -> list[dict]:
     ]
 
 
-def _run_local_scraper_script(source_code: str, task_id: str | None) -> dict | None:
+def _run_local_scraper_script(source_code: str, task_id: str | None, run_reference: str | None = None) -> dict | None:
     script_path = SCRAPER_SCRIPTS.get(source_code)
     if script_path is None or not script_path.exists():
         return None
@@ -95,7 +103,9 @@ def _run_local_scraper_script(source_code: str, task_id: str | None) -> dict | N
             "SCRAPER_SEND_TO_API": "1",
             "SCRAPER_API_BASE_URL": settings.api_base_url,
             "SCRAPER_API_TOKEN": settings.scraper_api_token or "",
-            "SCRAPER_RUN_REFERENCE": f"celery:{task_id or source_code}",
+            # Audit 4, C.3 : le run_reference du trigger admin transite vers
+            # le script enfant — le batch d'ingestion adoptera le run PENDING.
+            "SCRAPER_RUN_REFERENCE": run_reference or f"celery:{task_id or source_code}",
         }
     )
     completed = subprocess.run(
@@ -132,9 +142,79 @@ def _run_local_scraper_script(source_code: str, task_id: str | None) -> dict | N
     return {"status": "completed", "source_code": source_code, "mode": "local_script"}
 
 
+def _matching_source_runs(db, source_code: str, run_reference: str | None) -> list[SourceScrapeRun]:
+    """Sous-runs du run admin identifie par `run_reference` (audit 4, C.1).
+
+    Chemin beat (run_reference None) : aucun sous-run n'existe encore —
+    c'est le batch d'ingestion qui cree le run de toutes pieces.
+    """
+    if not run_reference:
+        return []
+    stmt = (
+        select(SourceScrapeRun)
+        .join(SourceScrapeRun.source)
+        .join(SourceScrapeRun.scrape_run)
+        .where(
+            Source.code == source_code,
+            ScrapeRun.run_reference == run_reference,
+        )
+    )
+    return list(db.scalars(stmt))
+
+
+def _abandon_source(
+    db,
+    *,
+    source_code: str,
+    run_reference: str | None,
+    action: IngestionAction,
+    reason: str,
+) -> None:
+    """Trace un abandon en base et conclut les sous-runs admin (audit 4, A.1).
+
+    - L'evenement est rattache au premier sous-run admin connu (visible dans
+      /admin/scraping/runs/{id}/logs), sinon ecrit au niveau run (champ
+      source_scrape_run_id NULL, visible dans /admin/logs/events).
+    - Les sous-runs PENDING/RUNNING du run admin passent FAILED : le parent
+      sera recompute par finish_source_run — plus de zombies PENDING.
+    """
+    matching = _matching_source_runs(db, source_code, run_reference)
+    record_run_event(db, source_run=matching[0] if matching else None, action=action, reason=reason)
+    for source_run in matching:
+        if source_run.status in {ScrapeRunStatus.PENDING, ScrapeRunStatus.RUNNING}:
+            finish_source_run(source_run, ScrapeRunStatus.FAILED, error_message=reason[:500])
+
+
+class _ScraperTask(Task):
+    """Task base qui conclut les runs admin meme quand tout a echoue (C.1).
+
+    `on_failure` ne declenche qu'une fois les retries epuises (ou sur une
+    erreur non retryable) : sans lui, un crash du script laisserait le run
+    admin RUNNING jusqu'au filet zombie 6 h de la maintenance (M.1).
+    """
+
+    def on_failure(self, exc, task_id, args, kwargs, einfo):
+        source_code = args[0] if args else kwargs.get("source_code")
+        run_reference = kwargs.get("run_reference")
+        if run_reference and source_code:
+            try:
+                with session_scope() as db:
+                    _abandon_source(
+                        db,
+                        source_code=source_code,
+                        run_reference=run_reference,
+                        action=IngestionAction.FAILED,
+                        reason=f"task_scraper_echouee: {str(exc)[:180]}",
+                    )
+            except Exception:
+                logger.exception("Conclusion du run admin impossible apres echec task", extra={"task_id": task_id})
+        return super().on_failure(exc, task_id, args, kwargs, einfo)
+
+
 @celery_app.task(
     name="tasks.scrapers.run_source_scraper",
     bind=True,
+    base=_ScraperTask,
     # Audit 3, C4 (heritage audit 1) : un scraper qui depasse son timeout
     # subprocess ne doit pas marquer la tache FAILED definitive — on retente
     # avec backoff comme pour les erreurs transport HTTP.
@@ -142,42 +222,98 @@ def _run_local_scraper_script(source_code: str, task_id: str | None) -> dict | N
     retry_backoff=True,
     retry_kwargs={"max_retries": 3},
 )
-def run_source_scraper(self, source_code: str) -> dict:
+def run_source_scraper(self, source_code: str, run_reference: str | None = None) -> dict:
+    """Scrape une source et pousse son batch vers /api/ingest/offers.
+
+    Audit 4 :
+    - C.1/C.3 : `run_reference` (fourni par le trigger admin) relie la task
+      aux lignes de supervision PENDING — elles passent RUNNING ici, puis
+      terminales quand le batch d'ingestion est adopte/conclu.
+    - A.1 : chaque abandon (source inactive/inconnue, demo refusee, echec
+      d'envoi) est journalise EN BASE, plus seulement en log worker.
+    - E.4 : ALLOW_DEMO_SCRAPER est ignore en production.
+    """
     settings = get_settings()
     lock_name = f"scraper:{source_code}"
     with redis_lock(lock_name, ttl_seconds=1800) as acquired:
         if not acquired:
-            return {"status": "locked", "source_code": source_code}
+            return {"status": "locked", "source_code": source_code, "run_reference": run_reference}
 
         with session_scope() as db:
             source = db.scalar(select(Source).where(Source.code == source_code))
             if source is None or source.status != SourceStatus.ACTIVE or not source.supports_scraping:
-                return {"status": "skipped", "source_code": source_code, "reason": "source_inactive_or_unknown"}
+                # A.1 : abandon trace en base, pas seulement en log worker.
+                if source is None:
+                    reason = "source_inconnue"
+                elif source.status != SourceStatus.ACTIVE:
+                    reason = f"source_inactive:{source.status.value}"
+                else:
+                    reason = "source_sans_scraping"
+                _abandon_source(
+                    db, source_code=source_code, run_reference=run_reference,
+                    action=IngestionAction.SKIPPED, reason=reason,
+                )
+                return {"status": "skipped", "source_code": source_code, "reason": reason}
 
-        script_result = _run_local_scraper_script(source_code, self.request.id)
+            # C.1 : avancer les sous-runs PENDING du run admin vers RUNNING.
+            for source_run in _matching_source_runs(db, source.code, run_reference):
+                if source_run.status == ScrapeRunStatus.PENDING:
+                    mark_source_run_running(source_run)
+
+        script_result = _run_local_scraper_script(source_code, self.request.id, run_reference)
         if script_result is not None:
+            # C.1 : le script a fini. Si son batch a ete ingere, le sous-run
+            # est deja terminal (adoption + recompute cote ingestion). Sinon
+            # (0 offre trouvee, envoi non effectue), on le conclut SUCCESS a
+            # zero offre maintenant — pas de zombie RUNNING jusqu'au filet M.1.
+            if run_reference:
+                with session_scope() as db:
+                    for source_run in _matching_source_runs(db, source_code, run_reference):
+                        if source_run.status in {ScrapeRunStatus.PENDING, ScrapeRunStatus.RUNNING}:
+                            finish_source_run(source_run, ScrapeRunStatus.SUCCESS)
             return script_result
 
-        if os.getenv("ALLOW_DEMO_SCRAPER", "0").strip().lower() not in {"1", "true", "yes", "on"}:
-            return {
-                "status": "skipped",
-                "source_code": source_code,
-                "reason": "no_local_scraper_script",
-            }
+        # E.4 : le mode demo ne doit jamais alimenter la base de production
+        # avec des offres factices, meme si la variable d'env est restee a
+        # "1" par erreur sur la machine de deploiement.
+        demo_env = os.getenv("ALLOW_DEMO_SCRAPER", "0").strip().lower() in {"1", "true", "yes", "on"}
+        if not demo_env:
+            reason = "no_local_scraper_script"
+        elif settings.is_production:
+            reason = "demo_refuse_en_production"
+        else:
+            reason = None
+        if reason is not None:
+            with session_scope() as db:
+                _abandon_source(
+                    db, source_code=source_code, run_reference=run_reference,
+                    action=IngestionAction.SKIPPED, reason=reason,
+                )
+            return {"status": "skipped", "source_code": source_code, "reason": reason}
 
         batch_id = str(uuid4())
         payload = {
             "batch_id": batch_id,
             "source_code": source_code,
-            "run_reference": f"celery:{self.request.id}",
+            "run_reference": run_reference or f"celery:{self.request.id}",
             "scraped_at": datetime.now(UTC).isoformat(),
             "offers": _demo_scrape(source_code),
         }
         headers = {"X-Scraper-Token": settings.scraper_api_token or ""}
-        with httpx.Client(timeout=30.0) as client:
-            response = client.post(f"{settings.api_base_url.rstrip('/')}/api/ingest/offers", json=payload, headers=headers)
-            response.raise_for_status()
-            data = response.json()
+        try:
+            with httpx.Client(timeout=30.0) as client:
+                response = client.post(f"{settings.api_base_url.rstrip('/')}/api/ingest/offers", json=payload, headers=headers)
+                response.raise_for_status()
+                data = response.json()
+        except Exception as exc:
+            # A.1 : echec d'envoi du batch trace en base avant le raise.
+            reason = f"envoi_batch_echoue: {str(exc)[:180]}"
+            with session_scope() as db:
+                _abandon_source(
+                    db, source_code=source_code, run_reference=run_reference,
+                    action=IngestionAction.FAILED, reason=reason,
+                )
+            raise
         logger.info("Scraper source termine", extra={"source_code": source_code, "batch_id": batch_id, "response": data})
         return data
 

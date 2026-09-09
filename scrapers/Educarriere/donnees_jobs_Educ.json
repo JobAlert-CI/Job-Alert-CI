@@ -1,1 +1,638 @@
-[]
+[
+    {
+        "title": "Commercial terrain (H/F)",
+        "source_url": "https://emploi.educarriere.ci/offre-155013-commercial-terrain-h-f.html",
+        "canonical_url": "https://emploi.educarriere.ci/offre-155013-commercial-terrain-h-f.html",
+        "location_raw": "Abidjan",
+        "salary_raw": null,
+        "published_at": "2026-09-08T00:00:00.000Z",
+        "collected_at": "2026-09-09T09:48:40.594Z",
+        "first_seen_at": "2026-09-09T09:48:40.594Z",
+        "last_seen_at": "2026-09-09T09:48:40.594Z",
+        "expires_at": "2026-10-08T00:00:00.000Z",
+        "application_deadline_at": "2026-10-08T00:00:00.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": null,
+            "label": "Abidjan"
+        },
+        "specialty": {
+            "code": "ressources humaines",
+            "label": "Ressources Humaines"
+        },
+        "contract_type": {
+            "code": "CDD",
+            "label": "Emploi (CDD)"
+        },
+        "experience_level": {
+            "code": "INCONNU",
+            "label": null,
+            "min_years": null,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_2",
+            "label": "BAC+2",
+            "rank": 2
+        },
+        "description": "Détails de l'offre LA MISSION Vous êtes responsable de l'ouverture de nouveaux comptes et du développement commercial sur le terrain. Vous identifiez les décideurs, qualifiez leurs besoins, présentez les offres adaptées de C2S Group, organisez les rendez-vous utiles et accompagnez les opportunités jusqu'à la signature, en coordination avec les équipes internes. ACTIVITÉS PRINCIPALES - Construire et exécuter un plan de prospection hebdomadaire par zone, secteur et typologie de cible. - Identifier les entreprises et décideurs pertinents, obtenir des rendez-vous et alimenter en continu le vivier d'opportunités. - Présenter avec clarté les offres du Groupe : conseil, études, formation, transformation digitale et solutions de relation client, selon les priorités commerciales définies. - Qualifier chaque besoin : problématique, budget, décideur, calendrier, concurrence et prochaine étape. - Préparer les rendez-vous, conduire la découverte client, déployer l'argumentaire et traiter les objections. - Contribuer aux propositions commerciales avec les experts métiers, assurer les relances et soutenir la négociation jusqu'à la conclusion. - Enregistrer le jour même les visites, contacts, opportunités et actions de suivi dans le CRM mobile. - Produire un reporting fiable : activité terrain, pipeline, taux de conversion, prévisions et difficultés rencontrées. - Assurer une veille marché et remonter les offres concurrentes, besoins émergents et signaux commerciaux. - Veiller à la qualité de la relation client et faciliter le passage de relais aux équipes chargées de l'exécution. PROFIL RECHERCHÉ - Formation Bac+2 à Bac+5 en commerce, vente, marketing, gestion ou domaine équivalent. - Expérience réussie de 2 ans minimum en prospection terrain B2B et développement de nouveaux comptes ; les résultats obtenus devront pouvoir être expliqués et chiffrés. - Bonne compréhension des cycles de vente de services. Une expérience dans le conseil, la formation, les solutions digitales, les services aux entreprises ou la relation client constitue un atout. - Maîtrise du français professionnel à l'oral et à l'écrit ; capacité à présenter une offre et à rédiger un compte rendu exploitable. - Aisance avec les outils numériques, le CRM mobile, la messagerie et les outils bureautiques. - Bonne connaissance du tissu économique d'Abidjan et capacité à se déplacer régulièrement sur le terrain. - Un portefeuille relationnel professionnel est apprécié, sans se substituer à la capacité réelle de prospection. DOSSIER DE CANDIDATURE Transmettez votre CV accompagné d'un court message indiquant : (1) vos résultats commerciaux terrain les plus significatifs (2) les secteurs et types de clients que vous maîtrisez (3) votre disponibilité (4) vos prétentions salariales",
+        "company_name": "C2S GROUP",
+        "company": {
+            "name": "C2S GROUP",
+            "website_url": null,
+            "type": null,
+            "description": null
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": null,
+        "raw_fields": {
+            "contract_raw": "Emploi (CDD)",
+            "experience_raw": null,
+            "education_raw": "BAC+2, BAC+3, BAC+4, BAC+5",
+            "published_raw": "Publiée le 08/09/2026",
+            "expires_raw": "08/10/2026",
+            "secteur_raw": "Ressources Humaines"
+        },
+        "secteur": {
+            "code": "ressources humaines",
+            "label": "Ressources Humaines"
+        },
+        "active": "2026-09-08T00:00:00.000Z"
+    },
+    {
+        "title": "Expert(e) en Suivi, Évaluation, Redevabilité et Apprentissage (SERA/MEL)",
+        "source_url": "https://emploi.educarriere.ci/offre-155012-expert-e-en-suivi-evaluation-redevabilite-et-apprentissage-sera-mel.html",
+        "canonical_url": "https://emploi.educarriere.ci/offre-155012-expert-e-en-suivi-evaluation-redevabilite-et-apprentissage-sera-mel.html",
+        "location_raw": "Côte d'Ivoire",
+        "salary_raw": null,
+        "published_at": "2026-09-08T00:00:00.000Z",
+        "collected_at": "2026-09-09T09:48:53.602Z",
+        "first_seen_at": "2026-09-09T09:48:53.602Z",
+        "last_seen_at": "2026-09-09T09:48:53.602Z",
+        "expires_at": "2026-09-11T00:00:00.000Z",
+        "application_deadline_at": "2026-09-11T00:00:00.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": null,
+            "district": null,
+            "label": "Côte d'Ivoire"
+        },
+        "specialty": {
+            "code": "environnement",
+            "label": "Environnement"
+        },
+        "contract_type": {
+            "code": "INCONNU",
+            "label": "Emploi"
+        },
+        "experience_level": {
+            "code": "INCONNU",
+            "label": null,
+            "min_years": null,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_4",
+            "label": "BAC+4",
+            "rank": 4
+        },
+        "description": "Détails de l'offre Le/la titulaire du poste aura pour mission principale de concevoir et de piloter le dispositif sera/mel afin de mesurer la performance, l'impact et la redevabilité des actions menées sur le terrain. Missions et responsabilités principales Sous la supervision de la coordination du projet, l'expert(e) aura pour principales missions : • Concevoir et opérationnaliser le dispositif de suivi, évaluation, redevabilité et apprentissage (sera/mel) adapté aux objectifs du projet. • Élaborer les cadres de résultats, définir les indicateurs clés de performance et mettre en place des systèmes robustes de collecte et d’analyse des données de terrain. • Assurer le suivi rigoureux des résultats et des indicateurs spécifiques liés au climat, à l’environnement et à la biodiversité. • Garantir la mise en œuvre des mécanismes de redevabilité envers les parties prenantes, les bailleurs et les communautés locales bénéficiaires. • Documenter les leçons apprises, les bonnes pratiques et les études de cas pour favoriser l'apprentissage organisationnel et l'amélioration continue des interventions. • Produire des rapports de performance périodiques (techniques et d'impact) destinés à la direction, aux partenaires et aux bailleurs de fonds. • Former et accompagner les équipes de terrain et les partenaires locaux sur les outils et les méthodologies de collecte et de gestion des données. Profil recherché / qualifications • Être titulaire d’une formation supérieure (bac+5 minimum) en suivi-évaluation, statistiques, gestion de projets ou dans tout autre domaine connexe. • Justifier d’une expérience professionnelle confirmée de 5 ans minimum dans la conception de cadres de résultats, d'indicateurs, de systèmes de collecte et d’analyse des données. • Démontrer une maîtrise avérée du suivi des résultats et des indicateurs liés au climat, à l’environnement et à la biodiversité. • Disposer d'une excellente capacité à produire des rapports de performance et à documenter les bonnes pratiques et leçons apprises. • Avoir de solides compétences dans l'animation de mécanismes de redevabilité et d'apprentissage au sein de projets de développement. Les candidat(e)s intéressé(e)s sont invité(e)s à transmettre leur CV à cphda.recrutement@gmail.com au plus tard le 11 septembre 2026, en précisant en objet : Expert(e) en Suivi, Évaluation, Redevabilité et Apprentissage (SERA/MEL) NB : Seules les personnes dont les dossiers auront été retenus seront contactées pour la suite du processus.",
+        "company_name": "Centre pour la promotion des droits de l'homme et du developpement en Afrique",
+        "company": {
+            "name": "Centre pour la promotion des droits de l'homme et du developpement en Afrique",
+            "website_url": null,
+            "type": null,
+            "description": null
+        },
+        "company_hint": null,
+        "application_email": "cphda.recrutement@gmail.com",
+        "application_emails": [
+            "cphda.recrutement@gmail.com"
+        ],
+        "remote_work": null,
+        "raw_fields": {
+            "contract_raw": "Emploi",
+            "experience_raw": null,
+            "education_raw": "BAC+4",
+            "published_raw": "Publiée le 08/09/2026",
+            "expires_raw": "11/09/2026",
+            "secteur_raw": "Environnement"
+        },
+        "secteur": {
+            "code": "environnement",
+            "label": "Environnement"
+        },
+        "active": "2026-09-08T00:00:00.000Z"
+    },
+    {
+        "title": "Apporteur d’affaires B2B SPARK’LINE",
+        "source_url": "https://emploi.educarriere.ci/offre-155011-apporteur-d-affaires-b2b-spark-line.html",
+        "canonical_url": "https://emploi.educarriere.ci/offre-155011-apporteur-d-affaires-b2b-spark-line.html",
+        "location_raw": "ABIDJAN",
+        "salary_raw": null,
+        "published_at": "2026-09-08T00:00:00.000Z",
+        "collected_at": "2026-09-09T09:49:06.695Z",
+        "first_seen_at": "2026-09-09T09:49:06.695Z",
+        "last_seen_at": "2026-09-09T09:49:06.695Z",
+        "expires_at": "2026-09-20T00:00:00.000Z",
+        "application_deadline_at": "2026-09-20T00:00:00.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": null,
+            "label": "ABIDJAN"
+        },
+        "specialty": {
+            "code": "communication, marketing",
+            "label": "Communication, Marketing"
+        },
+        "contract_type": {
+            "code": "INTERIM",
+            "label": "Interim"
+        },
+        "experience_level": {
+            "code": "INCONNU",
+            "label": null,
+            "min_years": null,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_2",
+            "label": "BAC+2",
+            "rank": 2
+        },
+        "description": "Détails de l'offre À PROPOS DE SPARK’LINE SPARK’LINE accompagne les entreprises, PME, institutions et organisations internationales dans l’amélioration de leur visibilité et de leur image de marque grâce à des solutions d’impression personnalisées haut de gamme : gadgets publicitaires, supports marketing, branding, communication visuelle et objets promotionnels. Dans le cadre du développement de notre portefeuille clients B2B, nous recherchons un apporteur d’affaires expérimenté, dynamique et orienté résultats. VOTRE MISSION Votre principale mission sera d’identifier et de transformer de nouvelles opportunités commerciales en contrats pour SPARK’LINE. À ce titre, vous devrez : Exploiter votre réseau professionnel et votre carnet d’adresses pour prospecter de nouveaux clients B2B ; Identifier les besoins des entreprises en impression, gadgets publicitaires, branding et communication visuelle ; Organiser des prises de contact et des rendez-vous avec les décideurs ; Présenter les offres et les capacités de SPARK’LINE ; Détecter les appels d’offres, consultations et projets d’achat ; Faciliter la mise en relation avec les responsables des achats, dirigeants, responsables marketing et responsables de communication ; Assurer le suivi des prospects jusqu’à la signature des contrats ; Développer durablement le portefeuille clients de SPARK’LINE. PROFIL RECHERCHÉ Expérience confirmée dans l’apport d’affaires, la vente B2B ou le développement commercial ; Excellent carnet d’adresses auprès des entreprises, PME, institutions, ONG, organisations internationales et administrations ; Capacité à entrer directement en contact avec les décideurs ; Bonne connaissance du marché ivoirien ; Excellentes aptitudes en négociation et en communication ; Forte capacité à atteindre des objectifs commerciaux ; Autonomie, disponibilité, dynamisme, intégrité et sens du résultat ; Une expérience dans l’imprimerie, la publicité, l’événementiel, le marketing, les achats ou la communication visuelle constitue un avantage important. Une expérience dans l’imprimerie, la publicité, l’événementiel, le marketing, les achats ou la communication visuelle constitue un avantage important. RÉMUNÉRATION Commission attractive sur chaque marché effectivement conclu et encaissé ; Rémunération évolutive selon le chiffre d’affaires généré ; Possibilité de collaboration durable en fonction des performances. POURQUOI REJOINDRE SPARK’LINE ? Une offre variée répondant aux besoins de communication des entreprises ; Des solutions personnalisées et adaptées à chaque client ; Un accompagnement commercial pour la préparation des devis et des propositions ; Un potentiel de commissions élevé pour les profils disposant d’un réseau actif ; Une collaboration fondée sur la performance et les résultats. CANDIDATURE Envoyez votre CV accompagné d’une courte présentation de votre expérience, des secteurs dans lesquels vous disposez d’un réseau actif et, si possible, de quelques exemples de marchés B2B déjà apportés. Objet : Candidature – Apporteur d’affaires B2B SPARK’LINE Seuls les candidats disposant d’une expérience réelle en développement commercial B2B et d’un carnet d’adresses exploitable seront considérés.",
+        "company_name": "SPARKLINE",
+        "company": {
+            "name": "SPARKLINE",
+            "website_url": null,
+            "type": null,
+            "description": null
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": null,
+        "raw_fields": {
+            "contract_raw": "Interim",
+            "experience_raw": null,
+            "education_raw": "BAC+2, BAC+3, BAC+4, BAC+5",
+            "published_raw": "Publiée le 08/09/2026",
+            "expires_raw": "20/09/2026",
+            "secteur_raw": "Communication, Marketing"
+        },
+        "secteur": {
+            "code": "communication, marketing",
+            "label": "Communication, Marketing"
+        },
+        "active": "2026-09-08T00:00:00.000Z"
+    },
+    {
+        "title": "CHAUFFEURS PROFESSIONNELS (2 POSTES)",
+        "source_url": "https://emploi.educarriere.ci/offre-155010-chauffeurs-professionnels-2-postes.html",
+        "canonical_url": "https://emploi.educarriere.ci/offre-155010-chauffeurs-professionnels-2-postes.html",
+        "location_raw": "Angré Château Fin Goudron",
+        "salary_raw": null,
+        "published_at": "2026-09-08T00:00:00.000Z",
+        "collected_at": "2026-09-09T09:49:25.627Z",
+        "first_seen_at": "2026-09-09T09:49:25.627Z",
+        "last_seen_at": "2026-09-09T09:49:25.627Z",
+        "expires_at": "2026-09-15T00:00:00.000Z",
+        "application_deadline_at": "2026-09-15T00:00:00.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": "Angré",
+            "label": "Angré Château Fin Goudron"
+        },
+        "specialty": {
+            "code": "transport (chauffeur)",
+            "label": "Transport (Chauffeur)"
+        },
+        "contract_type": {
+            "code": "CDD",
+            "label": "Emploi (CDD)"
+        },
+        "experience_level": {
+            "code": "INCONNU",
+            "label": null,
+            "min_years": null,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_1",
+            "label": "BAC+1",
+            "rank": 1
+        },
+        "description": "Détails de l'offre OFFRE D’EMPLOI – CHAUFFEUR (TRANSPORT SCOLAIRE / MINI BUS) CentaSource recrute un Chauffeur professionnel pour le compte d’un établissement scolaire réputé et de grande qualité basé à Abidjan. INFORMATIONS DU POSTE • Poste : Chauffeur / Conducteur de mini bus • Type de contrat : Temps plein (non logé) • Horaires : Lundi – Vendredi • Heures de travail : Environ 05h00 – 16h00 • Date de prise de fonction : Immédiate (sous 3 jours) • Salaire : À partir de 100 000 – 120 000 FCFA et plus selon expérience ZONE DE RÉSIDENCE OBLIGATOIRE Les candidats doivent impérativement résider dans les zones suivantes : • Université d’Abobo • Dokui • Anador Toute candidature hors de cette zone ne sera pas considérée (contraintes horaires très tôt le matin). MISSIONS PRINCIPALES • Assurer le transport quotidien (aller/retour) du personnel et/ou des élèves • Effectuer les trajets scolaires en toute sécurité • Veiller à la ponctualité stricte des rotations • Maintenir la propreté et le bon état du véhicule • Effectuer les vérifications de base du véhicule avant utilisation • Signaler immédiatement tout incident ou panne PROFIL RECHERCHÉ • Minimum 3 ans d’expérience en conduite • Expérience confirmée en conduite de mini bus • Permis de conduire valide correspondant à la catégorie • Expérience en conduite professionnelle (écoles, entreprises, transport) souhaitée • Bonne discipline et sens des responsabilités • Capacité à passer une vérification des anciens emplois • Disponible immédiatement Profil souhaité : • Homme adulte • Bonne condition physique • Sérieux, ponctuel et rigoureux ? CONDITIONS DE TRAVAIL • Début de service très tôt le matin (05h00) • Service en deux rotations (matin et retour après-midi) • Lundi à vendredi uniquement • Poste non logé CANDIDATURE Les candidats intéressés sont invités à envoyer leur CV à : ???? jobs@centa-source.com Objet du mail : CANDIDATURE CHAUFFEUR – TRANSPORT SCOLAIRE Louer Des Équipements",
+        "company_name": "Une importante entreprise",
+        "company": {
+            "name": "Une importante entreprise",
+            "website_url": null,
+            "type": null,
+            "description": null
+        },
+        "company_hint": null,
+        "application_email": "jobs@centa-source.com",
+        "application_emails": [
+            "jobs@centa-source.com"
+        ],
+        "remote_work": null,
+        "raw_fields": {
+            "contract_raw": "Emploi (CDD)",
+            "experience_raw": null,
+            "education_raw": "BAC, BAC+1, BAC+2, BAC+3",
+            "published_raw": "Publiée le 08/09/2026",
+            "expires_raw": "15/09/2026",
+            "secteur_raw": "Transport (Chauffeur)"
+        },
+        "secteur": {
+            "code": "transport (chauffeur)",
+            "label": "Transport (Chauffeur)"
+        },
+        "active": "2026-09-08T00:00:00.000Z"
+    },
+    {
+        "title": "STAGIAIRE FIBRE OPTIQUE HOMME",
+        "source_url": "https://emploi.educarriere.ci/offre-155009-stagiaire-fibre-optique-homme.html",
+        "canonical_url": "https://emploi.educarriere.ci/offre-155009-stagiaire-fibre-optique-homme.html",
+        "location_raw": "KOUMASSI, MARCORY",
+        "salary_raw": null,
+        "published_at": "2026-09-08T00:00:00.000Z",
+        "collected_at": "2026-09-09T09:49:45.554Z",
+        "first_seen_at": "2026-09-09T09:49:45.554Z",
+        "last_seen_at": "2026-09-09T09:49:45.554Z",
+        "expires_at": "2026-09-30T00:00:00.000Z",
+        "application_deadline_at": "2026-09-30T00:00:00.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": "Marcory",
+            "label": "KOUMASSI, MARCORY"
+        },
+        "specialty": {
+            "code": "informatique, logistique/transport , telecommunications",
+            "label": "Informatique, Logistique/Transport , Télécommunications"
+        },
+        "contract_type": {
+            "code": "STAGE",
+            "label": "Stage"
+        },
+        "experience_level": {
+            "code": "INCONNU",
+            "label": null,
+            "min_years": null,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC",
+            "label": "BAC",
+            "rank": 0
+        },
+        "description": "Détails de l'offre formation pratique aux métiers des télécoms Dans le cadre du développement de nos activités, Impulsion Services recherche des jeunes motivés souhaitant découvrir et apprendre concrètement les métiers des télécommunications et de la fibre optique. L’objectif est simple : former des jeunes, leur permettre de découvrir le métier sur le terrain, développer leurs compétences et identifier les profils capables d’évoluer à long terme au sein de l’entreprise. Nous recherchons avant tout des personnes : * motivées et sérieuses ; * ponctuelles et disciplinées ; * ayant l’envie d’apprendre un métier technique ; * capables de travailler en équipe ; * ayant une bonne capacité d’adaptation ; * à l’aise avec le travail de terrain ; * souhaitant construire progressivement une carrière dans le secteur des télécoms. Le stagiaire sera progressivement formé aux réalités du métier et pourra notamment découvrir : * les interventions techniques liées à la fibre optique ; * les opérations de raccordement et de maintenance ; * les bonnes pratiques de travail sur le terrain ; * l’utilisation des équipements et outils techniques ; * les règles de qualité et de sécurité ; * l’organisation d’une équipe technique ; * le reporting des interventions. La formation se fera principalement par la pratique et l’accompagnement des équipes sur le terrain. une possibilité d’évolution Ce stage n’est pas conçu uniquement comme une période d’observation. Les stagiaires qui démontreront leur sérieux, leur capacité d’apprentissage, leur maîtrise progressive du métier et leur aptitude à travailler en équipe pourront être considérés pour une collaboration à plus long terme au sein d’Impulsion Services. L’objectif est donc de permettre à certains profils de passer progressivement : découverte ? apprentissage ? qualification ? autonomie ? emploi. pour candidater Merci d’envoyer votre CV en précisant : en objet : « candidature stage technique – Impulsion Services » Dans le corps du mail: * Votre lieu de résidence: * Permis de conduire : Oui / Non * Savez-vous conduire une boîte manuelle ? Oui / Non Les candidats ne respectant pas cette formule, ne verrons pas le mail considerer. Formation",
+        "company_name": "IMPULSION SERVICES",
+        "company": {
+            "name": "IMPULSION SERVICES",
+            "website_url": null,
+            "type": null,
+            "description": null
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": null,
+        "raw_fields": {
+            "contract_raw": "Stage",
+            "experience_raw": null,
+            "education_raw": "BAC, BEPC, BT, CAP, Première, Quatrième, Terminale, Troisième",
+            "published_raw": "Publiée le 08/09/2026",
+            "expires_raw": "30/09/2026",
+            "secteur_raw": "Informatique, Logistique/Transport , Télécommunications"
+        },
+        "secteur": {
+            "code": "informatique, logistique/transport , telecommunications",
+            "label": "Informatique, Logistique/Transport , Télécommunications"
+        },
+        "active": "2026-09-08T00:00:00.000Z"
+    },
+    {
+        "title": "Expert(e) en Suivi, Évaluation, Redevabilité et Apprentissage (SERA/MEL)",
+        "source_url": "https://emploi.educarriere.ci/offre-155008-expert-e-en-suivi-evaluation-redevabilite-et-apprentissage-sera-mel.html",
+        "canonical_url": "https://emploi.educarriere.ci/offre-155008-expert-e-en-suivi-evaluation-redevabilite-et-apprentissage-sera-mel.html",
+        "location_raw": "Côte d'Ivoire",
+        "salary_raw": null,
+        "published_at": "2026-09-08T00:00:00.000Z",
+        "collected_at": "2026-09-09T09:50:06.905Z",
+        "first_seen_at": "2026-09-09T09:50:06.905Z",
+        "last_seen_at": "2026-09-09T09:50:06.905Z",
+        "expires_at": "2026-09-11T00:00:00.000Z",
+        "application_deadline_at": "2026-09-11T00:00:00.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": null,
+            "district": null,
+            "label": "Côte d'Ivoire"
+        },
+        "specialty": {
+            "code": "environnement",
+            "label": "Environnement"
+        },
+        "contract_type": {
+            "code": "INCONNU",
+            "label": "Emploi"
+        },
+        "experience_level": {
+            "code": "INCONNU",
+            "label": null,
+            "min_years": null,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_4",
+            "label": "BAC+4",
+            "rank": 4
+        },
+        "description": "Détails de l'offre Contexte du poste Le/la titulaire du poste aura pour mission principale de concevoir et de piloter le dispositif sera/mel afin de mesurer la performance, l'impact et la redevabilité des actions menées sur le terrain. Missions et responsabilités principales Sous la supervision de la coordination du projet, l'expert(e) aura pour principales missions : • Concevoir et opérationnaliser le dispositif de suivi, évaluation, redevabilité et apprentissage (sera/mel) adapté aux objectifs du projet. • Élaborer les cadres de résultats, définir les indicateurs clés de performance et mettre en place des systèmes robustes de collecte et d’analyse des données de terrain. • Assurer le suivi rigoureux des résultats et des indicateurs spécifiques liés au climat, à l’environnement et à la biodiversité. • Garantir la mise en œuvre des mécanismes de redevabilité envers les parties prenantes, les bailleurs et les communautés locales bénéficiaires. • Documenter les leçons apprises, les bonnes pratiques et les études de cas pour favoriser l'apprentissage organisationnel et l'amélioration continue des interventions. • Produire des rapports de performance périodiques (techniques et d'impact) destinés à la direction, aux partenaires et aux bailleurs de fonds. • Former et accompagner les équipes de terrain et les partenaires locaux sur les outils et les méthodologies de collecte et de gestion des données. Profil recherché / qualifications • Être titulaire d’une formation supérieure (bac+5 minimum) en suivi-évaluation, statistiques, gestion de projets ou dans tout autre domaine connexe. • Justifier d’une expérience professionnelle confirmée de 5 ans minimum dans la conception de cadres de résultats, d'indicateurs, de systèmes de collecte et d’analyse des données. • Démontrer une maîtrise avérée du suivi des résultats et des indicateurs liés au climat, à l’environnement et à la biodiversité. • Disposer d'une excellente capacité à produire des rapports de performance et à documenter les bonnes pratiques et leçons apprises. • Avoir de solides compétences dans l'animation de mécanismes de redevabilité et d'apprentissage au sein de projets de développement. Les candidat(e)s intéressé(e)s sont invité(e)s à transmettre leurs CVs datés et signés à cphda.recrutement@gmail.com au plus tard le 11 septembre 2026, en précisant en objet : Expert(e) en Suivi, Évaluation, Redevabilité et Apprentissage (SERA/MEL) NB : Seules les personnes dont les dossiers auront été retenus seront contactées pour la suite du processus.",
+        "company_name": "Centre pour la promotion des droits de l'homme et du developpement en Afrique",
+        "company": {
+            "name": "Centre pour la promotion des droits de l'homme et du developpement en Afrique",
+            "website_url": null,
+            "type": null,
+            "description": null
+        },
+        "company_hint": null,
+        "application_email": "cphda.recrutement@gmail.com",
+        "application_emails": [
+            "cphda.recrutement@gmail.com"
+        ],
+        "remote_work": null,
+        "raw_fields": {
+            "contract_raw": "Emploi",
+            "experience_raw": null,
+            "education_raw": "BAC+4",
+            "published_raw": "Publiée le 08/09/2026",
+            "expires_raw": "11/09/2026",
+            "secteur_raw": "Environnement"
+        },
+        "secteur": {
+            "code": "environnement",
+            "label": "Environnement"
+        },
+        "active": "2026-09-08T00:00:00.000Z"
+    },
+    {
+        "title": "Responsable/ Spécialiste HSE",
+        "source_url": "https://emploi.educarriere.ci/offre-155007-responsable-specialiste-hse.html",
+        "canonical_url": "https://emploi.educarriere.ci/offre-155007-responsable-specialiste-hse.html",
+        "location_raw": "Port Bouet - Abidjan",
+        "salary_raw": null,
+        "published_at": "2026-09-08T00:00:00.000Z",
+        "collected_at": "2026-09-09T09:50:26.581Z",
+        "first_seen_at": "2026-09-09T09:50:26.581Z",
+        "last_seen_at": "2026-09-09T09:50:26.581Z",
+        "expires_at": "2026-09-30T00:00:00.000Z",
+        "application_deadline_at": "2026-09-30T00:00:00.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": "Port-Bouët",
+            "label": "Port Bouet - Abidjan"
+        },
+        "specialty": {
+            "code": "maintenance des systemes de production",
+            "label": "Maintenance des Systèmes de Production"
+        },
+        "contract_type": {
+            "code": "CDD",
+            "label": "Emploi (CDD)"
+        },
+        "experience_level": {
+            "code": "INCONNU",
+            "label": null,
+            "min_years": null,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_5",
+            "label": "BAC+5",
+            "rank": 5
+        },
+        "description": "Détails de l'offre Missions principales - Élaborer et déployer le Plan HSE/ PPSPS du projet et définir les exigences applicables aux entreprises intervenantes. - Piloter l’identification des dangers et l’analyse des risques liés aux travaux et aux situations de coactivité. - Superviser le système Permis de Travail, consignation/LOTO et contrôles des travaux à risques. - Organiser et maîtriser la coactivité entre les différents lots, entreprises et activités. - Superviser les opérations à risques : travaux en hauteur, levage, espaces confinés, travaux à chaud, travaux électriques, ouverture d’équipements, etc. - Piloter les inspections, audits, causeries, accueils HSE et contrôles terrain des entreprises. - Suivre les performances HSE, incidents, écarts et actions correctives et assurer le reporting quotidien et périodique. - Participer à la gestion des incidents, aux analyses de causes et au retour d’expérience de l’arrêt. - Superviser la préparation des opérations à risques : travaux en hauteur, levage, espaces confinés, travaux à chaud, travaux électriques, ouverture d’équipements, etc. - Préparer le pilotage des inspections, audits, causeries, accueils HSE et contrôles terrain des entreprises. - Suivi les performances HSE, incidents, écarts et actions correctives et assurer le reporting quotidien et périodique. - Participer à la gestion des incidents, aux analyses de causes et au retour d’expérience de l’arrêt & préparation de réponse aux situations d'urgence Profil recherché - Formation Bac+5 minimum en HSE, QHSE ou équivalent (certification SST/Sauveteur Secouriste du Travail appréciée) - Expérience de 3 à 5 ans minimum en HSE sur chantier industriel, idéalement en environnement pétrolier/pétrochimique - Expérience impérative sur raffinerie ou plateforme pétrolière ou projet à forte intensité de coactivité - Bonne connaissance des référentiels MASE, ISO 45001, ISO 14001, ISO 9001 - Maîtrise des outils d'analyse de risques (permis de travail, plan de prévention, analyse des risques par tâche) - Capacité à gérer des situations d'urgence et à faire respecter la discipline sécurité sur le terrain - Autorité naturelle, pédagogie, sens de l'observation et de la rigueur - Préparer les plans de circulation des véhicules pendant le projet -",
+        "company_name": "Une entreprise",
+        "company": {
+            "name": "Une entreprise",
+            "website_url": null,
+            "type": null,
+            "description": null
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": null,
+        "raw_fields": {
+            "contract_raw": "Emploi (CDD)",
+            "experience_raw": null,
+            "education_raw": "BAC+5",
+            "published_raw": "Publiée le 08/09/2026",
+            "expires_raw": "30/09/2026",
+            "secteur_raw": "Maintenance des Systèmes de Production"
+        },
+        "secteur": {
+            "code": "maintenance des systemes de production",
+            "label": "Maintenance des Systèmes de Production"
+        },
+        "active": "2026-09-08T00:00:00.000Z"
+    },
+    {
+        "title": "Chef d'équipe / Ouvrier qualifié (maçon, coffreur, ferrailleur)",
+        "source_url": "https://emploi.educarriere.ci/offre-155006-chef-d-equipe-ouvrier-qualifie-macon-coffreur-ferrailleur.html",
+        "canonical_url": "https://emploi.educarriere.ci/offre-155006-chef-d-equipe-ouvrier-qualifie-macon-coffreur-ferrailleur.html",
+        "location_raw": "ABIDJAN",
+        "salary_raw": null,
+        "published_at": "2026-09-08T00:00:00.000Z",
+        "collected_at": "2026-09-09T09:50:53.619Z",
+        "first_seen_at": "2026-09-09T09:50:53.619Z",
+        "last_seen_at": "2026-09-09T09:50:53.619Z",
+        "expires_at": "2026-10-15T00:00:00.000Z",
+        "application_deadline_at": "2026-10-15T00:00:00.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": null,
+            "label": "ABIDJAN"
+        },
+        "specialty": {
+            "code": "batiment, mines/geologie/petrole , ressources humaines",
+            "label": "Bâtiment, Mines/Géologie/Pétrole , Ressources Humaines"
+        },
+        "contract_type": {
+            "code": "INCONNU",
+            "label": "Emploi"
+        },
+        "experience_level": {
+            "code": "INCONNU",
+            "label": null,
+            "min_years": null,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_1",
+            "label": "BAC+1",
+            "rank": 1
+        },
+        "description": "Détails de l'offre Missions principales ? Exécuter les travaux selon les consignes techniques ? Encadrer une petite équipe d'ouvriers ? Veiller à la qualité et à la sécurité de l'exécution Compétences requises ? Maîtrise d'un corps de métier du bâtiment ? Lecture de plans simples ? Respect des consignes de sécurité CAP/BEP à Bac Pro",
+        "company_name": "LAM'S GROUP",
+        "company": {
+            "name": "LAM'S GROUP",
+            "website_url": null,
+            "type": null,
+            "description": null
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": null,
+        "raw_fields": {
+            "contract_raw": "Emploi",
+            "experience_raw": null,
+            "education_raw": "BAC+1, BAC+2, BAC+3, BT, CAP",
+            "published_raw": "Publiée le 08/09/2026",
+            "expires_raw": "15/10/2026",
+            "secteur_raw": "Bâtiment, Mines/Géologie/Pétrole , Ressources Humaines"
+        },
+        "secteur": {
+            "code": "batiment, mines/geologie/petrole , ressources humaines",
+            "label": "Bâtiment, Mines/Géologie/Pétrole , Ressources Humaines"
+        },
+        "active": "2026-09-08T00:00:00.000Z"
+    },
+    {
+        "title": "Ingénieur(e) génie civil / structures",
+        "source_url": "https://emploi.educarriere.ci/offre-155005-ingenieur-e-genie-civil-structures.html",
+        "canonical_url": "https://emploi.educarriere.ci/offre-155005-ingenieur-e-genie-civil-structures.html",
+        "location_raw": "ABIDJAN",
+        "salary_raw": null,
+        "published_at": "2026-09-08T00:00:00.000Z",
+        "collected_at": "2026-09-09T09:51:15.983Z",
+        "first_seen_at": "2026-09-09T09:51:15.983Z",
+        "last_seen_at": "2026-09-09T09:51:15.983Z",
+        "expires_at": "2026-10-15T00:00:00.000Z",
+        "application_deadline_at": "2026-10-15T00:00:00.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": null,
+            "label": "ABIDJAN"
+        },
+        "specialty": {
+            "code": "batiment, mines/geologie/petrole , ressources humaines",
+            "label": "Bâtiment, Mines/Géologie/Pétrole , Ressources Humaines"
+        },
+        "contract_type": {
+            "code": "INCONNU",
+            "label": "Emploi"
+        },
+        "experience_level": {
+            "code": "INCONNU",
+            "label": null,
+            "min_years": null,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_4",
+            "label": "BAC+4",
+            "rank": 4
+        },
+        "description": "Détails de l'offre Missions principales ? Concevoir et dimensionner les ouvrages ? Réaliser les études techniques et de faisabilité ? Contrôler la conformité des plans d'exécution Compétences requises ? Maîtrise des logiciels de calcul (Robot, AutoCAD) ? Connaissance des normes de construction (Eurocodes) ? Rigueur scientifique Bac+5 (Ingénieur)",
+        "company_name": "LAM'S GROUP",
+        "company": {
+            "name": "LAM'S GROUP",
+            "website_url": null,
+            "type": null,
+            "description": null
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": null,
+        "raw_fields": {
+            "contract_raw": "Emploi",
+            "experience_raw": null,
+            "education_raw": "BAC+4, BAC+5, BAC+6",
+            "published_raw": "Publiée le 08/09/2026",
+            "expires_raw": "15/10/2026",
+            "secteur_raw": "Bâtiment, Mines/Géologie/Pétrole , Ressources Humaines"
+        },
+        "secteur": {
+            "code": "batiment, mines/geologie/petrole , ressources humaines",
+            "label": "Bâtiment, Mines/Géologie/Pétrole , Ressources Humaines"
+        },
+        "active": "2026-09-08T00:00:00.000Z"
+    },
+    {
+        "title": "Responsable Logistique",
+        "source_url": "https://emploi.educarriere.ci/offre-155004-responsable-logistique.html",
+        "canonical_url": "https://emploi.educarriere.ci/offre-155004-responsable-logistique.html",
+        "location_raw": "Port Bouet - Abidjan",
+        "salary_raw": null,
+        "published_at": "2026-09-08T00:00:00.000Z",
+        "collected_at": "2026-09-09T09:51:28.556Z",
+        "first_seen_at": "2026-09-09T09:51:28.556Z",
+        "last_seen_at": "2026-09-09T09:51:28.556Z",
+        "expires_at": "2026-09-30T00:00:00.000Z",
+        "application_deadline_at": "2026-09-30T00:00:00.000Z",
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": "Port-Bouët",
+            "label": "Port Bouet - Abidjan"
+        },
+        "specialty": {
+            "code": "maintenance des systemes de production",
+            "label": "Maintenance des Systèmes de Production"
+        },
+        "contract_type": {
+            "code": "CDD",
+            "label": "Emploi (CDD)"
+        },
+        "experience_level": {
+            "code": "INCONNU",
+            "label": null,
+            "min_years": null,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_5",
+            "label": "BAC+5",
+            "rank": 5
+        },
+        "description": "Détails de l'offre Missions principales : - Organiser et piloter la logistique globale du chantier : réception, stockage, distribution des équipements et matériels - Planifier et coordonner les moyens de manutention (grues, chariots élévateurs, engins de levage) en lien avec les équipes travaux - Gérer les accès chantier, le transport du personnel et l'hébergement/restauration si nécessaire - Assurer la gestion des zones de stockage et du parc matériel (entrées/sorties, traçabilité) - Coordonner avec les fournisseurs et transporteurs pour le respect des délais de livraison - Anticiper les besoins logistiques selon le planning d'exécution des différents lots - Veiller au respect des règles HSE dans toutes les opérations logistiques (circulation, levage, manutention) - Produire les indicateurs et rapports logistiques réguliers pour la coordination Projet Profil recherché - Formation Bac+3/5 en Logistique, Transport, Gestion des Opérations ou équivalent - Expérience de 5 ans minimum en gestion logistique de chantier, idéalement en milieu industriel ou pétrolier - Expérience sur arrêt/turnaround de raffinerie fortement appréciée - Maîtrise de la planification logistique et des outils de gestion de stock/parc matériel - Connaissance des règles de sécurité liées à la manutention et au levage - Sensibilité HSE marquée (référentiels MASE / ISO 45001 appréciés) - Leadership, réactivité, capacité à gérer les imprévus et les pics d'activité - Bonne coordination avec les équipes travaux, achats et HSE",
+        "company_name": "Une entreprise",
+        "company": {
+            "name": "Une entreprise",
+            "website_url": null,
+            "type": null,
+            "description": null
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": null,
+        "raw_fields": {
+            "contract_raw": "Emploi (CDD)",
+            "experience_raw": null,
+            "education_raw": "BAC+5",
+            "published_raw": "Publiée le 08/09/2026",
+            "expires_raw": "30/09/2026",
+            "secteur_raw": "Maintenance des Systèmes de Production"
+        },
+        "secteur": {
+            "code": "maintenance des systemes de production",
+            "label": "Maintenance des Systèmes de Production"
+        },
+        "active": "2026-09-08T00:00:00.000Z"
+    }
+]

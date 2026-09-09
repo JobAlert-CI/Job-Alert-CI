@@ -305,8 +305,37 @@ def process_raw_offers(
 
 @celery_app.task(name="tasks.ai_processing.trigger_ai_processing")
 def trigger_ai_processing(scraper_results: list[dict] | None = None, force: bool = False) -> dict:
+    """Callback du chord des scrapers (audit 4, E.5 : vraie aggregation).
+
+    Avant : les resultats du chord etaient juste comptes (`len(...)`), les
+    erreurs passaient inapercues et le log ne disait rien des sources. On
+    agrege desormais par statut (completed/skipped/locked/failed) et on
+    journalise un resume lisible avant de relancer le traitement IA.
+    """
+    results = scraper_results or []
+    par_statut: dict[str, int] = {}
+    sources_en_erreur: list[str] = []
+    for item in results:
+        if isinstance(item, dict):
+            statut = str(item.get("status", "unknown"))
+            par_statut[statut] = par_statut.get(statut, 0) + 1
+            if statut in {"failed", "error"}:
+                sources_en_erreur.append(str(item.get("source_code") or item.get("error") or "?"))
+        else:
+            par_statut["unknown"] = par_statut.get("unknown", 0) + 1
+    if par_statut:
+        logger.info(
+            "Chord scrapers termine",
+            extra={"nb_resultats": len(results), "par_statut": par_statut, "sources_en_erreur": sources_en_erreur},
+        )
     result = process_raw_offers.apply_async(kwargs={"trigger_type": "auto", "force": force}, queue="ai")
-    return {"status": "queued", "task_id": result.id, "scraper_results_count": len(scraper_results or [])}
+    return {
+        "status": "queued",
+        "task_id": result.id,
+        "scraper_results_count": len(results),
+        "scrapers_par_statut": par_statut,
+        "scrapers_sources_en_erreur": sources_en_erreur,
+    }
 
 
 @celery_app.task(name="tasks.ai_processing.sweep_raw_offers")

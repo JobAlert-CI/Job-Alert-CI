@@ -5,7 +5,20 @@ from typing import Literal
 
 from pydantic import BaseModel
 
+from models.enums import IngestionAction
 from schemas.base import TimestampRead
+
+# Audit 4, A.6 : mapping action d'ingestion -> niveau de log, partage entre
+# /admin/logs (filtrage SQL par niveau) et /admin/scraping/runs/{id}/logs.
+# Une seule definition, plus de copie locale divergente entre routers.
+INGESTION_LEVEL_BY_ACTION: dict[IngestionAction, str] = {
+    IngestionAction.FAILED: "error",
+    IngestionAction.SKIPPED: "warning",
+    IngestionAction.DUPLICATE: "info",
+    IngestionAction.UPDATED: "info",
+    IngestionAction.INSERTED: "info",
+}
+
 
 class AdminActionLogRead(BaseModel):
     id: str
