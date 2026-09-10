@@ -1,7 +1,7 @@
 """Audit 4, Lot 6 (G.1) : journal des evenements systeme unifie.
 
 Revision ID: 0020_system_event_logs
-Revises: 0019_ingestion_events_created_at_idx
+Revises: 0019_ingestion_events_created_at
 Create Date: 2026-09-09
 
 Comble le constat G.1 : les echecs de tasks Celery et d'envoi d'emails ne
@@ -20,7 +20,7 @@ import sqlalchemy as sa
 from alembic import op
 
 revision: str = "0020_system_event_logs"
-down_revision: str | None = "0019_ingestion_events_created_at_idx"
+down_revision: str | None = "0019_ingestion_events_created_at"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 

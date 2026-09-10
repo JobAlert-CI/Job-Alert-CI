@@ -81,6 +81,18 @@ const KIND_MATCH = {
   fallback_city: { libelle: "Même ville (T5)", ton: "outline", couleur: "#64748b" },
 }
 
+// Audit 4, H.1 : palier GLOBAL du digest (EmailDigestRead.match_tier) — le
+// palier le plus bas auquel le contenu du digest a dû descendre pour
+// remplir l'email. Distinct des match_kind PAR OFFRE (colonne voisine).
+const TIER_DIGEST = {
+  T0: { libelle: "T0 — Filière exacte", ton: "default", titre: "Digest rempli sur les filières exactes de l'abonné" },
+  T1: { libelle: "T1 — Filière élargie", ton: "secondary", titre: "Digest rempli via les filières secondaires (T1)" },
+  T2: { libelle: "T2 — Fallback contrat", ton: "secondary", titre: "Digest rempli via le fallback contrat (T2)" },
+  T3: { libelle: "T3 — Fallback fraîcheur", ton: "secondary", titre: "Digest rempli via le fallback fraîcheur (T3)" },
+  T4: { libelle: "T4 — Fallback expérience", ton: "outline", titre: "Digest rempli via le fallback expérience (T4)" },
+  T5: { libelle: "T5 — Fallback ville", ton: "outline", titre: "Digest rempli via le fallback ville (T5)" },
+}
+
 const STATUT_DIGEST = {
   sent: { libelle: "Envoyé", variante: "secondary" },
   failed: { libelle: "Échoué", variante: "destructive" },
@@ -651,6 +663,7 @@ const HistoriqueEnvois = ({ abonneId }) => {
             <TableHead>Sujet</TableHead>
             <TableHead className="text-center">Offres</TableHead>
             <TableHead>Statut</TableHead>
+            <TableHead className="hidden md:table-cell">Palier global</TableHead>
             <TableHead className="hidden md:table-cell">Paliers de matching</TableHead>
           </TableRow>
         </TableHeader>
@@ -676,6 +689,22 @@ const HistoriqueEnvois = ({ abonneId }) => {
                     <p className="mt-0.5 text-[10px] text-muted-foreground" title={envoi.skipped_reason}>
                       {envoi.skipped_reason}
                     </p>
+                  )}
+                </TableCell>
+                {/* Audit 4, H.1 : tier GLOBAL du digest (champ serveur match_tier),
+                    distinct des paliers par offre — n'a de sens que sur un
+                    digest avec des offres (sans offre = pas de palier). */}
+                <TableCell className="hidden md:table-cell">
+                  {envoi.match_tier && Number(envoi.offer_count) > 0 ? (
+                    <Badge
+                      variant={(TIER_DIGEST[envoi.match_tier] ?? { ton: "outline" }).ton}
+                      className="text-[10px]"
+                      title={(TIER_DIGEST[envoi.match_tier] ?? { titre: `Palier ${envoi.match_tier}` }).titre}
+                    >
+                      {(TIER_DIGEST[envoi.match_tier] ?? { libelle: envoi.match_tier }).libelle}
+                    </Badge>
+                  ) : (
+                    <span className="text-xs text-muted-foreground">—</span>
                   )}
                 </TableCell>
                 <TableCell className="hidden md:table-cell">

@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom"
+import { useState } from "react"
 import { Eye, Star, TrendingUp } from "lucide-react"
 import { useAdminTopViewedQuery } from "@/features/admin-dashboard.tools"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -6,30 +7,52 @@ import {
   Table, TableHeader, TableBody, TableHead, TableRow, TableCell,
 } from "@/components/ui/table"
 import { SectionErreur, SectionVide } from "../components/EtatsSection"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 /* ─────────────────────────────────────────────────────────────────────
    Section 4 — Top 10 des offres les plus consultées.
 
-   NOTE backend (doc v3 §2) : le paramètre days est accepté mais non
-   branché — le tri se fait sur view_count TOTAL. On affiche donc
-   "depuis toujours" et pas "7 jours" pour rester honnête.
+   Audit 4, H.2 : le paramètre days est désormais EFFECTIF côté serveur
+   (vues datées via last_seen_at, posé par le flush Redis des compteurs
+   ≤ 1 min après la vue réelle). Sélecteur de fenêtre 7 / 30 jours —
+   plus de faux « depuis toujours ».
 
    Shape réelle (vérifiée API + fixture) : { id, title, status,
    visible_site, view_count, save_count, published_at, company: {id,
    name, slug}, primary_filiere_id }.
    ───────────────────────────────────────────────────────────────────── */
 
+const FENETRES = [
+  { valeur: 7, libelle: "7 jours" },
+  { valeur: 30, libelle: "30 jours" },
+]
+
+/** État local de la fenêtre (7 / 30 jours) — useState simple, pas de global. */
+const useFenetreVues = () => {
+  const [days, setDays] = useState(7)
+  return [days, setDays]
+}
+
 const TopOffres = () => {
-  const { data, isLoading, isError, refetch } = useAdminTopViewedQuery({ limit: 10 })
+  const [days, setDays] = useFenetreVues()
+  const { data, isLoading, isError, refetch } = useAdminTopViewedQuery({ limit: 10, days })
 
   return (
     <section aria-label="Offres les plus consultées">
-      <div className="mb-3 flex items-center justify-between">
+      <div className="mb-3 flex items-center justify-between gap-2">
         <h2 className="flex items-center gap-2 font-heading text-sm font-semibold">
           <TrendingUp className="size-4 text-primary" aria-hidden />
           Offres les plus consultées
         </h2>
-        <span className="text-[10px] text-muted-foreground">depuis toujours</span>
+        <Tabs value={String(days)} onValueChange={(v) => setDays(Number(v))}>
+          <TabsList className="h-7">
+            {FENETRES.map((f) => (
+              <TabsTrigger key={f.valeur} value={String(f.valeur)} className="px-2.5 py-0 text-[11px]">
+                {f.libelle}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
       </div>
 
       {isError ? (

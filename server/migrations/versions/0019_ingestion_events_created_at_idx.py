@@ -1,6 +1,6 @@
 """Audit 4, Lot 5 (A.3) : index created_at sur offer_ingestion_events.
 
-Revision ID: 0019_ingestion_events_created_at_idx
+Revision ID: 0019_ingestion_events_created_at
 Revises: 0018_admin_action_logout
 Create Date: 2026-09-09
 
@@ -19,7 +19,7 @@ from collections.abc import Sequence
 import sqlalchemy as sa
 from alembic import op
 
-revision: str = "0019_ingestion_events_created_at_idx"
+revision: str = "0019_ingestion_events_created_at"
 down_revision: str | None = "0018_admin_action_logout"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None

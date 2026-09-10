@@ -13,9 +13,10 @@ import { getOverview, getRuns, getRunDetail, getTopViewedOffers } from "@/api/ad
                  suit overview ;
    - tier-stats: distribution matching sur 7 jours, évolue lentement →
                  staleTime 5 min ;
-   - top-viewed: tri sur view_count total (le param days n'est pas
-                 branché côté backend — traiter comme "top all-time",
-                 cf. doc v3 §2) → staleTime 5 min.
+   - top-viewed: top des vues FENETRE days (audit 4, H.2 : days est
+                 désormais branché côté serveur sur last_seen_at, posé à
+                 chaque flush Redis des compteurs ≤ 1 min après la vue) →
+                 staleTime 5 min.
    ───────────────────────────────────────────────────────────────────── */
 
 export const adminDashboardKeys = {
@@ -66,9 +67,14 @@ export const useAdminRunDetailQuery = (runId, { enabled = true } = {}) =>
     staleTime: 60 * 1000,
   })
 
-/* ─── Top offres consultées (all-time : days non branché backend) ────── */
+/* ─── Top offres consultées (fenêtre days branchée serveur, audit 4 H.2) ─ */
 
-export const useAdminTopViewedQuery = (params = { limit: 10 }) =>
+/**
+ * @param {Object} params { limit (1-50, defaut 10), days (1-90, defaut 7 serveur) }
+ * days est EFFECTIF côté serveur depuis l'audit 4 (H.2) : les vues sont
+ * datées via last_seen_at. La section TopOffres passe days explicite.
+ */
+export const useAdminTopViewedQuery = (params = { limit: 10, days: 7 }) =>
   useQuery({
     queryKey: adminDashboardKeys.topViewed(params),
     queryFn: ({ signal }) => getTopViewedOffers(params, { signal }),

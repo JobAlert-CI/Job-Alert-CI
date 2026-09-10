@@ -44,6 +44,7 @@ const ACTIONS = [
   { valeur: "suppression", libelle: "Suppression" },
   { valeur: "envoi", libelle: "Envoi" },
   { valeur: "connexion", libelle: "Connexion (depuis cycles récents)" },
+  { valeur: "deconnexion", libelle: "Déconnexion (depuis l'audit 4)" },
   { valeur: "scraping", libelle: "Scraping" },
 ]
 
@@ -53,6 +54,7 @@ const VARIANTE_ACTION = {
   suppression: "destructive",
   envoi: "outline",
   connexion: "outline",
+  deconnexion: "outline",
   scraping: "outline",
 }
 
@@ -64,8 +66,10 @@ const dateHeure = (iso) => {
 }
 
 const JournalAdmin = () => {
-  const { action, admin, table, page, pageTaille, paramsApi, setAction, setAdmin, setTable, setPage, reinitialiser } =
-    useFiltresJournalAdmin()
+  const {
+    action, admin, table, debut, fin, page, pageTaille, paramsApi,
+    setAction, setAdmin, setTable, setDebut, setFin, setPage, reinitialiser,
+  } = useFiltresJournalAdmin()
 
   const { data: pageJournal, isLoading, isError, refetch } = useJournalAuditQuery(paramsApi)
   const { data: admins } = useAdminsAuteurs()
@@ -88,7 +92,7 @@ const JournalAdmin = () => {
   const entrees = pageJournal?.items ?? []
   const total = pageJournal?.total ?? 0
   const pagesTotales = Math.max(1, Math.ceil(total / pageTaille))
-  const filtresActifs = !!(action || admin || table)
+  const filtresActifs = !!(action || admin || table || debut || fin)
 
   return (
     <FiltresJournalAdminProvider>
@@ -145,13 +149,36 @@ const JournalAdmin = () => {
             value={table}
             onChange={(e) => setTable(e.target.value)}
             aria-label="Filtrer par table cible"
-            className="h-9 rounded-md border border-border bg-background px-2 text-xs"
+            className="h-9 max-w-56 rounded-md border border-border bg-background px-2 text-xs"
           >
             <option value="">Toutes les tables</option>
             {tablesDistintes.map((t) => (
               <option key={t} value={t}>{t}</option>
             ))}
           </select>
+          {/* Audit 4, A.7 : plage de dates inclusive (AAAA-MM-JJ, en URL). */}
+          <label className="flex items-center gap-1 text-[11px] text-muted-foreground">
+            Du
+            <input
+              type="date"
+              value={debut}
+              max={fin || undefined}
+              onChange={(e) => setDebut(e.target.value)}
+              aria-label="Date de début (incluse)"
+              className="h-9 rounded-md border border-border bg-background px-2 text-xs"
+            />
+          </label>
+          <label className="flex items-center gap-1 text-[11px] text-muted-foreground">
+            au
+            <input
+              type="date"
+              value={fin}
+              min={debut || undefined}
+              onChange={(e) => setFin(e.target.value)}
+              aria-label="Date de fin (incluse)"
+              className="h-9 rounded-md border border-border bg-background px-2 text-xs"
+            />
+          </label>
           {filtresActifs && (
             <Button variant="ghost" size="sm" onClick={reinitialiser}>
               <RotateCcw aria-hidden /> Réinitialiser

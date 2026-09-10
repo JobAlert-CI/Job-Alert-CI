@@ -20,6 +20,8 @@ const CONFIG_FILTRES_JOURNAL_ADMIN = {
     { key: "admin", param: "admin_id", defaut: "" },
     { key: "action", param: "action", defaut: "" },
     { key: "table", param: "target_table", defaut: "" },
+    { key: "debut", param: "date_debut", defaut: "" },
+    { key: "fin", param: "date_fin", defaut: "" },
     { key: "page", param: "page", defaut: "1" },
   ],
 }
@@ -44,18 +46,26 @@ export const FiltresJournalAdminProvider = ({ children }) => {
       admin: valeurs.admin,
       action: valeurs.action,
       table: valeurs.table,
+      // Audit 4, A.7 : plage de dates optionnelle (AAAA-MM-JJ, bornes
+      // inclusives côté serveur ; 400 explicite si malformée).
+      debut: valeurs.debut,
+      fin: valeurs.fin,
       page,
       pageTaille: PAGE_TAILLE,
       paramsApi: {
         admin_id: valeurs.admin || undefined,
         action: valeurs.action || undefined,
         target_table: valeurs.table || undefined,
+        date_debut: valeurs.debut || undefined,
+        date_fin: valeurs.fin || undefined,
         limit: PAGE_TAILLE,
         offset: (page - 1) * PAGE_TAILLE,
       },
       setAdmin: (v) => { setScalar("admin", v); setScalar("page", "1") },
       setAction: (v) => { setScalar("action", v); setScalar("page", "1") },
       setTable: (v) => { setScalar("table", v); setScalar("page", "1") },
+      setDebut: (v) => { setScalar("debut", v); setScalar("page", "1") },
+      setFin: (v) => { setScalar("fin", v); setScalar("page", "1") },
       setPage: (v) => setScalar("page", v),
       reinitialiser: () => reset(),
     }

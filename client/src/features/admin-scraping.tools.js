@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import {
-  getScrapingStatus, getScrapingSummary, getRuns, getRunDetail, getRunLogs, triggerScraping,
+  getScrapingStatus, getScrapingSummary, getRuns, getRunDetail, getRunLogs,
+  triggerScraping, updateRunNotes,
 } from "@/api/admin/scraping"
 
 /* ─────────────────────────────────────────────────────────────────────
@@ -36,7 +37,7 @@ export const adminScrapingKeys = {
   summary: ["admin", "scraping", "summary"],
   runs: (params) => ["admin", "scraping", "runs", params],
   run: (runId) => ["admin", "scraping", "run", runId],
-  runLogs: (runId) => ["admin", "scraping", "run", runId, "logs"],
+  runLogs: (runId, params) => ["admin", "scraping", "run", runId, "logs", params],
 }
 
 /* Statuts de run qui signalent une activité en cours. */
@@ -118,11 +119,15 @@ export const useAdminRunDetailQuery = (runId, { enabled = true } = {}) =>
  * Journal d'événements du run (une ligne par offre traitée, niveau
  * dérivé serveur : failed→error, skipped→warning, sinon info).
  * Rechargé en même temps que le détail tant que le run est actif.
+ *
+ * Audit 4, C.6 : le filtre niveau est désormais SQL-side (paramètre
+ * `level` de la requête, plus de filtrage client) et la réponse est
+ * bornée — params { level, limit, offset } pour paginer côté serveur.
  */
-export const useAdminRunLogsQuery = (runId, { enabled = true, runActif = false } = {}) =>
+export const useAdminRunLogsQuery = (runId, { enabled = true, runActif = false, params = {} } = {}) =>
   useQuery({
-    queryKey: adminScrapingKeys.runLogs(runId),
-    queryFn: ({ signal }) => getRunLogs(runId, { signal }),
+    queryKey: adminScrapingKeys.runLogs(runId, params),
+    queryFn: ({ signal }) => getRunLogs(runId, params, { signal }),
     enabled: !!runId && enabled,
     staleTime: 5 * 1000,
     // Polling piloté par l'état du DÉTAIL (le journal ne porte pas le
@@ -132,11 +137,52 @@ export const useAdminRunLogsQuery = (runId, { enabled = true, runActif = false }
   })
 
 
+/* ─── Annotation d'un run (PATCH /runs/{id}, audit 4 C.4) ────────────── */
+
+/** Notes libres après coup — usage forensique, journalisée serveur. */
+export const useModifierNotesRun = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ runId, notes }) => updateRunNotes(runId, { notes }),
+    onSuccess: (run) => {
+      // Le PATCH renvoie le run complet : on écrit DIRECTEMENT dans le
+      // cache du détail (setQueryData) — les listes voisines aussi.
+      queryClient.setQueryData(adminScrapingKeys.run(run.id), run)
+      queryClient.invalidateQueries({ queryKey: adminScrapingKeys.root })
+      return run
+    },
+  })
+}
+
+
 /* ─── Déclenchement manuel (POST /trigger) ───────────────────────────── */
 
-/** Erreur → message lisible (404 = aucune source active correspondante). */
+/** Erreur → message lisible (404 = aucune source active, 409 = run déjà
+ *  déclenché aujourd'hui par cet admin — audit 4, C.2, detail serveur
+ *  français explicite, 503 = broker Celery injoignable, run marqué failed). */
 export const messageErreurScraping = (err) =>
   err?.response?.data?.detail || err?.message || "Action impossible"
+
+/**
+ * Audit 4, C.2 — un run a-t-il déjà été déclenché AUJOURD'HUI par cet
+ * admin (toutes sources) ? Le serveur répond 409 dans ce cas ; on le
+ * sait D'AVANCE par croisement local avec getRuns (zéro endpoint
+ * nouveau) : triggered_by = `admin:{admin_id}` et run_date = jour
+ * LOCAL serveur (fuseau produit Africa/Abidjan).
+ */
+export const useRunAdminDuJour = (adminId) =>
+  useQuery({
+    queryKey: ["admin", "scraping", "runs", { limit: 100, _usage: "run-du-jour" }],
+    queryFn: ({ signal }) => getRuns({ limit: 100 }, { signal }),
+    enabled: !!adminId,
+    staleTime: 10 * 1000,
+    retry: 1,
+    select: (runs) => {
+      if (!Array.isArray(runs)) return null
+      const jour = new Intl.DateTimeFormat("en-CA", { timeZone: "Africa/Abidjan" }).format(new Date())
+      return runs.find((r) => r.run_date === jour && r.triggered_by === `admin:${adminId}`) ?? null
+    },
+  })
 
 export const useTriggerScraping = () => {
   const queryClient = useQueryClient()

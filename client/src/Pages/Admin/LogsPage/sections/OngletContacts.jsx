@@ -30,6 +30,10 @@ import { SectionErreur, SectionVide, SectionAucunResultat } from "../components/
 
    ⚠️ La réponse du PATCH renvoie le statut STOCKÉ ("in_progress",
    "closed") — CONTACT_INTERNE_VERS_API traduit pour les badges.
+   ⚠️ Audit 4, K.1 : contacts_par_statut / contacts_total sont FENÊTRÉS
+   sur days (30 j ici) — les libellés l'affichent (plus de « total »
+   absolu trompeur ; un message plus vieux que la fenêtre n'y figure
+   pas, mais reste filtrable dans la table).
    ───────────────────────────────────────────────────────────────────── */
 
 const COULEURS_STATUT = {
@@ -100,7 +104,7 @@ const OngletContacts = () => {
               aria-pressed={actif}
               aria-label={`Filtrer sur ${s.libelle} (${valeur})`}
               className={`rounded-xl transition-focus ${actif ? "ring-2 ring-primary" : ""}`}>
-              <CarteCompteur label={s.libelle} valeur={valeur} chargement={statsCharge} />
+              <CarteCompteur label={`${s.libelle} (30 j)`} valeur={valeur} chargement={statsCharge} />
             </button>
           )
         })}
@@ -109,7 +113,7 @@ const OngletContacts = () => {
       {/* ─── Chart C5 : donut par statut ─── */}
       <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4">
         <h3 className="text-xs font-bold tracking-wider text-muted-foreground uppercase">
-          Messages par statut <span className="font-normal normal-case">(total {stats?.contacts_total ?? 0})</span>
+          Messages par statut <span className="font-normal normal-case">(30 derniers jours — total {stats?.contacts_total ?? 0})</span>
         </h3>
         {statsCharge ? (
           <Skeleton className="h-52 w-full rounded-lg" />

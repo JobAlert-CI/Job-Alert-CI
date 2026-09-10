@@ -1,15 +1,22 @@
 import { useMemo, useState } from "react"
 import { Link, useParams } from "react-router-dom"
-import { ArrowLeft, FileClock, Globe } from "lucide-react"
+import { ArrowLeft, FileClock, Globe, Pencil, Save } from "lucide-react"
 import {
-  useAdminRunDetailQuery, useAdminRunLogsQuery, messageErreurScraping,
+  useAdminRunDetailQuery, useAdminRunLogsQuery, useModifierNotesRun, messageErreurScraping,
 } from "@/features/admin-scraping.tools"
 import { useReferentialsQuery } from "@/lib/referentiels-query"
+import { useNotify } from "@/contexts/Notify.context"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Textarea } from "@/components/ui/textarea"
 import {
   Select, SelectTrigger, SelectValue, SelectContent, SelectItem,
 } from "@/components/ui/select"
+import {
+  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
+} from "@/components/ui/dialog"
 import {
   Table, TableHeader, TableBody, TableHead, TableRow, TableCell,
 } from "@/components/ui/table"
@@ -34,9 +41,18 @@ import {
      niveau dérivé serveur : failed→error, skipped→warning, sinon
      info), filtrable par niveau.
 
+   Audit 4 :
+   - C.4 : les notes d'un run sont éditables APRÈS COUP (annotation
+     forensique « source down, on relancera demain ») — dialog
+     crayon, journalisé serveur, null = effacer ;
+   - C.6 : le filtre niveau du journal est SQL-side (paramètre `level`
+     de /runs/{id}/logs, plus de filtrage client) et la réponse est
+     bornée (limit 200 + offset → pagination honnête côté page).
+
    Données :
    - GET /api/admin/scraping/runs/{id}          (sous-runs préchargés)
-   - GET /api/admin/scraping/runs/{id}/logs     (journal)
+   - GET /api/admin/scraping/runs/{id}/logs     (journal, borné)
+   - PATCH /api/admin/scraping/runs/{id}        (notes, audit 4 C.4)
    - Noms de sources : référentiel PUBLIC /api/referentials/sources
      (useReferentialsQuery, cache déjà chaud depuis les pages offres —
      résolution Map source_id → name, zéro appel dédié).
@@ -62,15 +78,34 @@ const LIBELLE_ACTION = {
   failed: "Échec",
 }
 
+const TAILLE_PAGE_JOURNAL = 200
+
 const DetailRun = () => {
   const { id: runId } = useParams()
+  const notify = useNotify()
   const [niveauFiltre, setNiveauFiltre] = useState("")
+  const [pageJournal, setPageJournal] = useState(1)
+  const [notesOuvertes, setNotesOuvertes] = useState(false)
 
   const {
     data: run, isLoading, isError, error, refetch,
   } = useAdminRunDetailQuery(runId)
   const runActif = statutRunActif(run?.status)
-  const { data: logs, isLoading: logsChargement } = useAdminRunLogsQuery(runId, { runActif })
+
+  // Audit 4, C.6 : filtre niveau SQL-side + pagination bornée — les
+  // params sont le miroir exact des Query params serveur.
+  const paramsJournal = useMemo(
+    () => ({
+      level: niveauFiltre || undefined,
+      limit: TAILLE_PAGE_JOURNAL,
+      offset: (pageJournal - 1) * TAILLE_PAGE_JOURNAL,
+    }),
+    [niveauFiltre, pageJournal]
+  )
+  const { data: logs, isLoading: logsChargement } = useAdminRunLogsQuery(runId, { runActif, params: paramsJournal })
+
+  // Audit 4, C.4 : annotation des notes après coup.
+  const notesMutation = useModifierNotesRun()
 
   // Résolution source_id → nom : référentiel public déjà en cache.
   const { data: referentiels } = useReferentialsQuery()
@@ -80,7 +115,10 @@ const DetailRun = () => {
     return map
   }, [referentiels])
 
-  const logsFiltres = niveauFiltre ? (logs ?? []).filter((l) => l.niveau === niveauFiltre) : logs
+  const changerNiveau = (valeur) => {
+    setNiveauFiltre(valeur)
+    setPageJournal(1)
+  }
 
   /* ─── 404 : run introuvable ─── */
   if (isError) {
@@ -118,8 +156,26 @@ const DetailRun = () => {
               </h1>
               <p className="text-xs text-muted-foreground">
                 Déclenché par {run.triggered_by}
-                {run.notes ? ` — « ${run.notes} »` : ""}
               </p>
+              {/* Notes éditables après coup (audit 4, C.4) */}
+              <div className="mt-1 flex flex-wrap items-center gap-2">
+                {run.notes ? (
+                  <span className="rounded-md bg-muted px-2 py-0.5 text-xs italic text-muted-foreground">
+                    « {run.notes} »
+                  </span>
+                ) : (
+                  <span className="text-[10px] text-muted-foreground">Aucune annotation.</span>
+                )}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 px-1.5 text-[11px]"
+                  onClick={() => setNotesOuvertes(true)}
+                  aria-label={run.notes ? "Modifier l'annotation du run" : "Annoter ce run"}
+                >
+                  <Pencil className="size-3" aria-hidden /> {run.notes ? "Modifier" : "Annoter"}
+                </Button>
+              </div>
             </div>
             <StatusChip
               tone={TONE_STATUT_RUN[run.status] ?? "navy"}
@@ -231,22 +287,26 @@ const DetailRun = () => {
                 <FileClock className="size-4 text-primary" aria-hidden />
                 Journal d'ingestion
               </h2>
-              <Select value={niveauFiltre} onValueChange={setNiveauFiltre}>
-                <SelectTrigger className="h-7 w-40" aria-label="Filtrer le journal par niveau">
-                  <SelectValue placeholder="Niveau" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">Tous</SelectItem>
-                  {Object.entries(LIBELLE_NIVEAU).map(([valeur, [libelle]]) => (
-                    <SelectItem key={valeur} value={valeur}>{libelle}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="flex items-center gap-2">
+                {/* Audit 4, C.6 : filtre niveau SQL-side — changer de niveau
+                    repart à la page 1 côté serveur. */}
+                <Select value={niveauFiltre} onValueChange={changerNiveau}>
+                  <SelectTrigger className="h-7 w-40" aria-label="Filtrer le journal par niveau">
+                    <SelectValue placeholder="Niveau" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">Tous</SelectItem>
+                    {Object.entries(LIBELLE_NIVEAU).map(([valeur, [libelle]]) => (
+                      <SelectItem key={valeur} value={valeur}>{libelle}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
             <p className="text-[10px] text-muted-foreground">
               Une ligne par offre traitée — journal spécifique au scraping (les événements
-              d'envoi ou d'IA n'y figurent pas).
+              d'envoi ou d'IA n'y figurent pas). 200 lignes par page, filtrées côté serveur.
             </p>
 
             {logsChargement ? (
@@ -254,12 +314,14 @@ const DetailRun = () => {
                 {[...Array(5)].map((_, i) => <Skeleton key={i} className="h-8 w-full rounded-lg" />)}
               </div>
             ) : !logs?.length ? (
-              <SectionVide message="Aucun événement pour ce run." />
-            ) : !logsFiltres?.length ? (
-              <SectionAucunResultat
-                message="Aucun événement à ce niveau."
-                onReset={() => setNiveauFiltre("")}
-              />
+              niveauFiltre ? (
+                <SectionAucunResultat
+                  message="Aucun événement à ce niveau."
+                  onReset={() => changerNiveau("")}
+                />
+              ) : (
+                <SectionVide message="Aucun événement pour ce run." />
+              )
             ) : (
               <div className="overflow-x-auto rounded-xl border border-border">
                 <Table>
@@ -274,7 +336,7 @@ const DetailRun = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {logsFiltres.map((log) => {
+                    {logs.map((log) => {
                       const [libelleNiveau, variante] = LIBELLE_NIVEAU[log.niveau] ?? [log.niveau, "outline"]
                       return (
                         <TableRow key={log.id}>
@@ -323,10 +385,122 @@ const DetailRun = () => {
                 </Table>
               </div>
             )}
+
+            {/* Pagination heuristique honnête : liste plate bornée à
+                limit=200 — « page suivante possible si page pleine ». */}
+            {!logsChargement && Array.isArray(logs) && (logs.length === TAILLE_PAGE_JOURNAL || pageJournal > 1) && (
+              <nav aria-label="Pagination du journal" className="flex flex-wrap items-center justify-between gap-2">
+                <p className="text-xs text-muted-foreground tabular-nums">
+                  Journal — page {pageJournal}
+                </p>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPageJournal(Math.max(1, pageJournal - 1))}
+                    disabled={pageJournal <= 1}
+                    aria-label="Page précédente du journal"
+                  >
+                    Précédent
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setPageJournal(pageJournal + 1)}
+                    disabled={logs?.length !== TAILLE_PAGE_JOURNAL}
+                    aria-label="Page suivante du journal"
+                  >
+                    Suivant
+                  </Button>
+                </div>
+              </nav>
+            )}
           </section>
         </>
       )}
+
+      {/* ─── Dialog annotation des notes (audit 4, C.4) ─── */}
+      {run && (
+        <DialogNotesRun
+          ouvert={notesOuvertes}
+          onFermer={() => setNotesOuvertes(false)}
+          run={run}
+          mutation={notesMutation}
+          notifier={notify}
+        />
+      )}
     </div>
+  )
+}
+
+/* Dialog d'annotation forensique d'un run (audit 4, C.4) — monté
+   conditionnellement par la valeur `notes`, réinitialisé à chaque
+   ouverture (initialiseur useState sur run.notes). */
+const DialogNotesRun = ({ ouvert, onFermer, run, mutation, notifier }) => {
+  const [notes, setNotes] = useState(run?.notes ?? "")
+
+  // Réinitialiser à chaque réouverture (le dialog reste monté tant
+  // que run existe) : la valeur suit le run en cache.
+  const [ouvertePrecedente, setOuvertePrecedente] = useState(ouvert)
+  if (ouvert !== ouvertePrecedente) {
+    setOuvertePrecedente(ouvert)
+    setNotes(run?.notes ?? "")
+  }
+
+  const enregistrer = () => {
+    mutation.mutate(
+      { runId: run.id, notes: notes.trim() || null },
+      {
+        onSuccess: () => {
+          notifier("Annotation enregistrée", "success")
+          onFermer()
+        },
+        onError: (err) => notifier(messageErreurScraping(err) || "Annotation impossible", "error"),
+      }
+    )
+  }
+
+  return (
+    <Dialog open={ouvert} onOpenChange={(o) => !o && onFermer()}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Pencil className="size-4 text-primary" aria-hidden />
+            Annoter ce run
+          </DialogTitle>
+          <DialogDescription>
+            Annotation libre (usage forensique — ex. « source down, on relancera demain »).
+            Journalisée dans le journal d'activité. Laisser vide pour effacer.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="flex flex-col gap-1.5">
+          <Label htmlFor="run-notes">Notes</Label>
+          <Textarea
+            id="run-notes"
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            maxLength={1000}
+            rows={3}
+            placeholder="Ex. échec HTTP 503 sur GoAfrica, relance prévue demain…"
+            aria-describedby="run-notes-compteur"
+          />
+          <p id="run-notes-compteur" className="text-right text-[10px] text-muted-foreground tabular-nums">
+            {notes.length}/1000
+          </p>
+        </div>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={onFermer}>
+            Annuler
+          </Button>
+          <Button onClick={enregistrer} disabled={mutation.isPending}>
+            <Save aria-hidden className={mutation.isPending ? "animate-pulse" : undefined} />
+            {mutation.isPending ? "Enregistrement…" : "Enregistrer"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }
 

@@ -42,12 +42,33 @@ const getRunDetail = async (runId, { signal } = {}) => {
 /**
  * GET /api/admin/scraping/runs/{run_id}/logs — evenements d'ingestion du run
  * (un par offre traitee, niveau derive de l'action : error/ warning/ info).
+ * Audit 4, C.6 : reponse bornee + filtre niveau COTE SQL —
+ * @param {Object} params level ("info"|"warning"|"error"), limit (1-200, defaut 200), offset (>= 0)
  */
-const getRunLogs = async (runId, { signal } = {}) => {
-  const response = await adminApi.get(`${API_URL}/runs/${encodeURIComponent(runId)}/logs`, { signal });
+const getRunLogs = async (runId, params = {}, { signal } = {}) => {
+  const response = await adminApi.get(`${API_URL}/runs/${encodeURIComponent(runId)}/logs`, {
+    params: cleanParams(params),
+    signal,
+  });
   return response.data;
 };
 
-export { getScrapingStatus, getScrapingSummary, triggerScraping, getRuns, getRunDetail, getRunLogs };
+/**
+ * PATCH /api/admin/scraping/runs/{run_id} — annotation du run apres coup
+ * (audit 4, C.4 : notes libres, usage forensique « source down, on
+ * relancera demain »). Journalisee cote serveur. → ScrapeRunRead.
+ * @param {string} runId
+ * @param {Object} data { notes: string | null } — null = effacer
+ */
+const updateRunNotes = async (runId, data, { signal } = {}) => {
+  const response = await adminApi.patch(
+    `${API_URL}/runs/${encodeURIComponent(runId)}`,
+    data,
+    { signal },
+  );
+  return response.data;
+};
 
-export default { getScrapingStatus, getScrapingSummary, triggerScraping, getRuns, getRunDetail, getRunLogs };
+export { getScrapingStatus, getScrapingSummary, triggerScraping, getRuns, getRunDetail, getRunLogs, updateRunNotes };
+
+export default { getScrapingStatus, getScrapingSummary, triggerScraping, getRuns, getRunDetail, getRunLogs, updateRunNotes };

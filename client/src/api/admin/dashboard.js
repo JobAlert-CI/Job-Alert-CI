@@ -31,7 +31,7 @@ const getRunDetail = async (runId, { signal } = {}) => {
 
 /**
  * GET /api/admin/dashboard/top-viewed-offers — top N offres actives par vues.
- * @param {Object} params { days: 1-90 (defaut 7, reserve), limit: 1-50 (defaut 10) }
+ * @param {Object} params { days: 1-90 (defaut 7, EFFECTIF depuis l'audit 4 H.2 — filtre last_seen_at), limit: 1-50 (defaut 10) }
  */
 const getTopViewedOffers = async (params = {}, { signal } = {}) => {
   const response = await adminApi.get(`/api/admin/dashboard/top-viewed-offers`, { params, signal });

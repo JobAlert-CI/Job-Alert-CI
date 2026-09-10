@@ -60,8 +60,10 @@ const CadreChart = ({ titre, chargement, vide, videMessage, children, minHeight 
 
 const OngletEvents = () => {
   const notify = useNotify()
-  const { niveau, source, pageEvents, paramsEvents, setNiveau, setSource, setPageEvents, reinitialiserEvents } =
-    useFiltresLogsAdmin()
+  const {
+    niveau, source, debutEvents, finEvents, pageEvents, paramsEvents,
+    setNiveau, setSource, setDebutEvents, setFinEvents, setPageEvents, reinitialiserEvents,
+  } = useFiltresLogsAdmin()
 
   const { data: stats, isLoading: statsCharge } = useLogsStatsQuery(30)
   const { data: events, isLoading, isError, refetch } = useEventsQuery(paramsEvents)
@@ -102,7 +104,7 @@ const OngletEvents = () => {
     [stats]
   )
 
-  const filtresActifs = !!(niveau || source)
+  const filtresActifs = !!(niveau || source || debutEvents || finEvents)
   const pagePleine = Array.isArray(events) && events.length === paramsEvents.limit
 
   return (
@@ -168,6 +170,29 @@ const OngletEvents = () => {
             <option key={s.id ?? s.code} value={s.id ?? ""}>{s.label}</option>
           ))}
         </select>
+        {/* Audit 4, A.7 : plage de dates inclusive (AAAA-MM-JJ, en URL). */}
+        <label className="flex items-center gap-1 text-[11px] text-muted-foreground">
+          Du
+          <input
+            type="date"
+            value={debutEvents}
+            max={finEvents || undefined}
+            onChange={(e) => setDebutEvents(e.target.value)}
+            aria-label="Date de début des événements (incluse)"
+            className="h-9 rounded-md border border-border bg-background px-2 text-xs"
+          />
+        </label>
+        <label className="flex items-center gap-1 text-[11px] text-muted-foreground">
+          au
+          <input
+            type="date"
+            value={finEvents}
+            min={debutEvents || undefined}
+            onChange={(e) => setFinEvents(e.target.value)}
+            aria-label="Date de fin des événements (incluse)"
+            className="h-9 rounded-md border border-border bg-background px-2 text-xs"
+          />
+        </label>
         <p className="flex items-center gap-1 text-[10px] text-muted-foreground">
           <Radar className="size-3" aria-hidden /> Module scraping seul — les autres modules n'émettent pas d'événements.
         </p>

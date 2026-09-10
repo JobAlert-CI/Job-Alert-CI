@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils"
 import Seo from "@/components/seo/Seo"
 import { CtaLink, StatusChip } from "@/components/shared"
 import { contactSeo } from "@/lib/seo"
+import { createContact } from "@/api/public/contact"
 
 /* ════════════════════════════════════════════════════════════════════
 DONNÉES
@@ -79,13 +80,16 @@ const HorlogeAbidjan = () => {
 }
 
 /* ════════════════════════════════════════════════════════════════════
-FORMULAIRE — composé comme un email vers l'équipe
+FORMULAIRE — composé comme un email vers l'équipe, envoyé pour de
+vrai via POST /api/contact (audit 4 : le mock setTimeout est retiré).
+Rate-limit serveur : 429 avec header Retry-After (secondes).
 ════════════════════════════════════════════════════════════════════ */
 const FormulaireContact = () => {
   const [form, setForm] = useState({ nom: "", email: "", sujet: "", message: "" })
   const [tentative, setTentative] = useState(false)
   const [sending, setSending] = useState(false)
   const [sent, setSent] = useState(false)
+  const [erreurEnvoi, setErreurEnvoi] = useState("")
 
   const set = (k, v) => setForm((p) => ({ ...p, [k]: v }))
   const sujetObj = SUJETS.find((s) => s.id === form.sujet)
@@ -101,15 +105,48 @@ const FormulaireContact = () => {
 
   const canSend = Object.keys(erreurs).length === 0
 
-  const submit = (ev) => {
+  const submit = async (ev) => {
     ev.preventDefault()
     setTentative(true)
+    setErreurEnvoi("")
     if (!canSend || sending) return
     setSending(true)
-    setTimeout(() => {
-      setSending(false)
+    try {
+      // Envoi RÉEL — le module api/public/contact.js existait sans être
+      // jamais appelé. subject_code = id du sujet (contrat serveur).
+      await createContact({
+        full_name: form.nom.trim(),
+        email: form.email.trim(),
+        subject_code: form.sujet,
+        message: form.message.trim(),
+      })
       setSent(true)
-    }, 1400)
+    } catch (err) {
+      // 429 = rate-limit serveur : Retry-After (secondes) rendu lisible.
+      if (err?.response?.status === 429) {
+        const delai = Number(err.response.headers?.["retry-after"])
+        const lisible = Number.isFinite(delai) && delai > 0
+          ? delai >= 60
+            ? `environ ${Math.ceil(delai / 60)} min`
+            : `${delai} s`
+          : "un instant"
+        setErreurEnvoi(
+          `Trop de messages envoyés — patientez ${lisible} avant de réessayer. Votre message n'est pas parti.`
+        )
+      } else if (err?.response?.status === 422) {
+        setErreurEnvoi(
+          "Certains champs sont invalides (message de 20 caractères min, 2000 max). Vérifiez et réessayez."
+        )
+      } else if (err?.code === "ECONNABORTED") {
+        setErreurEnvoi("L'envoi a pris trop de temps. Vérifiez votre connexion puis réessayez.")
+      } else {
+        setErreurEnvoi(
+          "L'envoi a échoué côté serveur. Rien n'est perdu : réessayez dans un instant, ou écrivez-nous directement à bonjour@jobalert.ci."
+        )
+      }
+    } finally {
+      setSending(false)
+    }
   }
 
   const champ = (k) =>
@@ -293,6 +330,14 @@ const FormulaireContact = () => {
                       {form.message.length}/1000
                     </span>
                   </div>
+                </div>
+
+                <div className="flex items-start gap-2" role="alert" aria-live="polite">
+                  {erreurEnvoi ? (
+                    <p className="w-full rounded-lg border border-red-200 bg-red-50 px-3.5 py-2.5 text-[12px] font-medium leading-relaxed text-red-600">
+                      {erreurEnvoi}
+                    </p>
+                  ) : null}
                 </div>
 
                 <button

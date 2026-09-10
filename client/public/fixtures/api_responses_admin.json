@@ -550,7 +550,8 @@
           "template_version": "v1",
           "offer_links": [],
           "created_at": "2026-09-03T06:30:00",
-          "updated_at": "2026-09-03T06:30:12"
+          "updated_at": "2026-09-03T06:30:12",
+          "match_tier": "T0"
         }
       ]
     },
@@ -2350,15 +2351,25 @@
           "status": "ok",
           "queues": {
             "emails_queued": 0,
-            "ingestion_depth": "N/A (simulee: pas de file Redis directe exposee)",
-            "ai_depth": "N/A"
+            "ingestion_depth": 3,
+            "ai_depth": 28,
+            "emails_depth": 0,
+            "default_depth": 0
           },
-          "message": "0 digests en file d'attente"
+          "message": "0 digests en file d'attente ; profondeurs broker LLEN (ai=28, ingestion=3, emails=0)"
         },
         "heartbeat": {
           "status": "ok",
-          "last_heartbeat_at": "2026-09-04T06:52:35",
+          "last_heartbeat_at": "2026-09-10T01:30:00Z",
           "message": "Derniere offre creee"
+        },
+        "email_provider": {
+          "status": "ok",
+          "message": "Aucun echec d'envoi recent"
+        },
+        "ai_provider": {
+          "status": "ok",
+          "message": "3 cle(s) IA active(s), aucune erreur recente"
         },
         "admin_auth": {
           "status": "ok",
@@ -2442,6 +2453,189 @@
       "status_code": 200,
       "data": {
         "count": 182
+      }
+    },
+    "getSystemSchedule": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/system/schedule"
+      },
+      "status_code": 200,
+      "data": {
+        "timezone": "Africa/Abidjan",
+        "scraper_beat_enabled": true,
+        "retry_failed_digests_enabled": false,
+        "no_offer_email_enabled": true,
+        "entries": [
+          {
+            "name": "ai-process-raw-offers-sweep",
+            "task": "tasks.ai_processing.sweep_raw_offers",
+            "queue": "ai",
+            "label": "Sweep IA des offres brutes",
+            "description": "Toutes les 5 min : traite les offres status=brut restantes (queue ai).",
+            "env_key": null,
+            "interval_seconds": 300,
+            "schedule_kind": "interval"
+          },
+          {
+            "name": "digest-prepare",
+            "task": "tasks.digests.prepare_daily_digests",
+            "queue": "emails",
+            "label": "Digest — phase 1 preparation",
+            "description": "Construit et file les digests du jour (verrou Redis lock:digest:prepare:{date}).",
+            "env_key": "DAILY_DIGEST_PREPARE_HOUR / DAILY_DIGEST_PREPARE_MINUTE",
+            "utc_time": "07:30",
+            "local_time": "07:30",
+            "schedule_kind": "daily"
+          },
+          {
+            "name": "digest-send",
+            "task": "tasks.digests.send_daily_digests",
+            "queue": "emails",
+            "label": "Digest — phase 2 envoi",
+            "description": "Envoie les digests files par la phase 1 (verrou lock:digest:send:{date}).",
+            "env_key": "DAILY_DIGEST_SEND_HOUR / DAILY_DIGEST_SEND_MINUTE",
+            "utc_time": "08:00",
+            "local_time": "08:00",
+            "schedule_kind": "daily"
+          },
+          {
+            "name": "digest-send-no-offer",
+            "task": "tasks.digests.send_no_offer_emails",
+            "queue": "emails",
+            "label": "Digest — emails sans offre",
+            "description": "30 min apres l'envoi principal : emails « aucune offre » aux abonnes concernes (derive de DAILY_DIGEST_SEND_HOUR, audit 4, F.3).",
+            "env_key": "derive de DAILY_DIGEST_SEND_HOUR (+30 min)",
+            "utc_time": "08:30",
+            "local_time": "08:30",
+            "schedule_kind": "daily"
+          },
+          {
+            "name": "flush-offer-metrics",
+            "task": "tasks.maintenance.flush_offer_metrics",
+            "queue": "emails",
+            "label": "Flush compteurs offres",
+            "description": "Applique les deltas view/save Redis en base, chaque minute.",
+            "env_key": null,
+            "interval_seconds": 60,
+            "schedule_kind": "interval"
+          },
+          {
+            "name": "purge-ai-alerts",
+            "task": "tasks.maintenance.purge_ai_alerts",
+            "queue": "emails",
+            "label": "Purge alertes IA (> 90 jours)",
+            "description": "Supprime les alertes IA de plus de 90 jours (audit 4, B.4).",
+            "env_key": "DAILY_PURGE_HOUR (minute fixe :15)",
+            "utc_time": "03:15",
+            "local_time": "03:15",
+            "schedule_kind": "daily"
+          },
+          {
+            "name": "purge-expired-refresh-tokens",
+            "task": "tasks.maintenance.purge_expired_refresh_tokens",
+            "queue": "emails",
+            "label": "Purge refresh tokens expires",
+            "description": "Supprime les refresh tokens admin arrives a expiration.",
+            "env_key": "DAILY_PURGE_HOUR",
+            "utc_time": "03:00",
+            "local_time": "03:00",
+            "schedule_kind": "daily"
+          },
+          {
+            "name": "purge-ingestion-events",
+            "task": "tasks.maintenance.purge_ingestion_events",
+            "queue": "ingestion",
+            "label": "Purge events d'ingestion (2 vitesses)",
+            "description": "raw_payload NULL au-dela de 15 jours, suppression complete au-dela de 90 jours (audit 4, A.3 — par lots de 5000, la table etant la plus grosse du systeme).",
+            "env_key": "DAILY_PURGE_HOUR (minute fixe :30)",
+            "utc_time": "03:30",
+            "local_time": "03:30",
+            "schedule_kind": "daily"
+          },
+          {
+            "name": "purge-system-events",
+            "task": "tasks.maintenance.purge_system_events",
+            "queue": "emails",
+            "label": "Purge journal systeme (> 90 jours)",
+            "description": "Supprime les evenements systeme (G.1) de plus de 90 jours — echecs tasks/emails/IA.",
+            "env_key": "DAILY_PURGE_HOUR (minute fixe :45)",
+            "utc_time": "03:45",
+            "local_time": "03:45",
+            "schedule_kind": "daily"
+          },
+          {
+            "name": "requalify-stale-runs",
+            "task": "tasks.maintenance.requalify_stale_runs",
+            "queue": "ingestion",
+            "label": "Requalification runs zombies",
+            "description": "Toutes les 30 min : RUNNING > 6 h ou PENDING > 24 h -> FAILED (audit 4, M.1).",
+            "env_key": null,
+            "interval_seconds": 1800,
+            "schedule_kind": "interval"
+          },
+          {
+            "name": "retry-failed-digests",
+            "task": "tasks.digests.retry_failed_digests",
+            "queue": "emails",
+            "label": "Rattrapage digests failed",
+            "description": "Horaire 09:00-18:00 : republie les digests FAILED non epuises (kill-switch RETRY_FAILED_DIGESTS_ENABLED, off par defaut — audit 4, M.2).",
+            "env_key": null,
+            "utc_time": "09-18:00",
+            "local_time": "09:00-18:00",
+            "schedule_kind": "hourly-range"
+          },
+          {
+            "name": "scrape-all-sources",
+            "task": "tasks.scrapers.run_active_scrapers",
+            "queue": "ingestion",
+            "label": "Scraping de toutes les sources actives",
+            "description": "Toutes les sources ACTIVE supports_scraping de la table sources, via run_active_scrapers (audit 4, F.1 : une source ajoutee via l'admin est scrapee des le lendemain sans redéploiement).",
+            "env_key": "DAILY_COLLECTION_HOUR",
+            "toggle": "SCRAPER_BEAT_ENABLED",
+            "utc_time": "06:00",
+            "local_time": "06:00",
+            "schedule_kind": "daily"
+          }
+        ]
+      }
+    },
+    "getSystemEvents": {
+      "request": {
+        "method": "GET",
+        "url": "/api/admin/system/events"
+      },
+      "status_code": 200,
+      "data": {
+        "total": 2,
+        "limit": 50,
+        "days": 7,
+        "events": [
+          {
+            "id": "b1e4c9a2-0000-4a55-8d1e-2f6b7a9c0d11",
+            "source": "celery",
+            "severity": "error",
+            "event_type": "task_failure",
+            "message": "La tache send_daily_digests a echoue (attempt 2/3).",
+            "context": {
+              "task_id": "d8449be0-f500-46e9-ae86-8c0a7780e71f",
+              "digest_date": "2026-09-09"
+            },
+            "created_at": "2026-09-09T08:02:11+00:00"
+          },
+          {
+            "id": "a2f3d1b0-1111-4b77-9c2d-3e8f1a5b6c7d",
+            "source": "email",
+            "severity": "warning",
+            "event_type": "digest_send_partial",
+            "message": "3 digests en echec sur 120 envoyes.",
+            "context": {
+              "failed": 3,
+              "total": 120
+            },
+            "created_at": "2026-09-09T08:31:47+00:00"
+          }
+        ]
       }
     }
   }

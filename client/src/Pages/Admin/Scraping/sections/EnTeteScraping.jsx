@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom"
 import { Radar, RotateCw } from "lucide-react"
 import {
   aUnRunActif,
@@ -20,9 +21,14 @@ import {
 
    Le bouton ouvre le dialog de déclenchement (confirmation) porté
    par la page (index.jsx) : choix source unique ou toutes, + notes.
+
+   ⚠️ Audit 4, C.2 : si un run « toutes sources » a déjà été déclenché
+   aujourd'hui par cet admin, un encart remplace le bouton (le
+   serveur répondrait 409) : statut du run du jour + lien direct vers
+   son détail ; le dialog reste ouvrable pour une source SEULE.
    ───────────────────────────────────────────────────────────────────── */
 
-const EnTeteScraping = ({ onDeclencher }) => {
+const EnTeteScraping = ({ onDeclencher, runDuJour = null }) => {
   // Les runs servent uniquement à l'état global : même queryKey que
   // l'historique → zéro appel réseau supplémentaire. Une erreur ici
   // n'est pas bloquante : l'en-tête reste utilisable sans la chip.
@@ -66,9 +72,24 @@ const EnTeteScraping = ({ onDeclencher }) => {
         {dernier && !enCours && (
           <span className="text-xs text-muted-foreground">{ilYA(dernier.finished_at ?? dernier.started_at)}</span>
         )}
-        <Button size="sm" onClick={onDeclencher}>
-          <RotateCw aria-hidden /> Lancer un scraping
-        </Button>
+        {runDuJour ? (
+          <span className="flex items-center gap-1.5 rounded-lg border border-border bg-muted/40 px-2.5 py-1.5 text-xs text-muted-foreground">
+            Toutes sources déjà déclenché aujourd'hui —{" "}
+            <Link
+              to={`/admin/scraping/runs/${runDuJour.id}`}
+              className="inline-flex items-center gap-0.5 font-medium text-primary underline-offset-2 hover:underline"
+            >
+              voir le run du jour
+            </Link>
+            <Button size="sm" variant="outline" className="ml-1" onClick={onDeclencher}>
+              Source seule…
+            </Button>
+          </span>
+        ) : (
+          <Button size="sm" onClick={onDeclencher}>
+            <RotateCw aria-hidden /> Lancer un scraping
+          </Button>
+        )}
       </div>
     </section>
   )

@@ -3,8 +3,9 @@ import { ErrorBoundary } from "react-error-boundary"
 import { Radar, RotateCw } from "lucide-react"
 import AdminSectionFallback from "@/components/admin/AdminSectionFallback"
 import {
-  useTriggerScraping, messageErreurScraping, useAdminScrapingStatusQuery,
+  useTriggerScraping, messageErreurScraping, useAdminScrapingStatusQuery, useRunAdminDuJour,
 } from "@/features/admin-scraping.tools"
+import { useAdminAuth } from "@/contexts/AdminAuth.context"
 import { useNotify } from "@/contexts/Notify.context"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
@@ -38,17 +39,25 @@ import HistoriqueRuns from "./sections/HistoriqueRuns"
                          pagination heuristique, lien vers le détail
                          (page 11, cycle suivant).
 
-   Dialog de déclenchement : POST /api/admin/scraping/trigger crée
-   seulement des lignes "pending" — l'exécution est asynchrone
-   (worker Celery). Le message de succès dit « en file d'attente »,
-   JAMAIS « scraping terminé » (doc v3 §10 point d'attention).
+   Dialog de déclenchement : POST /api/admin/scraping/trigger
+   dispatche réellement les tasks Celery (audit 4, C.1 — le run
+   n'est plus un fantôme PENDING). Le message de succès dit « en file
+   d'attente », JAMAIS « scraping terminé » (doc v3 §10).
    404 = aucune source active correspondante → message clair.
+   ⚠️ Audit 4, C.2 : 409 si un run a DÉJÀ été déclenché aujourd'hui
+   par cet admin (toutes sources) — le bouton est GRISÉ d'avance via
+   useRunAdminDuJour (croisement local getRuns) avec un lien vers le
+   run du jour ; le trigger PAR SOURCE reste disponible.
+   ⚠️ Audit 4, C.1 : 503 = broker Celery injoignable → le run est
+   marqué failed côté serveur (aucune ligne mensongère) — le detail
+   serveur remonte tel quel.
    ───────────────────────────────────────────────────────────────────── */
 
 const MAX_NOTES = 1000
 
 const Scraping = () => {
   const notify = useNotify()
+  const { profile } = useAdminAuth()
 
   // Sources du dialog (pas un état partagé : le dialog se remonte à
   // chaque ouverture → réinitialisation naturelle, pattern cycle 8).
@@ -58,6 +67,11 @@ const Scraping = () => {
 
   const { data: sources } = useAdminScrapingStatusQuery()
   const triggerMutation = useTriggerScraping()
+
+  // Audit 4, C.2 : run du jour déjà déclenché par CET admin → le
+  // bouton « toutes sources » est grisÉ d'avance (409 sinon).
+  const { data: runDuJour } = useRunAdminDuJour(profile?.id)
+  const dejaDeclenche = !!runDuJour
 
   const ouvrirDialog = () => {
     setSourceCode("")
@@ -89,7 +103,7 @@ const Scraping = () => {
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
       <ErrorBoundary FallbackComponent={AdminSectionFallback}>
-        <EnTeteScraping onDeclencher={ouvrirDialog} />
+        <EnTeteScraping onDeclencher={ouvrirDialog} runDuJour={runDuJour} />
       </ErrorBoundary>
 
       {/* Compteurs (sélection utilisateur cycle 10) : 2 dérivés des
@@ -134,7 +148,9 @@ const Scraping = () => {
                   <SelectValue placeholder="Toutes les sources actives" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Toutes les sources actives</SelectItem>
+                  <SelectItem value="" disabled={dejaDeclenche}>
+                    Toutes les sources actives{dejaDeclenche ? " (déjà déclenché aujourd'hui)" : ""}
+                  </SelectItem>
                   {(sources ?? []).map((s) => (
                     <SelectItem key={s.source_code} value={s.source_code}>
                       {s.source_name}
@@ -143,7 +159,9 @@ const Scraping = () => {
                 </SelectContent>
               </Select>
               <p className="text-[10px] text-muted-foreground">
-                Les sources en pause sont exclues automatiquement (404 si aucune source active).
+                {dejaDeclenche
+                  ? "Toutes sources : déjà déclenché aujourd'hui (une fois par administrateur et par jour). Lancez une source seule ou attendez demain."
+                  : "Les sources en pause sont exclues automatiquement (404 si aucune source active)."}
               </p>
             </div>
 
@@ -168,7 +186,10 @@ const Scraping = () => {
             <Button variant="outline" onClick={() => setDialogOuvert(false)}>
               Annuler
             </Button>
-            <Button onClick={lancerScraping} disabled={triggerMutation.isPending}>
+            <Button
+              onClick={lancerScraping}
+              disabled={triggerMutation.isPending || (dejaDeclenche && !sourceCode)}
+            >
               <RotateCw aria-hidden className={triggerMutation.isPending ? "animate-spin" : undefined} />
               {triggerMutation.isPending ? "Mise en file…" : "Lancer"}
             </Button>

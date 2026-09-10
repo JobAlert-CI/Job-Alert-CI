@@ -10,7 +10,9 @@ const API_URL = "/api/admin/logs";
  * Cycle 16 : enveloppe PAGINEE { items, total, limit, offset } — le total
  * est exact SOUS FILTRES (pagination honnete, plus d'heuristique).
  * @param {Object} params admin_id, action ("creation"|"modification"|"suppression"|
- *   "envoi"|"connexion"|"scraping"), target_table, limit (1-200, defaut 50), offset (>= 0)
+ *   "envoi"|"connexion"|"deconnexion"|"scraping"), target_table,
+ *   date_debut (AAAA-MM-JJ, borne inferieure inclusive — audit 4, A.7),
+ *   date_fin (AAAA-MM-JJ, borne superieure inclusive), limit (1-200, defaut 50), offset (>= 0)
  */
 const getAuditLogs = async (params = {}, { signal } = {}) => {
   const response = await adminApi.get(`${API_URL}/audit`, { params: cleanParams(params), signal });
@@ -43,7 +45,8 @@ const getLogsStats = async (params = {}, { signal } = {}) => {
 /**
  * GET /api/admin/logs/events — evenements d'ingestion.
  * @param {Object} params module ("scraping" seul disponible), level ("info"|"warning"|"error"),
- *   source_id, limit (1-200, defaut 50), offset (>= 0)
+ *   source_id, date_debut (AAAA-MM-JJ inclusive — audit 4, A.7), date_fin (AAAA-MM-JJ inclusive),
+ *   limit (1-200, defaut 50), offset (>= 0)
  */
 const getEventLogs = async (params = {}, { signal } = {}) => {
   const response = await adminApi.get(`${API_URL}/events`, { params: cleanParams(params), signal });
