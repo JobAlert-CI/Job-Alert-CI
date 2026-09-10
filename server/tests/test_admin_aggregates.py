@@ -9,6 +9,7 @@ Couvre :
 from __future__ import annotations
 
 import uuid
+from datetime import timedelta
 
 import pytest
 
@@ -68,6 +69,9 @@ def _seed_offer_pipeline(admin_db):
             existing.view_count = max(existing.view_count, view_count)
             return existing
         from datetime import datetime, timezone
+        # Audit 4, H.2 : le top-viewed est fenetre sur last_seen_at — les
+        # offres seedees simulent des offres RECEMMENT consultees.
+        seen_at = datetime.now(timezone.utc) - timedelta(hours=1)
         offer = JobOffer(
             id=str(uuid.uuid4()),
             title=title,
@@ -79,6 +83,7 @@ def _seed_offer_pipeline(admin_db):
             source_url=f"https://{company.slug}/{uuid.uuid4().hex[:6]}",
             view_count=view_count,
             save_count=max(1, view_count // 5),
+            last_seen_at=seen_at,
             status=status,
             visible_site=visible,
             deleted_at=datetime.now(timezone.utc) if deleted else None,

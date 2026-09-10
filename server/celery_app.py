@@ -97,6 +97,8 @@ task_routes = {
     "tasks.maintenance.purge_ai_alerts": {"queue": "emails"},
     # Audit 4, lot 5 (A.3) : purge des evenements d'ingestion (2 vitesses).
     "tasks.maintenance.purge_ingestion_events": {"queue": "ingestion"},
+    # Audit 4, lot 6 (G.1) : purge du journal des evenements systeme (90 j).
+    "tasks.maintenance.purge_system_events": {"queue": "emails"},
     "tasks.digests.prepare_daily_digests": {"queue": "emails"},
     "tasks.digests.build_and_queue_digest": {"queue": "emails"},
     "tasks.digests.mark_preparation_completed": {"queue": "emails"},
@@ -191,6 +193,15 @@ beat_schedule["purge-expired-refresh-tokens"] = {
 beat_schedule["purge-ai-alerts"] = {
     "task": "tasks.maintenance.purge_ai_alerts",
     "schedule": _abidjan_crontab(settings.daily_purge_hour, 15),
+    "options": {"queue": "emails"},
+}
+
+# Audit 4, lot 6 (G.1) : purge du journal des evenements systeme (90 j).
+# Minute :45 isolee des autres purges nocturnes ; queue emails (table
+# petite, volume faible — aucun besoin du lotissement ingestion).
+beat_schedule["purge-system-events"] = {
+    "task": "tasks.maintenance.purge_system_events",
+    "schedule": _abidjan_crontab(settings.daily_purge_hour, 45),
     "options": {"queue": "emails"},
 }
 
@@ -316,6 +327,13 @@ _BEAT_META: dict[str, dict] = {
         "kind": "daily",
         "local_time": f"{settings.daily_purge_hour:02d}:15",
         "env_key": "DAILY_PURGE_HOUR (minute fixe :15)",
+    },
+    "purge-system-events": {
+        "label": "Purge journal systeme (> 90 jours)",
+        "description": "Supprime les evenements systeme (G.1) de plus de 90 jours — echecs tasks/emails/IA.",
+        "kind": "daily",
+        "local_time": f"{settings.daily_purge_hour:02d}:45",
+        "env_key": "DAILY_PURGE_HOUR (minute fixe :45)",
     },
     "purge-ingestion-events": {
         "label": "Purge events d'ingestion (2 vitesses)",

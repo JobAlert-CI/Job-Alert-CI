@@ -11,11 +11,13 @@ from celery_app import celery_app
 from core.config import get_settings
 from db.session import session_scope
 from models import DigestStatus, EmailDeliveryAttempt, EmailDigest
+from models.enums import SystemEventSeverity, SystemEventSource
 from services.digest_builder_service import (
     digest_date_for,
     get_eligible_subscriber_ids,
 )
 from services.email.resend_provider import get_email_provider
+from services.system_events import log_system_event
 from tasks.locks import redis_lock
 
 """Taches Celery du digest quotidien en deux phases.
@@ -134,8 +136,17 @@ def prepare_daily_digests(
             chord(header)(mark_preparation_completed.s(day_key))
             # On renvoie ici un accus de dispatch sans attendre la fin.
             return {"status": "dispatched", "digest_date": day_key, "total": total}
-        except Exception:
+        except Exception as exc:
             logger.exception("Preparation des digests echouee pour %s", day_key)
+            # Audit 4, G.1 : echec visible en base (requetable admin), pas
+            # seulement en log worker.
+            log_system_event(
+                source=SystemEventSource.CELERY,
+                severity=SystemEventSeverity.ERROR,
+                event_type="digest_prepare_failed",
+                message=f"Preparation des digests echouee pour {day_key}",
+                context={"day_key": day_key, "error": type(exc).__name__},
+            )
             _set_marker(client, PREPARE_STATUS_KEY.format(day=day_key), "failed")
             raise
 
@@ -165,6 +176,14 @@ def build_and_queue_digest(self, subscriber_id: str, digest_date: str, force: bo
     except Exception as exc:
         # Un abonne en erreur ne doit jamais bloquer les autres.
         logger.exception("build_and_queue_digest echoue (subscriber_id=%s)", subscriber_id)
+        # Audit 4, G.1 : trace unitaire en base pour l'admin.
+        log_system_event(
+            source=SystemEventSource.CELERY,
+            severity=SystemEventSeverity.ERROR,
+            event_type="digest_build_failed",
+            message=f"Construction du digest echouee (abonne {subscriber_id})",
+            context={"subscriber_id": subscriber_id, "digest_date": digest_date, "error": type(exc).__name__},
+        )
         return {
             "subscriber_id": subscriber_id,
             "digest_id": None,
@@ -303,6 +322,15 @@ def send_digest(self, digest_id: str) -> dict:
         if attempts_done < settings.email_max_retries:
             raise self.retry(countdown=settings.email_retry_backoff_seconds * (2**self.request.retries)) from exc
         logger.exception("send_digest abandonne (digest_id=%s)", digest_id)
+        # Audit 4, G.1 : dernier echec definitif (retries epuises) — trace
+        # en base, pas seulement en log worker.
+        log_system_event(
+            source=SystemEventSource.EMAIL,
+            severity=SystemEventSeverity.ERROR,
+            event_type="digest_send_failed",
+            message=f"Envoi du digest abandonne apres retries (digest {digest_id})",
+            context={"digest_id": digest_id, "error": type(exc).__name__, "retries": self.request.retries},
+        )
         return {"digest_id": digest_id, "success": False, "status": "error", "error": type(exc).__name__}
 
     if outcome.success:
@@ -425,8 +453,16 @@ def send_no_offer_emails(date_override: str | None = None) -> dict:
                 "digest_date": day_key,
                 **summary,
             }
-        except Exception:
+        except Exception as exc:
             logger.exception("Envoi no-offer echoue pour %s", day_key)
+            # Audit 4, G.1 : echec en base pour l'admin.
+            log_system_event(
+                source=SystemEventSource.EMAIL,
+                severity=SystemEventSeverity.ERROR,
+                event_type="no_offer_emails_failed",
+                message=f"Envoi des emails sans offre echoue pour {day_key}",
+                context={"day_key": day_key, "error": type(exc).__name__},
+            )
             return {"status": "failed", "digest_date": day_key}
 
 

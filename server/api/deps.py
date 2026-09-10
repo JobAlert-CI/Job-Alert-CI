@@ -20,12 +20,23 @@ health checks) mais les routes `/api/admin/*` utilisent desormais
 
 
 def require_admin_api_key(x_admin_api_key: str | None = Header(default=None)) -> None:
-    """Protection simple par cle partagee, utile pour des scripts hors navigateur."""
+    """Protection simple par cle partagee, utile pour des scripts hors navigateur.
+
+    Audit 4, J.5 : AUCUNE route du projet n'utilise cette dependance — la
+    cle ADMIN_API_KEY ne sert qu'a proteger /metrics (via son propre
+    _is_authorized, cf. api/metrics.py). On la CONSERVE volontairement :
+    des scripts internes/health-checks externes peuvent l'invoquer, et la
+    casser serait gratuit. Elle est journalisee ici comme surface connue,
+    pas oubliee. Si un inventaire confirme l'absence d'usage externe, elle
+    pourra etre retiree sans impact applicatif.
+    """
 
     settings = get_settings()
     if not settings.admin_api_key:
         raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Admin API non configuree")
-    if x_admin_api_key != settings.admin_api_key:
+    # Audit 4, J.1 : comparaison a temps constant, alignee sur les deux
+    # autres validateurs d'en-tetes internes (scraper/internal ci-dessous).
+    if not x_admin_api_key or not secrets.compare_digest(x_admin_api_key, settings.admin_api_key):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Cle admin invalide")
 
 

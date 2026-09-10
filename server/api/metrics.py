@@ -64,6 +64,67 @@ def observe_request(method: str, path: str, status_code: int, duration_seconds: 
         _purge_if_needed()
 
 
+def _business_metrics() -> list[str]:
+    """O.1 (audit 4) : compteurs metier derives de la base, format Prometheus.
+
+    Un dashboard Grafana branche sur /metrics ne voyait que le trafic HTTP ;
+    la sante du pipeline (offres inserees, digests envoyes/echoues, jobs IA
+    en echec) n'etait visible qu'en sessions admin. Lecture SQL par scrape :
+    cout faible (4 requetes agregees), cardinalite FIXE (une ligne par
+    metier — pas de fuite memoire, contrairement aux compteurs HTTP).
+
+    En cas d'erreur SQL, on renvoie [] : /metrics doit rester scrapeable
+    meme quand la base flanche (le blackbox_exporter a /health/db-deep
+    pour l'alerter) — jamais de 500 sur l'endpoint de monitoring.
+    """
+    from sqlalchemy import func, select
+
+    from db.session import SessionLocal
+    from models import DigestStatus, EmailDigest, JobOffer, ScrapeRun
+    from models.ai import AIJob
+    from models.enums import AIJobStatus
+
+    try:
+        with SessionLocal() as db:
+            offers_total = db.scalar(select(func.count()).select_from(JobOffer)) or 0
+            inserted_total = db.scalar(select(func.coalesce(func.sum(ScrapeRun.total_inserted), 0))) or 0
+            digests_sent = (
+                db.scalar(select(func.count()).select_from(EmailDigest).where(EmailDigest.status == DigestStatus.SENT))
+                or 0
+            )
+            digests_failed = (
+                db.scalar(select(func.count()).select_from(EmailDigest).where(EmailDigest.status == DigestStatus.FAILED))
+                or 0
+            )
+            digests_queued = (
+                db.scalar(select(func.count()).select_from(EmailDigest).where(EmailDigest.status == DigestStatus.QUEUED))
+                or 0
+            )
+            ai_failed = (
+                db.scalar(select(func.count()).select_from(AIJob).where(AIJob.status == AIJobStatus.FAILED)) or 0
+            )
+    except Exception as exc:
+        logger.warning("Metriques metier indisponibles (base): %s", exc)
+        return []
+
+    return [
+        "# HELP jobalert_offers_total Total job offers in database.",
+        "# TYPE jobalert_offers_total gauge",
+        f"jobalert_offers_total {offers_total}",
+        "# HELP jobalert_offers_inserted_total Cumulative offers inserted by scraping runs.",
+        "# TYPE jobalert_offers_inserted_total counter",
+        f"jobalert_offers_inserted_total {inserted_total}",
+        "# HELP jobalert_digests_total Digests by terminal or pending status.",
+        "# TYPE jobalert_digests_total counter",
+        f'jobalert_digests_total{{status="sent"}} {digests_sent}',
+        f'jobalert_digests_total{{status="failed"}} {digests_failed}',
+        f'jobalert_digests_total{{status="queued"}} {digests_queued}',
+        "# HELP jobalert_ai_jobs_failed_total Cumulative AI jobs ended in failure.",
+        "# TYPE jobalert_ai_jobs_failed_total counter",
+        f"jobalert_ai_jobs_failed_total {ai_failed}",
+    ]
+
+
 def _format_prometheus() -> str:
     lines = [
         "# HELP http_requests_total Total HTTP requests served.",
@@ -77,6 +138,8 @@ def _format_prometheus() -> str:
         lines.append("# TYPE http_request_duration_seconds_sum counter")
         for (method, path), duration in sorted(_request_duration_sum.items()):
             lines.append(f'http_request_duration_seconds_sum{{method="{method}",path="{path}"}} {duration:.6f}')
+    # O.1 : compteurs metier apres les compteurs HTTP (meme format texte).
+    lines.extend(_business_metrics())
     return "\n".join(lines) + "\n"
 
 

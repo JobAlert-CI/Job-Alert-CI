@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from datetime import UTC, datetime
+from datetime import datetime
 
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session, selectinload
@@ -27,11 +27,14 @@ from models import (
     Source,
     SourceScrapeRun,
     SourceStatus,
+    SystemEventSeverity,
+    SystemEventSource,
 )
 from services.ai_batches import process_ai_batch_with_provider
 from services.ai_errors import AIAllProvidersFailedError, AIProviderError
 from services.ai_results import apply_ai_results
 from services.normalization import slugify
+from services.system_events import log_system_event
 from tasks.locks import redis_lock
 
 logger = logging.getLogger(__name__)
@@ -40,7 +43,10 @@ RAW_STATUSES = {JobOfferStatus.BRUT}
 
 
 def _now() -> datetime:
-    return datetime.now(UTC)
+    """Alias du now_utc centralise (audit 4, I.4)."""
+    from core.clock import now_utc
+
+    return now_utc()
 
 
 def _trigger(value: str) -> AIJobTrigger:
@@ -287,6 +293,15 @@ def process_raw_offers(
                     legacy.status = AiProcessingJobStatus.FAILED
                     legacy.error_message = str(exc)[:1000]
                     legacy.finished_at = _now()
+                # Audit 4, G.1 : echec de tout le pipeline IA trace dans le
+                # journal systeme (source=ia), requetable depuis l'admin.
+                log_system_event(
+                    source=SystemEventSource.IA,
+                    severity=SystemEventSeverity.ERROR,
+                    event_type="ai_processing_all_providers_failed",
+                    message=f"Traitement IA echoue : tous les providers ont echoue ({len(offers)} offres)",
+                    context={"ai_job_id": job.id, "offers": len(offers), "error": str(exc)[:300]},
+                )
                 return {"status": "failed", "processed": 0, "error": str(exc), "ai_job_id": job.id}
             except AIProviderError as exc:
                 # AINoAvailableKeyError (et toute AIConfigurationError) passe
@@ -304,6 +319,14 @@ def process_raw_offers(
                     legacy.status = AiProcessingJobStatus.FAILED
                     legacy.error_message = str(exc)[:1000]
                     legacy.finished_at = _now()
+                # Audit 4, G.1 : idem — erreur provider/configuration.
+                log_system_event(
+                    source=SystemEventSource.IA,
+                    severity=SystemEventSeverity.ERROR,
+                    event_type="ai_processing_provider_error",
+                    message=f"Traitement IA echoue ({type(exc).__name__})",
+                    context={"ai_job_id": job.id, "offers": len(offers), "error": str(exc)[:300]},
+                )
                 return {"status": "failed", "processed": 0, "error": str(exc), "ai_job_id": job.id}
 
 

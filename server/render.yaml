@@ -1,0 +1,121 @@
+# Topologie de deploiement Render (audit 4, F.5).
+#
+# Ce blueprint versionne la separation web/worker/beat qui vivait
+# uniquement dans la console Render. Un nouvel environnement peut etre
+# recree fidelement depuis le repo.
+#
+# Vitesse de demarrage : les workers attendent la base avant de servir —
+# pas de readiness gate necessaire (Celery retente le broker lui-meme).
+databases:
+  - name: jobalert-ci-db
+    databaseName: jobalert_ci
+    user: jobalert_app
+    plan: basic-256mb
+
+services:
+  # ─── Service web (API FastAPI + /metrics) ─────────────────────────────
+  - type: web
+    name: jobalert-ci-api
+    runtime: python
+    rootDir: server
+    buildCommand: ./.venv/Scripts/python.exe -m pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: jobalert-ci-db
+          property: connectionString
+      - key: CELERY_BROKER_URL
+        sync: false # a renseigner (Redis Render ou Upstash), db 0
+      - key: CELERY_RESULT_BACKEND
+        sync: false # meme instance Redis, db 1
+      - key: REDIS_URL
+        sync: false # meme instance Redis, db 2
+      - key: ADMIN_JWT_SECRET
+        generateValue: true # >= 32 caracteres (garde au boot, audit 4 J.4)
+      - key: SCRAPER_API_TOKEN
+        generateValue: true
+      - key: INTERNAL_API_TOKEN
+        generateValue: true
+      - key: ADMIN_API_KEY
+        generateValue: true # protege /metrics en prod
+      - key: AI_ENABLED
+        value: "false" # NoopAIProcessor par defaut
+      - key: AI_KEY_ENCRYPTION_SECRET
+        sync: false # requis si AI_ENABLED=true (Fernet, >= 32 chars)
+      - key: RESEND_API_KEY
+        sync: false
+      - key: API_BASE_URL
+        sync: false # URL publique du service web
+      - key: PUBLIC_BASE_URL
+        sync: false # URL publique du client
+      - key: CORS_ORIGINS
+        sync: false # origine du client, jamais wildcard en prod
+      - key: AUTO_CREATE_TABLES
+        value: "false" # Alembic pilote le schema en prod
+
+  # ─── Worker Celery (3 queues) ────────────────────────────────────────
+  # acks_late + reject_on_worker_lost + prefetch=1 (audit 4, P.1) : une
+  # tache en cours au redemarrage du worker est reattribuee, pas perdue.
+  - type: worker
+    name: jobalert-ci-worker
+    runtime: python
+    rootDir: server
+    buildCommand: ./.venv/Scripts/python.exe -m pip install -r requirements.txt
+    startCommand: celery -A celery_app.celery_app worker -Q ai,ingestion,emails --loglevel=info --concurrency=2
+    envVars:
+      # Herite des memes variables que le service web (copie render.yaml
+      # du web service ou utilise un env group partage).
+      - key: APP_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: jobalert-ci-db
+          property: connectionString
+      - key: CELERY_BROKER_URL
+        sync: false
+      - key: CELERY_RESULT_BACKEND
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: AI_ENABLED
+        value: "false"
+      - key: AI_KEY_ENCRYPTION_SECRET
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: API_BASE_URL
+        sync: false
+      - key: PUBLIC_BASE_URL
+        sync: false
+      - key: SCRAPER_BEAT_ENABLED
+        value: "true"
+
+  # ─── Beat (UNE SEULE instance — jamais scalable) ─────────────────────
+  # Le beat declenche les crontabs (scraping 06:00, digests 07:30/08:00,
+  # purges 03:xx, sweep IA 5 min). Plusieurs instances = doublons de
+  # declenchements. Les verrous Redis par tache restent la seconde barriere.
+  - type: worker
+    name: jobalert-ci-beat
+    runtime: python
+    rootDir: server
+    buildCommand: ./.venv/Scripts/python.exe -m pip install -r requirements.txt
+    startCommand: celery -A celery_app.celery_app beat --loglevel=info
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: jobalert-ci-db
+          property: connectionString
+      - key: CELERY_BROKER_URL
+        sync: false
+      - key: CELERY_RESULT_BACKEND
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: SCRAPER_BEAT_ENABLED
+        value: "true"

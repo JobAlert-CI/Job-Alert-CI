@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from datetime import UTC, datetime, timedelta
+
 from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
 
@@ -33,10 +35,12 @@ def top_viewed_offers(
 ) -> list[OfferSummaryRead]:
     """Top N offres par `view_count` sur une fenetre temporelle.
 
-    Strategie : on ne filtre PAS sur `last_seen_at` (pas fiable) — on prend
-    toutes les offres non-archivees, et on trie par `view_count DESC`. Le
-    filtre `days` reste dispo pour evolution (ex: si on tracke un
-    `first_view_at` un jour).
+    Audit 4, H.2 : `days` est desormais CABLE sur `last_seen_at`. La colonne
+    est alimentee par le flush des compteurs (apply_metric_deltas pose
+    last_seen_at a chaque application de deltas de vues, au maximum 1 min
+    apres la vue reelle) — l'ancien commentaire "pas fiable" datait
+    d'avant ce mecanisme. Une offre pas vue dans la fenetre n'apparait
+    plus, meme si son compteur cumule est eleve.
 
     `include_statuses` : par defaut, seules les offres visibles et actives
     remontent (sense business : pas la peine d'exhiber les archivees dans
@@ -45,10 +49,12 @@ def top_viewed_offers(
     if include_statuses is None:
         include_statuses = [JobOfferStatus.ACTIVE.value]
 
+    cutoff = datetime.now(UTC) - timedelta(days=days)
     stmt = (
         select(JobOffer)
         .where(JobOffer.status.in_(include_statuses))
         .where(JobOffer.deleted_at.is_(None))
+        .where(JobOffer.last_seen_at >= cutoff)
         .order_by(JobOffer.view_count.desc(), JobOffer.id)
         .limit(limit)
     )

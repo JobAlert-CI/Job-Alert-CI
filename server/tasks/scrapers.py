@@ -23,7 +23,9 @@ from models import (
     SourceScrapeRun,
     SourceStatus,
 )
+from models.enums import SystemEventSeverity, SystemEventSource
 from services.scrape_runs import finish_source_run, mark_source_run_running, record_run_event
+from services.system_events import log_system_event
 from tasks.locks import redis_lock
 
 logger = logging.getLogger(__name__)
@@ -208,6 +210,21 @@ class _ScraperTask(Task):
                     )
             except Exception:
                 logger.exception("Conclusion du run admin impossible apres echec task", extra={"task_id": task_id})
+        # Audit 4, G.1 : echec de task scraper trace dans le journal systeme
+        # (visible admin) — pas seulement en log worker. Sans run_reference
+        # (chemin beat), c'etait le SEUL vestige de l'echec.
+        log_system_event(
+            source=SystemEventSource.SCRAPING,
+            severity=SystemEventSeverity.ERROR,
+            event_type="scraper_task_failed",
+            message=f"Task scraper echouee (source {source_code or '?'})",
+            context={
+                "source_code": source_code,
+                "task_id": task_id,
+                "run_reference": run_reference,
+                "error": type(exc).__name__,
+            },
+        )
         return super().on_failure(exc, task_id, args, kwargs, einfo)
 
 

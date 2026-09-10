@@ -30,6 +30,14 @@ PostgreSQL and Redis must be running locally. Env comes from `server/.env` (copy
 - Celery workers are split per queue; beat schedules demo scrapes at 06:00–06:30.
 - Scraper subprocess used by server can be pointed at its own venv via `SCRAPER_PYTHON`.
 
+## Maintenance rules (audit 4, L.2/L.4/I.2 — server)
+
+- **Migrations creating tables MUST be idempotent.** Migration 0001 runs `Base.metadata.create_all` — on a fresh DB it already creates every table of the CURRENT models. Any later migration doing `op.create_table`/`op.create_index` MUST guard with `sa.inspect(bind).get_table_names()`/`get_indexes()` first (pattern 0004/0019/0020), or it crashes on fresh bases.
+- **Enum/bounds changes ship as one commit on both layers.** DB constraints (`enum_column` CHECK) and Pydantic validators (`Field(ge=…, le=…)`) are a double validation — a value accepted by the schema but refused by the DB becomes a 500. Any new enum value or bound change requires a CHECK migration (pattern 0017) AND the Pydantic update in the same commit.
+- **New read aggregations go in services, not routers.** Legacy admin routers hold read SQL (accepted debt, audit 4 I.2), but any NEW aggregation belongs in `services/` (e.g. `admin_aggregates.py`, `system_health.py` helpers) so it stays unit-testable.
+- **One clock: `core/clock.py::now_utc()`** (audit 4, I.4). Never write a new `datetime.now(UTC)` helper; alias the central one.
+- **Timezone-naive datetimes never leave a boundary.** SQLite tests return naive datetimes — re-awareify before comparing (cf. `_aware` in `system_health.py`).
+
 ## Testing quirks
 
 - `server/tests/conftest.py` force-sets env (SQLite file DB, unreachable Redis → fallback mode, no Resend key) before any app import. Don't import `core.config` before conftest's env setup; tests need no external services.

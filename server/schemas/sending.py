@@ -30,6 +30,11 @@ class EmailDigestRead(TimestampRead):
     skipped_reason: str | None = None
     sent_at: datetime | None = None
     template_version: str
+    # Audit 4, H.1 (gap connu) : palier de matching atteint par ce digest
+    # (T0 selection stricte -> T5 repli maximal). Le champ existe en base
+    # (models/emails.py:52), etait filtre dans les exports et compte en
+    # stats tier — il manquait uniquement de la reponse liste/detail.
+    match_tier: str = "T0"
     offer_links: list[EmailDigestOfferRead] = []
 
 

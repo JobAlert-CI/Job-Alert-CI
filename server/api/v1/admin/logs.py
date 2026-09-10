@@ -429,9 +429,8 @@ async def update_contact_status(
     # Cycle 17 : la colonne replied_at existait mais AUCUNE route ne la
     # posait — on la renseigne quand on passe le message a "replied"
     # (premiere reponse seulement, un retour en arriere ne l'efface pas).
-    if CONTACT_STATUS_ALIASES[payload.status] is ContactMessageStatus.REPLIED:
-        if message.replied_at is None:
-            message.replied_at = datetime.now(UTC)
+    if CONTACT_STATUS_ALIASES[payload.status] is ContactMessageStatus.REPLIED and message.replied_at is None:
+        message.replied_at = datetime.now(UTC)
     message.status = CONTACT_STATUS_ALIASES[payload.status]
 
     log_admin_action(

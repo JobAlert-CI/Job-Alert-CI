@@ -44,6 +44,8 @@ from models.enums import (
     ScrapeRunStatus,
     SourceStatus,
     SubscriberStatus,
+    SystemEventSeverity,
+    SystemEventSource,
     TokenPurpose,
     TransactionalEmailPurpose,
     TransactionalEmailStatus,
@@ -69,6 +71,7 @@ from models.subscriptions import (
     SubscriberToken,
     UnsubscribeEvent,
 )
+from models.system import SystemEventLog
 
 __all__ = [
     "AIAlert",
@@ -142,6 +145,9 @@ __all__ = [
     "SubscriberFiliere",
     "SubscriberStatus",
     "SubscriberToken",
+    "SystemEventLog",
+    "SystemEventSeverity",
+    "SystemEventSource",
     "TokenPurpose",
     "TransactionalEmailEvent",
     "TransactionalEmailPurpose",

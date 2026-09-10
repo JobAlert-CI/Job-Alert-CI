@@ -133,6 +133,26 @@ class AIAlertSeverity(StrEnum):
     CRITICAL = "critical"
 
 
+# ─── Journal d'evenements systeme (audit 4, G.1 — Lot 6) ─────────────────
+
+
+class SystemEventSource(StrEnum):
+    """Origine d'un evenement du journal systeme (models/system.py)."""
+
+    CELERY = "celery"
+    EMAIL = "email"
+    SCRAPING = "scraping"
+    IA = "ia"
+    API = "api"
+
+
+class SystemEventSeverity(StrEnum):
+    INFO = "info"
+    WARNING = "warning"
+    ERROR = "error"
+    CRITICAL = "critical"
+
+
 class AIFiliereSuggestionStatus(StrEnum):
     PENDING = "pending"
     APPROVED = "approved"

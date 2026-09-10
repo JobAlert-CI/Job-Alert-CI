@@ -46,4 +46,11 @@ def create_contact(
             detail="Trop de messages envoyes. Merci de patienter.",
             headers={"Retry-After": str(decision.retry_after_seconds or 60)},
         )
-    return create_contact_message(db, payload, request)
+    # Audit 4, I.1 : la route extrait IP/user-agent — le service ne depend
+    # plus de l'objet Request FastAPI (testable sans app, reutilisable task).
+    return create_contact_message(
+        db,
+        payload,
+        client_ip=request.client.host if request.client else None,
+        user_agent=request.headers.get("user-agent"),
+    )

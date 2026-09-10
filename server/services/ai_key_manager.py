@@ -3,7 +3,7 @@ from __future__ import annotations
 import random
 import time
 from dataclasses import dataclass
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta
 from typing import Any
 
 from sqlalchemy import nullsfirst, or_, select
@@ -34,7 +34,10 @@ class AIProviderExecutionResult:
 
 
 def utc_now() -> datetime:
-    return datetime.now(UTC)
+    """Alias du now_utc centralise (audit 4, I.4) — signature publique gardee."""
+    from core.clock import now_utc
+
+    return now_utc()
 
 
 def select_available_api_keys(db: Session, *, now: datetime | None = None, limit: int | None = None) -> list[AIApiKey]:

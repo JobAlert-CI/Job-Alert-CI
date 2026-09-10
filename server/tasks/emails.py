@@ -6,8 +6,10 @@ from celery_app import celery_app
 from core.config import get_settings
 from db.session import session_scope
 from models import TransactionalEmailPurpose
+from models.enums import SystemEventSeverity, SystemEventSource
 from services.email.resend_provider import get_email_provider
 from services.email_confirmation_service import send_confirmation_email_now
+from services.system_events import log_system_event
 
 """Envoi asynchrone des emails transactionnels de confirmation.
 
@@ -85,6 +87,18 @@ def send_confirmation_email_task(
         subscriber_id,
         attempts_done,
         result.error_message,
+    )
+    # Audit 4, G.1 : echec definitif (retries epuises) trace en base.
+    log_system_event(
+        source=SystemEventSource.EMAIL,
+        severity=SystemEventSeverity.ERROR,
+        event_type="confirmation_email_failed",
+        message=f"Email de confirmation abandonne (abonne {subscriber_id})",
+        context={
+            "subscriber_id": subscriber_id,
+            "attempts": attempts_done,
+            "error": (result.error_message or "")[:500],
+        },
     )
     return {"success": False, "error": result.error_message, "attempts": attempts_done}
 

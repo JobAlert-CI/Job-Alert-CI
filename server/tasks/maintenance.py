@@ -12,6 +12,8 @@ from datetime import UTC, datetime, timedelta
 from sqlalchemy import delete, func, select, update
 
 from celery_app import celery_app
+from models.enums import SystemEventSeverity, SystemEventSource
+from services.system_events import log_system_event
 
 logger = logging.getLogger(__name__)
 
@@ -40,6 +42,11 @@ INGESTION_EVENT_PURGE_BATCH_SIZE = 5000
 # 6 h couvre largement le timeout subprocess (1 h) + retries Celery.
 STALE_RUN_HOURS = 6
 
+# Audit 4, G.1 (Lot 6) : retention du journal des evenements systeme.
+# Volume faible (echecs + quelques infos ops) ; 90 jours suffisent pour
+# le forensique sans faire de cette table une deuxieme base de logs.
+SYSTEM_EVENT_RETENTION_DAYS = 90
+
 
 @celery_app.task(name="tasks.maintenance.purge_expired_refresh_tokens")
 def purge_expired_refresh_tokens() -> dict:
@@ -65,6 +72,12 @@ def purge_expired_refresh_tokens() -> dict:
         logger.info("Purge refresh tokens: %s lignes supprimees", deleted)
     except Exception:
         logger.exception("Purge des refresh tokens impossible")
+        log_system_event(
+            source=SystemEventSource.CELERY,
+            severity=SystemEventSeverity.ERROR,
+            event_type="maintenance_purge_refresh_tokens_failed",
+            message="Purge des refresh tokens impossible",
+        )
         return {"deleted": 0, "error": True}
     return {"deleted": deleted}
 
@@ -90,6 +103,12 @@ def flush_offer_metrics() -> dict:
         return {"applied": applied}
     except Exception:
         logger.exception("Flush des metriques offres impossible")
+        log_system_event(
+            source=SystemEventSource.CELERY,
+            severity=SystemEventSeverity.ERROR,
+            event_type="maintenance_flush_offer_metrics_failed",
+            message="Flush des metriques offres impossible",
+        )
         return {"applied": 0, "error": True}
 
 
@@ -116,6 +135,12 @@ def purge_ai_alerts() -> dict:
         logger.info("Purge alertes IA: %s lignes supprimees", deleted)
     except Exception:
         logger.exception("Purge des alertes IA impossible")
+        log_system_event(
+            source=SystemEventSource.CELERY,
+            severity=SystemEventSeverity.ERROR,
+            event_type="maintenance_purge_ai_alerts_failed",
+            message="Purge des alertes IA impossible",
+        )
         return {"deleted": 0, "error": True}
     return {"deleted": deleted}
 
@@ -177,6 +202,12 @@ def purge_ingestion_events() -> dict:
                     break
     except Exception:
         logger.exception("Purge payload ingestion events impossible (phase NULLify)")
+        log_system_event(
+            source=SystemEventSource.CELERY,
+            severity=SystemEventSeverity.ERROR,
+            event_type="maintenance_purge_ingestion_events_failed",
+            message="Purge des evenements d'ingestion impossible (phase payload)",
+        )
         return {"payload_nulled": payload_nulled, "deleted": 0, "error": True}
 
     # Phase 2 : DELETE des events de plus de 90 jours, meme lotissement.
@@ -201,6 +232,12 @@ def purge_ingestion_events() -> dict:
                     break
     except Exception:
         logger.exception("Purge ingestion events impossible (phase DELETE)")
+        log_system_event(
+            source=SystemEventSource.CELERY,
+            severity=SystemEventSeverity.ERROR,
+            event_type="maintenance_purge_ingestion_events_failed",
+            message="Purge des evenements d'ingestion impossible (phase DELETE)",
+        )
         return {"payload_nulled": payload_nulled, "deleted": deleted, "error": True}
 
     if payload_nulled or deleted:
@@ -271,8 +308,41 @@ def requalify_stale_runs() -> dict:
             logger.info("Requalification zombies: %s runs passes FAILED", requalified)
     except Exception:
         logger.exception("Requalification des runs zombies impossible")
+        log_system_event(
+            source=SystemEventSource.CELERY,
+            severity=SystemEventSeverity.ERROR,
+            event_type="maintenance_requalify_stale_runs_failed",
+            message="Requalification des runs zombies impossible",
+        )
         return {"requalified": 0, "error": True}
     return {"requalified": requalified}
+
+
+@celery_app.task(name="tasks.maintenance.purge_system_events")
+def purge_system_events() -> dict:
+    """Purge le journal des evenements systeme au-dela de 90 j (audit 4, G.1).
+
+    Le journal n'est alimente que par les echecs et quelques infos ops :
+    90 jours d'historique suffisent au forensique (convention identique
+    aux alertes IA et aux events d'ingestion). Idempotent : ne touche que
+    les lignes de plus de SYSTEM_EVENT_RETENTION_DAYS jours.
+    """
+    from db.session import session_scope
+    from models.system import SystemEventLog
+
+    cutoff = datetime.now(UTC) - timedelta(days=SYSTEM_EVENT_RETENTION_DAYS)
+    try:
+        with session_scope() as db:
+            result = db.execute(delete(SystemEventLog).where(SystemEventLog.created_at < cutoff))
+            deleted = result.rowcount or 0
+        if deleted:
+            logger.info("Purge system events: %s lignes supprimees", deleted)
+    except Exception:
+        logger.exception("Purge des evenements systeme impossible")
+        # Pas de log_system_event ici : la table est peut-etre la cause de
+        # l'echec (boucle infinie de journalisation d'echec de purge).
+        return {"deleted": 0, "error": True}
+    return {"deleted": deleted}
 
 
 __all__ = [
@@ -282,9 +352,11 @@ __all__ = [
     "INGESTION_EVENT_RETENTION_DAYS",
     "REFRESH_TOKEN_RETENTION_DAYS",
     "STALE_RUN_HOURS",
+    "SYSTEM_EVENT_RETENTION_DAYS",
     "flush_offer_metrics",
     "purge_ai_alerts",
     "purge_expired_refresh_tokens",
     "purge_ingestion_events",
+    "purge_system_events",
     "requalify_stale_runs",
 ]

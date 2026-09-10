@@ -2,6 +2,24 @@
 
 Backend FastAPI pour JobAlert CI : offres, filieres, sources, contenu, admin, envois, scraping et ingestion d'offres scrapees.
 
+## Perimetre actuel vs MVP (audit 4, H.4)
+
+Le README decrivait historiquement le MVP ; l'etat reel du serveur a
+largement depasse le cahier des charges initial. Tableau des ecarts a
+connaetre avant de lire le reste :
+
+| Axe | MVP (cahier des charges) | Etat actuel |
+|---|---|---|
+| Base | SQLite | PostgreSQL (migrations Alembic 0001→0020) |
+| Back-office | absent | multi-rôles (super_admin, gestionnaire_offres, gestionnaire_utilisateurs, moderateur), JWT + refresh rotation, audit log, settings runtime |
+| IA | non prevu | pipeline complet : cles chiffrees (Fernet), jobs, tentatives, alertes, circuit-breaker, fallback multi-cles (`AI_ENABLED=false` par defaut) |
+| Emails | digests simples | digests cascade T0-T5 (`match_tier`), emails transactionnels, no-offer, retry borne, marqueurs Redis |
+| Observabilite | logs bruts | `/metrics` Prometheus (HTTP + metier), health checks multi-niveaux, journal systeme unifie (`system_event_logs`, audit 4 G.1) |
+| Exports/qualite | non prevus | exports CSV/JSON filtres, stats fenetrees, purges de retention 15/90 j |
+
+Non livres a ce jour (gaps connus assumes, roadmap produit) : 2FA admin,
+segments d'abonnes sauvegardes, matrice de permissions par route.
+
 ## Installation locale
 
 ```powershell
@@ -59,7 +77,12 @@ celery -A celery_app.celery_app worker -Q ai --loglevel=info
 celery -A celery_app.celery_app beat --loglevel=info
 ```
 
-Celery Beat planifie les sources demo a 06:00, 06:10, 06:20 et 06:30, et lance un sweep IA factice toutes les 5 minutes pour rattraper les offres `brute`.
+Celery Beat planifie (audit 4, F.1-F.4) : le scraping de toutes les sources
+actives a 06:00 (`run_active_scrapers` — une source activee via l'admin est
+scrapee des le lendemain), la preparation des digests a 07:30, leur envoi a
+08:00, les emails sans offre 30 min apres l'envoi, et un sweep IA toutes les
+5 minutes pour rattraper les offres `brut`. Vue complete en lecture seule :
+`GET /api/admin/system/schedule`.
 
 ## Pipeline d'ingestion
 

@@ -1,5 +1,6 @@
 # Crée schema ContentPageCreate et ContentPageUpdate
 from __future__ import annotations
+
 from datetime import UTC, datetime
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -31,7 +32,6 @@ from schemas.editorial import (
     ArticleCreate,
     ArticleFeaturedUpdate,
     ArticleKeyFigureCreate,
-    ArticleKeyFigureRead,
     ArticleListItem,
     ArticleRead,
     ArticleSectionCreate,
@@ -41,7 +41,6 @@ from schemas.editorial import (
     ArticleSeriesUpdate,
     ArticleStatusUpdate,
     ArticleTakeawayCreate,
-    ArticleTakeawayRead,
     ArticleUpdate,
     ContentPageCreate,
     ContentPageUpdate,
@@ -52,7 +51,6 @@ from schemas.editorial import (
     SeriesArticlesUpdate,
 )
 from services.audit import log_admin_action
-from services.normalization import slugify
 from services.search_utils import safe_ilike
 
 # Le contenu editorial (articles, pages, FAQ) est pilote par les moderateurs.

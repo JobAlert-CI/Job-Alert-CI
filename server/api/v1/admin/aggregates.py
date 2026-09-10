@@ -20,7 +20,7 @@ router = APIRouter(
 def get_top_viewed_offers(
     db: Session = Depends(get_db),
     _: object = Depends(get_current_admin),
-    days: int = Query(7, ge=1, le=90, description="Fenetre temporelle en jours (info, pas encore filtree sur last_seen_at)"),
+    days: int = Query(7, ge=1, le=90, description="Fenetre temporelle en jours (filtre sur last_seen_at)"),
     limit: int = Query(10, ge=1, le=50),
 ):
     """Top N offres par nombre de vues (active + visible_site=True seulement).
@@ -29,9 +29,8 @@ def get_top_viewed_offers(
     pour eviter un conflit avec `GET /api/admin/offers/{offer_id}` qui
     capturerait `/offers/top-viewed` avec `offer_id="top-viewed"`.
 
-    Note : le parametre `days` est reserve pour evolution future. Aujourd'hui
-    on tri par `view_count DESC` sur toutes les offres actives. Le filtre sera
-    branche quand on aura un `last_view_at` fiable.
+    Audit 4, H.2 : `days` est desormais effectif — les vues sont dated
+    via `last_seen_at` (pose par le flush Redis des compteurs).
     """
     return top_viewed_offers(db, days=days, limit=limit)
 

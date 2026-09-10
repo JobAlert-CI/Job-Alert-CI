@@ -109,7 +109,7 @@ def resolve_runtime_settings(db: Session, settings: Settings | None = None) -> S
 
     try:
         lignes = {ligne.key: ligne.value for ligne in db.scalars(select(SiteSetting)).all()}
-    except Exception:  # noqa: BLE001 - robustesse : la metier ne doit pas echouer
+    except Exception:
         logger.warning("site_settings illisible, utilisation de la config d'environnement")
         return base
 
@@ -149,7 +149,7 @@ def get_confirmation_subject(db: Session, settings: Settings | None = None) -> s
     base = settings or get_settings()
     try:
         ligne = db.scalar(select(SiteSetting).where(SiteSetting.key == "email_confirmation_subject"))
-    except Exception:  # noqa: BLE001
+    except Exception:
         return base.email_from_name and "Confirmez votre inscription à JobAlert CI"
     if ligne is None or not (ligne.value or "").strip():
         from services.email.templates import DEFAULT_SUBJECT

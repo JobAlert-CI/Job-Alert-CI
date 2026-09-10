@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import UTC, datetime
+from datetime import datetime
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -53,7 +53,10 @@ def _min_filiere_confidence(db: Session) -> float | None:
 
 
 def _now() -> datetime:
-    return datetime.now(UTC)
+    """Alias du now_utc centralise (audit 4, I.4)."""
+    from core.clock import now_utc
+
+    return now_utc()
 
 
 def _optional_code(db: Session, model, code: str | None, label: str):

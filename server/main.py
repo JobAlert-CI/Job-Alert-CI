@@ -17,6 +17,11 @@ settings = get_settings()
 
 _INSECURE_DEFAULT_JWT_SECRET = "dev-insecure-secret-change-me"
 
+# Audit 4, J.4 : longueur minimale des secrets au boot. Un secret de 8
+# caracteres est signable/force en minutes ; 32 caracteres est le seuil
+# standard du projet (cf. refresh tokens du projet soeur).
+_MIN_SECRET_LENGTH = 32
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -27,6 +32,15 @@ async def lifespan(app: FastAPI):
             "ADMIN_JWT_SECRET doit etre defini explicitement en production (APP_ENV=production)."
         )
 
+    # Audit 4, J.4 : garde de longueur — un ADMIN_JWT_SECRET court mais
+    # explicite (ex. "abc") demarrait sans avertissement ; en production
+    # c'est un secret force-brute bien plus vite. 32 chars minimum.
+    if settings.is_production and len(settings.admin_jwt_secret) < _MIN_SECRET_LENGTH:
+        raise RuntimeError(
+            f"ADMIN_JWT_SECRET doit faire au moins {_MIN_SECRET_LENGTH} caracteres en production "
+            f"(longueur actuelle: {len(settings.admin_jwt_secret)})."
+        )
+
     # Audit 4, B.7 : pipeline IA actif en production sans secret de
     # chiffrement = chaque tache IA levera AIConfigurationError au premier
     # decrypt. Mieux vaut un boot rouge qu'un service "sain" au pipeline
@@ -35,6 +49,19 @@ async def lifespan(app: FastAPI):
         raise RuntimeError(
             "AI_KEY_ENCRYPTION_SECRET doit etre defini en production quand AI_ENABLED=true "
             "(chiffrement des cles IA en base)."
+        )
+
+    # Audit 4, J.4 (suite) : le secret Fernet doit lui aussi etre robuste —
+    # il protege les cles API IA stockees en base.
+    if (
+        settings.is_production
+        and settings.ai_enabled
+        and settings.ai_key_encryption_secret
+        and len(settings.ai_key_encryption_secret) < _MIN_SECRET_LENGTH
+    ):
+        raise RuntimeError(
+            f"AI_KEY_ENCRYPTION_SECRET doit faire au moins {_MIN_SECRET_LENGTH} caracteres en production "
+            f"(longueur actuelle: {len(settings.ai_key_encryption_secret)})."
         )
 
     # En production, Alembic doit piloter le schema. Ce flag reste pratique pour
