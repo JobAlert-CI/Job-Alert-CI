@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { Link } from "react-router-dom"
+import { motion } from "framer-motion"
 import { ArrowLeftRight, Check, X } from "lucide-react"
 import {
   useMarquerDoublon, useRejeterDoublon, messageErreurMutation,
@@ -15,26 +16,18 @@ import {
 
 /* ─────────────────────────────────────────────────────────────────────
    Carte d'une paire de doublons potentiels.
-
    Shape (vérifiée API live) : { offer_a_id, offer_b_id, offer_a_title,
    offer_b_title, offer_a_company, similarity_score, reason }.
-
-   Interactions (doc v3 §5) :
-   - « Fusionner » = marque B comme doublon de A, motif optionnel →
-     dialog de confirmation (action semi-destructive : B quitte le
-     scan et n'apparaît plus comme candidat, mais reste en base avec
-     son statut — is_duplicate=true, vérifié live) ;
-   - « Ce n'est pas un doublon » = rejet simple, la paire ne
-     réapparaîtra plus (table RejectedDuplicatePair) ;
-   - liens vers les fiches A et B pour comparaison manuelle.
-   ───────────────────────────────────────────────────────────────────── */
+   Refonte : la racine est un motion.article avec `layout` + exit —
+   dans l'AnimatePresence de DoublonsPage, la carte traitée s'estompe
+   en douceur pendant que les suivantes remontent sans à-coup.
+───────────────────────────────────────────────────────────────────── */
 
 const CarteDoublon = ({ paire, onTraitee }) => {
   const notify = useNotify()
   const [dialogOuvert, setDialogOuvert] = useState(false)
   const [motif, setMotif] = useState("")
   const [apercuOffreId, setApercuOffreId] = useState(null)
-
   const marquerMutation = useMarquerDoublon()
   const rejeterMutation = useRejeterDoublon()
 
@@ -70,14 +63,19 @@ const CarteDoublon = ({ paire, onTraitee }) => {
   const mutationEnCours = marquerMutation.isPending || rejeterMutation.isPending
 
   return (
-    <article
-      className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4"
+    <motion.article
+      layout
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.95 }}
+      transition={{ duration: 0.25, ease: "easeOut" }}
+      className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4 transition-colors hover:border-primary/25"
       data-testid="paire-doublon"
     >
       {/* En-tête : score + entreprise + raison */}
       <div className="flex flex-wrap items-center gap-2">
         <Badge
-          variant={score >= 90 ? "destructive" : score >= 80 ? "default" : "secondary"}
+          variant={score >= 90 ? "destructive" : score >= 80 ? "warning" : "secondary"}
           className="tabular-nums"
         >
           {score}% similaire
@@ -93,7 +91,7 @@ const CarteDoublon = ({ paire, onTraitee }) => {
       {/* Comparaison A | B */}
       <div className="grid items-center gap-2 sm:grid-cols-[1fr_auto_1fr]">
         <div className="flex flex-col gap-1 rounded-lg border border-border/60 bg-muted/20 p-2.5">
-          <span className="text-[9px] font-bold tracking-wider text-muted-foreground/70 uppercase">Offre A (conservee)</span>
+          <span className="text-[9px] font-bold tracking-wider text-muted-foreground/70 uppercase">Offre A (conservée)</span>
           <div className="flex items-center gap-1.5">
             <BoutonApercu
               onClick={() => setApercuOffreId(paire.offer_a_id)}
@@ -131,25 +129,15 @@ const CarteDoublon = ({ paire, onTraitee }) => {
 
       {/* Actions */}
       <div className="flex flex-wrap items-center justify-end gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={rejeter}
-          disabled={mutationEnCours}
-        >
+        <Button variant="outline" size="sm" onClick={rejeter} disabled={mutationEnCours}>
           <Check aria-hidden /> Ce n'est pas un doublon
         </Button>
-        <Button
-          size="sm"
-          variant="destructive"
-          onClick={() => setDialogOuvert(true)}
-          disabled={mutationEnCours}
-        >
+        <Button size="sm" variant="destructive" onClick={() => setDialogOuvert(true)} disabled={mutationEnCours}>
           <X aria-hidden /> Fusionner
         </Button>
       </div>
 
-      {/* Confirmation fusion (motif optionnel) */}
+      {/* Confirmation fusion (motif optionnel). */}
       <Dialog open={dialogOuvert} onOpenChange={setDialogOuvert}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -161,7 +149,6 @@ const CarteDoublon = ({ paire, onTraitee }) => {
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-col gap-1.5">
-            {/* Motif optionnel (doc v3 §5 : champ de motif optionnel) */}
             <Input
               value={motif}
               onChange={(e) => setMotif(e.target.value)}
@@ -170,9 +157,7 @@ const CarteDoublon = ({ paire, onTraitee }) => {
             />
           </div>
           <DialogFooter>
-            <Button variant="ghost" size="sm" onClick={() => setDialogOuvert(false)}>
-              Annuler
-            </Button>
+            <Button variant="ghost" size="sm" onClick={() => setDialogOuvert(false)}>Annuler</Button>
             <Button variant="destructive" size="sm" onClick={fusionner} disabled={marquerMutation.isPending}>
               {marquerMutation.isPending ? "Marquage…" : "Marquer comme doublon"}
             </Button>
@@ -180,13 +165,13 @@ const CarteDoublon = ({ paire, onTraitee }) => {
         </DialogContent>
       </Dialog>
 
-      {/* Aperçu rapide de l'offre A ou B (comparaison avant décision) */}
+      {/* Aperçu rapide de l'offre A ou B (comparaison avant décision). */}
       <ApercuOffre
         ouvert={!!apercuOffreId}
         onOpenChange={(o) => !o && setApercuOffreId(null)}
         offerId={apercuOffreId}
       />
-    </article>
+    </motion.article>
   )
 }
 

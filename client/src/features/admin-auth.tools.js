@@ -1,7 +1,8 @@
 import { useMutation, useQuery } from "@tanstack/react-query"
-import { getStoredTokens, clearStoredTokens } from "@/api/admin/axiosAdmin"
+import { getStoredTokens, clearStoredTokens } from "@/api/axiosAdmin"
 import { login as apiLogin, logout as apiLogout, getProfile } from "@/api/admin/auth"
 import { queryClient } from "@/lib/queryClient"
+import { z } from "zod"
 
 /* ─────────────────────────────────────────────────────────────────────
    Session admin : hooks TanStack + constantes de rôles.
@@ -41,6 +42,22 @@ export const adminAuthKeys = {
   root: ["admin", "auth"],
   session: ["admin", "auth", "session"],
 }
+
+
+/* ─── Validation client (bloque les soumissions invalides avant le serveur) ─── */
+
+export const schemaEmail = z
+  .string()
+  .trim()
+  .min(1, "L'email est requis.")
+  .email("Format d'email invalide.")
+
+export const loginSchema = z.object({
+  email: schemaEmail,
+  password: z.string().min(1, "Le mot de passe est requis."),
+})
+
+export const forgotSchema = z.object({ email: schemaEmail })
 
 /* ─── Session courante ──────────────────────────────────────────────── */
 

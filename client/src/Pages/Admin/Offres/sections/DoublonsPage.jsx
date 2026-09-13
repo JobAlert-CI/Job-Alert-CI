@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { ArrowLeft, Inbox, SearchX, SlidersHorizontal } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
+import { ArrowLeft, Inbox, SearchX, SlidersHorizontal, Loader2 } from "lucide-react"
 import { useAdminDoublonsQuery } from "@/features/admin-offres.tools"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -9,54 +10,51 @@ import { Label } from "@/components/ui/label"
 import { Slider } from "@/components/ui/slider"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from "@/components/ui/empty"
+import SectionCardAdmin from "@/components/admin/SectionCardAdmin"
 import { SectionErreur } from "../components/EtatsSection"
 import CarteDoublon from "../components/CarteDoublon"
-
-/* ─────────────────────────────────────────────────────────────────────
-   Page Doublons à vérifier — /admin/offres/doublons (sous-écran de la
-   gestion des offres). super_admin + gestionnaire_offres.
-
-   Objectif (doc v3 §5) : traiter les offres qui se ressemblent fortement
-   (même entreprise, titre proche) SANS le même hash exact — ce que le
-   dédoublonnage automatique ne peut pas capturer seul.
-
-   Contrat API (vérifié live 2026-09-05) :
-   - GET /offers/duplicates/candidates?min_similarity=80 [&company_id]
-     → [{ offer_a_id, offer_b_id, offer_a_title, offer_b_title,
-          offer_a_company, similarity_score, reason }]
-     Déjà triée par score décroissant côté serveur.
-   - Header X-Scan-Truncated: true → résultats partiels, affiner.
-   - POST /{offer_b_id}/mark-duplicate { duplicate_of_id, duplicate_reason? }
-     → B.is_duplicate=true (statut inchangé, vérifié), B sort du scan.
-     Refuse A==B et cycles (erreur serveur explicite).
-   - POST /duplicates/reject { offer_a_id, offer_b_id, reason? }
-     → la paire ne revient plus dans les scans (RejectedDuplicatePair).
-
-   Seuil : 60-100, défaut 80 (doc v3). Le scan coûte cher côté serveur :
-   debounce manuel — le relance se fait au relâchement du curseur,
-   jamais pendant le glissement.
-   ───────────────────────────────────────────────────────────────────── */
+import Bloc, { VARIANTS_PAGE } from "@/components/admin/Bloc"
 
 const SEUIL_DEFAUT = 80
 
+/* Skeleton fidèle à CarteDoublon : en-tête, comparaison A|B, actions. */
+const SkeletonCarteDoublon = () => (
+  <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4" aria-hidden="true">
+    <div className="flex items-center gap-2">
+      <Skeleton className="h-5 w-24 rounded-full" />
+      <Skeleton className="h-3 w-32" />
+      <Skeleton className="ml-auto h-3 w-40" />
+    </div>
+    <div className="grid items-center gap-2 sm:grid-cols-[1fr_auto_1fr]">
+      <div className="flex flex-col gap-2 rounded-lg border border-border/60 bg-muted/20 p-2.5">
+        <Skeleton className="h-2.5 w-24" />
+        <Skeleton className="h-4 w-3/4" />
+      </div>
+      <Skeleton className="mx-auto size-4 rounded" />
+      <div className="flex flex-col gap-2 rounded-lg border border-border/60 bg-muted/20 p-2.5">
+        <Skeleton className="h-2.5 w-24" />
+        <Skeleton className="h-4 w-3/4" />
+      </div>
+    </div>
+    <div className="flex justify-end gap-2">
+      <Skeleton className="h-8 w-44 rounded-md" />
+      <Skeleton className="h-8 w-28 rounded-md" />
+    </div>
+  </div>
+)
+
 const DoublonsPage = () => {
   const navigate = useNavigate()
-
   const [seuil, setSeuil] = useState(SEUIL_DEFAUT)
   const [filtreEntreprise, setFiltreEntreprise] = useState("")
+  // true pendant le glissement → badge du seuil « tactile ».
+  const [enGlissement, setEnGlissement] = useState(false)
 
-  // Scan au seuil courant — staleTime 2 min dans le hook, invalidé après
-  // chaque fusion/rejet (queryKey racine ["admin","offers"]).
-  // NOTE: le composant Slider base-ui passe `value` comme number simple
-  // quand une seule poignée (onValueChange(value: number)), et expose
-  // onValueCommitted pour ne relancer le scan qu'au relâchement.
   const { data: paires, isLoading, isError, refetch, isFetching } = useAdminDoublonsQuery({
     min_similarity: seuil,
   })
 
-  // Filtre entreprise côté client (les noms viennent des paires elles-mêmes,
-  // pas d'appel supplémentaire — le param company_id existe côté serveur
-  // mais nécessite un UUID que la réponse ne fournit pas).
+  // Filtre entreprise côté client (les noms viennent des paires elles-mêmes).
   const pairesFiltrees = useMemo(() => {
     if (!filtreEntreprise.trim()) return paires ?? []
     const q = filtreEntreprise.trim().toLowerCase()
@@ -68,10 +66,9 @@ const DoublonsPage = () => {
     )
   }, [paires, filtreEntreprise])
 
-  const surTraitee = () => {
-    // Fusion/rejet → invalide puis refetch silencieux du scan.
-    refetch()
-  }
+  // Fusion/rejet → invalide puis refetch silencieux du scan : les cartes
+  // traitées sortent en animation, les suivantes remontent via `layout`.
+  const surTraitee = () => refetch()
 
   if (isError) {
     return (
@@ -83,110 +80,143 @@ const DoublonsPage = () => {
   }
 
   return (
-    <div className="mx-auto flex w-full max-w-4xl flex-col gap-4">
-      <EnTete onRetour={() => navigate("/admin/offres")} />
+    <motion.div
+      variants={VARIANTS_PAGE}
+      initial="cache"
+      animate="visible"
+      className="mx-auto flex w-full max-w-6xl flex-col gap-6"
+    >
+      <Bloc>
+        <EnTete onRetour={() => navigate("/admin/offres")} />
 
-      {/* Réglages : seuil + filtre entreprise */}
-      <section
-        aria-label="Réglages du scan"
-        className="flex flex-col gap-4 rounded-xl border border-border bg-card p-4"
-      >
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="seuil-doublons" className="text-xs font-medium">
-              Seuil de similarité
-            </Label>
-            <Badge variant="secondary" className="tabular-nums">{seuil}%</Badge>
-          </div>
-          <Slider
-            id="seuil-doublons"
-            value={seuil}
-            onValueChange={(v) => setSeuil(typeof v === "number" ? v : v[0])}
-            onValueCommitted={() => refetch()}
-            min={60}
-            max={100}
-            step={5}
-            aria-label="Seuil minimal de similarité (60 à 100)"
-          />
-          <p className="text-[10px] text-muted-foreground">
-            Plus bas = plus de paires (et plus de faux positifs). Le scan relance quand vous relâchez le curseur.
-          </p>
-        </div>
+        {/* ─── Réglages : seuil + filtre entreprise ─── */}
+        <SectionCardAdmin
+          title="Réglages du scan"
+          description="Plus le seuil est bas, plus il y a de paires — et de faux positifs."
+          icon={SlidersHorizontal}
+        >
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="seuil-doublons" className="text-xs font-medium">
+                  Seuil de similarité
+                </Label>
+                {/* Badge « tactile » : grossit + passe en couleur pendant le
+                  glissement, puis relance le scan au relâchement. */}
+                <motion.span
+                  animate={{ scale: enGlissement ? 1.12 : 1 }}
+                  transition={{ duration: 0.15, ease: "easeOut" }}
+                  className="motion-reduce:transition-none"
+                >
+                  <Badge variant={enGlissement ? "default" : "secondary"} className="tabular-nums">
+                    {seuil}%
+                  </Badge>
+                </motion.span>
+              </div>
+              <Slider
+                id="seuil-doublons"
+                value={seuil}
+                onValueChange={(v) => {
+                  setSeuil(typeof v === "number" ? v : v[0])
+                  setEnGlissement(true)
+                }}
+                onValueCommitted={() => {
+                  setEnGlissement(false)
+                  refetch()
+                }}
+                min={60}
+                max={100}
+                step={5}
+                aria-label="Seuil minimal de similarité (60 à 100)"
+              />
+              <p className="text-[10px] text-muted-foreground">
+                Le scan relance quand vous relâchez le curseur — pas pendant le glissement.
+              </p>
+            </div>
 
-        <div className="flex flex-col gap-1.5">
-          <Label htmlFor="filtre-entreprise" className="text-xs font-medium">
-            Filtrer par entreprise ou titre
-          </Label>
-          <Input
-            id="filtre-entreprise"
-            type="search"
-            value={filtreEntreprise}
-            onChange={(e) => setFiltreEntreprise(e.target.value)}
-            placeholder="Ex. transcargo…"
-            className="max-w-sm"
-          />
-        </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="filtre-entreprise" className="text-xs font-medium">
+                Filtrer par entreprise ou titre
+              </Label>
+              <Input
+                id="filtre-entreprise"
+                type="search"
+                value={filtreEntreprise}
+                onChange={(e) => setFiltreEntreprise(e.target.value)}
+                placeholder="Ex. transcargo…"
+                className="h-8 max-w-sm text-xs"
+              />
+            </div>
 
-        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-          <SlidersHorizontal className="size-3.5" aria-hidden />
-          {isLoading ? (
-            <Skeleton className="h-4 w-40" />
-          ) : (
-            <>
-              {pairesFiltrees.length} paire{pairesFiltrees.length > 1 ? "s" : ""} à examiner
-              {isFetching && <span className="animate-pulse">— scan en cours…</span>}
-              {filtreEntreprise && paires?.length !== pairesFiltrees.length && (
-                <span>(sur {paires.length} non filtrées)</span>
+            <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground" aria-live="polite">
+              {isLoading ? (
+                <Skeleton className="h-4 w-40" />
+              ) : (
+                <>
+                  <span className="tabular-nums">
+                    {pairesFiltrees.length} paire{pairesFiltrees.length > 1 ? "s" : ""} à examiner
+                  </span>
+                  {isFetching && (
+                    <span className="flex items-center gap-1">
+                      <Loader2 className="size-3 animate-spin" aria-hidden /> scan en cours…
+                    </span>
+                  )}
+                  {filtreEntreprise && paires?.length !== pairesFiltrees.length && (
+                    <span className="tabular-nums">(sur {paires.length} non filtrées)</span>
+                  )}
+                </>
               )}
-            </>
-          )}
-        </div>
-      </section>
+            </div>
+          </div>
+        </SectionCardAdmin>
 
-      {/* Résultats */}
-      {isLoading ? (
-        <div className="flex flex-col gap-3">
-          {[...Array(4)].map((_, i) => (
-            <Skeleton key={i} className="h-36 w-full rounded-xl" />
-          ))}
-        </div>
-      ) : pairesFiltrees.length === 0 ? (
-        filtreEntreprise ? (
-          <Empty>
-            <EmptyHeader>
-              <EmptyMedia variant="icon"><SearchX /></EmptyMedia>
-              <EmptyTitle>Aucune paire pour ce filtre</EmptyTitle>
-              <EmptyDescription>
-                Aucune paire ne correspond à « {filtreEntreprise} » au seuil de {seuil}%.
-              </EmptyDescription>
-            </EmptyHeader>
-            <Button variant="outline" size="sm" onClick={() => setFiltreEntreprise("")}>
-              Vider le filtre
-            </Button>
-          </Empty>
+        {/* ─── Résultats : sortie animée des paires traitées ─── */}
+        {isLoading ? (
+          <div className="flex flex-col gap-3" aria-busy="true">
+            {[...Array(4)].map((_, i) => <SkeletonCarteDoublon key={i} />)}
+          </div>
+        ) : pairesFiltrees.length === 0 ? (
+          filtreEntreprise ? (
+            <div className="rounded-xl border border-dashed border-border bg-card/50">
+              <Empty>
+                <EmptyHeader>
+                  <EmptyMedia variant="icon"><SearchX /></EmptyMedia>
+                  <EmptyTitle>Aucune paire pour ce filtre</EmptyTitle>
+                  <EmptyDescription>
+                    Aucune paire ne correspond à « {filtreEntreprise} » au seuil de {seuil}%.
+                  </EmptyDescription>
+                </EmptyHeader>
+                <Button variant="outline" size="sm" onClick={() => setFiltreEntreprise("")}>
+                  Vider le filtre
+                </Button>
+              </Empty>
+            </div>
+          ) : (
+            <div className="rounded-xl border border-dashed border-border bg-card/50">
+              <Empty>
+                <EmptyHeader>
+                  <EmptyMedia variant="icon"><Inbox /></EmptyMedia>
+                  <EmptyTitle>Aucun doublon potentiel</EmptyTitle>
+                  <EmptyDescription>
+                    Le scan n'a détecté aucune paire au seuil de {seuil}%. Baissez le seuil pour élargir la recherche.
+                  </EmptyDescription>
+                </EmptyHeader>
+              </Empty>
+            </div>
+          )
         ) : (
-          <Empty>
-            <EmptyHeader>
-              <EmptyMedia variant="icon"><Inbox /></EmptyMedia>
-              <EmptyTitle>Aucun doublon potentiel</EmptyTitle>
-              <EmptyDescription>
-                Le scan n'a détecté aucune paire au seuil de {seuil}%. Baissez le seuil pour élargir la recherche.
-              </EmptyDescription>
-            </EmptyHeader>
-          </Empty>
-        )
-      ) : (
-        <div className="flex flex-col gap-3">
-          {pairesFiltrees.map((paire) => (
-            <CarteDoublon
-              key={`${paire.offer_a_id}:${paire.offer_b_id}`}
-              paire={paire}
-              onTraitee={surTraitee}
-            />
-          ))}
-        </div>
-      )}
-    </div>
+          <AnimatePresence mode="popLayout">
+            {pairesFiltrees.map((paire) => (
+              <CarteDoublon
+                key={`${paire.offer_a_id}:${paire.offer_b_id}`}
+                paire={paire}
+                onTraitee={surTraitee}
+              />
+            ))}
+          </AnimatePresence>
+        )}
+      </Bloc>
+    </motion.div>
   )
 }
 
@@ -196,7 +226,7 @@ const EnTete = ({ onRetour }) => (
       <ArrowLeft aria-hidden />
     </Button>
     <div className="flex flex-col">
-      <h1 className="font-heading text-lg font-bold">Doublons à vérifier</h1>
+      <h1 className="font-heading text-lg font-bold tracking-tight">Doublons à vérifier</h1>
       <p className="text-xs text-muted-foreground">
         Paires d'offres suspectes — similarité sans hash identique.
       </p>

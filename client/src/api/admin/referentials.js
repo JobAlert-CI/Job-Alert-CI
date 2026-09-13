@@ -1,4 +1,4 @@
-import adminApi from "./axiosAdmin";
+import adminApi from "../axiosAdmin";
 
 /* Referentiels partages (filieres, sources, types de contrat, niveaux, villes) :
    super_admin uniquement. */

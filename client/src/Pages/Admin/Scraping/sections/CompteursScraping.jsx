@@ -1,4 +1,5 @@
 import { useMemo } from "react"
+import { Globe, Package, Target, Timer } from "lucide-react"
 import {
   useAdminScrapingStatusQuery,
   useAdminScrapingSummaryQuery,
@@ -8,25 +9,11 @@ import {
 import CarteCompteur from "@/components/admin/CarteCompteur"
 import { dureeLisible } from "../components/statuts-scraping"
 
-/* ─────────────────────────────────────────────────────────────────────
-   Compteurs du haut de la page Scraping (cycle 10, option A+B).
-
-   Sélection validée par l'utilisateur :
-   - Sources OK (x/N)        ← /status (déjà chargé par les cartes) ;
-   - Durée moy. 10 derniers  ← /runs limit 10 (même queryKey que
-                               l'historique → zéro appel en plus) ;
-   - Offres collectées       ← /stats/summary all-time (endpoint créé
-                               pour ce cycle) ;
-   - Taux de réussite         ← /stats/summary (runs terminés).
-
-   Aucun appel réseau supplémentaire pour les 2 premiers : ils
-   dérivent des requêtes déjà présentes sur la page.
-   ───────────────────────────────────────────────────────────────────── */
 
 const CompteursScraping = () => {
-  const { data: sources, isLoading: sourcesChargement } = useAdminScrapingStatusQuery()
-  const { data: runs, isLoading: runsChargement } = useAdminScrapingRunsQuery({ limit: 10 })
-  const { data: summary, isLoading: summaryChargement } = useAdminScrapingSummaryQuery()
+  const { data: sources } = useAdminScrapingStatusQuery()
+  const { data: runs } = useAdminScrapingRunsQuery({ limit: 10 })
+  const { data: summary } = useAdminScrapingSummaryQuery()
 
   const sourcesOk = useMemo(
     () => (sources ?? []).filter((s) => s.last_status === "success").length,
@@ -34,7 +21,7 @@ const CompteursScraping = () => {
   )
   const totalSources = sources?.length ?? 0
 
-  // Durée moyenne des 10 derniers runs TERMINÉS (fenêtre honnête).
+  /* Durée moyenne des 10 derniers runs TERMINÉS (fenêtre honnête). */
   const dureeMoyenne = useMemo(() => {
     const terminees = (runs ?? [])
       .filter((r) => !STATUTS_ACTIFS.includes(r?.status))
@@ -47,27 +34,27 @@ const CompteursScraping = () => {
   return (
     <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
       <CarteCompteur
-        label="Sources OK"
+        label="Sources opérationnelles"
         valeur={sourcesOk}
-        texte={`${sourcesOk}/${totalSources}`}
-        chargement={sourcesChargement}
+        suffixe={`/${totalSources}`}
+        icone={Globe}
       />
       <CarteCompteur
         label="Durée moy. (10 derniers runs)"
         valeur={dureeMoyenne ?? 0}
-        texte={dureeMoyenne !== null ? dureeLisible(dureeMoyenne) : "—"}
-        chargement={runsChargement}
+        suffixe={dureeMoyenne !== null ? `ms (${dureeLisible(dureeMoyenne)})` : ""}
+        icone={Timer}
       />
       <CarteCompteur
         label="Offres collectées (all-time)"
         valeur={summary?.total_raw_all_time}
-        chargement={summaryChargement}
+        icone={Package}
       />
       <CarteCompteur
         label="Taux de réussite"
         valeur={summary?.success_rate ?? 0}
         texte={summary?.success_rate == null ? "—" : `${summary.success_rate} %`}
-        chargement={summaryChargement}
+        icone={Target}
       />
     </div>
   )

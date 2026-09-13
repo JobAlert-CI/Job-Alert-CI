@@ -1,4 +1,4 @@
-import adminApi from "./axiosAdmin";
+import adminApi from "../axiosAdmin";
 import { cleanParams } from "../utils";
 
 /* Pilotage IA : cles API, jobs, file d'attente, alertes, suggestions de filiere.

@@ -5,17 +5,16 @@ import {
 } from "recharts"
 import { useAdminTierStatsQuery, TIER_LABELS, etatQualiteMatching, usePeutVoirEnvois } from "@/features/admin-matching.tools"
 import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { SectionErreur, SectionVide } from "../components/EtatsSection"
+import SectionCardAdmin from "@/components/admin/SectionCardAdmin"
 
 /* ─────────────────────────────────────────────────────────────────────
-   Section 3 — Qualité du matching cette semaine (T0 à T5).
-
-   Le code couleur transforme le graphique en signal d'alerte visuel
-   immédiat (doc v3 §2) : vert si T0/T1 dominant (≥70 %), orange
-   (≥40 %), rouge en dessous. Un T2+ élevé = référentiel trop strict.
-   ───────────────────────────────────────────────────────────────────── */
+  Section — Qualité du matching cette semaine (T0 à T5).
+  Code couleur = signal d'alerte visuel immédiat : vert si T0/T1
+  dominant (≥70 %), orange (≥40 %), rouge en dessous.
+  Refonte : animation de dessin des barres réactivée (700 ms).
+───────────────────────────────────────────────────────────────────── */
 
 const COULEURS_TIER = {
   T0: "#16a34a", // vert — matching exact filière
@@ -33,6 +32,8 @@ const ETATS_WIDGET = {
   vide: { libelle: "Aucune donnée", variante: "outline", classe: "text-muted-foreground" },
 }
 
+const formatNombre = (v) => (Number(v) || 0).toLocaleString("fr-FR")
+
 const TooltipPerso = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null
   return (
@@ -40,7 +41,7 @@ const TooltipPerso = ({ active, payload, label }) => {
       <p className="font-semibold">{label}</p>
       {payload.map((p) => (
         <p key={p.dataKey} className="text-muted-foreground">
-          {TIER_LABELS[p.dataKey] ?? p.dataKey} : {p.value}
+          {TIER_LABELS[p.dataKey] ?? p.dataKey} : {formatNombre(p.value)}
         </p>
       ))}
     </div>
@@ -51,7 +52,6 @@ const QualiteMatching = () => {
   const autorise = usePeutVoirEnvois()
   const { data, isLoading, isError, refetch } = useAdminTierStatsQuery(7)
 
-  // Barres empilées par jour : un point par jour, une série par tier.
   const parJour = useMemo(() => {
     const byDay = data?.tier_distribution?.by_day ?? {}
     return Object.entries(byDay)
@@ -67,74 +67,64 @@ const QualiteMatching = () => {
   const totalSemaine = data?.tier_distribution?.global?.total ?? 0
 
   return (
-    <section aria-label="Qualité du matching cette semaine">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between gap-2">
-            <span className="flex items-center gap-2">
-              <Activity className="size-4 text-primary" aria-hidden />
-              Qualité du matching — 7 jours
-            </span>
-            {totalSemaine > 0 && (
-              <Badge variant={metaEtat.variante} className={metaEtat.classe}>
-                {metaEtat.libelle}
-              </Badge>
-            )}
-          </CardTitle>
-          <CardDescription>
-            Distribution des paliers de matching sur les digests envoyés. Beaucoup de T2+ (orange/rouge) = référentiel de filières trop strict.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {!autorise ? (
-            <SectionVide message="Statistiques d'envoi réservées aux super admins et gestionnaires utilisateurs." />
-          ) : isError ? (
-            <SectionErreur onRetry={refetch} message="Impossible de charger la qualité du matching." />
-          ) : isLoading ? (
-            <Skeleton className="h-48 w-full" />
-          ) : !parJour.length ? (
-            <SectionVide message="Aucun digest envoyé sur les 7 derniers jours." />
-          ) : (
-            <>
-              <div className="h-48 w-full" role="img" aria-label="Répartition quotidienne des paliers de matching T0 à T5">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={parJour} margin={{ top: 4, right: 4, left: -28, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border, #e5e9eb)" vertical={false} />
-                    <XAxis
-                      dataKey="date"
-                      tickFormatter={(d) => new Date(d).toLocaleDateString("fr-FR", { day: "2-digit", month: "short" })}
-                      tick={{ fontSize: 10 }}
-                      axisLine={false}
-                      tickLine={false}
-                    />
-                    <YAxis tick={{ fontSize: 10 }} axisLine={false} tickLine={false} allowDecimals={false} />
-                    <Tooltip content={<TooltipPerso />} />
-                    {Object.keys(TIER_LABELS).map((tier) => (
-                      <Bar
-                        key={tier}
-                        dataKey={tier}
-                        stackId="tiers"
-                        fill={COULEURS_TIER[tier]}
-                        isAnimationActive={false}
-                      />
-                    ))}
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-              {/* Légende accessible hors du graphique (lecteurs d'écran) */}
-              <ul className="mt-2 flex flex-wrap gap-x-3 gap-y-1">
-                {Object.entries(TIER_LABELS).map(([tier, libelle]) => (
-                  <li key={tier} className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
-                    <span className="size-2 rounded-sm" style={{ backgroundColor: COULEURS_TIER[tier] }} aria-hidden />
-                    {tier} — {libelle}
-                  </li>
+    <SectionCardAdmin
+      title="Qualité du matching (7 derniers jours)"
+      description="Distribution des paliers sur les digests envoyés."
+      icon={Activity}
+      badge={totalSemaine > 0 && (
+        <Badge variant={metaEtat.variante} className={`font-bold ${metaEtat.classe}`}>
+          {metaEtat.libelle}
+        </Badge>
+      )}
+    >
+      {!autorise ? (
+        <SectionVide message="Statistiques d'envoi réservées aux super admins et gestionnaires utilisateurs." />
+      ) : isError ? (
+        <SectionErreur onRetry={refetch} message="Impossible de charger la qualité du matching." />
+      ) : isLoading ? (
+        <Skeleton className="h-48 w-full" />
+      ) : !parJour.length ? (
+        <SectionVide message="Aucun digest envoyé sur les 7 derniers jours." />
+      ) : (
+        <>
+          <div className="h-48 w-full" role="img" aria-label="Répartition quotidienne des paliers de matching T0 à T5">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={parJour} margin={{ top: 4, right: 4, left: -28, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border, #e5e9eb)" vertical={false} />
+                <XAxis
+                  dataKey="date"
+                  tickFormatter={(d) => new Date(d).toLocaleDateString("fr-FR", { day: "2-digit", month: "short" })}
+                  tick={{ fontSize: 10 }}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis tick={{ fontSize: 10 }} axisLine={false} tickLine={false} allowDecimals={false} />
+                <Tooltip content={<TooltipPerso />} cursor={{ fill: "var(--color-muted)", opacity: 0.5 }} />
+                {Object.keys(TIER_LABELS).map((tier) => (
+                  <Bar
+                    key={tier}
+                    dataKey={tier}
+                    stackId="tiers"
+                    fill={COULEURS_TIER[tier]}
+                    animationDuration={700}
+                    animationEasing="ease-out"
+                  />
                 ))}
-              </ul>
-            </>
-          )}
-        </CardContent>
-      </Card>
-    </section>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+          {/* Légende accessible hors du graphique (lecteurs d'écran) */}
+          <ul className="mt-2 flex flex-wrap gap-x-3 gap-y-1">
+            {Object.entries(TIER_LABELS).map(([tier, libelle]) => (
+              <li key={tier} className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+                <span className="size-2 rounded-sm" style={{ backgroundColor: COULEURS_TIER[tier] }} aria-hidden="true" />
+                {tier} — {libelle}
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+    </SectionCardAdmin>
   )
 }
 

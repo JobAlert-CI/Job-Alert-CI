@@ -1,29 +1,17 @@
-import { useMemo } from "react"
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts"
+import { useEffect, useMemo, useState } from "react"
+import { PieChart, Pie, Cell, Sector, ResponsiveContainer } from "recharts"
 import { Tags } from "lucide-react"
-import { useAdminTierStatsQuery } from "@/features/admin-matching.tools"
+import { cn } from "cn"
+import { useAdminTierStatsQuery, usePeutVoirEnvois } from "@/features/admin-matching.tools"
 import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { SectionErreur, SectionVide } from "../components/EtatsSection"
-import { usePeutVoirEnvois } from "@/features/admin-matching.tools"
+import SectionCardAdmin from "@/components/admin/SectionCardAdmin"
 
-/* ─────────────────────────────────────────────────────────────────────
-   Section — Types de match par offre (donut).
-
-   Même réponse que QualiteMatching : match_kind_distribution est
-   incluse dans GET /sending/tier-stats — zéro appel supplémentaire
-   (TanStack déduplique via la queryKey identique).
-
-   Kinds réels (vérifiés API live) : primary, secondary,
-   fallback_contract, fallback_freshness, fallback_experience,
-   fallback_city. Le type exact renvoyé par le backend n'est pas
-   garanti exhaustif : toute clé inconnue est affichée telle quelle.
-   ───────────────────────────────────────────────────────────────────── */
 
 const COULEURS_KIND = {
-  primary: "#0f766e",            // teal foncé — filière directe
-  secondary: "#0891b2",          // cyan — filière secondaire
+  primary: "#0f766e",
+  secondary: "#0891b2",
   fallback_contract: "#d97706",
   fallback_freshness: "#ea580c",
   fallback_experience: "#dc2626",
@@ -39,26 +27,28 @@ const LIBELLES_KIND = {
   fallback_city: "Fallback ville",
 }
 
-/** Palette de secours pour un kind non répertorié. */
 const COULEURS_SECOURS = ["#7c3aed", "#4f46e5", "#0284c7", "#059669", "#ca8a04", "#be185d"]
 
 const couleurKind = (kind, i) =>
   COULEURS_KIND[kind] ?? COULEURS_SECOURS[i % COULEURS_SECOURS.length]
 
-const TooltipPerso = ({ active, payload }) => {
-  if (!active || !payload?.length) return null
-  const p = payload[0]
-  return (
-    <div className="rounded-lg border border-border bg-popover px-2.5 py-1.5 text-xs shadow-md">
-      <p className="font-semibold">{LIBELLES_KIND[p.name] ?? p.name}</p>
-      <p className="text-muted-foreground">{p.value} offre{p.value > 1 ? "s" : ""}</p>
-    </div>
-  )
-}
+/** Segment actif : léger écart du centre (rayon +5). */
+const SecteurActif = ({ cx, cy, innerRadius, outerRadius, startAngle, endAngle, fill }) => (
+  <Sector
+    cx={cx}
+    cy={cy}
+    innerRadius={innerRadius}
+    outerRadius={outerRadius + 5}
+    startAngle={startAngle}
+    endAngle={endAngle}
+    fill={fill}
+  />
+)
 
 const TypesMatch = () => {
   const autorise = usePeutVoirEnvois()
   const { data, isLoading, isError, refetch } = useAdminTierStatsQuery(7)
+  const [survol, setSurvol] = useState(null)
 
   const parts = useMemo(() => {
     const kinds = data?.match_kind_distribution?.global?.kinds ?? {}
@@ -67,92 +57,126 @@ const TypesMatch = () => {
       .sort((a, b) => b.value - a.value)
   }, [data])
 
-  const total = parts.reduce((acc, p) => acc + p.value, 0)
+  /* Le survol pointe vers un indice : on le réinitialise à chaque
+     nouveau jeu de données pour éviter un indice hors bornes. */
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => setSurvol(null), [data])
 
-  // Rôle sans accès au router sending : message explicite, pas de
-  // requête déclenchée (le hook est enabled: false).
-  if (!autorise) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Tags className="size-4 text-primary" aria-hidden />
-            Types de match — 7 jours
-          </CardTitle>
-          <CardDescription>Répartition par type de rattachement offre.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <SectionVide message="Statistiques d'envoi réservées aux super admins et gestionnaires utilisateurs." />
-        </CardContent>
-      </Card>
-    )
-  }
+  const total = parts.reduce((acc, p) => acc + p.value, 0)
+  const indexActif = survol !== null && survol < parts.length ? survol : null
+  const segmentActif = indexActif !== null ? parts[indexActif] : null
+
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center justify-between gap-2">
-          <span className="flex items-center gap-2">
-            <Tags className="size-4 text-primary" aria-hidden />
-            Types de match — 7 jours
-          </span>
-          {total > 0 && <Badge variant="secondary">{total} offre{total > 1 ? "s" : ""} rattachée{total > 1 ? "s" : ""}</Badge>}
-        </CardTitle>
-        <CardDescription>
-          Comment les offres des digests ont été rattachées aux filières. Beaucoup de fallbacks = matching à assouplir.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        {isError ? (
-          <SectionErreur onRetry={refetch} message="Impossible de charger les types de match." />
-        ) : isLoading ? (
-          <Skeleton className="h-48 w-full" />
-        ) : !parts.length ? (
-          <SectionVide message="Aucune offre rattachée sur les 7 derniers jours." />
-        ) : (
-          <div className="flex flex-col items-center gap-3 sm:flex-row sm:items-center">
-            <div className="h-48 w-48 shrink-0" role="img" aria-label={`Répartition des types de match : ${parts.map((p) => `${LIBELLES_KIND[p.name] ?? p.name} ${p.value}`).join(", ")}`}>
+    <SectionCardAdmin
+      title="Types de match (7j)"
+      icon={Tags}
+      badge={total > 0 && (
+        <Badge variant="secondary">
+          {total.toLocaleString("fr-FR")} rattachée{total > 1 ? "s" : ""}
+        </Badge>
+      )}
+    >
+      {!autorise ? (
+        <SectionVide message="Statistiques d'envoi réservées aux super admins et gestionnaires utilisateurs." />
+      ) :isError ? (
+        <SectionErreur onRetry={refetch} message="Impossible de charger les types de match." />
+      ) : isLoading ? (
+        <Skeleton className="h-48 w-full" />
+      ) : !parts.length ? (
+        <SectionVide message="Aucune offre rattachée sur les 7 derniers jours." />
+      ) : (
+        <div className="flex flex-col items-center gap-4 sm:flex-row sm:gap-5">
+          {/* Donut + centre dynamique */}
+          <div className="relative h-44 w-44 shrink-0">
+            <div
+              className="h-full w-full"
+              role="img"
+              aria-label={`Répartition des types de match : ${parts
+                .map((p) => `${LIBELLES_KIND[p.name] ?? p.name} ${p.value}`)
+                .join(", ")}`}
+            >
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
                     data={parts}
                     dataKey="value"
                     nameKey="name"
-                    innerRadius="55%"
+                    innerRadius="60%"
                     outerRadius="85%"
                     paddingAngle={2}
                     strokeWidth={0}
-                    isAnimationActive={false}
+                    animationDuration={800}
+                    animationEasing="ease-out"
+                    activeIndex={indexActif}
+                    activeShape={SecteurActif}
+                    onMouseEnter={(_, i) => setSurvol(i)}
+                    onMouseLeave={() => setSurvol(null)}
                   >
                     {parts.map((p, i) => (
-                      <Cell key={p.name} fill={couleurKind(p.name, i)} />
+                      <Cell
+                        key={p.name}
+                        fill={couleurKind(p.name, i)}
+                        opacity={indexActif === null || indexActif === i ? 1 : 0.35}
+                        className="cursor-pointer outline-none transition-opacity duration-200"
+                      />
                     ))}
                   </Pie>
-                  <Tooltip content={<TooltipPerso />} />
                 </PieChart>
               </ResponsiveContainer>
             </div>
-            {/* Légende textuelle (lecteurs d'écran + lecture chiffrée) */}
-            <ul className="flex w-full flex-col gap-1.5 text-xs">
-              {parts.map((p, i) => {
-                const part = total ? Math.round((p.value / total) * 100) : 0
-                return (
-                  <li key={p.name} className="flex items-center justify-between gap-2">
+
+            {/* Centre : total par défaut, valeur du segment au survol */}
+            <div aria-hidden="true" className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center">
+              <span className="font-heading text-2xl font-bold tabular-nums">
+                {(segmentActif ? segmentActif.value : total).toLocaleString("fr-FR")}
+              </span>
+              <span className="mt-0.5 max-w-24 truncate text-[10px] font-medium text-muted-foreground">
+                {segmentActif
+                  ? LIBELLES_KIND[segmentActif.name] ?? segmentActif.name
+                  : "offres rattachées"}
+              </span>
+            </div>
+          </div>
+
+          {/* Légende interactive (souris + clavier), synchronisée */}
+          <ul className="flex w-full flex-col gap-0.5 text-xs">
+            {parts.map((p, i) => {
+              const part = total ? Math.round((p.value / total) * 100) : 0
+              const actif = indexActif === i
+              return (
+                <li key={p.name}>
+                  <button
+                    type="button"
+                    onMouseEnter={() => setSurvol(i)}
+                    onMouseLeave={() => setSurvol(null)}
+                    onFocus={() => setSurvol(i)}
+                    onBlur={() => setSurvol(null)}
+                    className={cn(
+                      "flex w-full items-center justify-between gap-2 rounded-lg px-2 py-1.5 text-left outline-none transition-colors duration-150",
+                      "focus-visible:ring-2 focus-visible:ring-ring",
+                      actif ? "bg-muted" : "hover:bg-muted/60"
+                    )}
+                  >
                     <span className="flex min-w-0 items-center gap-1.5">
-                      <span className="size-2.5 shrink-0 rounded-sm" style={{ backgroundColor: couleurKind(p.name, i) }} aria-hidden />
+                      <span
+                        className="size-2.5 shrink-0 rounded-sm"
+                        style={{ backgroundColor: couleurKind(p.name, i) }}
+                        aria-hidden="true"
+                      />
                       <span className="truncate">{LIBELLES_KIND[p.name] ?? p.name}</span>
                     </span>
                     <span className="shrink-0 tabular-nums text-muted-foreground">
-                      {p.value} ({part} %)
+                      {p.value.toLocaleString("fr-FR")} ({part} %)
                     </span>
-                  </li>
-                )
-              })}
-            </ul>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+                  </button>
+                </li>
+              )
+            })}
+          </ul>
+        </div>
+      )}
+    </SectionCardAdmin>
   )
 }
 

@@ -1,11 +1,12 @@
 
 import { cn } from "@/lib/utils"
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
+import { Badge } from "../ui/badge"
 
 const TONES = {
   emerald: "border-emerald-500/25 bg-emerald-500/10 text-emerald-700",
-  orange:  "border-brand-orange/30 bg-brand-orange/10 text-brand-orange",
-  navy:    "border-brand-navy/20 bg-brand-navy/5 text-brand-navy",
+  orange: "border-brand-orange/30 bg-brand-orange/10 text-brand-orange",
+  navy: "border-brand-navy/20 bg-brand-navy/5 text-brand-navy",
 }
 const DOTS = { emerald: "bg-emerald-500", orange: "bg-brand-orange", navy: "bg-brand-navy" }
 
@@ -13,8 +14,8 @@ const DOTS = { emerald: "bg-emerald-500", orange: "bg-brand-orange", navy: "bg-b
 const StatusChip = ({ children, tooltip, tone = "emerald", ping = true, className }) => (
   <Tooltip>
     <TooltipTrigger >
-      <span className={cn(
-        "inline-flex cursor-default items-center gap-2.5 rounded-full border py-1.5 pl-2.5 pr-4 text-xs font-semibold",
+      <Badge className={cn(
+        "text-white text-xs flex items-center gap-1",
         TONES[tone],
         className
       )}>
@@ -23,7 +24,7 @@ const StatusChip = ({ children, tooltip, tone = "emerald", ping = true, classNam
           <span className={cn("relative inline-flex size-2 rounded-full", DOTS[tone])} />
         </span>
         {children}
-      </span>
+      </Badge>
     </TooltipTrigger>
     {tooltip && <TooltipContent side="bottom" className="max-w-62.5 text-center">{tooltip}</TooltipContent>}
   </Tooltip>

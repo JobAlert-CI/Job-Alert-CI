@@ -1,4 +1,4 @@
-import adminApi from "./axiosAdmin";
+import adminApi from "../axiosAdmin";
 import { cleanParams } from "../utils";
 
 /* Gestion de contenu editorial : articles, sections/blocs, categories,
@@ -16,6 +16,8 @@ const getArticles = async (params = {}, { signal } = {}) => {
   const response = await adminApi.get(`${API_URL}/articles`, { params: cleanParams(params), signal });
   return response.data;
 };
+
+
 
 /** GET /api/admin/content/articles/{article_id} — article complet avec sections/blocs. */
 const getArticle = async (articleId, { signal } = {}) => {
@@ -60,6 +62,38 @@ const deleteArticle = async (articleId, { signal } = {}) => {
   await adminApi.delete(`${API_URL}/articles/${encodeURIComponent(articleId)}`, { signal });
   return true;
 };
+
+/** POST /articles/{id}/takeaways {text, position?} → ArticleRead (liste complète re-sérialisée). */
+const addTakeaway = async (articleId, data, { signal } = {}) => {
+  const response = await adminApi.post(
+    `${API_URL}/articles/${encodeURIComponent(articleId)}/takeaways`,
+    data,
+    { signal },
+  )
+  return response.data
+}
+
+/** DELETE /takeaways/{id} → 204 (positions recompactées serveur). */
+const removeTakeaway = async (takeawayId, { signal } = {}) => {
+  await adminApi.delete(`${API_URL}/takeaways/${encodeURIComponent(takeawayId)}`, { signal })
+  return true
+}
+
+/** POST /articles/{id}/key-figures {value, label, prefix?, suffix?, position?} → ArticleRead. */
+const addKeyFigure = async (articleId, data, { signal } = {}) => {
+  const response = await adminApi.post(
+    `${API_URL}/articles/${encodeURIComponent(articleId)}/key-figures`,
+    data,
+    { signal },
+  )
+  return response.data
+}
+
+/** DELETE /key-figures/{id} → 204. */
+const removeKeyFigure = async (figureId, { signal } = {}) => {
+  await adminApi.delete(`${API_URL}/key-figures/${encodeURIComponent(figureId)}`, { signal })
+  return true
+}
 
 /* ─── Sections et blocs ──────────────────────────────────────────────── */
 
@@ -229,6 +263,32 @@ const deletePage = async (pageId, { signal } = {}) => {
   return true;
 };
 
+/** POST /pages {content_type, slug, title, …} → 201, statut initial draft. */
+const createPageStatique = async (data, { signal } = {}) => {
+  const response = await adminApi.post(`${API_URL}/pages`, data, { signal })
+  return response.data
+}
+
+/** PUT /pages/{id} — champs fournis uniquement (slug/type immuables). */
+const updatePageStatique = async (pageId, data, { signal } = {}) => {
+  const response = await adminApi.put(
+    `${API_URL}/pages/${encodeURIComponent(pageId)}`,
+    data,
+    { signal },
+  )
+  return response.data
+}
+
+/** PATCH /pages/{id}/status {status} — published_at figé à la 1re publication. */
+const changerStatutPage = async (pageId, status, { signal } = {}) => {
+  const response = await adminApi.patch(
+    `${API_URL}/pages/${encodeURIComponent(pageId)}/status`,
+    { status },
+    { signal },
+  )
+  return response.data
+}
+
 export {
   getArticles,
   getArticle,
@@ -237,6 +297,10 @@ export {
   updateArticleStatus,
   updateArticleFeatured,
   deleteArticle,
+  addTakeaway,
+  removeTakeaway,
+  addKeyFigure,
+  removeKeyFigure,
   createSection,
   updateSection,
   deleteSection,
@@ -261,6 +325,9 @@ export {
   createPage,
   updatePage,
   deletePage,
+  createPageStatique,
+  updatePageStatique,
+  changerStatutPage,
 };
 
 export default {
@@ -271,6 +338,10 @@ export default {
   updateArticleStatus,
   updateArticleFeatured,
   deleteArticle,
+  addTakeaway,
+  removeTakeaway,
+  addKeyFigure,
+  removeKeyFigure,
   createSection,
   updateSection,
   deleteSection,
@@ -295,4 +366,7 @@ export default {
   createPage,
   updatePage,
   deletePage,
+  createPageStatique,
+  updatePageStatique,
+  changerStatutPage,
 };

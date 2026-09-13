@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -11,30 +11,38 @@ import {
 
 /* ─────────────────────────────────────────────────────────────────────
    Dialog de création d'une nouvelle clé (cycle 18, doc v3 §18).
-
    PUT /{key} est un UPSERT transparent : le front ne distingue jamais
    « créer » et « modifier ». On PREVIENT toutefois si la clé existe
    déjà (l'admin pense créer, il va en fait écraser une valeur) —
    honnêteté sans bloquer (l'upsert reste légitime).
-
    Validation locale miroir serveur : clé ≤ 100 car., description
    ≤ 500, valeur ≤ 10 000 (422 sinon — formatApiError gère l'affichage).
+   Refonte : monté EN PERMANENCE et piloté par la prop `open` (anim-
+   ations d'entrée/sortie Radix préservées) ; champs réinitialisés par
+   useEffect à chaque ouverture. L'état d'ouverture vit dans index.jsx
+   (plus de duplication avec TableauParametres).
    ───────────────────────────────────────────────────────────────────── */
-
-const DialogCreationParametre = ({ ouverte, onFermer }) => {
+const DialogCreationParametre = ({ open, onFermer }) => {
   const notify = useNotify()
   const { data: parametres } = useParametresQuery()
   const sauvegarder = useSauvegarderParametre()
-
   const [cle, setCle] = useState("")
   const [valeur, setValeur] = useState("")
   const [description, setDescription] = useState("")
+
+  /* Le composant ne se démonte plus : formulaire vierge à chaque ouverture. */
+  useEffect(() => {
+    if (!open) return
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setCle("")
+    setValeur("")
+    setDescription("")
+  }, [open])
 
   // La clé existe déjà ? (upsert = écrasement, on prévient).
   const existeDeja = (parametres ?? []).some((p) => p.key === cle.trim())
   const cleValide = cle.trim().length >= 1 && cle.trim().length <= 100
   const erreurValeur = cle.trim() ? validerValeur(cle.trim(), valeur) : null
-
   const peutSoumettre = cleValide && !erreurValeur && valeur.length > 0 && !sauvegarder.isPending
 
   const soumettre = () => {
@@ -51,7 +59,7 @@ const DialogCreationParametre = ({ ouverte, onFermer }) => {
   }
 
   return (
-    <Dialog open={ouverte} onOpenChange={(ouvert) => { if (!ouvert) onFermer() }}>
+    <Dialog open={open} onOpenChange={(ouvert) => { if (!ouvert) onFermer() }}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Nouvelle clé de paramètre</DialogTitle>

@@ -29,7 +29,7 @@
     }
   },
   "include": [    
-    "src/Pages/DetailsOffre/**/*"
+    "src/Pages/Admin/Contenu/**/*"
   ],
   "ignore": {
     "useGitignore": true,

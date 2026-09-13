@@ -46,9 +46,9 @@ export const adminIaKeys = {
 
 export const STATUTS_JOB = {
   pending: { libelle: "En attente", variante: "secondary" },
-  running: { libelle: "En cours", variante: "default" },
-  completed: { libelle: "Terminé", variante: "default" },
-  partial_failure: { libelle: "Échec partiel", variante: "secondary" },
+  running: { libelle: "En cours", variante: "outline" },
+  completed: { libelle: "Terminé", variante: "outline" },
+  partial_failure: { libelle: "Échec partiel", variante: "warning" },
   failed: { libelle: "Échoué", variante: "destructive" },
 }
 
@@ -74,8 +74,8 @@ export const STATUTS_SUGGESTION = [
 
 export const VARIANTE_SUGGESTION = {
   pending: "secondary",
-  approved: "default",
-  rejected: "outline",
+  approved: "outline",
+  rejected: "destructive",
 }
 
 export const libelleStatutJob = (valeur) => STATUTS_JOB[valeur]?.libelle ?? valeur

@@ -1,4 +1,4 @@
-import adminApi from "./axiosAdmin";
+import adminApi from "../axiosAdmin";
 import { cleanParams } from "../utils";
 
 /* Pilotage du scraping : super_admin uniquement. */

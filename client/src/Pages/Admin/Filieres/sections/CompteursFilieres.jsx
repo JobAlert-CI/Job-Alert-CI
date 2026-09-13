@@ -4,17 +4,8 @@ import {
   useStatsOffresParFiliere, useStatsAbonnesParFiliere,
 } from "@/features/admin-filieres.tools"
 import CarteCompteur from "@/components/admin/CarteCompteur"
+import { Briefcase, FolderGit2, Tag, Users } from "lucide-react"
 
-/* ─────────────────────────────────────────────────────────────────────
-   Compteurs du haut de la page Filières (cycle 12, sélection user) :
-   - Filières actives (x/N)     ← liste admin déjà chargée (0 appel) ;
-   - Offres rattachées           ← /api/stats/offers/by-filiere (somme
-                                   des filières peuplées — « au moins ») ;
-   - Abonnés rattachés           ← top-filieres cycle 7 (idem) ;
-   - Filières sans mot-clé       ← liste admin (indicateur qualité :
-                                   une filière sans mot-clé n'est jamais
-                                   détectée par le matching automatique).
-   ───────────────────────────────────────────────────────────────────── */
 
 const CompteursFilieres = () => {
   const { data: filieres, isLoading } = useAdminFilieresQuery()
@@ -45,22 +36,26 @@ const CompteursFilieres = () => {
       <CarteCompteur
         label="Filières actives"
         valeur={actives}
-        texte={`${actives}/${filieres?.length ?? 0}`}
+        suffixe={`/${filieres?.length ?? 0}`}
+        icone={FolderGit2}
         chargement={isLoading}
       />
       <CarteCompteur
         label="Offres rattachées"
         valeur={offresTotal}
+        icone={Briefcase}
         chargement={offresChargement}
       />
       <CarteCompteur
         label="Abonnés rattachés"
         valeur={abonnesTotal}
+        icone={Users}
         chargement={abonnesChargement}
       />
       <CarteCompteur
         label="Filières sans mot-clé"
         valeur={sansMotCle}
+        icone={Tag}
         chargement={isLoading}
       />
     </div>

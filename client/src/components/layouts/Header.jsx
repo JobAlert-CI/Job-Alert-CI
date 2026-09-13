@@ -200,7 +200,6 @@ const Header = () => {
 
   const topConseil = topArticles[0]
   const totalArticles = topArticles.length
-  const hasFreshData = totalActives > 0
 
   const openMega = (name) => {
     if (closeTimer.current) window.clearTimeout(closeTimer.current)
@@ -298,27 +297,9 @@ const Header = () => {
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            className="overflow-hidden bg-brand-navy text-white"
+            className="overflow-hidden bg-brand-navy text-white flex justify-end"
           >
             <div className="flex items-center justify-between gap-4 px-4 py-1.5 text-[11px] font-medium md:px-8 lg:px-12">
-              <p className="flex items-center gap-2">
-                <span className="relative flex size-2">
-                  <span className="absolute inline-flex size-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                  <span className="relative inline-flex size-2 rounded-full bg-emerald-400" />
-                </span>
-                <span className="text-white/90">
-                  {hasFreshData ? (
-                    <>
-                      Collecte terminée —{" "}
-                      <strong className="font-semibold text-white">
-                        {nouveauxCeMatin} nouvelle{nouveauxCeMatin > 1 ? "s" : ""} offre{nouveauxCeMatin > 1 ? "s" : ""}
-                      </strong>
-                    </>
-                  ) : (
-                    <>Collecte du jour en cours…</>
-                  )}
-                </span>
-              </p>
               <p className="hidden items-center gap-2 text-white/60 md:flex">
                 {dateFr}
                 <span className="text-white/30">·</span>

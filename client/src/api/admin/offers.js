@@ -1,4 +1,4 @@
-import adminApi from "./axiosAdmin";
+import adminApi from "../axiosAdmin";
 import { cleanParams } from "../utils";
 
 /* Gestion des offres : super_admin + gestionnaire_offres. */

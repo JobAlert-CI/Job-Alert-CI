@@ -1,4 +1,4 @@
-import adminApi from "./axiosAdmin";
+import adminApi from "../axiosAdmin";
 
 /* Dashboard : point d'entree du back-office, accessible a tous les roles admin. */
 

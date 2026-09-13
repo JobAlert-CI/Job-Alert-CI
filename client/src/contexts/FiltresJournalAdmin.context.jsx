@@ -1,18 +1,13 @@
-import { createContext, useContext, useMemo } from "react"
+import { createContext, useContext, useEffect, useMemo, useRef } from "react"
 import { useUrlFilters } from "@/hooks/use-url-filters"
 
 /* ─────────────────────────────────────────────────────────────────────
-   Contexte de filtres du journal d'activité (cycle 16).
-
-   Params miroirs du serveur (api/admin/logs.js) : admin_id, action,
-   target_table. Pagination offset en état page — MAIS le total est
-   désormais servi (/audit renvoie {items, total}), donc la page peut
-   afficher « X sur N » et calculer le nombre de pages.
-
-   Pas de paramètre q : l'endpoint n'expose pas de recherche texte
-   (action/admin/table sont les 3 seuls filtres serveur).
-   ───────────────────────────────────────────────────────────────────── */
-
+Contexte de filtres du journal d'activité (cycle 16).
+Params miroirs du serveur (api/admin/logs.js) : admin_id, action,
+target_table. Pagination offset en état page — le total est servi
+(/audit renvoie {items, total}), la page affiche « X sur N ».
+Pas de paramètre q : l'endpoint n'expose pas de recherche texte.
+───────────────────────────────────────────────────────────────────── */
 const PAGE_TAILLE = 50
 
 const CONFIG_FILTRES_JOURNAL_ADMIN = {
@@ -40,6 +35,18 @@ export const useFiltresJournalAdmin = () => {
 export const FiltresJournalAdminProvider = ({ children }) => {
   const { valeurs, setScalar, reset } = useUrlFilters(CONFIG_FILTRES_JOURNAL_ADMIN)
 
+  /* Reset RÉACTIF de la page : dès que la signature des filtres
+     change, retour à la page 1 — sans jamais doubler les setScalar
+     dans un même handler (source du bug de filtres « morts »). */
+  const signatureFiltres = `${valeurs.admin}|${valeurs.action}|${valeurs.table}|${valeurs.debut}|${valeurs.fin}`
+  const signaturePrecedente = useRef(signatureFiltres)
+  useEffect(() => {
+    if (signaturePrecedente.current !== signatureFiltres) {
+      signaturePrecedente.current = signatureFiltres
+      if (valeurs.page !== "1") setScalar("page", "1")
+    }
+  }, [signatureFiltres, valeurs.page, setScalar])
+
   const valeur = useMemo(() => {
     const page = Math.max(1, parseInt(valeurs.page, 10) || 1)
     return {
@@ -61,11 +68,13 @@ export const FiltresJournalAdminProvider = ({ children }) => {
         limit: PAGE_TAILLE,
         offset: (page - 1) * PAGE_TAILLE,
       },
-      setAdmin: (v) => { setScalar("admin", v); setScalar("page", "1") },
-      setAction: (v) => { setScalar("action", v); setScalar("page", "1") },
-      setTable: (v) => { setScalar("table", v); setScalar("page", "1") },
-      setDebut: (v) => { setScalar("debut", v); setScalar("page", "1") },
-      setFin: (v) => { setScalar("fin", v); setScalar("page", "1") },
+      /* UN seul setScalar par setter — la remise à 1 de la page est
+         gérée par l'effet ci-dessus. */
+      setAdmin: (v) => setScalar("admin", v),
+      setAction: (v) => setScalar("action", v),
+      setTable: (v) => setScalar("table", v),
+      setDebut: (v) => setScalar("debut", v),
+      setFin: (v) => setScalar("fin", v),
       setPage: (v) => setScalar("page", v),
       reinitialiser: () => reset(),
     }

@@ -1,5 +1,5 @@
 export { default as api } from "./axiosInstance";
-export { default as adminApi } from "./admin/axiosAdmin";
+export { default as adminApi } from "./axiosAdmin";
 export * from "./errors";
 export { cleanParams } from "./utils";
 

@@ -1,5 +1,6 @@
-import { useState } from "react"
-import { KeyRound, Plug, Plus, Trash2 } from "lucide-react"
+import { useMemo, useState } from "react"
+import { motion, AnimatePresence } from "framer-motion"
+import { KeyRound, Loader2, Plug, Plus, Trash2 } from "lucide-react"
 import {
   messageErreurIa, useClesIaQuery, useCreerCleIa, useModifierCleIa,
   useSupprimerCleIa, useTesterCleIa,
@@ -9,23 +10,14 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
-  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
-} from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table"
+  Table, TableHeader, TableBody, TableHead, TableRow, TableCell,
+} from "@/components/ui/table"
+import SectionCardAdmin from "@/components/admin/SectionCardAdmin"
+import EnteteTriable from "@/components/admin/EnteteTriable"
 import { SectionErreur, SectionVide } from "../components/EtatsSection"
-
-/* ─────────────────────────────────────────────────────────────────────
-   Section Clés API (cycle 19, doc v3 §19) — CRUD complet.
-
-   ⚠️ Le champ clé n'est JAMAIS pré-rempli en édition (le serveur ne
-   renvoie que api_key_last4 → masque ****ab12) : PATCH sans api_key =
-   clé inchangée. Test de connexion : résultat INLINE par ligne. Delete
-   grisé si DERNIÈRE clé active (garde serveur 400 « Impossible de
-   supprimer la derniere cle IA active » — on évite le clic inutile).
-   ───────────────────────────────────────────────────────────────────── */
+import DialogCleIA from "@/components/dialog/DialogCleIA"
+import BtnAction from "@/components/admin/BtnAction"
+import DialogSupprCleIA from "@/components/dialog/DialogSupprCleIA"
 
 const FOURNISSEURS = [
   { valeur: "openai_compatible", libelle: "OpenAI-compatible" },
@@ -45,184 +37,31 @@ const dateHeure = (iso) => {
   return new Date(iso).toLocaleString("fr-FR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })
 }
 
-/* ─── Dialog création / édition (champ clé JAMAIS pré-rempli) ─── */
-
-const DialogCle = ({ cle, mutation, onFermer }) => {
-  const notify = useNotify()
-  const edit = !!cle
-  // Le champ api_key démarre TOUJOURS vide : le serveur ne renvoie jamais
-  // la clé — seul un masque ****ab12 est affichable.
-  const [valeurs, setValeurs] = useState(() => ({
-    name: cle?.name ?? "",
-    provider_type: cle?.provider_type ?? "openai_compatible",
-    base_url: cle?.base_url ?? "",
-    models: cle?.models ?? "",
-    api_key: "",
-    priority: cle?.priority ?? 100,
-    is_active: cle?.is_active ?? true,
-    max_concurrent_requests: cle?.max_concurrent_requests ?? 1,
-    timeout_seconds: cle?.timeout_seconds ?? 60,
-    max_retries: cle?.max_retries ?? 2,
-    retry_backoff_seconds: cle?.retry_backoff_seconds ?? 5,
-    rate_limit_per_minute: cle?.rate_limit_per_minute ?? "",
-    notes: cle?.notes ?? "",
-  }))
-
-  const modelsTexte = Array.isArray(valeurs.models)
-    ? valeurs.models.join(", ")
-    : typeof valeurs.models === "string" ? valeurs.models : ""
-
-  const enregistrer = () => {
-    const base = {
-      name: valeurs.name.trim(),
-      provider_type: valeurs.provider_type,
-      base_url: valeurs.base_url.trim() || null,
-      priority: Number(valeurs.priority) || 0,
-      is_active: valeurs.is_active,
-      max_concurrent_requests: Number(valeurs.max_concurrent_requests) || 1,
-      timeout_seconds: Number(valeurs.timeout_seconds) || 60,
-      max_retries: Number(valeurs.max_retries) || 0,
-      retry_backoff_seconds: Number(valeurs.retry_backoff_seconds) || 0,
-      rate_limit_per_minute: valeurs.rate_limit_per_minute === "" ? null : Number(valeurs.rate_limit_per_minute),
-      notes: valeurs.notes.trim() || null,
-    }
-    // models : liste texte → array (vide = null, inchangé en PATCH si null).
-    const liste = modelsTexte.split(",").map((m) => m.trim()).filter(Boolean)
-    const models = liste.length ? { models: liste } : {}
-    // Clé : en création OBLIGATOIRE ; en édition OPTIONNELLE (vide = inchangée).
-    const cleChamp = !edit || valeurs.api_key.trim() ? { api_key: valeurs.api_key.trim() } : {}
-
-    if (edit && !valeurs.name.trim()) return notify("Le nom est obligatoire", "error")
-    if (!edit && !valeurs.api_key.trim()) return notify("La clé API est obligatoire en création", "error")
-
-    const payload = { ...base, ...models, ...cleChamp }
-    mutation.mutate(
-      edit ? { cleId: cle.id, data: payload } : payload,
-      {
-        onSuccess: () => {
-          notify(edit ? `Clé « ${valeurs.name} » mise à jour` : `Clé « ${valeurs.name} » créée`, "success")
-          onFermer()
-        },
-        onError: (err) => notify(messageErreurIa(err), "error"),
-      }
-    )
-  }
-
-  return (
-    <Dialog open onOpenChange={(ouvert) => !ouvert && onFermer()}>
-      <DialogContent className="max-h-[85vh] overflow-y-auto sm:max-w-2xl">
-        <DialogHeader>
-          <DialogTitle>{edit ? `Modifier « ${cle.name} »` : "Nouvelle clé API IA"}</DialogTitle>
-          <DialogDescription>
-            {edit
-              ? "La clé elle-même n'est jamais relue : laissez le champ vide pour conserver la clé actuelle."
-              : "La clé est chiffrée à la création — seul le suffixe ****abcd restera affichable."}
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="grid gap-3">
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="cle-nom">Nom</Label>
-              <Input id="cle-nom" value={valeurs.name}
-                onChange={(e) => setValeurs((v) => ({ ...v, name: e.target.value }))} />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="cle-fournisseur">Fournisseur</Label>
-              <select id="cle-fournisseur" value={valeurs.provider_type}
-                onChange={(e) => setValeurs((v) => ({ ...v, provider_type: e.target.value }))}
-                className="h-9 rounded-md border border-input bg-input/20 px-2 text-xs">
-                {FOURNISSEURS.map((f) => <option key={f.valeur} value={f.valeur}>{f.libelle}</option>)}
-              </select>
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="cle-api">Clé API {edit && <span className="font-normal text-muted-foreground">(vide = inchangée)</span>}</Label>
-            <Input id="cle-api" type="password" value={valeurs.api_key} autoComplete="new-password"
-              placeholder={edit ? "Laisser vide pour conserver la clé actuelle" : "sk-…"}
-              onChange={(e) => setValeurs((v) => ({ ...v, api_key: e.target.value }))} />
-          </div>
-
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="cle-base-url">Base URL (optionnel)</Label>
-              <Input id="cle-base-url" value={valeurs.base_url} placeholder="https://api.openai.com/v1"
-                onChange={(e) => setValeurs((v) => ({ ...v, base_url: e.target.value }))} />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="cle-models">Modèles (optionnel, virgules)</Label>
-              <Input id="cle-models" value={modelsTexte} placeholder="gpt-4o-mini, gpt-4.1"
-                onChange={(e) => setValeurs((v) => ({ ...v, models: e.target.value }))} />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="cle-priorite">Priorité</Label>
-              <Input id="cle-priorite" type="number" min={0} value={valeurs.priority}
-                onChange={(e) => setValeurs((v) => ({ ...v, priority: e.target.value }))} />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="cle-concurrent">Requêtes //</Label>
-              <Input id="cle-concurrent" type="number" min={1} value={valeurs.max_concurrent_requests}
-                onChange={(e) => setValeurs((v) => ({ ...v, max_concurrent_requests: e.target.value }))} />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="cle-timeout">Timeout (s)</Label>
-              <Input id="cle-timeout" type="number" min={1} value={valeurs.timeout_seconds}
-                onChange={(e) => setValeurs((v) => ({ ...v, timeout_seconds: e.target.value }))} />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="cle-retries">Retries</Label>
-              <Input id="cle-retries" type="number" min={0} value={valeurs.max_retries}
-                onChange={(e) => setValeurs((v) => ({ ...v, max_retries: e.target.value }))} />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="cle-backoff">Backoff (s)</Label>
-              <Input id="cle-backoff" type="number" min={0} value={valeurs.retry_backoff_seconds}
-                onChange={(e) => setValeurs((v) => ({ ...v, retry_backoff_seconds: e.target.value }))} />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="cle-rate">Rate limit /min</Label>
-              <Input id="cle-rate" type="number" min={1} value={valeurs.rate_limit_per_minute}
-                placeholder="illimité"
-                onChange={(e) => setValeurs((v) => ({ ...v, rate_limit_per_minute: e.target.value }))} />
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <Label htmlFor="cle-active">Active</Label>
-              <select id="cle-active" value={valeurs.is_active ? "1" : "0"}
-                onChange={(e) => setValeurs((v) => ({ ...v, is_active: e.target.value === "1" }))}
-                className="h-9 rounded-md border border-input bg-input/20 px-2 text-xs">
-                <option value="1">Oui — utilisée par le pipeline</option>
-                <option value="0">Non — désactivée</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="cle-notes">Notes (optionnel)</Label>
-            <Textarea id="cle-notes" rows={2} value={valeurs.notes}
-              onChange={(e) => setValeurs((v) => ({ ...v, notes: e.target.value }))} />
-          </div>
-        </div>
-
-        <DialogFooter>
-          <Button variant="outline" onClick={onFermer}>Annuler</Button>
-          <Button onClick={enregistrer} disabled={mutation.isPending}>
-            {mutation.isPending ? "Enregistrement…" : edit ? "Enregistrer" : "Créer la clé"}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  )
+/* Tri « français » robuste : nombres, textes, dates ISO ; vides en fin. */
+const comparerValeurs = (a, b) => {
+  const videA = a === null || a === undefined || a === ""
+  const videB = b === null || b === undefined || b === ""
+  if (videA && videB) return 0
+  if (videA) return 1
+  if (videB) return -1
+  if (typeof a === "number" && typeof b === "number") return a - b
+  return String(a).localeCompare(String(b), "fr", { numeric: true, sensitivity: "base" })
 }
 
-/* ─── Section ─── */
+/* Sentinelle ISO : une clé JAMAIS utilisée reste en fin de liste en desc. */
+const JAMAIS = "0000-01-01T00:00:00"
 
+/* Colonnes triables — « Quotas » (affichage multi-valeurs) et
+   « Connexion » (résultat de test interactif) sont exclus. */
+const COLONNES = [
+  { cle: "nom", libelle: "Nom", directionInitiale: "asc", triValeur: (c) => (c.name ?? "").toLowerCase() },
+  { cle: "fournisseur", libelle: "Fournisseur", directionInitiale: "asc", triValeur: (c) => libelleFournisseur(c.provider_type) },
+  { cle: "priorite", libelle: "Priorité", directionInitiale: "asc", triValeur: (c) => c.priority ?? 0 },
+  { cle: "statut", libelle: "Statut", directionInitiale: "desc", triValeur: (c) => (c.is_active ? 1 : 0) },
+  { cle: "activite", libelle: "Dernière activité", directionInitiale: "desc", triValeur: (c) => c.last_used_at ?? JAMAIS },
+]
+
+/* ─── Section ─── */
 const SectionCles = () => {
   const notify = useNotify()
   const { data: cles, isLoading, isError, refetch } = useClesIaQuery()
@@ -230,13 +69,34 @@ const SectionCles = () => {
   const modifier = useModifierCleIa()
   const supprimer = useSupprimerCleIa()
   const tester = useTesterCleIa()
-
   const [edition, setEdition] = useState(null)          // null | {} (création) | cle
   const [confirmation, setConfirmation] = useState(null) // cle à supprimer
   // Résultats de test inline : { [cleId]: { ok, model?, message?, enCours } }
   const [tests, setTests] = useState({})
+  /* Tri INITIALISÉ : « Priorité » ascendante = ordre serveur (0 en
+     premier) — aucun saut visuel au chargement, chevron actif visible. */
+  const [tri, setTri] = useState({ cle: "priorite", direction: "asc" })
 
   const nbActives = (cles ?? []).filter((c) => c.is_active).length
+
+  const clesAffichees = useMemo(() => {
+    const base = cles ?? []
+    if (!tri) return base
+    const colonne = COLONNES.find((c) => c.cle === tri.cle)
+    if (!colonne) return base
+    const copie = [...base].sort((a, b) => comparerValeurs(colonne.triValeur(a), colonne.triValeur(b)))
+    return tri.direction === "asc" ? copie : copie.reverse()
+  }, [cles, tri])
+
+  /* Cycle de tri : sens initial → sens inverse → aucun (ordre serveur). */
+  const basculerTri = (colonne) => {
+    setTri((prec) => {
+      if (prec?.cle !== colonne.cle) return { cle: colonne.cle, direction: colonne.directionInitiale ?? "desc" }
+      if (prec.direction === (colonne.directionInitiale ?? "desc"))
+        return { cle: colonne.cle, direction: prec.direction === "asc" ? "desc" : "asc" }
+      return null
+    })
+  }
 
   const testerCle = (cle) => {
     setTests((t) => ({ ...t, [cle.id]: { enCours: true } }))
@@ -256,123 +116,157 @@ const SectionCles = () => {
     })
   }
 
-  return (
-    <section aria-label="Clés API IA" className="flex flex-col gap-3">
-      <div className="flex flex-wrap items-end justify-between gap-2">
-        <div>
-          <h2 className="flex items-center gap-2 text-sm font-bold">
-            <KeyRound className="size-4 text-primary" aria-hidden /> Clés API
-          </h2>
-          <p className="text-xs text-muted-foreground">
-            {cles?.length ?? "…"} clé{(cles?.length ?? 0) > 1 ? "s" : ""} configurée{(cles?.length ?? 0) > 1 ? "s" : ""} — {nbActives} active{nbActives > 1 ? "s" : ""}.
-            Le pipeline refuse de tourner sans clé active.
-          </p>
-        </div>
-        <Button size="sm" onClick={() => setEdition({})}>
-          <Plus aria-hidden /> Nouvelle clé
-        </Button>
-      </div>
+  /* key = fondu léger du corps à chaque changement de tri. */
+  const cleCorps = `${tri?.cle ?? "aucun"}-${tri?.direction ?? ""}`
 
-      {isError ? (
-        <SectionErreur onRetry={refetch} message="Impossible de charger les clés." />
-      ) : isLoading ? (
-        <div className="flex flex-col gap-2">
-          {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-11 w-full rounded-lg" />)}
-        </div>
-      ) : !cles?.length ? (
-        <SectionVide message="Aucune clé API configurée — le pipeline IA ne peut pas tourner. Créez-en une pour activer la normalisation." />
-      ) : (
-        <div className="overflow-x-auto rounded-xl border border-border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Nom</TableHead>
-                <TableHead>Fournisseur</TableHead>
-                <TableHead className="text-right">Priorité</TableHead>
-                <TableHead className="hidden text-right md:table-cell">Quotas</TableHead>
-                <TableHead>Statut</TableHead>
-                <TableHead className="hidden lg:table-cell">Dernière activité</TableHead>
-                <TableHead>Connexion</TableHead>
-                <TableHead className="w-10" />
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {cles.map((cle) => {
-                const test = tests[cle.id]
-                const derniereActive = cle.is_active && nbActives <= 1
-                return (
-                  <TableRow key={cle.id}>
-                    <TableCell>
-                      <span className="block text-xs font-medium">{cle.name}</span>
-                      {cle.api_key_masked && (
-                        <span className="block font-mono text-[10px] text-muted-foreground">{cle.api_key_masked}</span>
-                      )}
-                    </TableCell>
-                    <TableCell className="text-xs">{libelleFournisseur(cle.provider_type)}</TableCell>
-                    <TableCell className="text-right tabular-nums">{cle.priority}</TableCell>
-                    <TableCell className="hidden text-[11px] text-muted-foreground md:table-cell">
-                      {cle.max_concurrent_requests}// · {cle.timeout_seconds}s · {cle.max_retries}r
-                      {cle.rate_limit_per_minute ? ` · ${cle.rate_limit_per_minute}/min` : ""}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={cle.is_active ? "secondary" : "outline"}>
-                        {cle.is_active ? "Active" : "Inactive"}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="hidden text-[11px] text-muted-foreground lg:table-cell">
-                      <span className="block">util. {dateHeure(cle.last_used_at)}</span>
-                      <span className="block">err. {dateHeure(cle.last_error_at)}</span>
-                    </TableCell>
-                    <TableCell>
-                      {test?.enCours ? (
-                        <span className="text-[11px] text-muted-foreground">Test…</span>
-                      ) : test ? (
-                        <span className={`flex flex-col text-[11px] ${test.ok ? "text-emerald-600" : "text-destructive"}`}>
-                          <span>{test.ok ? `OK${test.model ? ` · ${test.model}` : ""}` : "Échec"}</span>
-                          {!test.ok && test.message && (
-                            <span className="block max-w-40 truncate text-destructive" title={test.message}>
-                              {test.message}
-                            </span>
-                          )}
-                        </span>
-                      ) : (
-                        <Button variant="ghost" size="sm" onClick={() => testerCle(cle)}
-                          aria-label={`Tester la connexion de ${cle.name}`}>
-                          <Plug className="size-3.5" aria-hidden /> Tester
-                        </Button>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-1">
-                        <Button variant="ghost" size="sm" onClick={() => setEdition(cle)}
-                          aria-label={`Modifier la clé ${cle.name}`} className="text-xs">
-                          Modifier
-                        </Button>
-                        <Button
-                          variant="ghost" size="icon-sm"
-                          disabled={derniereActive}
-                          title={derniereActive
-                            ? "Dernière clé active — le serveur refuse sa suppression (400)"
-                            : `Supprimer la clé ${cle.name}`}
-                          aria-label={derniereActive
-                            ? "Suppression impossible : dernière clé active"
-                            : `Supprimer la clé ${cle.name}`}
-                          onClick={() => setConfirmation(cle)}>
-                          <Trash2 className="size-3.5" aria-hidden />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                )
-              })}
-            </TableBody>
-          </Table>
-        </div>
-      )}
+  return (
+    <>
+      <SectionCardAdmin
+        title="Clés API"
+        description={`${cles?.length ?? "…"} clé${(cles?.length ?? 0) > 1 ? "s" : ""} configurée${(cles?.length ?? 0) > 1 ? "s" : ""} — ${nbActives} active${nbActives > 1 ? "s" : ""}. Le pipeline refuse de tourner sans clé active. Tri par colonne.`}
+        icon={KeyRound}
+        contentClassName="p-0 sm:p-0"
+        action={
+          <BtnAction variant="outline" size="sm" onClick={() => setEdition({})}>
+            <Plus aria-hidden="true" className="size-3.5" /> Nouvelle clé
+          </BtnAction>
+        }
+      >
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.div
+            key={isLoading ? "chargement" : isError ? "erreur" : "donnees"}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.18, ease: "easeOut" }}
+          >
+            {isError ? (
+              <div className="p-4">
+                <SectionErreur onRetry={refetch} message="Impossible de charger les clés." />
+              </div>
+            ) : isLoading ? (
+              <div className="flex flex-col gap-2 p-4" aria-busy="true">
+                {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-11 w-full rounded-lg" />)}
+              </div>
+            ) : !cles?.length ? (
+              <div className="p-4">
+                <SectionVide message="Aucune clé API configurée — le pipeline IA ne peut pas tourner. Créez-en une pour activer la normalisation." />
+              </div>
+            ) : (
+              <div className="overflow-x-auto scrollbar-thin">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="hover:bg-transparent">
+                      <EnteteTriable colonne={COLONNES.find((c) => c.cle === "nom")} tri={tri} onTri={basculerTri} />
+                      <EnteteTriable colonne={COLONNES.find((c) => c.cle === "fournisseur")} tri={tri} onTri={basculerTri} />
+                      <EnteteTriable colonne={COLONNES.find((c) => c.cle === "priorite")} tri={tri} onTri={basculerTri} aligneDroite />
+                      <TableHead className="hidden text-right md:table-cell">Quotas</TableHead>
+                      <EnteteTriable colonne={COLONNES.find((c) => c.cle === "statut")} tri={tri} onTri={basculerTri} />
+                      <EnteteTriable
+                        colonne={COLONNES.find((c) => c.cle === "activite")}
+                        tri={tri}
+                        onTri={basculerTri}
+                        className="hidden lg:table-cell"
+                      />
+                      <TableHead>Connexion</TableHead>
+                      <TableHead className="w-10" />
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody key={cleCorps} className="animate-in fade-in duration-200 motion-reduce:animate-none">
+                    {clesAffichees.map((cle) => {
+                      const test = tests[cle.id]
+                      const derniereActive = cle.is_active && nbActives <= 1
+                      return (
+                        <TableRow key={cle.id} className="transition-colors hover:bg-muted/50">
+                          <TableCell>
+                            <span className="block text-xs font-medium">{cle.name}</span>
+                            {cle.api_key_masked && (
+                              <span className="block font-mono text-[10px] text-muted-foreground">{cle.api_key_masked}</span>
+                            )}
+                          </TableCell>
+                          <TableCell className="text-xs">{libelleFournisseur(cle.provider_type)}</TableCell>
+                          <TableCell className="text-right tabular-nums">{cle.priority}</TableCell>
+                          <TableCell className="hidden text-[11px] text-muted-foreground md:table-cell">
+                            {cle.max_concurrent_requests}// · {cle.timeout_seconds}s · {cle.max_retries}r
+                            {cle.rate_limit_per_minute ? ` · ${cle.rate_limit_per_minute}/min` : ""}
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant={cle.is_active ? "secondary" : "outline"}>
+                              {cle.is_active ? "Active" : "Inactive"}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="hidden text-[11px] text-muted-foreground lg:table-cell">
+                            <span className="block">util. {dateHeure(cle.last_used_at)}</span>
+                            <span className="block">err. {dateHeure(cle.last_error_at)}</span>
+                          </TableCell>
+                          <TableCell>
+                            {test?.enCours ? (
+                              <span className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
+                                <Loader2 className="size-3.5 animate-spin" aria-hidden="true" />
+                                Test en cours…
+                              </span>
+                            ) : test ? (
+                              <span className={`flex flex-col text-[11px] ${test.ok ? "text-emerald-600" : "text-destructive"}`}>
+                                <span>{test.ok ? `OK${test.model ? ` · ${test.model}` : ""}` : "Échec"}</span>
+                                {!test.ok && test.message && (
+                                  <span className="block max-w-40 truncate text-destructive" title={test.message}>
+                                    {test.message}
+                                  </span>
+                                )}
+                              </span>
+                            ) : (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => testerCle(cle)}
+                                aria-label={`Tester la connexion de ${cle.name}`}
+                              >
+                                <Plug className="size-3.5" aria-hidden="true" /> Tester
+                              </Button>
+                            )}
+                          </TableCell>
+                          <TableCell>
+                            <div className="flex items-center gap-1">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setEdition(cle)}
+                                aria-label={`Modifier la clé ${cle.name}`}
+                                className="text-xs"
+                              >
+                                Modifier
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon-sm"
+                                disabled={derniereActive}
+                                title={derniereActive
+                                  ? "Dernière clé active — le serveur refuse sa suppression (400)"
+                                  : `Supprimer la clé ${cle.name}`}
+                                aria-label={derniereActive
+                                  ? "Suppression impossible : dernière clé active"
+                                  : `Supprimer la clé ${cle.name}`}
+                                onClick={() => setConfirmation(cle)}
+                                className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                              >
+                                <Trash2 className="size-3.5" aria-hidden="true" />
+                              </Button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      )
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+          </motion.div>
+        </AnimatePresence>
+      </SectionCardAdmin>
 
       {/* Dialog création / édition */}
       {edition && (
-        <DialogCle
+        <DialogCleIA
           cle={edition.id ? edition : null}
           mutation={edition.id ? modifier : creer}
           onFermer={() => setEdition(null)}
@@ -381,24 +275,14 @@ const SectionCles = () => {
 
       {/* Confirmation suppression */}
       {confirmation && (
-        <Dialog open onOpenChange={(ouvert) => !ouvert && setConfirmation(null)}>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Supprimer la clé « {confirmation.name} » ?</DialogTitle>
-              <DialogDescription>
-                La clé sera retirée du pipeline (suppression douce). Les offres déjà normalisées ne sont pas affectées.
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setConfirmation(null)}>Annuler</Button>
-              <Button variant="destructive" disabled={supprimer.isPending} onClick={() => supprimerCle(confirmation)}>
-                Supprimer
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+        <DialogSupprCleIA
+          confirmation={confirmation}
+          setConfirmation={setConfirmation}
+          supprimerCle={supprimerCle}
+          supprimer={supprimer}
+        />
       )}
-    </section>
+    </>
   )
 }
 

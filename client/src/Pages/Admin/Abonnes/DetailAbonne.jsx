@@ -1,10 +1,15 @@
 import { useMemo, useState } from "react"
-import { Link, useNavigate, useParams } from "react-router-dom"
-import { ArrowLeft, Ban, Check, FileText, Mail, Pause, Pencil, Save, Send, ShieldAlert, X } from "lucide-react"
+import { useNavigate, useParams } from "react-router-dom"
+import { motion, AnimatePresence } from "framer-motion"
+import {
+  ArrowLeft, Ban, Check, Copy, FileText, Mail, Pause, Pencil, Save,
+  Send, ShieldAlert, User2, X,
+} from "lucide-react"
 import {
   Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart,
-  ResponsiveContainer, Tooltip, XAxis, YAxis,
+  ResponsiveContainer, XAxis, YAxis,
 } from "recharts"
+import { cn } from "cn"
 import {
   STATUTS_ABONNE, useAdminSubscriberDetailQuery, useAdminSubscriberSendsQuery,
   useAdminAbonneEmailsTx, useModifierAbonne, useChangerStatutAbonne,
@@ -15,53 +20,35 @@ import { useNotify } from "@/contexts/Notify.context"
 import CarteCompteur from "@/components/admin/CarteCompteur"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from "@/components/ui/empty"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Switch } from "@/components/ui/switch"
 import { Textarea } from "@/components/ui/textarea"
-import {
-  Tabs, TabsContent, TabsList, TabsTrigger,
-} from "@/components/ui/tabs"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog"
-import {
-  Table, TableHeader, TableBody, TableHead, TableRow, TableCell,
-} from "@/components/ui/table"
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table"
 import { SectionErreur } from "./components/EtatsSection"
+import HeroAdmin from "@/components/admin/HeroAdmin"
+import BtnAction from "@/components/admin/BtnAction"
 
 /* ─────────────────────────────────────────────────────────────────────
    Page Détail utilisateur — /admin/utilisateurs/:id (doc v3 §8).
-
-   Objectif : tout ce qu'on sait sur un abonné pour le support
-   (« pourquoi je ne reçois plus d'offres ? ») et l'intervention ciblée.
-
-   super_admin + gestionnaire_utilisateurs (guard par route).
-
-   Bandeau de compteurs (cycle 8+) :
-   - digests reçus, offres reçues, taux de succès (depuis sends,
-     déjà chargé par l'onglet) ;
-   - ancienneté (subscribed_at) ;
-   - offres actives correspondant à ses filières (endpoint dédié
-     /stats/matching-offers-count — cas support « digest vide »).
-
-   Onglets :
-   1. Profil — identité, filières (priorité, lecture seule : le choix
-      reste au candidat via son lien email, doc v3 §8), contrats
-      préférés, canal, préférence conseils + édition administrative.
-   2. Statistiques — donut paliers de matching agrégés (match_kind)
-      + timeline des envois (offres par digest dans le temps).
-   3. Envois — historique des digests (statut + paliers par envoi).
-   4. Emails transactionnels — route page 16 filtrée sur l'abonné.
-
-   Actions : changement de statut (motif pour désinscription),
-   « Envoyer une sélection » → cycle 9, anonymisation RGPD explicite.
-   ───────────────────────────────────────────────────────────────────── */
+   Refonte :
+   • Onglets (Profil / Statistiques / Envois / Emails transactionnels)
+     avec fondu enchaîné AnimatePresence mode="wait" ;
+   • Copie rapide de l'email (en-tête + carte Identité) ;
+   • Historique des envois : les paliers de REPLI (T2-T5) deviennent
+     de simples points colorés avec infobulle — seuls primary/secondary
+     gardent un badge plein (réduction du bruit visuel) ;
+   • Skeletons fidèles : fausses lignes de table, anneau pour le donut.
+   Audit 4 : C.4 notes après coup, C.6 filtre niveau SQL-side, H.1
+   palier global du digest distinct des match_kind par offre.
+───────────────────────────────────────────────────────────────────── */
 
 const LIBELLE_STATUT = Object.fromEntries(STATUTS_ABONNE.map((s) => [s.valeur, s.libelle]))
-
 const VARIANTE_STATUT = {
   active: "secondary",
   unsubscribed: "outline",
@@ -71,19 +58,18 @@ const VARIANTE_STATUT = {
   deleted: "outline",
 }
 
-// match_kind du modèle EmailDigestOffer → libellé + ton + couleur (doc v3 §8).
+// match_kind du modèle EmailDigestOffer → libellé + ton + couleur.
+// `repli` : true pour les fallbacks (T2-T5) → rendu en simple point.
 const KIND_MATCH = {
-  primary: { libelle: "Filière principale", ton: "default", couleur: "#2563eb" },
-  secondary: { libelle: "Filière secondaire (T1)", ton: "secondary", couleur: "#10b981" },
-  fallback_contract: { libelle: "Même contrat (T2)", ton: "secondary", couleur: "#f59e0b" },
-  fallback_freshness: { libelle: "Offre récente (T3)", ton: "secondary", couleur: "#a855f7" },
-  fallback_experience: { libelle: "Profil proche (T4)", ton: "outline", couleur: "#ec4899" },
-  fallback_city: { libelle: "Même ville (T5)", ton: "outline", couleur: "#64748b" },
+  primary: { libelle: "Filière principale", ton: "default", couleur: "#2563eb", repli: false },
+  secondary: { libelle: "Filière secondaire (T1)", ton: "secondary", couleur: "#10b981", repli: false },
+  fallback_contract: { libelle: "Même contrat (T2)", ton: "secondary", couleur: "#f59e0b", repli: true },
+  fallback_freshness: { libelle: "Offre récente (T3)", ton: "secondary", couleur: "#a855f7", repli: true },
+  fallback_experience: { libelle: "Profil proche (T4)", ton: "outline", couleur: "#ec4899", repli: true },
+  fallback_city: { libelle: "Même ville (T5)", ton: "outline", couleur: "#64748b", repli: true },
 }
 
-// Audit 4, H.1 : palier GLOBAL du digest (EmailDigestRead.match_tier) — le
-// palier le plus bas auquel le contenu du digest a dû descendre pour
-// remplir l'email. Distinct des match_kind PAR OFFRE (colonne voisine).
+// Audit 4, H.1 : palier GLOBAL du digest (EmailDigestRead.match_tier).
 const TIER_DIGEST = {
   T0: { libelle: "T0 — Filière exacte", ton: "default", titre: "Digest rempli sur les filières exactes de l'abonné" },
   T1: { libelle: "T1 — Filière élargie", ton: "secondary", titre: "Digest rempli via les filières secondaires (T1)" },
@@ -109,19 +95,74 @@ const PURPOSE_TX = {
   unsubscribe: "Désinscription",
 }
 
+const ONGLETS = [
+  { valeur: "profil", libelle: "Profil" },
+  { valeur: "stats", libelle: "Statistiques" },
+  { valeur: "envois", libelle: "Envois" },
+  { valeur: "emails", libelle: "Emails transactionnels" },
+]
+
 const dateHeureFr = (iso) =>
   iso
     ? new Date(iso).toLocaleString("fr-FR", { day: "2-digit", month: "short", year: "2-digit", hour: "2-digit", minute: "2-digit" })
     : "—"
 
+/* Bouton copie presse-papiers avec feedback « Copié ! ». */
+const BoutonCopie = ({ texte, libelle }) => {
+  const [copie, setCopie] = useState(false)
+  const copier = async () => {
+    try {
+      await navigator.clipboard.writeText(texte)
+      setCopie(true)
+      window.setTimeout(() => setCopie(false), 1600)
+    } catch {
+      /* Presse-papiers indisponible : on ignore. */
+    }
+  }
+  return (
+    <button
+      type="button"
+      onClick={copier}
+      aria-label={libelle ?? `Copier ${texte}`}
+      title={copie ? "Copié !" : "Copier"}
+      className="inline-flex size-5 shrink-0 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+    >
+      {copie ? <Check className="size-3 text-emerald-600" aria-hidden /> : <Copy className="size-3" aria-hidden />}
+    </button>
+  )
+}
+
+/* ─── Skeletons fidèles ─── */
+const SkeletonTableau = ({ lignes = 5, colonnes = 6 }) => (
+  <div className="flex flex-col gap-3 rounded-xl border border-border p-4" aria-hidden="true">
+    {[...Array(lignes)].map((_, i) => (
+      <div key={i} className="flex items-center gap-3">
+        {[...Array(colonnes)].map((_, j) => (
+          <Skeleton key={j} className={cn("h-4", j === 0 ? "w-24" : "flex-1")} />
+        ))}
+      </div>
+    ))}
+  </div>
+)
+
+const SkeletonDonut = () => (
+  <div className="flex items-center justify-center py-6" aria-hidden="true">
+    <div className="relative size-40">
+      <Skeleton className="size-40 rounded-full" />
+      <div className="absolute inset-8 rounded-full bg-card" />
+    </div>
+  </div>
+)
+
 const DetailAbonne = () => {
   const { id } = useParams()
   const navigate = useNavigate()
   const notify = useNotify()
-
   const { data: abonne, isLoading, isError, refetch } = useAdminSubscriberDetailQuery(id)
+  const { data: matching } = useCompteOffresActivesFiliere(id)
   const { data: referentiels } = useReferentialsQuery()
 
+  const [onglet, setOnglet] = useState("profil")
   const [editionOuverte, setEditionOuverte] = useState(false)
   const [dialogStatutOuvert, setDialogStatutOuvert] = useState(false)
   const [nouveauStatut, setNouveauStatut] = useState("")
@@ -131,7 +172,6 @@ const DetailAbonne = () => {
   const statutMutation = useChangerStatutAbonne()
   const anonymiserMutation = useAnonymiserAbonne()
 
-  // Résolutions UUID → labels (référentiel public en cache).
   const filiereParId = useMemo(
     () => new Map((referentiels?.filieres ?? []).map((f) => [f.id, f])),
     [referentiels]
@@ -147,12 +187,12 @@ const DetailAbonne = () => {
 
   if (isLoading || !abonne) {
     return (
-      <div className="mx-auto flex w-full max-w-4xl flex-col gap-4">
+      <div className="mx-auto flex w-full max-w-4xl flex-col gap-4" aria-busy="true">
         <Skeleton className="h-8 w-64" />
         <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
           {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-24 rounded-xl" />)}
         </div>
-        <Skeleton className="h-64 w-full rounded-xl" />
+        <SkeletonTableau lignes={6} colonnes={5} />
       </div>
     )
   }
@@ -161,51 +201,53 @@ const DetailAbonne = () => {
 
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-4">
-      {/* En-tête */}
-      <div className="flex flex-wrap items-start justify-between gap-2">
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={() => navigate("/admin/utilisateurs")} aria-label="Retour à la liste">
-            <ArrowLeft aria-hidden />
-          </Button>
-          <div className="flex flex-col gap-0.5">
-            <h1 className="font-heading truncate text-lg font-bold" title={abonne.email}>
-              {abonne.full_name || abonne.email}
-            </h1>
-            <p className="text-xs text-muted-foreground">
-              {abonne.email} · inscrit le {dateHeureFr(abonne.subscribed_at).split(" à ")[0]}
-              {abonne.source && ` · via ${abonne.source}`}
-            </p>
-          </div>
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <Badge variant={VARIANTE_STATUT[abonne.status] ?? "outline"} data-testid="statut-abonne">
-            {LIBELLE_STATUT[abonne.status] ?? abonne.status}
-          </Badge>
-          {!estAnonymise && (
-            <>
-              <Button
-                size="sm"
-                variant="outline"
-                render={<Link to={`/admin/utilisateurs/${abonne.id}/envoyer`} />}
-              >
-                <Send aria-hidden /> Envoyer une sélection
-              </Button>
-              <Button size="sm" variant="outline" onClick={() => setEditionOuverte(true)}>
-                <Pencil aria-hidden /> Modifier
-              </Button>
-              <Button size="sm" variant="destructive" onClick={() => setAnonymOuvert(true)}>
-                <ShieldAlert aria-hidden /> Anonymiser…
-              </Button>
-            </>
-          )}
-        </div>
+      <div>
+        <Button variant="ghost" size="icon" onClick={() => navigate("/admin/utilisateurs")} aria-label="Retour à la liste">
+          <ArrowLeft aria-hidden />
+        </Button>
       </div>
 
-      {/* Bandeau de compteurs (données sends + matching déjà chargées
-          par les onglets — les hooks ci-dessous partagent le cache). */}
-      <BandeauCompteurs abonneId={abonne.id} filiereParId={filiereParId} subscribedAt={abonne.subscribed_at} />
+      {/* ─── En-tête : email copiable ─── */}
+      <HeroAdmin
+        title={abonne.full_name || abonne.email}
+        titleBdge="Abonné"
+        icon={User2}
+        description={
+          <span className="inline-flex flex-wrap items-center gap-x-2 gap-y-1">
+            <span className="inline-flex items-center gap-1">
+              {abonne.email}
+              <BoutonCopie texte={abonne.email} libelle="Copier l'adresse email" />
+            </span>
+            <span>
+              · inscrit le <span className="font-bold">{dateHeureFr(abonne.subscribed_at).split(" à ")[0]}</span>
+            </span>
+            {abonne.source && <span>· via {abonne.source}</span>}
+          </span>
+        }
+        badges={
+          <Badge variant={VARIANTE_STATUT[abonne.status] ?? "outline"} className="text-xs font-bold" data-testid="statut-abonne">
+            {LIBELLE_STATUT[abonne.status] ?? abonne.status}
+          </Badge>
+        }
+      >
+        {!estAnonymise && (
+          <div className="flex flex-wrap items-center gap-1.5">
+            <BtnAction size="xs" variant="outline" onClick={() => navigate(`/admin/utilisateurs/${abonne.id}/envoyer`)}>
+              <Send aria-hidden className="size-4" /> Envoyer une sélection
+            </BtnAction>
+            <BtnAction size="xs" variant="outline" onClick={() => setEditionOuverte(true)}>
+              <Pencil aria-hidden className="size-4" /> Modifier
+            </BtnAction>
+            <BtnAction size="xs" variant="danger" onClick={() => setAnonymOuvert(true)}>
+              <ShieldAlert aria-hidden className="size-4" /> Anonymiser…
+            </BtnAction>
+          </div>
+        )}
+      </HeroAdmin>
 
-      {/* Rappel anonymisation */}
+      {/* Bandeau de compteurs */}
+      <BandeauCompteurs abonneId={abonne.id} subscribedAt={abonne.subscribed_at} />
+
       {estAnonymise && (
         <div className="rounded-lg border border-border bg-muted/40 p-3 text-xs text-muted-foreground">
           Cet abonné a été anonymisé (RGPD) : ses données personnelles ont été effacées.
@@ -213,105 +255,126 @@ const DetailAbonne = () => {
         </div>
       )}
 
-      {/* Onglets */}
-      <Tabs defaultValue="profil">
-        <TabsList>
-          <TabsTrigger value="profil">Profil</TabsTrigger>
-          <TabsTrigger value="stats">Statistiques</TabsTrigger>
-          <TabsTrigger value="envois">Envois</TabsTrigger>
-          <TabsTrigger value="emails">Emails transactionnels</TabsTrigger>
+      {/* ─── Onglets avec fondu enchaîné ─── */}
+      <Tabs value={onglet} onValueChange={setOnglet} className="w-full">
+        <TabsList
+          className={cn(
+            "flex h-auto w-full justify-start gap-1 overflow-x-auto rounded-lg border border-border bg-muted/20 p-1",
+            "scrollbar-none [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+          )}
+        >
+          {ONGLETS.map(({ valeur, libelle }) => (
+            <TabsTrigger
+              key={valeur}
+              value={valeur}
+              className={cn(
+                "whitespace-nowrap rounded-md px-4 py-2 text-xs font-semibold transition-colors",
+                onglet === valeur
+                  ? "bg-brand-orange text-brand-navy shadow-soft"
+                  : "text-muted-foreground hover:bg-card hover:text-foreground"
+              )}
+            >
+              {libelle}
+            </TabsTrigger>
+          ))}
         </TabsList>
-
-        {/* ── Onglet Profil ── */}
-        <TabsContent value="profil" className="mt-3">
-          <div className="grid gap-4 md:grid-cols-2">
-            {/* Carte identité */}
-            <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4">
-              <h3 className="text-xs font-bold tracking-wider text-muted-foreground uppercase">Identité</h3>
-              <Ligne label="Nom complet">{abonne.full_name || "—"}</Ligne>
-              <Ligne label="Ville">{abonne.city || "—"}</Ligne>
-              <Ligne label="Fuseau horaire">{abonne.timezone}</Ligne>
-              <Ligne label="Source d'inscription">{abonne.source || "—"}</Ligne>
-              <Ligne label="Conseils carrière">
-                <Switch checked={abonne.wants_career_tips} disabled aria-label="Préférence conseils carrière (modifiable via Modifier)" />
-              </Ligne>
-              {abonne.unsubscribe_reason && (
-                <Ligne label="Motif de désinscription">{abonne.unsubscribe_reason}</Ligne>
-              )}
-            </div>
-
-            {/* Carte filières + contrats (lecture seule — choix du candidat) */}
-            <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4">
-              <h3 className="text-xs font-bold tracking-wider text-muted-foreground uppercase">
-                Abonnements ({abonne.filiere_links.length}/3)
-              </h3>
-              {abonne.filiere_links.length ? (
-                <ul className="flex flex-col gap-1.5">
-                  {abonne.filiere_links.map((lien) => {
-                    const filiere = filiereParId.get(lien.filiere_id)
-                    return (
-                      <li key={lien.id} className="flex items-center gap-2 text-sm">
-                        <Badge variant="outline" className="tabular-nums">#{lien.priority}</Badge>
-                        {filiere?.label ?? `Filière ${lien.filiere_id.slice(0, 8)}…`}
-                      </li>
-                    )
-                  })}
-                </ul>
-              ) : (
-                <p className="text-xs text-muted-foreground">
-                  Aucune filière — cet abonné ne recevra pas d'offres ciblées.
-                </p>
-              )}
-              <h3 className="mt-2 text-xs font-bold tracking-wider text-muted-foreground uppercase">
-                Contrats préférés ({abonne.contract_preferences.length})
-              </h3>
-              <div className="flex flex-wrap gap-1.5">
-                {abonne.contract_preferences.map((pref) => (
-                  <Badge key={pref.id} variant="secondary">
-                    {contratParId.get(pref.contract_type_id)?.label ?? pref.contract_type_id.slice(0, 8)}
-                  </Badge>
-                ))}
-                {!abonne.contract_preferences.length && (
-                  <span className="text-xs text-muted-foreground">Aucune préférence.</span>
-                )}
-              </div>
-              <p className="mt-1 text-[10px] text-muted-foreground">
-                Les filières et contrats restent sous le contrôle du candidat (lien email) —
-                ils ne sont pas modifiables ici (doc v3 §8).
-              </p>
-            </div>
-
-            {/* Notes internes */}
-            <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4 md:col-span-2">
-              <h3 className="flex items-center gap-1.5 text-xs font-bold tracking-wider text-muted-foreground uppercase">
-                <FileText className="size-3.5" aria-hidden /> Notes internes
-              </h3>
-              {abonne.admin_notes ? (
-                <p className="text-sm whitespace-pre-wrap text-muted-foreground">{abonne.admin_notes}</p>
-              ) : (
-                <p className="text-xs text-muted-foreground">Aucune note interne.</p>
-              )}
-            </div>
-          </div>
-        </TabsContent>
-
-        {/* ── Onglet Statistiques ── */}
-        <TabsContent value="stats" className="mt-3">
-          <StatistiquesAbonne abonneId={abonne.id} />
-        </TabsContent>
-
-        {/* ── Onglet Envois ── */}
-        <TabsContent value="envois" className="mt-3">
-          <HistoriqueEnvois abonneId={abonne.id} />
-        </TabsContent>
-
-        {/* ── Onglet Emails transactionnels ── */}
-        <TabsContent value="emails" className="mt-3">
-          <EmailsTransactionnels abonneId={abonne.id} />
-        </TabsContent>
       </Tabs>
 
-      {/* Changement de statut (barre d'actions contextuelle) */}
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.div
+          key={onglet}
+          role="tabpanel"
+          aria-label={ONGLETS.find((o) => o.valeur === onglet)?.libelle}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -6 }}
+          transition={{ duration: 0.18, ease: "easeOut" }}
+        >
+          {onglet === "profil" && (
+            <div className="grid gap-4 md:grid-cols-2">
+              {/* Carte identité — email copiable */}
+              <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4">
+                <h3 className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80">Identité</h3>
+                <Ligne label="Nom complet">{abonne.full_name || "—"}</Ligne>
+                <Ligne label="Email">
+                  <span className="inline-flex items-center gap-1">
+                    {abonne.email}
+                    <BoutonCopie texte={abonne.email} libelle="Copier l'adresse email" />
+                  </span>
+                </Ligne>
+                <Ligne label="Ville">{abonne.city || "—"}</Ligne>
+                <Ligne label="Fuseau horaire">{abonne.timezone}</Ligne>
+                <Ligne label="Source d'inscription">{abonne.source || "—"}</Ligne>
+                <Ligne label="Conseils carrière">
+                  <Switch checked={abonne.wants_career_tips} disabled aria-label="Préférence conseils carrière (modifiable via Modifier)" />
+                </Ligne>
+                {abonne.unsubscribe_reason && (
+                  <Ligne label="Motif de désinscription">{abonne.unsubscribe_reason}</Ligne>
+                )}
+              </div>
+
+              {/* Carte filières + contrats (lecture seule) */}
+              <div className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4">
+                <h3 className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80">
+                  Abonnements ({abonne.filiere_links.length}/3)
+                </h3>
+                {abonne.filiere_links.length ? (
+                  <ul className="flex flex-col gap-1.5">
+                    {abonne.filiere_links.map((lien) => {
+                      const filiere = filiereParId.get(lien.filiere_id)
+                      const count = matching?.by_filiere?.find((l) => l.filiere_id === lien.filiere_id)?.active_offers_count
+                      return (
+                        <li key={lien.id} className="flex items-center gap-2 text-sm">
+                          <Badge variant="outline" className="tabular-nums">#{lien.priority}</Badge>
+                          {filiere?.label ?? `Filière ${lien.filiere_id.slice(0, 8)}…`}
+                          {count != null && (
+                            <span className="font-bold text-muted-foreground">({count} offre{count === 1 ? "" : "s"})</span>
+                          )}
+                        </li>
+                      )
+                    })}
+                  </ul>
+                ) : (
+                  <p className="text-xs text-muted-foreground">
+                    Aucune filière — cet abonné ne recevra pas d'offres ciblées.
+                  </p>
+                )}
+                <h3 className="mt-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80">
+                  Contrats préférés ({abonne.contract_preferences.length})
+                </h3>
+                <div className="flex flex-wrap gap-1.5">
+                  {abonne.contract_preferences.map((pref) => (
+                    <Badge key={pref.id} variant="secondary">
+                      {contratParId.get(pref.contract_type_id)?.label ?? pref.contract_type_id.slice(0, 8)}
+                    </Badge>
+                  ))}
+                  {!abonne.contract_preferences.length && (
+                    <span className="text-xs text-muted-foreground">Aucune préférence.</span>
+                  )}
+                </div>
+              </div>
+
+              {/* Notes internes */}
+              <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4 md:col-span-2">
+                <h3 className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80">
+                  <FileText className="size-3.5" aria-hidden /> Notes internes
+                </h3>
+                {abonne.admin_notes ? (
+                  <p className="whitespace-pre-wrap text-sm text-muted-foreground">{abonne.admin_notes}</p>
+                ) : (
+                  <p className="text-xs text-muted-foreground">Aucune note interne.</p>
+                )}
+              </div>
+            </div>
+          )}
+
+          {onglet === "stats" && <StatistiquesAbonne abonneId={abonne.id} />}
+          {onglet === "envois" && <HistoriqueEnvois abonneId={abonne.id} />}
+          {onglet === "emails" && <EmailsTransactionnels abonneId={abonne.id} />}
+        </motion.div>
+      </AnimatePresence>
+
+      {/* Changement de statut */}
       {!estAnonymise && (
         <div className="flex flex-wrap items-center gap-2 rounded-xl border border-border bg-card p-3">
           <span className="text-xs font-semibold text-muted-foreground">Changer le statut :</span>
@@ -338,17 +401,10 @@ const DetailAbonne = () => {
         </div>
       )}
 
-      {/* ── Dialogs ── */}
-
       {/* Édition administrative */}
-      {editionOuverte && (
-        <DialogEditionAbonne
-          abonne={abonne}
-          onFermer={() => setEditionOuverte(false)}
-        />
-      )}
+      {editionOuverte && <DialogEditionAbonne abonne={abonne} onFermer={() => setEditionOuverte(false)} />}
 
-      {/* Confirmation changement de statut (motif pour désinscription) */}
+      {/* Confirmation changement de statut */}
       <Dialog open={dialogStatutOuvert} onOpenChange={setDialogStatutOuvert}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -397,7 +453,7 @@ const DetailAbonne = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Confirmation anonymisation RGPD — libellé explicite (doc v3 §8) */}
+      {/* Confirmation anonymisation RGPD */}
       <Dialog open={anonymOuvert} onOpenChange={setAnonymOuvert}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -435,28 +491,23 @@ const DetailAbonne = () => {
   )
 }
 
-/* ─── Bandeau de compteurs ──────────────────────────────────────────── */
-
-const BandeauCompteurs = ({ abonneId, filiereParId, subscribedAt }) => {
-  // sends + matching partagent le cache avec les onglets : zéro requête
-  // supplémentaire quand ils sont déjà consultés.
+/* ─── Bandeau de compteurs ─── */
+const BandeauCompteurs = ({ abonneId, subscribedAt }) => {
   const { data: envois, isLoading: envoisChargement } = useAdminSubscriberSendsQuery(abonneId, { limit: 100 })
   const { data: matching, isLoading: matchingChargement } = useCompteOffresActivesFiliere(abonneId)
-
-  // Ancienneté : Date.now() figée au montage (initialiseur paresseux —
-  // pas d'impureté pendant le rendu, la valeur ne bouge pas au refetch).
   const [maintenant] = useState(() => Date.now())
-  const ancienneteTexte = useMemo(() => {
+
+  const anciennete = useMemo(() => {
     if (!subscribedAt) return "—"
     const jours = Math.max(0, Math.floor((maintenant - new Date(subscribedAt).getTime()) / 86400000))
-    if (jours < 31) return `${jours} j`
-    if (jours < 365) return `${Math.round(jours / 30)} mois`
-    return `${(jours / 365).toFixed(jours % 365 < 60 ? 0 : 1)} an(s)`
+    if (jours < 31) return [jours, "jours"]
+    if (jours < 365) return [Math.round(jours / 30), "mois"]
+    return [(jours / 365).toFixed(jours % 365 < 60 ? 0 : 1), "ans"]
   }, [subscribedAt, maintenant])
 
   if (envoisChargement) {
     return (
-      <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3 xl:grid-cols-4" aria-busy="true">
         {[...Array(4)].map((_, i) => <Skeleton key={i} className="h-24 rounded-xl" />)}
       </div>
     )
@@ -465,57 +516,30 @@ const BandeauCompteurs = ({ abonneId, filiereParId, subscribedAt }) => {
   const digests = envois ?? []
   const digestsRecus = digests.filter((e) => e.status === "sent").length
   const offresRecues = digests.reduce((somme, e) => somme + (e.offer_count ?? 0), 0)
-  const reussis = digestsRecus
   const echecs = digests.filter((e) => e.status === "failed").length
-  const tauxSucces = reussis + echecs > 0 ? Math.round((reussis / (reussis + echecs)) * 100) : null
+  const tauxSucces = digestsRecus + echecs > 0 ? Math.round((digestsRecus / (digestsRecus + echecs)) * 100) : null
   const sansOffre = digests.filter((e) => e.status === "skipped_empty").length
 
   return (
-    <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-      <CarteCompteur
-        label="Digests reçus"
-        valeur={digestsRecus}
-      />
-      <CarteCompteur
-        label="Offres reçues"
-        valeur={offresRecues}
-      />
-      <CarteCompteur
-        label="Taux de succès"
-        texte={tauxSucces === null ? "—" : `${tauxSucces} %`}
-        valeur={tauxSucces ?? 0}
-      />
+    <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+      <CarteCompteur label="Digests reçus" valeur={digestsRecus} />
+      <CarteCompteur label="Offres reçues" valeur={offresRecues} />
+      <CarteCompteur label="Taux de succès" valeur={tauxSucces ?? 0} suffixe="%" />
       <CarteCompteur
         label="Offres actives (ses filières)"
-        valeur={matchingChargement ? undefined : (matching?.total ?? 0)}
+        valeur={matchingChargement ? undefined : matching?.total ?? 0}
         chargement={matchingChargement}
       />
-      {/* Ancienneté remplace le taux si pas de digests ? Non : les 4
-          ci-dessus + l'ancienneté en sous-titre des compteurs. */}
-      <p className="col-span-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground xl:col-span-4">
-        <span>Ancienneté : <strong className="text-foreground">{ancienneteTexte}</strong></span>
-        {sansOffre > 0 && (
-          <span>Digests sans offre : <strong className="text-foreground">{sansOffre}</strong></span>
-        )}
-        {matching?.by_filiere?.length > 0 && (
-          <span>
-            Par filière :{" "}
-            {matching.by_filiere
-              .map((f) => `${filiereParId.get(f.filiere_id)?.label ?? "—"} (${f.active_offers_count})`)
-              .join(" · ")}
-          </span>
-        )}
-      </p>
+      <CarteCompteur label="Ancienneté" valeur={anciennete?.[0]} suffixe={anciennete?.[1]} />
+      <CarteCompteur label="Digests sans offre" valeur={sansOffre} />
     </div>
   )
 }
 
-/* ─── Onglet Statistiques (donut paliers + timeline) ────────────────── */
-
+/* ─── Onglet Statistiques (donut paliers + timeline) ─── */
 const StatistiquesAbonne = ({ abonneId }) => {
   const { data: envois, isLoading, isError, refetch } = useAdminSubscriberSendsQuery(abonneId, { limit: 100 })
 
-  // Donut : agrégation de TOUS les match_kind reçus.
   const donneesPaliers = useMemo(() => {
     const compteurs = {}
     for (const envoi of envois ?? []) {
@@ -531,7 +555,6 @@ const StatistiquesAbonne = ({ abonneId }) => {
     }))
   }, [envois])
 
-  // Timeline : offres par digest (barres) dans l'ordre chronologique.
   const donneesTimeline = useMemo(
     () =>
       [...(envois ?? [])]
@@ -545,16 +568,26 @@ const StatistiquesAbonne = ({ abonneId }) => {
   )
 
   if (isError) return <SectionErreur onRetry={refetch} message="Impossible de charger les statistiques." />
-  if (isLoading) return <Skeleton className="h-64 w-full rounded-xl" />
+  if (isLoading) {
+    return (
+      <div className="grid gap-4 md:grid-cols-2" aria-busy="true">
+        <div className="rounded-xl border border-border bg-card p-4"><SkeletonDonut /></div>
+        <div className="rounded-xl border border-border bg-card p-4">
+          <div className="flex h-44 items-end gap-2 px-2" aria-hidden="true">
+            {[40, 65, 50, 85, 60, 70].map((h, i) => <Skeleton key={i} className="flex-1 rounded-t" style={{ height: `${h}%` }} />)}
+          </div>
+        </div>
+      </div>
+    )
+  }
 
-  const jourCourt = (iso) =>
-    new Date(`${iso}T00:00:00`).toLocaleDateString("fr-FR", { day: "2-digit", month: "short" })
+  const jourCourt = (iso) => new Date(`${iso}T00:00:00`).toLocaleDateString("fr-FR", { day: "2-digit", month: "short" })
 
   return (
     <div className="grid gap-4 md:grid-cols-2">
       {/* Donut paliers de matching */}
       <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4">
-        <h3 className="text-xs font-bold tracking-wider text-muted-foreground uppercase">
+        <h3 className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80">
           Paliers de matching reçus (tous digests)
         </h3>
         {donneesPaliers.length ? (
@@ -563,14 +596,16 @@ const StatistiquesAbonne = ({ abonneId }) => {
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={donneesPaliers} dataKey="value" nameKey="name"
-                    innerRadius="55%" outerRadius="80%" paddingAngle={2} isAnimationActive={false}
+                    data={donneesPaliers}
+                    dataKey="value"
+                    nameKey="name"
+                    innerRadius="55%"
+                    outerRadius="80%"
+                    paddingAngle={2}
+                    strokeWidth={0}
                   >
-                    {donneesPaliers.map((entree, i) => (
-                      <Cell key={i} fill={entree.couleur} />
-                    ))}
+                    {donneesPaliers.map((entree, i) => <Cell key={i} fill={entree.couleur} />)}
                   </Pie>
-                  <Tooltip />
                   <Legend wrapperStyle={{ fontSize: 11 }} />
                 </PieChart>
               </ResponsiveContainer>
@@ -581,21 +616,15 @@ const StatistiquesAbonne = ({ abonneId }) => {
             </p>
           </>
         ) : (
-          <Empty className="py-10">
-            <EmptyHeader>
-              <EmptyMedia variant="icon" />
-              <EmptyTitle>Aucune offre reçue</EmptyTitle>
-              <EmptyDescription>
-                Le donut apparaîtra dès qu'un digest contenant des offres sera envoyé.
-              </EmptyDescription>
-            </EmptyHeader>
-          </Empty>
+          <div className="rounded-lg border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
+            Aucune offre reçue — le donut apparaîtra dès qu'un digest contenant des offres sera envoyé.
+          </div>
         )}
       </div>
 
       {/* Timeline des envois */}
       <div className="flex flex-col gap-2 rounded-xl border border-border bg-card p-4">
-        <h3 className="text-xs font-bold tracking-wider text-muted-foreground uppercase">
+        <h3 className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80">
           Offres reçues par digest
         </h3>
         {donneesTimeline.length ? (
@@ -605,32 +634,19 @@ const StatistiquesAbonne = ({ abonneId }) => {
                 <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.3} />
                 <XAxis dataKey="day" tickFormatter={jourCourt} fontSize={10} tickLine={false} />
                 <YAxis allowDecimals={false} fontSize={10} tickLine={false} />
-                <Tooltip
-                  labelFormatter={(d) => jourCourt(d)}
-                  formatter={(valeur, nom, entry) => [
-                    `${valeur} offre(s) — ${STATUT_DIGEST[entry?.payload?.statut]?.libelle ?? entry?.payload?.statut}`,
-                    "Reçues",
-                  ]}
-                />
-                <Bar dataKey="offres" name="Offres" fill="#2563eb" isAnimationActive={false} radius={[4, 4, 0, 0]} />
+                <Bar dataKey="offres" name="Offres" fill="#2563eb" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         ) : (
-          <Empty className="py-10">
-            <EmptyHeader>
-              <EmptyMedia variant="icon" />
-              <EmptyTitle>Aucun envoi</EmptyTitle>
-              <EmptyDescription>La timeline apparaîtra dès le premier digest.</EmptyDescription>
-            </EmptyHeader>
-          </Empty>
+          <div className="rounded-lg border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
+            Aucun envoi — la timeline apparaîtra dès le premier digest.
+          </div>
         )}
       </div>
     </div>
   )
 }
-
-/* ─── Sous-composants existants ────────────────────────────────────── */
 
 const Ligne = ({ label, children }) => (
   <div className="flex items-center justify-between gap-2 text-sm">
@@ -639,13 +655,12 @@ const Ligne = ({ label, children }) => (
   </div>
 )
 
-/** Historique des envois (digests) — avec palier de matching par offre. */
+/** Historique des envois — paliers de REPLI en simples points colorés (tooltip). */
 const HistoriqueEnvois = ({ abonneId }) => {
   const { data: envois, isLoading, isError, refetch } = useAdminSubscriberSendsQuery(abonneId, { limit: 50 })
 
   if (isError) return <SectionErreur onRetry={refetch} message="Impossible de charger l'historique d'envois." />
-  if (isLoading) return <Skeleton className="h-48 w-full rounded-xl" />
-
+  if (isLoading) return <SkeletonTableau lignes={6} colonnes={6} />
   if (!envois?.length) {
     return (
       <div className="rounded-xl border border-border bg-card p-6 text-center text-sm text-muted-foreground">
@@ -655,10 +670,10 @@ const HistoriqueEnvois = ({ abonneId }) => {
   }
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-border">
+    <div className="overflow-x-auto rounded-xl border border-border scrollbar-thin">
       <Table>
         <TableHeader>
-          <TableRow>
+          <TableRow className="hover:bg-transparent">
             <TableHead>Date</TableHead>
             <TableHead>Sujet</TableHead>
             <TableHead className="text-center">Offres</TableHead>
@@ -672,7 +687,7 @@ const HistoriqueEnvois = ({ abonneId }) => {
             const statut = STATUT_DIGEST[envoi.status] ?? { libelle: envoi.status, variante: "outline" }
             const kinds = [...new Set((envoi.offer_links ?? []).map((o) => o.match_kind))]
             return (
-              <TableRow key={envoi.id}>
+              <TableRow key={envoi.id} className="transition-colors hover:bg-muted/50">
                 <TableCell className="whitespace-nowrap text-muted-foreground tabular-nums">
                   {dateHeureFr(envoi.sent_at ?? envoi.scheduled_for)}
                 </TableCell>
@@ -691,9 +706,7 @@ const HistoriqueEnvois = ({ abonneId }) => {
                     </p>
                   )}
                 </TableCell>
-                {/* Audit 4, H.1 : tier GLOBAL du digest (champ serveur match_tier),
-                    distinct des paliers par offre — n'a de sens que sur un
-                    digest avec des offres (sans offre = pas de palier). */}
+                {/* Audit 4, H.1 : tier GLOBAL du digest, distinct des paliers par offre. */}
                 <TableCell className="hidden md:table-cell">
                   {envoi.match_tier && Number(envoi.offer_count) > 0 ? (
                     <Badge
@@ -708,10 +721,19 @@ const HistoriqueEnvois = ({ abonneId }) => {
                   )}
                 </TableCell>
                 <TableCell className="hidden md:table-cell">
-                  <div className="flex flex-wrap gap-1">
+                  <div className="flex flex-wrap items-center gap-1.5">
                     {kinds.map((kind) => {
-                      const info = KIND_MATCH[kind] ?? { libelle: kind, ton: "outline" }
-                      return (
+                      const info = KIND_MATCH[kind] ?? { libelle: kind, ton: "outline", couleur: "#94a3b8", repli: true }
+                      // Paliers de repli (T2-T5) : simple point coloré + infobulle.
+                      return info.repli ? (
+                        <span
+                          key={kind}
+                          title={info.libelle}
+                          aria-label={info.libelle}
+                          className="inline-block size-2.5 rounded-full"
+                          style={{ backgroundColor: info.couleur }}
+                        />
+                      ) : (
                         <Badge key={kind} variant={info.ton} className="text-[10px]">
                           {info.libelle}
                         </Badge>
@@ -734,8 +756,7 @@ const EmailsTransactionnels = ({ abonneId }) => {
   const { data: emails, isLoading, isError, refetch } = useAdminAbonneEmailsTx(abonneId)
 
   if (isError) return <SectionErreur onRetry={refetch} message="Impossible de charger les emails transactionnels." />
-  if (isLoading) return <Skeleton className="h-48 w-full rounded-xl" />
-
+  if (isLoading) return <SkeletonTableau lignes={5} colonnes={5} />
   if (!emails?.length) {
     return (
       <div className="rounded-xl border border-border bg-card p-6 text-center text-sm text-muted-foreground">
@@ -744,17 +765,13 @@ const EmailsTransactionnels = ({ abonneId }) => {
     )
   }
 
-  const VARIANTE_TX = {
-    sent: "secondary",
-    failed: "destructive",
-    queued: "outline",
-  }
+  const VARIANTE_TX = { sent: "secondary", failed: "destructive", queued: "outline" }
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-border">
+    <div className="overflow-x-auto rounded-xl border border-border [scrollbar-width:thin]">
       <Table>
         <TableHeader>
-          <TableRow>
+          <TableRow className="hover:bg-transparent">
             <TableHead>Date</TableHead>
             <TableHead>Motif</TableHead>
             <TableHead>Statut</TableHead>
@@ -764,7 +781,7 @@ const EmailsTransactionnels = ({ abonneId }) => {
         </TableHeader>
         <TableBody>
           {emails.map((email) => (
-            <TableRow key={email.id}>
+            <TableRow key={email.id} className="transition-colors hover:bg-muted/50">
               <TableCell className="whitespace-nowrap text-muted-foreground tabular-nums">
                 {dateHeureFr(email.created_at)}
               </TableCell>
@@ -788,14 +805,12 @@ const EmailsTransactionnels = ({ abonneId }) => {
 const DialogEditionAbonne = ({ abonne, onFermer }) => {
   const notify = useNotify()
   const modifierMutation = useModifierAbonne()
-
   const [valeurs, setValeurs] = useState(() => ({
     full_name: abonne.full_name ?? "",
     city: abonne.city ?? "",
     admin_notes: abonne.admin_notes ?? "",
     wants_career_tips: abonne.wants_career_tips,
   }))
-
   const set = (champ) => (v) => setValeurs((prev) => ({ ...prev, [champ]: v }))
 
   const soumettre = async (e) => {

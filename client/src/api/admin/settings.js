@@ -1,4 +1,4 @@
-import adminApi from "./axiosAdmin";
+import adminApi from "../axiosAdmin";
 
 /* Parametres du site editables sans deploiement : super_admin uniquement. */
 

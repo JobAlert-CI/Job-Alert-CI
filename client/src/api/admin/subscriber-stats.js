@@ -1,4 +1,4 @@
-import adminApi from "./axiosAdmin";
+import adminApi from "../axiosAdmin";
 import { cleanParams } from "../utils";
 
 /* Statistiques abonnés : mêmes rôles que le router subscribers

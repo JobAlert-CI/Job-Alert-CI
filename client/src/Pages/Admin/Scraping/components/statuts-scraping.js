@@ -42,7 +42,7 @@ export const dureeLisible = (durationMs, startedAt, finishedAt) => {
   return null
 }
 
-const formaterDuree = (ms) => {
+export const formaterDuree = (ms) => {
   if (ms < 1000) return `${ms} ms`
   const s = Math.round(ms / 1000)
   if (s < 60) return `${s} s`

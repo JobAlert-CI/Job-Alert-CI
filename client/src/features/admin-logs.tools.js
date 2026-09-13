@@ -63,7 +63,7 @@ export const CONTACT_INTERNE_VERS_API = {
 
 /** Variantes de badge par statut contact (clé API). */
 export const VARIANTE_CONTACT = {
-  new: "default",
+  new: "secondary",
   read: "secondary",
   replied: "outline",
   archived: "outline",
@@ -118,8 +118,8 @@ export const libelleMotif = (valeur) =>
 
 /** Variantes badge par statut email. */
 export const VARIANTE_STATUT_EMAIL = {
-  sent: "default",
-  queued: "secondary",
+  sent: "secondary",
+  queued: "outline",
   failed: "destructive",
 }
 

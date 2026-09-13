@@ -1,17 +1,12 @@
-
 import { useCallback, useMemo } from "react"
 import { useSearchParams } from "react-router-dom"
 
 /* ════════════════════════════════════════════════════════════════════
-FILTRES ↔ URL — la query string est la source de vérité.
-Aucun rechargement : lecture réactive via useSearchParams,
-écriture en replace (pas de pollution de l'historique).
-
-Config (constante de module, jamais inline dans le composant) :
-  sets    → [{ key, param }]          ex. { key: "filieres", param: "fil" }
-  scalars → [{ key, param, defaut }]  ex. { key: "sort", param: "tri", defaut: "recent" }
-  period  → { debut, fin }            ex. { debut: "du", fin: "au" }
+   FILTRES ↔ URL — la query string est la source de vérité.
+   setScalar / setScalars matchent sur la CLÉ du scalaire (ex. "pageJobs"),
+   jamais sur le nom du param URL (ex. "page_jobs").
 ════════════════════════════════════════════════════════════════════ */
+
 const parseSet = (v) => new Set(v ? v.split(",").filter(Boolean) : [])
 const serialSet = (s) => [...s].join(",")
 
@@ -20,6 +15,7 @@ const parseDate = (v) => {
   const d = new Date(`${v}T00:00:00`)
   return Number.isNaN(d.getTime()) ? null : d
 }
+
 const serialDate = (d) => {
   if (!d) return null
   const m = String(d.getMonth() + 1).padStart(2, "0")
@@ -30,7 +26,6 @@ const serialDate = (d) => {
 export const useUrlFilters = ({ sets = [], scalars = [], period = null }) => {
   const [searchParams, setSearchParams] = useSearchParams()
 
-  /* ── URL → état (sets + période) ── */
   const filters = useMemo(() => {
     const f = {}
     sets.forEach(({ key, param }) => { f[key] = parseSet(searchParams.get(param)) })
@@ -43,14 +38,12 @@ export const useUrlFilters = ({ sets = [], scalars = [], period = null }) => {
     return f
   }, [searchParams, sets, period])
 
-  /* ── URL → état (scalaires : tri, vue, recherche…) ── */
   const valeurs = useMemo(() => {
     const v = {}
     scalars.forEach(({ key, param, defaut = "" }) => { v[key] = searchParams.get(param) ?? defaut })
     return v
   }, [searchParams, scalars])
 
-  /* ── état → URL ── */
   const toggle = useCallback((key, value) => {
     const def = sets.find((s) => s.key === key)
     if (!def) return
@@ -69,6 +62,22 @@ export const useUrlFilters = ({ sets = [], scalars = [], period = null }) => {
     setSearchParams((prev) => {
       const next = new URLSearchParams(prev)
       value && value !== def.defaut ? next.set(def.param, value) : next.delete(def.param)
+      return next
+    }, { replace: true })
+  }, [scalars, setSearchParams])
+
+  /* Écriture groupée : plusieurs scalaires en UNE seule écriture URL.
+     Indispensable quand un setter touche 2 params (filtre + reset de page) :
+     deux setSearchParams consécutifs ne se composent pas (le second écrase
+     le premier), donc on applique tout dans la même mise à jour. */
+  const setScalars = useCallback((changes) => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev)
+      Object.entries(changes).forEach(([key, value]) => {
+        const def = scalars.find((s) => s.key === key)
+        if (!def) return
+        value && value !== def.defaut ? next.set(def.param, value) : next.delete(def.param)
+      })
       return next
     }, { replace: true })
   }, [scalars, setSearchParams])
@@ -95,5 +104,5 @@ export const useUrlFilters = ({ sets = [], scalars = [], period = null }) => {
     }, { replace: true })
   }, [sets, scalars, period, setSearchParams])
 
-  return { filters, valeurs, toggle, setScalar, setPeriod, reset }
+  return { filters, valeurs, toggle, setScalar, setScalars, setPeriod, reset }
 }

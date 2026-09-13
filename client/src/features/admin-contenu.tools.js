@@ -161,7 +161,7 @@ export const useCreateTakeaway = () => {
   const invalidate = useInvalidateContenu()
   return useMutation({
     mutationFn: ({ articleId, data }) =>
-      import("@/api/admin/content-ext").then((m) => m.addTakeaway(articleId, data)),
+      import("@/api/admin/content").then((m) => m.addTakeaway(articleId, data)),
     onSuccess: invalidate,
   })
 }
@@ -169,7 +169,7 @@ export const useCreateTakeaway = () => {
 export const useDeleteTakeaway = () => {
   const invalidate = useInvalidateContenu()
   return useMutation({
-    mutationFn: (id) => import("@/api/admin/content-ext").then((m) => m.removeTakeaway(id)),
+    mutationFn: (id) => import("@/api/admin/content").then((m) => m.removeTakeaway(id)),
     onSuccess: invalidate,
   })
 }
@@ -178,7 +178,7 @@ export const useCreateKeyFigure = () => {
   const invalidate = useInvalidateContenu()
   return useMutation({
     mutationFn: ({ articleId, data }) =>
-      import("@/api/admin/content-ext").then((m) => m.addKeyFigure(articleId, data)),
+      import("@/api/admin/content").then((m) => m.addKeyFigure(articleId, data)),
     onSuccess: invalidate,
   })
 }
@@ -186,7 +186,7 @@ export const useCreateKeyFigure = () => {
 export const useDeleteKeyFigure = () => {
   const invalidate = useInvalidateContenu()
   return useMutation({
-    mutationFn: (id) => import("@/api/admin/content-ext").then((m) => m.removeKeyFigure(id)),
+    mutationFn: (id) => import("@/api/admin/content").then((m) => m.removeKeyFigure(id)),
     onSuccess: invalidate,
   })
 }
@@ -289,7 +289,7 @@ export const useCreatePage = () => {
   const invalidate = useInvalidateContenu()
   return useMutation({
     mutationFn: (data) =>
-      import("@/api/admin/content-ext").then((m) => m.createPageStatique(data)),
+      import("@/api/admin/content").then((m) => m.createPageStatique(data)),
     onSuccess: invalidate,
   })
 }
@@ -298,7 +298,7 @@ export const useUpdatePage = () => {
   const invalidate = useInvalidateContenu()
   return useMutation({
     mutationFn: ({ id, data }) =>
-      import("@/api/admin/content-ext").then((m) => m.updatePageStatique(id, data)),
+      import("@/api/admin/content").then((m) => m.updatePageStatique(id, data)),
     onSuccess: invalidate,
   })
 }
@@ -308,7 +308,7 @@ export const useChangerStatutPage = () => {
   const invalidate = useInvalidateContenu()
   return useMutation({
     mutationFn: ({ id, status }) =>
-      import("@/api/admin/content-ext").then((m) => m.changerStatutPage(id, status)),
+      import("@/api/admin/content").then((m) => m.changerStatutPage(id, status)),
     onSuccess: invalidate,
   })
 }

@@ -18,27 +18,20 @@ import {
 } from "@/components/ui/dialog"
 import { SectionErreur, SectionVide } from "../components/EtatsSection"
 
-/* ─────────────────────────────────────────────────────────────────────
-   Section Spécialités d'une filière (doc v3 §12 : sous-table).
-
-   CRUD /filieres/{id}/specialites + /specialites/{id} — chargée
-   seulement quand une filière est dépliée (useAdminSpecialitesQuery,
-   enabled par filiereId présent).
-   ───────────────────────────────────────────────────────────────────── */
 
 const SectionSpecialites = ({ filiereId }) => {
   const notify = useNotify()
-  const { data: specialites, isLoading, isError, refetch } = useAdminSpecialitesQuery(filiereId)
-
+  const { data: specialites, isLoading, isError, refetch } = useAdminSpecialitesQuery(filiereId, {
+    staleTime: 5 * 60 * 1000, // évite le skeleton à chaque réouverture du panneau
+  })
   const creerMutation = useCreateSpecialite(filiereId)
   const modifierMutation = useUpdateSpecialite(filiereId)
   const supprimerMutation = useDeleteSpecialite(filiereId)
-
-  const [edition, setEdition] = useState(null)     // null fermé, {} création, spécialité existante
+  const [edition, setEdition] = useState(null)
   const [suppression, setSuppression] = useState(null)
 
   return (
-    <section aria-label="Spécialités de la filière" className="flex flex-col gap-3 rounded-lg bg-background/60 p-3">
+    <section aria-label="Spécialités de la filière" className="flex flex-col gap-3 rounded-xl border border-border bg-card p-3 shadow-soft">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="flex items-center gap-2 font-heading text-sm font-semibold">
           <ListTree className="size-4 text-primary" aria-hidden />
@@ -61,7 +54,7 @@ const SectionSpecialites = ({ filiereId }) => {
         <div className="overflow-x-auto rounded-lg border border-border">
           <Table>
             <TableHeader>
-              <TableRow>
+              <TableRow className="hover:bg-transparent">
                 <TableHead>Spécialité</TableHead>
                 <TableHead className="hidden font-mono text-[10px] md:table-cell">Code</TableHead>
                 <TableHead className="text-right">Ordre</TableHead>
@@ -71,7 +64,7 @@ const SectionSpecialites = ({ filiereId }) => {
             </TableHeader>
             <TableBody>
               {specialites.map((spec) => (
-                <TableRow key={spec.id}>
+                <TableRow key={spec.id} className="transition-colors hover:bg-muted/50">
                   <TableCell className="text-sm font-medium">{spec.label}</TableCell>
                   <TableCell className="hidden font-mono text-[10px] text-muted-foreground md:table-cell">{spec.code}</TableCell>
                   <TableCell className="text-right tabular-nums text-muted-foreground">{spec.sort_order}</TableCell>
@@ -82,12 +75,7 @@ const SectionSpecialites = ({ filiereId }) => {
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center justify-end gap-1">
-                      <Button
-                        variant="ghost"
-                        size="icon-sm"
-                        onClick={() => setEdition(spec)}
-                        aria-label={`Modifier ${spec.label}`}
-                      >
+                      <Button variant="ghost" size="icon-sm" onClick={() => setEdition(spec)} aria-label={`Modifier ${spec.label}`}>
                         <Pencil aria-hidden />
                       </Button>
                       <Button
@@ -95,6 +83,7 @@ const SectionSpecialites = ({ filiereId }) => {
                         size="icon-sm"
                         onClick={() => setSuppression(spec)}
                         aria-label={`Supprimer ${spec.label}`}
+                        className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
                       >
                         <Trash2 aria-hidden />
                       </Button>
@@ -107,7 +96,6 @@ const SectionSpecialites = ({ filiereId }) => {
         </div>
       )}
 
-      {/* Dialog création / édition spécialité */}
       {edition && (
         <DialogSpecialite
           specialite={edition.id ? edition : null}
@@ -117,7 +105,6 @@ const SectionSpecialites = ({ filiereId }) => {
         />
       )}
 
-      {/* Confirmation suppression */}
       {suppression && (
         <Dialog open onOpenChange={(ouvert) => !ouvert && setSuppression(null)}>
           <DialogContent className="sm:max-w-md">

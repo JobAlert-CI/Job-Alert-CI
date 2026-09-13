@@ -56,7 +56,7 @@ const AdminLogs = lazy(() => import("./Pages/Admin/LogsPage"));
 const AdminParametres = lazy(() => import("./Pages/Admin/Parametres"));
 const AdminIa = lazy(() => import("./Pages/Admin/Ia"));
 const AdminSysteme = lazy(() => import("./Pages/Admin/Systeme"));
-const AdminLayout = lazy(() => import("./components/admin/AdminLayout"));
+const AdminLayout = lazy(() => import("./components/layouts/AdminLayout"));
 const RequireAdmin = lazy(() => import("./components/admin/AdminGuard"));
 import { AdminAuthProvider } from "@/contexts/AdminAuth.context";
 import { prefetchHome } from "./features/home.tools";
@@ -136,9 +136,6 @@ const App = () => (
                 <Route path="offres/:id" element={<DetailsOffre />} />
                 <Route path="conseils" element={<Conseils />} />
                 <Route path="conseils/:slug" element={<DetailsConseil />} />
-                <Route path="test" element={<FallbackPage />} />
-                {/* Toute URL inconnue → page 404 explicite (noindex). */}
-                <Route path="*" element={<PageIntrouvable />} />
               </Route>
 
               {/* ═══════════════════════════════════════════════════════════════
@@ -172,24 +169,24 @@ const App = () => (
                     }
                   >
                     <Route index element={<AdminOffres />} />
-                      <Route path="nouvelle" element={<AdminFormulaireOffre />} />
-                      <Route path="doublons" element={<AdminDoublons />} />
-                      <Route path=":id" element={<AdminFormulaireOffre />} />
-                    </Route>
-                    {/* Scraping : super_admin uniquement (doc v3 §10) —
+                    <Route path="nouvelle" element={<AdminFormulaireOffre />} />
+                    <Route path="doublons" element={<AdminDoublons />} />
+                    <Route path=":id" element={<AdminFormulaireOffre />} />
+                  </Route>
+                  {/* Scraping : super_admin uniquement (doc v3 §10) —
                         route parente avec Outlet pour accueillir le
                         détail de run (page 11, cycle suivant). */}
-                    <Route
-                      path="scraping"
-                      element={
-                        <RequireAdmin roles={["super_admin"]}>
-                          <Outlet />
-                        </RequireAdmin>
-                      }
-                    >
-                      <Route index element={<AdminScraping />} />
-                      <Route path="runs/:id" element={<AdminDetailRun />} />
-                    </Route>
+                  <Route
+                    path="scraping"
+                    element={
+                      <RequireAdmin roles={["super_admin"]}>
+                        <Outlet />
+                      </RequireAdmin>
+                    }
+                  >
+                    <Route index element={<AdminScraping />} />
+                    <Route path="runs/:id" element={<AdminDetailRun />} />
+                  </Route>
                   {/* Filières : super_admin uniquement (doc v3 §12). */}
                   <Route
                     path="filieres"
@@ -236,8 +233,8 @@ const App = () => (
                     }
                   />
                   <Route
-                      path="entreprises"
-                      element={
+                    path="entreprises"
+                    element={
                       <RequireAdmin roles={["super_admin"]}>
                         <AdminEntreprises />
                       </RequireAdmin>
@@ -294,6 +291,9 @@ const App = () => (
                   {/* Autres routes admin à ajouter ici */}
                 </Route>
               </Route>
+
+              {/* Toute URL inconnue → page 404 explicite (noindex). */}
+              <Route path="*" element={<PageIntrouvable />} />
             </Routes>
           </Suspense>
         </NotifyProvider>

@@ -1,52 +1,66 @@
-import { ErrorBoundary } from "react-error-boundary"
-import { Settings2, Zap } from "lucide-react"
-import AdminSectionFallback from "@/components/admin/AdminSectionFallback"
+import { useState } from "react"
+import { motion } from "framer-motion"
+import { Plus, Settings2 } from "lucide-react"
 import CompteursParametres from "./sections/CompteursParametres"
 import TableauParametres from "./sections/TableauParametres"
+import Bloc, { VARIANTS_PAGE } from "@/components/admin/Bloc"
+import HeroAdmin from "@/components/admin/HeroAdmin"
+import BtnAction from "@/components/admin/BtnAction"
+import DialogCreationParametre from "./components/DialogCreationParametre"
 
 /* ─────────────────────────────────────────────────────────────────────
    Page Paramètres du site — /admin/parametres (super_admin, doc v3 §18).
-
    Configuration éditable sans déploiement (heure d'envoi, textes,
-   coordonnées). Depuis le cycle 18, les valeurs sont CONSOMMÉES au
-   runtime (résolveur site_settings → Settings, fallback env) : ce
-   qui s'édite ici pilote VRAIMENT le site — confirmation d'email,
-   TTL des liens, expéditeur, support, sujet des mails.
-
-   Sections : compteurs P1-P4 (sélection validée) + table groupée à
-   édition inline (dirty-tracking, sauvegarde groupée POST /bulk ou
-   unitaire PUT /{key} upsert) + dialog création de clé.
+   coordonnées). Les valeurs sont CONSOMMÉES au runtime (résolveur
+   site_settings → Settings, fallback env) : ce qui s'édite ici pilote
+   VRAIMENT le site — confirmation d'email, TTL des liens, expéditeur,
+   support, sujet des mails.
+   Refonte :
+   • Le dialog de création n'est géré QU'ICI (avant : état dupliqué
+     dans index.jsx ET TableauParametres → conflits possibles). Le
+     tableau reçoit l'action via la prop `onNouvelleCle`.
+   • Dialog monté EN PERMANENCE (prop `open`) : animations Radix
+     préservées, champs réinitialisés par useEffect à l'ouverture.
    ───────────────────────────────────────────────────────────────────── */
+const ParametresAdmin = () => {
+  /* UNIQUE source de vérité pour le dialog de création. */
+  const [creationOuverte, setCreationOuverte] = useState(false)
+  const ouvrirCreation = () => setCreationOuverte(true)
+  const fermerCreation = () => setCreationOuverte(false)
 
-const ParametresAdmin = () => (
-  <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
-    {/* ─── En-tête ─── */}
-    <section aria-label="En-tête paramètres" className="flex flex-wrap items-end justify-between gap-3">
-      <div>
-        <h1 className="flex items-center gap-2 font-heading text-lg font-bold">
-          <Settings2 className="size-5 text-primary" aria-hidden />
-          Paramètres du site
-        </h1>
-        <p className="text-xs text-muted-foreground">
-          Configuration éditable sans déploiement — confirmation d'email, expéditeur, support…
-        </p>
-      </div>
-      <p className="flex items-center gap-1.5 rounded-lg border border-emerald-300/40 bg-emerald-500/10 px-2.5 py-1.5 text-[10px] font-medium text-emerald-700 dark:text-emerald-400">
-        <Zap className="size-3.5" aria-hidden />
-        Appliqué en direct au site (consommé au runtime)
-      </p>
-    </section>
+  return (
+    <motion.div
+      variants={VARIANTS_PAGE}
+      initial="cache"
+      animate="visible"
+      className="mx-auto flex w-full max-w-6xl flex-col gap-6"
+    >
+      {/* ─── En-tête ─── */}
+      <HeroAdmin
+        title="Paramètres du site"
+        description="Liste clé/valeur éditable — heure d'envoi, textes, coordonnées. Effet immédiat, sans redéploiement."
+        icon={Settings2}
+        titleBdge="Contenu & sécurité"
+      >
+        <BtnAction variant="primary" size="sm" onClick={ouvrirCreation}>
+          <Plus aria-hidden className="size-4" /> Nouvelle clé
+        </BtnAction>
+      </HeroAdmin>
 
-    {/* ─── Compteurs P1-P4 ─── */}
-    <ErrorBoundary FallbackComponent={AdminSectionFallback}>
-      <CompteursParametres />
-    </ErrorBoundary>
+      {/* ─── Compteurs P1-P4 ─── */}
+      <Bloc>
+        <CompteursParametres />
+      </Bloc>
 
-    {/* ─── Table (recherche, groupes, édition inline, bulk) ─── */}
-    <ErrorBoundary FallbackComponent={AdminSectionFallback}>
-      <TableauParametres />
-    </ErrorBoundary>
-  </div>
-)
+      {/* ─── Table (recherche, groupes, édition inline, bulk) ─── */}
+      <Bloc>
+        <TableauParametres onNouvelleCle={ouvrirCreation} />
+      </Bloc>
+
+      {/* Dialog monté en permanence — piloté par `open`. */}
+      <DialogCreationParametre open={creationOuverte} onFermer={fermerCreation} />
+    </motion.div>
+  )
+}
 
 export default ParametresAdmin

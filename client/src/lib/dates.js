@@ -22,3 +22,11 @@ export const dateLabel = (jours) => {
   if (jours === 1) return "Hier"
   return addDays(new Date(), -jours).toLocaleDateString("fr-FR", { day: "numeric", month: "short" })
 }
+export const dateHeure = (iso) => {
+  if (!iso) return "—"
+  const d = new Date(iso)
+  return (
+    d.toLocaleDateString("fr-FR", { day: "2-digit", month: "short" }) +
+    " " + d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })
+  )
+}

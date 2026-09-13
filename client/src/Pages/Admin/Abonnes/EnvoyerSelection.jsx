@@ -1,10 +1,12 @@
 import { useMemo, useState } from "react"
 import { Link, useNavigate, useParams } from "react-router-dom"
-import { ArrowLeft, Check, Eye, Mail, Search, Send } from "lucide-react"
+import { motion, AnimatePresence } from "framer-motion"
+import {
+  ArrowDown, ArrowLeft, ArrowUp, Check, ChevronUp, Eye, Mail, Search, Send, X,
+} from "lucide-react"
 import { cn } from "cn"
 import {
-  useAdminSubscriberDetailQuery, useApercuDigest, useEnvoyerSelection,
-  messageErreurAbonne,
+  useAdminSubscriberDetailQuery, useApercuDigest, useEnvoyerSelection, messageErreurAbonne,
 } from "@/features/admin-abonnes.tools"
 import { useAdminOffersQuery } from "@/features/admin-offres.tools"
 import { useRechercheDebouncee } from "@/hooks/use-recherche-debouncee"
@@ -18,30 +20,20 @@ import { Spinner } from "@/components/ui/spinner"
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog"
+import PaginationListe from "@/components/admin/PaginationListe"
 import { SectionErreur } from "./components/EtatsSection"
 
 /* ─────────────────────────────────────────────────────────────────────
    Page Envoi personnalisé — /admin/utilisateurs/:id/envoyer (doc v3 §9).
-
-   Objectif : envoyer manuellement une sélection d'offres à un abonné
-   précis (relance, offre spéciale négociée), avec aperçu avant envoi.
-
-   super_admin + gestionnaire_utilisateurs (guard par route).
-
-   Contrat vérifié live :
-   - POST /subscribers/{id}/send { offer_ids (min 1), subject? } → 201
-     EmailDigest QUEUED (template_version="manual"). ⚠ Mise en file :
-     le worker traite l'envoi — message « en file d'attente », JAMAIS
-     « email envoyé » (doc v3 §9). 400 si IDs introuvables.
-   - POST /sending/preview?subscriber_id=&offer_ids=... → { preview }
-     Aperçu SANS envoi : sans offer_ids = 5 premières offres des
-     filières (cascade auto) ; avec = la sélection.
-   - Sélecteur d'offres : GET /offers limité aux actives + visibles
-     (spec : « réutilisant la recherche/filtre de la page Offres »).
-
-   L'aperçu HTML (html_snippet) est rendu dans une IFRAME SANDBOXÉE —
-   le CSS de l'email ne fuit jamais dans l'interface admin (doc v3 §9).
-   ───────────────────────────────────────────────────────────────────── */
+   Refonte :
+   • Récapitulatif de sélection : barre sticky en SLIDE-UP avec liste
+     dépliable pour RÉORGANISER l'ordre des offres (flèches haut/bas)
+     et retirer une offre sans vider toute la liste ;
+   • Badge d'ordre « #N » animé (scale + fondu) à la sélection ;
+   • Pagination mutualisée PaginationListe.
+   Contrat : POST /subscribers/{id}/send → 201 EmailDigest QUEUED
+   (message « en file d'attente », JAMAIS « envoyé »).
+───────────────────────────────────────────────────────────────────── */
 
 const PAGE_TAILLE = 20
 
@@ -54,11 +46,11 @@ const EnvoyerSelection = () => {
   const { id: subscriberId } = useParams()
   const navigate = useNavigate()
   const notify = useNotify()
+  const {
+    data: abonne, isLoading: abonneCharge, isError: abonneErreur, refetch: refetchAbonne,
+  } = useAdminSubscriberDetailQuery(subscriberId)
 
-  const { data: abonne, isLoading: abonneCharge, isError: abonneErreur, refetch: refetchAbonne } =
-    useAdminSubscriberDetailQuery(subscriberId)
-
-  // Recherche offres (pattern page Offres : debounced → URL API).
+  // Recherche offres (pattern page Offres : debounced → état local).
   const [recherche, setRecherche] = useState("")
   const [page, setPage] = useState(1)
   const { valeurLocale, setValeurLocale } = useRechercheDebouncee({
@@ -78,35 +70,55 @@ const EnvoyerSelection = () => {
   )
   const { data: offres, isLoading: offresChargement } = useAdminOffersQuery(paramsOffres)
 
-  // Sélection (ordre préservé : tableau d'IDs, pas un Set).
+  // Sélection : tableau d'IDs (ordre préservé = ordre dans l'email).
   const [selection, setSelection] = useState([])
+  // Titres capturés à la sélection (les offres peuvent ne plus être sur
+  // la page courante quand on réorganise).
+  const [titresOffres, setTitresOffres] = useState({})
+  const [recoOuvert, setRecoOuvert] = useState(false)
   const [sujet, setSujet] = useState("")
   const [modeApercu, setModeApercu] = useState(MODE_APERCU.SELECTION)
   const [apercuOuvert, setApercuOuvert] = useState(false)
   const [confirmationOuverte, setConfirmationOuverte] = useState(false)
 
-  // Aperçu : la sélection si présente, sinon la cascade auto.
-  // `actif` = dialog ouvert → la query part à l'ouverture et re-part
-  // au changement de mode (queryKey inclut offerIds → auto = []).
   const apercuAuto = modeApercu === MODE_APERCU.AUTO
   const { data: apercu, isLoading: apercuCharge, isError: apercuErreur } =
     useApercuDigest(subscriberId, apercuAuto ? [] : selection, { actif: apercuOuvert })
 
   const envoyerMutation = useEnvoyerSelection()
 
-  const basculerOffre = (offreId) => {
+  const basculerOffre = (offre) => {
     setSelection((prev) =>
-      prev.includes(offreId) ? prev.filter((id) => id !== offreId) : [...prev, offreId]
+      prev.includes(offre.id) ? prev.filter((id) => id !== offre.id) : [...prev, offre.id]
     )
+    setTitresOffres((prev) => (prev[offre.id] ? prev : { ...prev, [offre.id]: offre.title }))
   }
+
+  const monterOffre = (index) => {
+    if (index === 0) return
+    setSelection((prev) => {
+      const copie = [...prev]
+      ;[copie[index - 1], copie[index]] = [copie[index], copie[index - 1]]
+      return copie
+    })
+  }
+
+  const descendreOffre = (index) => {
+    setSelection((prev) => {
+      if (index >= prev.length - 1) return prev
+      const copie = [...prev]
+      ;[copie[index + 1], copie[index]] = [copie[index], copie[index + 1]]
+      return copie
+    })
+  }
+
+  const retirerOffre = (offreId) => setSelection((prev) => prev.filter((id) => id !== offreId))
 
   const pageSuivantePossible = Array.isArray(offres) && offres.length === PAGE_TAILLE
 
   const ouvrirApercu = (mode) => {
     setModeApercu(mode)
     setApercuOuvert(true)
-    // Le queryKey dépend de modeApercu/selection — on laisse le hook
-    // refetcher avec les bons params au prochain rendu du dialog.
   }
 
   const envoyer = () => {
@@ -130,17 +142,17 @@ const EnvoyerSelection = () => {
   if (abonneErreur) {
     return <SectionErreur onRetry={refetchAbonne} message="Impossible de charger cet abonné." />
   }
+
   if (abonneCharge || !abonne) {
     return (
-      <div className="mx-auto flex w-full max-w-5xl flex-col gap-4">
+      <div className="mx-auto flex w-full max-w-5xl flex-col gap-4" aria-busy="true">
         <Skeleton className="h-8 w-72" />
         <Skeleton className="h-96 w-full rounded-xl" />
       </div>
     )
   }
 
-  const estAnonymise = abonne.status === "deleted"
-  if (estAnonymise) {
+  if (abonne.status === "deleted") {
     return (
       <div className="mx-auto flex w-full max-w-3xl flex-col gap-3">
         <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="w-fit">
@@ -155,7 +167,7 @@ const EnvoyerSelection = () => {
 
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-4">
-      {/* En-tête */}
+      {/* ─── En-tête ─── */}
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-3">
           <Button variant="ghost" size="icon" render={<Link to={`/admin/utilisateurs/${subscriberId}`} />} aria-label="Retour à la fiche">
@@ -168,16 +180,12 @@ const EnvoyerSelection = () => {
             </p>
           </div>
         </div>
-        <Button
-          size="sm"
-          onClick={() => setConfirmationOuverte(true)}
-          disabled={!selection.length}
-        >
+        <Button size="sm" onClick={() => setConfirmationOuverte(true)} disabled={!selection.length}>
           <Send aria-hidden /> Envoyer {selection.length > 0 && `(${selection.length})`}
         </Button>
       </div>
 
-      {/* Objet d'email (optionnel — défaut serveur « Sélection personnalisée JobAlert CI ») */}
+      {/* Objet d'email (optionnel) */}
       <div className="flex flex-col gap-1.5 rounded-xl border border-border bg-card p-4">
         <Label htmlFor="sujet-email" className="text-xs">Objet de l'email (optionnel)</Label>
         <Input
@@ -189,7 +197,7 @@ const EnvoyerSelection = () => {
         />
       </div>
 
-      {/* Barre : recherche + boutons aperçu */}
+      {/* Recherche + boutons aperçu */}
       <div className="flex flex-wrap items-center gap-2">
         <div className="relative min-w-52 flex-1">
           <Search className="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-muted-foreground" aria-hidden />
@@ -221,9 +229,9 @@ const EnvoyerSelection = () => {
         </Button>
       </div>
 
-      {/* Liste d'offres sélectionnables (actives + visibles uniquement — spec §9) */}
+      {/* ─── Liste d'offres sélectionnables ─── */}
       {offresChargement ? (
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2" aria-busy="true">
           {[...Array(6)].map((_, i) => <Skeleton key={i} className="h-16 w-full rounded-lg" />)}
         </div>
       ) : !offres?.length ? (
@@ -239,7 +247,7 @@ const EnvoyerSelection = () => {
               <li key={offre.id}>
                 <button
                   type="button"
-                  onClick={() => basculerOffre(offre.id)}
+                  onClick={() => basculerOffre(offre)}
                   aria-pressed={estSelectionnee}
                   className={cn(
                     "flex w-full items-center gap-3 rounded-lg border px-3 py-2 text-left transition-colors",
@@ -264,11 +272,22 @@ const EnvoyerSelection = () => {
                       {offre.primary_filiere && ` · ${offre.primary_filiere.label}`}
                     </span>
                   </span>
-                  {estSelectionnee && (
-                    <Badge variant="secondary" className="shrink-0">
-                      <Check aria-hidden /> #{indexSelection + 1}
-                    </Badge>
-                  )}
+                  {/* Badge d'ordre : apparition animée (scale + fondu). */}
+                  <AnimatePresence>
+                    {estSelectionnee && (
+                      <motion.span
+                        initial={{ opacity: 0, scale: 0.7 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.7 }}
+                        transition={{ duration: 0.15, ease: "easeOut" }}
+                        className="shrink-0"
+                      >
+                        <Badge variant="secondary" className="tabular-nums">
+                          <Check aria-hidden /> #{indexSelection + 1}
+                        </Badge>
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
                 </button>
               </li>
             )
@@ -276,47 +295,120 @@ const EnvoyerSelection = () => {
         </ul>
       )}
 
-      {/* Pagination */}
+      {/* Pagination mutualisée */}
       {offres?.length > 0 && (
-        <div className="flex items-center justify-between">
-          <p className="text-xs text-muted-foreground">Page {page}</p>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" onClick={() => setPage(p => p - 1)} disabled={page <= 1}>
-              Précédent
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => setPage(p => p + 1)} disabled={!pageSuivantePossible}>
-              Suivant
-            </Button>
-          </div>
-        </div>
+        <PaginationListe page={page} pagePleine={pageSuivantePossible} onPageChange={setPage} />
       )}
 
-      {/* Récapitulatif de sélection (sticky discret en bas) */}
-      {selection.length > 0 && (
-        <div className="sticky bottom-0 flex flex-wrap items-center gap-2 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 backdrop-blur">
-          <Badge variant="secondary" className="tabular-nums">{selection.length} sélectionnée(s)</Badge>
-          <Button size="sm" onClick={() => setConfirmationOuverte(true)}>
-            <Send aria-hidden /> Envoyer…
-          </Button>
-          <Button size="sm" variant="ghost" onClick={() => setSelection([])}>
-            Vider
-          </Button>
-        </div>
-      )}
+      {/* ─── Récapitulatif de sélection : slide-up + réorganisation ─── */}
+      <AnimatePresence>
+        {selection.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 24 }}
+            transition={{ duration: 0.22, ease: "easeOut" }}
+            className="sticky bottom-0 z-10 motion-reduce:transition-none"
+          >
+            <div className="rounded-xl border border-primary/30 bg-card/95 shadow-hover backdrop-blur">
+              <div className="flex flex-wrap items-center gap-2 px-3 py-2">
+                <Badge variant="secondary" className="tabular-nums">
+                  {selection.length} sélectionnée{selection.length > 1 ? "s" : ""}
+                </Badge>
+                <Button size="sm" onClick={() => setConfirmationOuverte(true)}>
+                  <Send aria-hidden /> Envoyer…
+                </Button>
+                <Button size="sm" variant="ghost" onClick={() => setSelection([])}>
+                  Vider
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => setRecoOuvert((o) => !o)}
+                  aria-expanded={recoOuvert}
+                  title="L'ordre de sélection définit l'ordre des offres dans l'email"
+                >
+                  Réorganiser
+                  <ChevronUp aria-hidden className={cn("size-3.5 transition-transform", !recoOuvert && "rotate-180")} />
+                </Button>
+              </div>
 
-      {/* ── Dialog Aperçu (iframe sandboxée — CSS email isolé) ── */}
+              {/* Liste réorganisable (flèches haut/bas + retrait) */}
+              <AnimatePresence initial={false}>
+                {recoOuvert && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.2, ease: "easeOut" }}
+                    className="overflow-hidden"
+                  >
+                    <ul className="flex flex-col gap-1 border-t border-border px-3 py-2">
+                      <AnimatePresence initial={false}>
+                        {selection.map((offreId, index) => (
+                          <motion.li
+                            key={offreId}
+                            layout
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.15 }}
+                            className="flex items-center gap-2 rounded-md px-1.5 py-1 text-xs transition-colors hover:bg-muted/50"
+                          >
+                            <span className="w-5 shrink-0 text-center font-bold tabular-nums text-muted-foreground">
+                              {index + 1}
+                            </span>
+                            <span className="min-w-0 flex-1 truncate">
+                              {titresOffres[offreId] ?? `${offreId.slice(0, 8)}…`}
+                            </span>
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              onClick={() => monterOffre(index)}
+                              disabled={index === 0}
+                              aria-label={`Monter « ${titresOffres[offreId] ?? "l'offre"} » d'une position`}
+                            >
+                              <ArrowUp className="size-3" aria-hidden />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              onClick={() => descendreOffre(index)}
+                              disabled={index === selection.length - 1}
+                              aria-label={`Descendre « ${titresOffres[offreId] ?? "l'offre"} » d'une position`}
+                            >
+                              <ArrowDown className="size-3" aria-hidden />
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              onClick={() => retirerOffre(offreId)}
+                              aria-label={`Retirer « ${titresOffres[offreId] ?? "l'offre"} » de la sélection`}
+                              className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                            >
+                              <X className="size-3" aria-hidden />
+                            </Button>
+                          </motion.li>
+                        ))}
+                      </AnimatePresence>
+                    </ul>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ─── Dialog Aperçu (iframe sandboxée — CSS email isolé) ─── */}
       <Dialog open={apercuOuvert} onOpenChange={(o) => !o && setApercuOuvert(false)}>
         <DialogContent className="sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Mail className="size-4" aria-hidden /> Aperçu du digest
             </DialogTitle>
-            <DialogDescription>
-              {apercu?.message ?? "Aperçu (non envoyé)"}
-            </DialogDescription>
+            <DialogDescription>{apercu?.message ?? "Aperçu (non envoyé)"}</DialogDescription>
           </DialogHeader>
-
-          {/* Bascule sélection / auto (doc v3 §9) */}
           <div className="flex items-center gap-1 rounded-lg border border-border p-1">
             {[
               { mode: MODE_APERCU.SELECTION, libelle: "Ma sélection", disabled: !selection.length },
@@ -336,7 +428,6 @@ const EnvoyerSelection = () => {
               </button>
             ))}
           </div>
-
           {apercuCharge ? (
             <div className="flex min-h-48 items-center justify-center" role="status">
               <Spinner className="size-5" />
@@ -351,8 +442,6 @@ const EnvoyerSelection = () => {
                 Objet : <strong className="text-foreground">{apercu.preview.subject_preview}</strong>
                 {" "}· {apercu.preview.offer_count} offre(s)
               </p>
-              {/* Iframe sandboxée : le CSS/HTML de l'email vit enfermé,
-                  aucune interférence avec l'interface admin (doc v3 §9). */}
               <iframe
                 title="Aperçu du rendu de l'email"
                 sandbox=""
@@ -368,7 +457,7 @@ const EnvoyerSelection = () => {
         </DialogContent>
       </Dialog>
 
-      {/* ── Dialog Confirmation (mise en file, jamais « envoyé ») ── */}
+      {/* ─── Dialog Confirmation (mise en file, jamais « envoyé ») ─── */}
       <Dialog open={confirmationOuverte} onOpenChange={setConfirmationOuverte}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -382,15 +471,12 @@ const EnvoyerSelection = () => {
             </DialogDescription>
           </DialogHeader>
           <ul className="max-h-32 overflow-y-auto rounded-lg border border-border p-2 text-xs text-muted-foreground">
-            {selection.map((offreId, i) => {
-              const offre = (offres ?? []).find((o) => o.id === offreId)
-              return (
-                <li key={offreId} className="flex gap-1.5">
-                  <span className="font-semibold text-foreground">{i + 1}.</span>
-                  {offre?.title ?? offreId.slice(0, 8) + "…"}
-                </li>
-              )
-            })}
+            {selection.map((offreId, i) => (
+              <li key={offreId} className="flex gap-1.5">
+                <span className="font-semibold text-foreground">{i + 1}.</span>
+                {titresOffres[offreId] ?? `${offreId.slice(0, 8)}…`}
+              </li>
+            ))}
           </ul>
           <DialogFooter>
             <Button variant="ghost" size="sm" onClick={() => setConfirmationOuverte(false)}>

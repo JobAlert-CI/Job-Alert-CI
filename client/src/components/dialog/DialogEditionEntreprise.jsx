@@ -1,5 +1,5 @@
-import { useState } from "react"
-import { Building2, Save } from "lucide-react"
+import { useEffect, useState } from "react"
+import { Building2, Save, TriangleAlert } from "lucide-react"
 import { useModifierEntreprise, messageErreurCompany } from "@/features/admin-entreprises.tools"
 import { useReferentialsQuery } from "@/lib/referentiels-query"
 import { useNotify } from "@/contexts/Notify.context"
@@ -15,20 +15,6 @@ import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog"
 
-/* ─────────────────────────────────────────────────────────────────────
-   Dialog d'édition d'une fiche entreprise.
-
-   Contrat PUT /companies/{id} (CompanyUpdate, TOUT optionnel — on
-   n'envoie que les champs soumis) : name, website_url, logo_url,
-   description, primary_filiere_id (UUID cette fois, pas un code —
-   cf. schemas/companies.py). Le slug/normalized_name sont recalculés
-   serveur si le nom change.
-
-   La clé `key={entreprise?.id}` au montage parent remonte l'état du
-   formulaire à chaque changement d'entreprise (pattern du repo, zéro
-   setState dans un effect).
-   ───────────────────────────────────────────────────────────────────── */
-
 const SELECT_VIDE = "__vide__"
 
 const DialogEditionEntreprise = ({ ouvert, entreprise, onFermer }) => {
@@ -36,8 +22,6 @@ const DialogEditionEntreprise = ({ ouvert, entreprise, onFermer }) => {
   const { data: referentiels } = useReferentialsQuery()
   const modifierMutation = useModifierEntreprise()
 
-  // Initialisation UNE fois : le parent passe key={entreprise?.id} →
-  // changement d'entreprise = remontage, pas de setState dans un effect.
   const [valeurs, setValeurs] = useState(() => ({
     name: entreprise?.name ?? "",
     website_url: entreprise?.website_url ?? "",
@@ -45,9 +29,13 @@ const DialogEditionEntreprise = ({ ouvert, entreprise, onFermer }) => {
     description: entreprise?.description ?? "",
     primary_filiere_id: entreprise?.primary_filiere_id ?? "",
   }))
+  const [logoErreur, setLogoErreur] = useState(false)
+
+  /* Nouvelle URL → nouvelle tentative de chargement. */
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => setLogoErreur(false), [valeurs.logo_url])
 
   const set = (champ) => (v) => setValeurs((prev) => ({ ...prev, [champ]: v }))
-
   const filieres = referentiels?.filieres ?? []
 
   const soumettre = async (e) => {
@@ -104,6 +92,7 @@ const DialogEditionEntreprise = ({ ouvert, entreprise, onFermer }) => {
             />
           </div>
 
+          {/* ─── Logo : saisie + aperçu dynamique ─── */}
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="ent-logo">Logo (URL)</Label>
             <Input
@@ -112,7 +101,32 @@ const DialogEditionEntreprise = ({ ouvert, entreprise, onFermer }) => {
               value={valeurs.logo_url}
               onChange={(e) => set("logo_url")(e.target.value)}
               placeholder="https://cdn…/logo.png"
+              aria-describedby="ent-logo-apercu"
             />
+            <div id="ent-logo-apercu" aria-live="polite">
+              {valeurs.logo_url.trim() && (
+                <div className="flex items-center gap-2 rounded-lg border border-border bg-muted/30 p-2">
+                  {logoErreur ? (
+                    <p className="flex items-center gap-1.5 text-xs text-destructive">
+                      <TriangleAlert className="size-3.5 shrink-0" aria-hidden />
+                      Impossible de charger cette image — vérifiez l'URL avant d'enregistrer.
+                    </p>
+                  ) : (
+                    <>
+                      <img
+                        key={valeurs.logo_url}
+                        src={valeurs.logo_url}
+                        alt={`Aperçu du logo de ${valeurs.name || "l'entreprise"}`}
+                        className="h-10 w-16 rounded border border-border bg-white object-contain p-0.5"
+                        onError={() => setLogoErreur(true)}
+                        onLoad={() => setLogoErreur(false)}
+                      />
+                      <span className="text-[10px] text-muted-foreground">Aperçu en direct</span>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="flex flex-col gap-1.5">

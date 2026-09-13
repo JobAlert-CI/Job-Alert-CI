@@ -1,23 +1,17 @@
-import { createContext, useContext, useMemo } from "react"
+import { createContext, useContext, useEffect, useMemo, useRef } from "react"
 import { useUrlFilters } from "@/hooks/use-url-filters"
 
 /* ─────────────────────────────────────────────────────────────────────
    Contexte de filtres de la page Logs & emails (cycle 17).
-
-   Trois onglets aux filtres serveur distincts, UN context pour toute la
-   page (les onglets partagent l'URL) :
-   - Événements : level, source_id ;
+   Trois onglets aux filtres serveur distincts, UN contexte pour toute
+   la page (les onglets partagent l'URL) :
+   - Événements : level, source_id, plage de dates ;
    - Contacts   : status (vocabulaire API : new|read|replied|archived|spam) ;
-   - Emails tx  : purpose (6 valeurs), status, recherche to_email (debouncée,
-     le hook de la page enveloppe setScalar BRUT — piège « q=query »).
-
-   Pagination : les 3 listes sont PLATES sans total → pages séparées par
-   onglet (page_events, page_contacts, page_emails) et heuristique
-   len == limit côté page, pattern PaginationListe.
-
-   Expose `onglet` pour que les compteurs/charts de chaque onglet
-   n'invalident que leurs clés.
-   ───────────────────────────────────────────────────────────────────── */
+   - Emails tx  : purpose (6 valeurs), status, recherche to_email
+     (debouncée, le hook de la page enveloppe setScalar BRUT).
+   Pagination : listes PLATES sans total → pages séparées par onglet
+   et heuristique len == limit côté page.
+───────────────────────────────────────────────────────────────────── */
 
 const TAILLE_PAGE_EVENTS = 50
 const TAILLE_PAGE_CONTACTS = 20
@@ -56,6 +50,36 @@ const _page = (valeur) => Math.max(1, parseInt(valeur, 10) || 1)
 export const FiltresLogsAdminProvider = ({ children }) => {
   const { valeurs, setScalar } = useUrlFilters(CONFIG_FILTRES_LOGS_ADMIN)
 
+  /* Reset RÉACTIF de la page de chaque onglet : dès que la signature de
+     ses filtres change, sa page revient à 1 — sans jamais doubler les
+     setScalar dans les setters. */
+  const signatureEvents = `${valeurs.niveau}|${valeurs.source}|${valeurs.debutEvents}|${valeurs.finEvents}`
+  const signatureContacts = valeurs.statutContact
+  const signatureEmails = `${valeurs.motif}|${valeurs.statutEmail}|${valeurs.recherche}`
+  const signaturesPrecedentes = useRef({
+    events: signatureEvents,
+    contacts: signatureContacts,
+    emails: signatureEmails,
+  })
+
+  useEffect(() => {
+    if (signaturesPrecedentes.current.events !== signatureEvents) {
+      signaturesPrecedentes.current.events = signatureEvents
+      if (valeurs.pageEvents !== "1") setScalar("page_events", "1")
+    }
+    if (signaturesPrecedentes.current.contacts !== signatureContacts) {
+      signaturesPrecedentes.current.contacts = signatureContacts
+      if (valeurs.pageContacts !== "1") setScalar("page_contacts", "1")
+    }
+    if (signaturesPrecedentes.current.emails !== signatureEmails) {
+      signaturesPrecedentes.current.emails = signatureEmails
+      if (valeurs.pageEmails !== "1") setScalar("page_emails", "1")
+    }
+  }, [
+    signatureEvents, signatureContacts, signatureEmails,
+    valeurs.pageEvents, valeurs.pageContacts, valeurs.pageEmails, setScalar,
+  ])
+
   const valeur = useMemo(
     () => ({
       onglet: ["events", "contacts", "emails"].includes(valeurs.onglet) ? valeurs.onglet : "events",
@@ -93,21 +117,32 @@ export const FiltresLogsAdminProvider = ({ children }) => {
         limit: TAILLE_PAGE_EMAILS,
         offset: (_page(valeurs.pageEmails) - 1) * TAILLE_PAGE_EMAILS,
       },
-      setScalar, // BRUT — la recherche debouncée le reçoit directement
+      setScalar, // BRUT — la recherche debouncée l'enveloppe côté page
+      /* UN seul setScalar par setter — la remise à 1 de la page est
+         gérée par l'effet réactif ci-dessus. */
       setOnglet: (v) => setScalar("onglet", v),
-      setNiveau: (v) => { setScalar("niveau", v); setScalar("page_events", "1") },
-      setSource: (v) => { setScalar("source", v); setScalar("page_events", "1") },
-      setDebutEvents: (v) => { setScalar("debut_events", v); setScalar("page_events", "1") },
-      setFinEvents: (v) => { setScalar("fin_events", v); setScalar("page_events", "1") },
-      setStatutContact: (v) => { setScalar("statut", v); setScalar("page_contacts", "1") },
-      setMotif: (v) => { setScalar("motif", v); setScalar("page_emails", "1") },
-      setStatutEmail: (v) => { setScalar("statut_email", v); setScalar("page_emails", "1") },
+      setNiveau: (v) => setScalar("niveau", v),
+      setSource: (v) => setScalar("source", v),
+      setDebutEvents: (v) => setScalar("debut_events", v),
+      setFinEvents: (v) => setScalar("fin_events", v),
+      setStatutContact: (v) => setScalar("statut", v),
+      setMotif: (v) => setScalar("motif", v),
+      setStatutEmail: (v) => setScalar("statut_email", v),
       setPageEvents: (v) => setScalar("page_events", v),
       setPageContacts: (v) => setScalar("page_contacts", v),
       setPageEmails: (v) => setScalar("page_emails", v),
-      reinitialiserEvents: () => { setScalar("niveau", ""); setScalar("source", ""); setScalar("debut_events", ""); setScalar("fin_events", ""); setScalar("page_events", "1") },
-      reinitialiserContacts: () => { setScalar("statut", ""); setScalar("page_contacts", "1") },
-      reinitialiserEmails: () => { setScalar("motif", ""); setScalar("statut_email", ""); setScalar("recherche", ""); setScalar("page_emails", "1") },
+      reinitialiserEvents: () => {
+        setScalar("niveau", "")
+        setScalar("source", "")
+        setScalar("debut_events", "")
+        setScalar("fin_events", "")
+      },
+      reinitialiserContacts: () => setScalar("statut", ""),
+      reinitialiserEmails: () => {
+        setScalar("motif", "")
+        setScalar("statut_email", "")
+        setScalar("recherche", "")
+      },
     }),
     [valeurs, setScalar]
   )

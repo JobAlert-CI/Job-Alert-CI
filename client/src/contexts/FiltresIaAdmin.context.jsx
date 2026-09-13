@@ -3,15 +3,11 @@ import { useUrlFilters } from "@/hooks/use-url-filters"
 
 /* ─────────────────────────────────────────────────────────────────────
    Contexte de filtres de la page Normalisation IA (cycle 19).
-
-   DEUX onglets (décision utilisateur : stats à part) :
-   - Pilotage : queue + run + jobs + clés + alertes + suggestions ;
-   - Statistiques : compteurs IA1-IA6 + charts C1-C5 (GET /stats).
-
-   L'onglet vit dans l'URL (pattern LogsPage cycle 17) pour un
-   atterrissage partageable. Pagination : listes plates sans total →
-   pages par liste (heuristique len == limit, pattern PaginationListe).
-   ───────────────────────────────────────────────────────────────────── */
+   Pagination : listes plates sans total → pages par liste
+   (heuristique len == limit, pattern PaginationListe).
+   ⚠️ setScalar/setScalars matchent sur la CLÉ du scalaire, jamais sur
+   le nom du param URL — sinon no-op silencieux (bug pagination).
+───────────────────────────────────────────────────────────────────── */
 
 const TAILLE_PAGE_JOBS = 20
 const TAILLE_PAGE_ALERTES = 20
@@ -43,11 +39,11 @@ export const useFiltresIaAdmin = () => {
 const _page = (valeur) => Math.max(1, parseInt(valeur, 10) || 1)
 
 export const FiltresIaAdminProvider = ({ children }) => {
-  const { valeurs, setScalar } = useUrlFilters(CONFIG_FILTRES_IA_ADMIN)
+  const { valeurs, setScalar, setScalars } = useUrlFilters(CONFIG_FILTRES_IA_ADMIN)
 
   const valeur = useMemo(
     () => ({
-      onglet: ["pilotage", "stats"].includes(valeurs.onglet) ? valeurs.onglet : "pilotage",
+      onglet: ["pilotage", "statistiques"].includes(valeurs.onglet) ? valeurs.onglet : "pilotage",
       severite: valeurs.severite,
       inclureAcquittees: valeurs.inclureAcquittees === "1",
       statutSuggestion: ["pending", "approved", "rejected"].includes(valeurs.statutSuggestion)
@@ -56,6 +52,7 @@ export const FiltresIaAdminProvider = ({ children }) => {
       pageJobs: _page(valeurs.pageJobs),
       pageAlertes: _page(valeurs.pageAlertes),
       pageSuggestions: _page(valeurs.pageSuggestions),
+
       paramsJobs: {
         limit: TAILLE_PAGE_JOBS,
         offset: (_page(valeurs.pageJobs) - 1) * TAILLE_PAGE_JOBS,
@@ -71,19 +68,24 @@ export const FiltresIaAdminProvider = ({ children }) => {
         limit: TAILLE_PAGE_SUGGESTIONS,
         offset: (_page(valeurs.pageSuggestions) - 1) * TAILLE_PAGE_SUGGESTIONS,
       },
-      setScalar, // BRUT (piège « q=query » documenté)
+
+      setScalar,   // BRUT (piège « q=query » documenté)
       setOnglet: (v) => setScalar("onglet", v),
-      setSeverite: (v) => { setScalar("severite", v); setScalar("page_alertes", "1") },
-      setInclureAcquittees: (v) => { setScalar("acquittees", v ? "1" : ""); setScalar("page_alertes", "1") },
-      setStatutSuggestion: (v) => { setScalar("statut_suggestion", v); setScalar("page_suggestions", "1") },
-      setPageJobs: (v) => setScalar("page_jobs", v),
-      setPageAlertes: (v) => setScalar("page_alertes", v),
-      setPageSuggestions: (v) => setScalar("page_suggestions", v),
-      reinitialiserAlertes: () => {
-        setScalar("severite", ""); setScalar("acquittees", ""); setScalar("page_alertes", "1")
-      },
+
+      /* Setters : on passe la CLÉ du scalaire. Les setters multi-params
+         utilisent setScalars (une seule écriture URL) pour éviter que le
+         second setSearchParams n'écrase le premier. */
+      setSeverite: (v) => setScalars({ severite: v, pageAlertes: "1" }),
+      setInclureAcquittees: (v) => setScalars({ inclureAcquittees: v ? "1" : "", pageAlertes: "1" }),
+      setStatutSuggestion: (v) => setScalars({ statutSuggestion: v, pageSuggestions: "1" }),
+
+      setPageJobs: (v) => setScalar("pageJobs", String(v)),
+      setPageAlertes: (v) => setScalar("pageAlertes", String(v)),
+      setPageSuggestions: (v) => setScalar("pageSuggestions", String(v)),
+
+      reinitialiserAlertes: () => setScalars({ severite: "", inclureAcquittees: "", pageAlertes: "1" }),
     }),
-    [valeurs, setScalar]
+    [valeurs, setScalar, setScalars]
   )
 
   return <FiltresIaContext.Provider value={valeur}>{children}</FiltresIaContext.Provider>

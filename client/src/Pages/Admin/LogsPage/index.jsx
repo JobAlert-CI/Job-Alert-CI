@@ -1,74 +1,128 @@
-import { ErrorBoundary } from "react-error-boundary"
-import { FileClock } from "lucide-react"
+import { AnimatePresence, motion } from "framer-motion"
+import { FileClock, Mail, MessageSquare, Terminal } from "lucide-react"
 import { useFiltresLogsAdmin, FiltresLogsAdminProvider } from "@/contexts/FiltresLogsAdmin.context"
-import AdminSectionFallback from "@/components/admin/AdminSectionFallback"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import OngletEvents from "./sections/OngletEvents"
 import OngletContacts from "./sections/OngletContacts"
 import OngletEmailsTx from "./sections/OngletEmailsTx"
+import HeroAdmin from "@/components/admin/HeroAdmin"
+import Bloc, { VARIANTS_PAGE, VARIANTS_PANNEAU } from "@/components/admin/Bloc"
+import { cn } from "@/lib/utils"
 
 /* ─────────────────────────────────────────────────────────────────────
    Page Logs & emails — /admin/logs (super_admin, doc v3 §17).
-
    Journal des erreurs & emails transactionnels, diagnostic technique
-   transverse : 3 onglets synchronisés à l'URL (param `onglet`) :
-   - Événements techniques (ingestion scraping, niveaux info/warning/error) ;
-   - Messages de contact (boîte de réception du site public, statuts
-     changés inline, spam assignable depuis le cycle 17) ;
-   - Emails transactionnels (6 motifs, recherche destinataire ilike,
-     badge « échecs aujourd'hui » — signal opérationnel Resend).
-
-   Chaque onglet porte ses compteurs + charts (sélection validée
-   cycle 17 : E1-E6, C1-C5, M1-M6) et son ErrorBoundary. Les listes
-   sont plates sans total → pagination heuristique honnête.
+   transverse : 3 onglets synchronisés à l'URL (param `onglet`).
+   Chaque onglet porte ses compteurs + charts, son TRI PAR EN-TÊTE
+   initialisé et son retour en haut du tableau au changement de page.
+   Refonte : repère visuel de défilement des onglets sur mobile
+   (fondu droit), transitions uniformes entre les vues.
    ───────────────────────────────────────────────────────────────────── */
+const ONGLETS = [
+  { valeur: "events", libelle: "Événements techniques", Icone: Terminal },
+  { valeur: "contacts", libelle: "Messages de contact", Icone: MessageSquare },
+  { valeur: "emails", libelle: "Emails transactionnels", Icone: Mail },
+]
 
 const LogsAdmin = () => {
   const { onglet, setOnglet } = useFiltresLogsAdmin()
-
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6">
+    <motion.div
+      variants={VARIANTS_PAGE}
+      initial="cache"
+      animate="visible"
+      className="mx-auto flex w-full max-w-6xl flex-col gap-6"
+    >
       {/* ─── En-tête ─── */}
-      <section aria-label="En-tête logs" className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="flex items-center gap-2 font-heading text-lg font-bold">
-            <FileClock className="size-5 text-primary" aria-hidden />
-            Journal des erreurs & emails transactionnels
-          </h1>
-          <p className="text-xs text-muted-foreground">
-            Diagnostic technique transverse — incidents de scraping, boîte de réception du site public et
-            suivi des emails transactionnels (inscriptions, désinscriptions).
-          </p>
-        </div>
-      </section>
+      <HeroAdmin
+        title="Journal des erreurs & emails transactionnels"
+        description="Diagnostic technique transverse — incidents de scraping, boîte de réception du site public et suivi des emails transactionnels (inscriptions, désinscriptions)."
+        icon={FileClock}
+        titleBdge="Contenu & sécurité"
+      />
 
       {/* ─── Onglets (synchronisés URL) ─── */}
-      <Tabs value={onglet} onValueChange={setOnglet}>
-        <TabsList>
-          <TabsTrigger value="events">Événements techniques</TabsTrigger>
-          <TabsTrigger value="contacts">Messages de contact</TabsTrigger>
-          <TabsTrigger value="emails">Emails transactionnels</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="events" className="mt-4">
-          <ErrorBoundary FallbackComponent={AdminSectionFallback}>
-            <OngletEvents />
-          </ErrorBoundary>
-        </TabsContent>
-
-        <TabsContent value="contacts" className="mt-4">
-          <ErrorBoundary FallbackComponent={AdminSectionFallback}>
-            <OngletContacts />
-          </ErrorBoundary>
-        </TabsContent>
-
-        <TabsContent value="emails" className="mt-4">
-          <ErrorBoundary FallbackComponent={AdminSectionFallback}>
-            <OngletEmailsTx />
-          </ErrorBoundary>
-        </TabsContent>
+      <Tabs value={onglet} onValueChange={setOnglet} className="mt-1 w-full">
+        <div className="relative">
+          <TabsList
+            className={cn(
+              "flex h-auto w-full justify-start gap-1 overflow-x-auto rounded-lg border border-border bg-muted/20 p-1",
+              "scrollbar-none [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+            )}
+          >
+            {ONGLETS.map(({ valeur, libelle, Icone }) => (
+              <TabsTrigger
+                key={valeur}
+                value={valeur}
+                className={cn(
+                  "gap-1.5 whitespace-nowrap rounded-md px-4 py-2 text-xs font-semibold transition-colors",
+                  onglet === valeur
+                    ? "bg-brand-orange text-brand-navy shadow-soft" /* navy sur orange : 6.3:1 AA */
+                    : "text-muted-foreground hover:bg-card hover:text-foreground"
+                )}
+              >
+                <Icone className="size-3.5" aria-hidden="true" />
+                {libelle}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+          {/* Repère de défilement mobile : fondu sur le bord droit,
+              indique que la barre d'onglets peut défiler. */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-y-0 right-0 w-10 rounded-r-lg bg-linear-to-l from-surface-container-lowest to-transparent lg:hidden"
+          />
+        </div>
+        <AnimatePresence mode="wait" initial={false}>
+          {onglet === "events" ? (
+            <motion.div
+              key="events"
+              role="tabpanel"
+              aria-label="Événements techniques"
+              variants={VARIANTS_PANNEAU}
+              initial="cache"
+              animate="visible"
+              exit="cache"
+              className="mt-4 flex flex-col gap-6"
+            >
+              <Bloc>
+                <OngletEvents />
+              </Bloc>
+            </motion.div>
+          ) : onglet === "contacts" ? (
+            <motion.div
+              key="contacts"
+              role="tabpanel"
+              aria-label="Messages de contact"
+              variants={VARIANTS_PANNEAU}
+              initial="cache"
+              animate="visible"
+              exit="cache"
+              className="mt-4 flex flex-col gap-6"
+            >
+              <Bloc>
+                <OngletContacts />
+              </Bloc>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="emails"
+              role="tabpanel"
+              aria-label="Emails transactionnels"
+              variants={VARIANTS_PANNEAU}
+              initial="cache"
+              animate="visible"
+              exit="cache"
+              className="mt-4 flex flex-col gap-6"
+            >
+              <Bloc>
+                <OngletEmailsTx />
+              </Bloc>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </Tabs>
-    </div>
+    </motion.div>
   )
 }
 

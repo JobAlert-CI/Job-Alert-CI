@@ -1,7 +1,7 @@
 import { useMemo } from "react"
 import { useJournalStatsQuery } from "@/features/admin-journal.tools"
-import { useFiltresJournalAdmin } from "@/contexts/FiltresJournalAdmin.context"
 import CarteCompteur from "@/components/admin/CarteCompteur"
+import { FileEdit, FilePlus2, LogIn, ScrollText, UserCheck } from "lucide-react"
 
 /* ─────────────────────────────────────────────────────────────────────
    Compteurs du Journal d'activité (cycle 16, sélection validée :
@@ -23,7 +23,6 @@ import CarteCompteur from "@/components/admin/CarteCompteur"
    ───────────────────────────────────────────────────────────────────── */
 
 const CompteursJournal = () => {
-  const { setAction } = useFiltresJournalAdmin()
   const { data: stats, isLoading } = useJournalStatsQuery(30)
 
   const valeurs = useMemo(() => {
@@ -39,32 +38,32 @@ const CompteursJournal = () => {
 
   return (
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-5">
-      <CarteCompteur label="Total (30 j)" valeur={valeurs.total} chargement={isLoading} />
-      <CarteCompteur label="Auteurs distincts" valeur={valeurs.auteurs} chargement={isLoading} />
-      <button
-        type="button"
-        onClick={() => setAction("connexion")}
-        className="text-left"
-        aria-label={`Voir les connexions (${valeurs.connexions})`}
-      >
-        <CarteCompteur label="Connexions (30 j)" valeur={valeurs.connexions} chargement={isLoading} />
-      </button>
-      <button
-        type="button"
-        onClick={() => setAction("modification")}
-        className="text-left"
-        aria-label={`Voir les modifications (${valeurs.modifications})`}
-      >
-        <CarteCompteur label="Modifications (30 j)" valeur={valeurs.modifications} chargement={isLoading} />
-      </button>
-      <button
-        type="button"
-        onClick={() => setAction("creation")}
-        className="text-left"
-        aria-label={`Voir les créations (${valeurs.creations})`}
-      >
-        <CarteCompteur label="Créations (30 j)" valeur={valeurs.creations} chargement={isLoading} />
-      </button>
+      <CarteCompteur label="Total (30 j)" valeur={valeurs.total} icone={ScrollText} chargement={isLoading} />
+      <CarteCompteur label="Auteurs distincts" valeur={valeurs.auteurs} icone={UserCheck} chargement={isLoading} />
+      <CarteCompteur
+        label="Connexions (30 j)"
+        valeur={valeurs.connexions}
+        icone={LogIn}
+        href="/admin/journal"
+        query="?action=connexion"
+        chargement={isLoading}
+      />
+      <CarteCompteur
+        label="Modifications (30 j)"
+        valeur={valeurs.modifications}
+        icone={FileEdit}
+        href="/admin/journal"
+        query="?action=modification"
+        chargement={isLoading}
+      />
+      <CarteCompteur
+        label="Créations (30 j)"
+        valeur={valeurs.creations}
+        icone={FilePlus2}
+        href="/admin/journal"
+        query="?action=creation"
+        chargement={isLoading}
+      />
     </div>
   )
 }
