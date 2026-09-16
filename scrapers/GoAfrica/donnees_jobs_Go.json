@@ -1,1 +1,607 @@
-[]
+[
+    {
+        "title": "Formateur(trice) / Expert(e) – Management d'Équipe et Leadership",
+        "source_url": "https://www.goafricaonline.com/ci/emploi/job-22222-formateurtrice-experte-management-d-equipe-et-leadership",
+        "canonical_url": "https://www.goafricaonline.com/ci/emploi/job-22222-formateurtrice-experte-management-d-equipe-et-leadership",
+        "location_raw": "Marcory, Abidjan - Côte d’Ivoire",
+        "salary_raw": null,
+        "published_at": "2026-09-14T00:00:00.000Z",
+        "collected_at": "2026-09-14T22:36:32.210Z",
+        "first_seen_at": "2026-09-14T22:36:32.210Z",
+        "last_seen_at": "2026-09-14T22:36:32.210Z",
+        "expires_at": null,
+        "application_deadline_at": null,
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": "Marcory",
+            "label": "Marcory, Abidjan - Côte d’Ivoire"
+        },
+        "contract_type": {
+            "code": "INTERIM",
+            "label": "Intérim / Freelance"
+        },
+        "experience_level": {
+            "code": "SENIOR",
+            "label": "+ de 7 ans d’expérience",
+            "min_years": 7,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_5",
+            "label": "BAC+5",
+            "rank": 5
+        },
+        "description": ". Missions et responsabilités ● Former aux fondamentaux du management d'équipe et aux styles de leadership situationnel. ● Enseigner les techniques de délégation, de fixation d'objectifs et de gestion de la performance. ● Former à la conduite du changement organisationnel et à la mobilisation des équipes. ● Renforcer les compétences en gestion des conflits et en cohésion d'équipe. ● Accompagner les managers dans l'évaluation de la performance et la motivation des collaborateurs. ● Former à la gestion du temps, des priorités et à la prise de décision managériale. Profil et compétences requises ● Bac+5 en management, gestion des ressources humaines ou domaine équivalent. ● Minimum 7 ans d'expérience en management d'équipe, dont une expérience de direction ou d'encadrement. ● Expérience confirmée en formation ou coaching de cadres dirigeants. ● Techniques de leadership, de management d'équipe et de gestion de la performance. ● Gestion des conflits, cohésion d'équipe et motivation des collaborateurs. ● Conduite du changement organisationnel. ● Excellentes capacités pédagogiques, rigueur et sens de l'écoute interculturelle. Spécificités liées au contexte de la Côte d'Ivoire ● Connaissance des dynamiques sociales et culturelles ivoiriennes influençant les pratiques managériales (rapport à la hiérarchie, dimension communautaire et intergénérationnelle). ● Capacité à manager des équipes mêlant personnel local et expatrié. ● Connaissance des enjeux managériaux propres au secteur public et aux grandes entreprises ivoiriennes. Livrables attendus et candidature Livrables : support de formation adapté au contexte ivoirien, outils d'évaluation des participants, rapport de mission avec recommandations. Dossier de candidature : CV détaillé, lettre de motivation, copies des diplômes/certifications, références professionnelles, exemple de support pédagogique le cas échéant. À transmettre selon les modalités de l'appel à candidatures publié par Trust Africa pour la Côte d'Ivoire",
+        "company": {
+            "name": "TRUST AFRICA CÔTE D'IVOIRE",
+            "website_url": "https://www.goafricaonline.com/ci/1197692-trust-africa-agences-recrutement-abidjan-cote-ivoire",
+            "type": "Emploi > Agences de recrutement",
+            "description": "Leader des solutions RH en Afrique de l’Ouest, TRUST AFRICA est présent en Guinée depuis 2016 et accompagne aujourd’hui plus de 450 entreprises dans leurs enjeux de recrutement et de développement des talents. Avec plus de 6 700 postes pourvus, notamment dans les secteurs des énergies renouvelables, bancaire, minier, industriel, nous proposons des solutions adaptées aux besoins de chaque organisation, à travers notamment le recrutement, la formation et l’accompagnement de projets RSE."
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": "Sans télétravail",
+        "raw_fields": {
+            "contract_raw": "Intérim / Freelance",
+            "experience_raw": "+ de 7 ans d’expérience",
+            "education_raw": "Bac+5 et plus",
+            "published_raw": "Posté le 14 septembre 2026",
+            "expires_raw": null
+        },
+        "télétravail": "Sans télétravail",
+        "is_télétravail": false,
+        "active": "2026-09-14T00:00:00.000Z"
+    },
+    {
+        "title": "Formateur(trice) / Expert(e) – Gestion de Projet (Méthodologie PRINCE2)",
+        "source_url": "https://www.goafricaonline.com/ci/emploi/job-22221-formateurtrice-experte-gestion-de-projet-methodologie-prince2",
+        "canonical_url": "https://www.goafricaonline.com/ci/emploi/job-22221-formateurtrice-experte-gestion-de-projet-methodologie-prince2",
+        "location_raw": "Marcory, Abidjan - Côte d’Ivoire",
+        "salary_raw": null,
+        "published_at": "2026-09-14T00:00:00.000Z",
+        "collected_at": "2026-09-14T22:36:42.496Z",
+        "first_seen_at": "2026-09-14T22:36:42.496Z",
+        "last_seen_at": "2026-09-14T22:36:42.496Z",
+        "expires_at": null,
+        "application_deadline_at": null,
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": "Marcory",
+            "label": "Marcory, Abidjan - Côte d’Ivoire"
+        },
+        "contract_type": {
+            "code": "INTERIM",
+            "label": "Freelance / Intérim"
+        },
+        "experience_level": {
+            "code": "SENIOR",
+            "label": "+ de 6 ans d’expérience",
+            "min_years": 6,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_5",
+            "label": "BAC+5",
+            "rank": 5
+        },
+        "description": "Missions et responsabilités ● Concevoir et animer un programme de formation structuré autour des principes, thèmes et processus PRINCE2. ● Former à l'élaboration des documents clés de gouvernance de projet (PID, rapports de fin d'étape, journal de risques). ● Organiser des sessions de préparation aux examens Foundation et Practitioner. ● Développer des études de cas adaptées au secteur public ivoirien et aux projets de coopération internationale. ● Accompagner l'articulation entre la méthodologie PRINCE2 et les procédures de marchés publics et de bailleurs. ● Assurer l'évaluation continue des participants et le suivi post-certification. Profil et compétences requises ● Bac+5 en gestion de projet ou domaine équivalent. ● Certification PRINCE2 Practitioner ; le statut de formateur accrédité PRINCE2 est un atout majeur. ● Minimum 6 ans d'expérience en gestion de projet, idéalement dans le secteur public ou les projets de développement. ● Maîtrise approfondie de la méthodologie PRINCE2 (principes, thèmes, processus). ● Maîtrise de la gouvernance et de la documentation de projet. ● Techniques pédagogiques de préparation aux certifications Foundation et Practitioner. ● Excellentes capacités pédagogiques, rigueur et sens de l'écoute interculturelle. Spécificités liées au contexte de la Côte d'Ivoire ● Connaissance du fonctionnement des administrations publiques ivoiriennes et de leurs procédures de gestion de projet. ● Maîtrise des procédures de marchés publics ivoiriens et de leur articulation avec la gouvernance de projet. ● Connaissance des exigences des principaux bailleurs de fonds présents en Côte d'Ivoire. Livrables attendus et candidature Livrables : support de formation adapté au contexte ivoirien, outils d'évaluation des participants, rapport de mission avec recommandations. Dossier de candidature : CV détaillé, lettre de motivation, copies des diplômes/certifications, références professionnelles, exemple de support pédagogique le cas échéant. À transmettre selon les modalités de l'appel à candidatures publié par Trust Africa pour la Côte d'Ivoire.",
+        "company": {
+            "name": "TRUST AFRICA CÔTE D'IVOIRE",
+            "website_url": "https://www.goafricaonline.com/ci/1197692-trust-africa-agences-recrutement-abidjan-cote-ivoire",
+            "type": "Emploi > Agences de recrutement",
+            "description": "Leader des solutions RH en Afrique de l’Ouest, TRUST AFRICA est présent en Guinée depuis 2016 et accompagne aujourd’hui plus de 450 entreprises dans leurs enjeux de recrutement et de développement des talents. Avec plus de 6 700 postes pourvus, notamment dans les secteurs des énergies renouvelables, bancaire, minier, industriel, nous proposons des solutions adaptées aux besoins de chaque organisation, à travers notamment le recrutement, la formation et l’accompagnement de projets RSE."
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": "Sans télétravail",
+        "raw_fields": {
+            "contract_raw": "Freelance / Intérim",
+            "experience_raw": "+ de 6 ans d’expérience",
+            "education_raw": "Bac+5 et plus",
+            "published_raw": "Posté le 14 septembre 2026",
+            "expires_raw": null
+        },
+        "télétravail": "Sans télétravail",
+        "is_télétravail": false,
+        "active": "2026-09-14T00:00:00.000Z"
+    },
+    {
+        "title": "Formateur(trice) / Expert(e) – Hygiène, Sécurité et Environnement (HSE)",
+        "source_url": "https://www.goafricaonline.com/ci/emploi/job-22219-formateurtrice-experte-hygiene-securite-et-environnement-hse",
+        "canonical_url": "https://www.goafricaonline.com/ci/emploi/job-22219-formateurtrice-experte-hygiene-securite-et-environnement-hse",
+        "location_raw": "Marcory, Abidjan - Côte d’Ivoire",
+        "salary_raw": null,
+        "published_at": "2026-09-14T00:00:00.000Z",
+        "collected_at": "2026-09-14T22:36:52.638Z",
+        "first_seen_at": "2026-09-14T22:36:52.638Z",
+        "last_seen_at": "2026-09-14T22:36:52.638Z",
+        "expires_at": null,
+        "application_deadline_at": null,
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": "Marcory",
+            "label": "Marcory, Abidjan - Côte d’Ivoire"
+        },
+        "contract_type": {
+            "code": "INTERIM",
+            "label": "Intérim / Freelance"
+        },
+        "experience_level": {
+            "code": "SENIOR",
+            "label": "+ de 7 ans d’expérience",
+            "min_years": 7,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_5",
+            "label": "BAC+5",
+            "rank": 5
+        },
+        "description": "Missions et responsabilités ● Former sur le cadre réglementaire ivoirien en matière d'environnement, d'hygiène et de sécurité au travail. ● Enseigner les méthodologies d'évaluation des risques professionnels et d'élaboration de plans de prévention. ● Former à la gestion des déchets industriels et à la protection environnementale des sites de production. ● Présenter les référentiels internationaux (ISO 45001, ISO 14001) et leur mise en œuvre pratique. ● Former à la gestion des situations d'urgence et des plans de continuité d'activité. ● Sensibiliser aux droits et obligations des employeurs et des travailleurs en matière de sécurité. Profil et compétences requises ● Bac+4/5 en HSE, environnement ou sécurité industrielle. ● Minimum 7 ans d'expérience professionnelle en gestion HSE, idéalement en milieu industriel ou minier. ● Certifications telles qu'ISO 45001 ou NEBOSH appréciées. ● Maîtrise du cadre réglementaire environnemental et social ivoirien. ● Méthodologies d'évaluation et de gestion des risques industriels. ● Connaissance des normes ISO 45001 (sécurité) et ISO 14001 (environnement). ● Excellentes capacités pédagogiques, rigueur et sens de l'écoute interculturelle ● Connaissance du rôle de l'Agence Nationale De l'Environnement (ANDE) et de la procédure d'étude d'impact environnemental et social (EIES). ● Maîtrise du régime CNPS relatif aux accidents du travail et aux maladies professionnelles. ● Connaissance des secteurs à risque prioritaires en Côte d'Ivoire : mines (or, manganèse), agro-industrie (huile de palme, caoutchouc, cacao), BTP. Livrables attendus et candidature Livrables : support de formation adapté au contexte ivoirien, outils d'évaluation des participants, rapport de mission avec recommandations. Dossier de candidature : CV détaillé, lettre de motivation, copies des diplômes/certifications, références professionnelles, exemple de support pédagogique le cas échéant. À transmettre selon les modalités de l'appel à candidatures publié par Trust Africa pour la Côte d'Ivoire.",
+        "company": {
+            "name": "TRUST AFRICA CÔTE D'IVOIRE",
+            "website_url": "https://www.goafricaonline.com/ci/1197692-trust-africa-agences-recrutement-abidjan-cote-ivoire",
+            "type": "Emploi > Agences de recrutement",
+            "description": "Leader des solutions RH en Afrique de l’Ouest, TRUST AFRICA est présent en Guinée depuis 2016 et accompagne aujourd’hui plus de 450 entreprises dans leurs enjeux de recrutement et de développement des talents. Avec plus de 6 700 postes pourvus, notamment dans les secteurs des énergies renouvelables, bancaire, minier, industriel, nous proposons des solutions adaptées aux besoins de chaque organisation, à travers notamment le recrutement, la formation et l’accompagnement de projets RSE."
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": "Sans télétravail",
+        "raw_fields": {
+            "contract_raw": "Intérim / Freelance",
+            "experience_raw": "+ de 7 ans d’expérience",
+            "education_raw": "Bac+5 et plus",
+            "published_raw": "Posté le 14 septembre 2026",
+            "expires_raw": null
+        },
+        "télétravail": "Sans télétravail",
+        "is_télétravail": false,
+        "active": "2026-09-14T00:00:00.000Z"
+    },
+    {
+        "title": "Formateur(trice) / Expert(e) – Gestion de Projet (Certification PMP)",
+        "source_url": "https://www.goafricaonline.com/ci/emploi/job-22220-formateurtrice-experte-gestion-de-projet-certification-pmp",
+        "canonical_url": "https://www.goafricaonline.com/ci/emploi/job-22220-formateurtrice-experte-gestion-de-projet-certification-pmp",
+        "location_raw": "Marcory, Abidjan - Côte d’Ivoire",
+        "salary_raw": null,
+        "published_at": "2026-09-14T00:00:00.000Z",
+        "collected_at": "2026-09-14T22:37:05.699Z",
+        "first_seen_at": "2026-09-14T22:37:05.699Z",
+        "last_seen_at": "2026-09-14T22:37:05.699Z",
+        "expires_at": null,
+        "application_deadline_at": null,
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": "Marcory",
+            "label": "Marcory, Abidjan - Côte d’Ivoire"
+        },
+        "contract_type": {
+            "code": "INTERIM",
+            "label": "Intérim / Freelance"
+        },
+        "experience_level": {
+            "code": "SENIOR",
+            "label": "+ de 8 ans d’expérience",
+            "min_years": 8,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_5",
+            "label": "BAC+5",
+            "rank": 5
+        },
+        "description": "Missions et responsabilités ● Concevoir et animer un programme de formation basé sur le référentiel PMBOK® Guide (dernière édition). ● Former sur les dix domaines de connaissance et les groupes de processus de la gestion de projet. ● Enseigner la gestion des risques, des coûts, des délais et de la qualité des projets. ● Présenter les approches agiles complémentaires (Scrum, Kanban) intégrées au référentiel PMI. ● Organiser des simulations d'examen et un accompagnement individualisé à la préparation de la certification. ● Développer des études de cas basées sur des projets structurants ivoiriens (infrastructures, énergie, agro-industrie Profil et compétences requises ● Bac+5 en gestion de projet, ingénierie ou domaine équivalent. ● Certification PMP active et à jour (PDU). ● Minimum 8 ans d'expérience en gestion de projets, dont une expérience significative en formation certifiante. ● Maîtrise approfondie du PMBOK® Guide et des processus de gestion de projet du PMI. ● Maîtrise d'outils de planification (MS Project, Primavera). ● Gestion des risques et du portefeuille de projets. ● Excellentes capacités pédagogiques, rigueur et sens de l'écoute interculturelle. Spécificités liées au contexte de la Côte d'Ivoire ● Connaissance des grands projets structurants ivoiriens (BTP, énergie, agro-industrie, transport). ● Maîtrise du cadre des marchés publics ivoiriens et de son articulation avec la gestion de projet. ● Connaissance des procédures des principaux bailleurs internationaux actifs en Côte d'Ivoire (Banque mondiale, BAD, AFD). Livrables attendus et candidature Livrables : support de formation adapté au contexte ivoirien, outils d'évaluation des participants, rapport de mission avec recommandations. Dossier de candidature : CV détaillé, lettre de motivation, copies des diplômes/certifications, références professionnelles, exemple de support pédagogique le cas échéant. À transmettre selon les modalités de l'appel à candidatures publié par Trust Africa pour la Côte d'Ivoire",
+        "company": {
+            "name": "TRUST AFRICA CÔTE D'IVOIRE",
+            "website_url": "https://www.goafricaonline.com/ci/1197692-trust-africa-agences-recrutement-abidjan-cote-ivoire",
+            "type": "Emploi > Agences de recrutement",
+            "description": "Leader des solutions RH en Afrique de l’Ouest, TRUST AFRICA est présent en Guinée depuis 2016 et accompagne aujourd’hui plus de 450 entreprises dans leurs enjeux de recrutement et de développement des talents. Avec plus de 6 700 postes pourvus, notamment dans les secteurs des énergies renouvelables, bancaire, minier, industriel, nous proposons des solutions adaptées aux besoins de chaque organisation, à travers notamment le recrutement, la formation et l’accompagnement de projets RSE."
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": "Sans télétravail",
+        "raw_fields": {
+            "contract_raw": "Intérim / Freelance",
+            "experience_raw": "+ de 8 ans d’expérience",
+            "education_raw": "Bac+5 et plus",
+            "published_raw": "Posté le 14 septembre 2026",
+            "expires_raw": null
+        },
+        "télétravail": "Sans télétravail",
+        "is_télétravail": false,
+        "active": "2026-09-14T00:00:00.000Z"
+    },
+    {
+        "title": "Formateur(trice) / Expert(e) – Direction Financière",
+        "source_url": "https://www.goafricaonline.com/ci/emploi/job-22217-formateurtrice-experte-direction-financiere",
+        "canonical_url": "https://www.goafricaonline.com/ci/emploi/job-22217-formateurtrice-experte-direction-financiere",
+        "location_raw": "Marcory, Abidjan - Côte d’Ivoire",
+        "salary_raw": null,
+        "published_at": "2026-09-14T00:00:00.000Z",
+        "collected_at": "2026-09-14T22:37:17.040Z",
+        "first_seen_at": "2026-09-14T22:37:17.040Z",
+        "last_seen_at": "2026-09-14T22:37:17.040Z",
+        "expires_at": null,
+        "application_deadline_at": null,
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": "Marcory",
+            "label": "Marcory, Abidjan - Côte d’Ivoire"
+        },
+        "contract_type": {
+            "code": "INTERIM",
+            "label": "Freelance / Intérim"
+        },
+        "experience_level": {
+            "code": "SENIOR",
+            "label": "+ de 10 ans d’expérience",
+            "min_years": 10,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_5",
+            "label": "BAC+5",
+            "rank": 5
+        },
+        "description": "● Former sur les normes comptables SYSCOHADA révisé et leur application pratique. ● Enseigner la gestion de la trésorerie et l'optimisation du besoin en fonds de roulement. ● Former au montage de dossiers de financement bancaire et d'introduction sur la BRVM. ● Présenter le cadre fiscal ivoirien applicable aux entreprises (impôt sur les sociétés, TVA, autres taxes). ● Former aux outils de contrôle de gestion et de reporting financier. ● Accompagner les participants dans l'élaboration de tableaux de bord financiers",
+        "company": {
+            "name": "TRUST AFRICA CÔTE D'IVOIRE",
+            "website_url": "https://www.goafricaonline.com/ci/1197692-trust-africa-agences-recrutement-abidjan-cote-ivoire",
+            "type": "Emploi > Agences de recrutement",
+            "description": "Leader des solutions RH en Afrique de l’Ouest, TRUST AFRICA est présent en Guinée depuis 2016 et accompagne aujourd’hui plus de 450 entreprises dans leurs enjeux de recrutement et de développement des talents. Avec plus de 6 700 postes pourvus, notamment dans les secteurs des énergies renouvelables, bancaire, minier, industriel, nous proposons des solutions adaptées aux besoins de chaque organisation, à travers notamment le recrutement, la formation et l’accompagnement de projets RSE."
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": "Sans télétravail",
+        "raw_fields": {
+            "contract_raw": "Freelance / Intérim",
+            "experience_raw": "+ de 10 ans d’expérience",
+            "education_raw": "Bac+5 et plus",
+            "published_raw": "Posté le 14 septembre 2026",
+            "expires_raw": null
+        },
+        "télétravail": "Sans télétravail",
+        "is_télétravail": false,
+        "active": "2026-09-14T00:00:00.000Z"
+    },
+    {
+        "title": "Formateur(trice) / Expert(e) – Executive Assistant / Assistanat de Direction",
+        "source_url": "https://www.goafricaonline.com/ci/emploi/job-22218-formateurtrice-experte-executive-assistant-assistanat-de-direction",
+        "canonical_url": "https://www.goafricaonline.com/ci/emploi/job-22218-formateurtrice-experte-executive-assistant-assistanat-de-direction",
+        "location_raw": "Marcory, Abidjan - Côte d’Ivoire",
+        "salary_raw": null,
+        "published_at": "2026-09-14T00:00:00.000Z",
+        "collected_at": "2026-09-14T22:37:29.734Z",
+        "first_seen_at": "2026-09-14T22:37:29.734Z",
+        "last_seen_at": "2026-09-14T22:37:29.734Z",
+        "expires_at": null,
+        "application_deadline_at": null,
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": "Marcory",
+            "label": "Marcory, Abidjan - Côte d’Ivoire"
+        },
+        "contract_type": {
+            "code": "INTERIM",
+            "label": "Intérim / Freelance"
+        },
+        "experience_level": {
+            "code": "SENIOR",
+            "label": "+ de 5 ans d’expérience",
+            "min_years": 5,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_4",
+            "label": "BAC+4",
+            "rank": 4
+        },
+        "description": "● Former à la gestion optimisée des agendas complexes et à l'organisation de réunions et de déplacements professionnels. ● Enseigner les techniques de rédaction administrative (courriers, comptes rendus, notes de synthèse). ● Former aux règles de protocole et d'accueil de personnalités et de délégations. ● Renforcer les compétences en communication interpersonnelle et interculturelle. ● Former à la gestion de la confidentialité et à l'éthique professionnelle. ● Présenter les outils bureautiques et collaboratifs modernes (suite Office, outils de visioconférence et de gestion de projet). ● Connaissance des codes protocolaires en usage dans l'administration publique et les institutions ivoiriennes, ainsi qu'auprès des autorités coutumières. ● Capacité à évoluer dans un environnement multiculturel (personnel local et expatrié). ● Connaissance des usages professionnels et du tissu des affaires ivoiriennes.",
+        "company": {
+            "name": "TRUST AFRICA CÔTE D'IVOIRE",
+            "website_url": "https://www.goafricaonline.com/ci/1197692-trust-africa-agences-recrutement-abidjan-cote-ivoire",
+            "type": "Emploi > Agences de recrutement",
+            "description": "Partenaire en solutions de recrutement Le recrutement est une étape clé dans le développement de toute entreprise. Nous vous accompagnons dans la recherche de talents, que ce soit pour des CDI, CDD, ou stages. Grâce à notre réseau de professionnels, notre base de CV qualifiés, et notre équipe experte du marché africain, nous identifions rapidement le profil idéal, dans tous les secteurs d’activité."
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": "Sans télétravail",
+        "raw_fields": {
+            "contract_raw": "Intérim / Freelance",
+            "experience_raw": "+ de 5 ans d’expérience",
+            "education_raw": "Bac+4",
+            "published_raw": "Posté le 14 septembre 2026",
+            "expires_raw": null
+        },
+        "télétravail": "Sans télétravail",
+        "is_télétravail": false,
+        "active": "2026-09-14T00:00:00.000Z"
+    },
+    {
+        "title": "Formateur(trice) / Expert(e) – Chef de Projet en Intelligence Artificielle",
+        "source_url": "https://www.goafricaonline.com/ci/emploi/job-22227-formateurtrice-experte-chef-de-projet-en-intelligence-artificielle",
+        "canonical_url": "https://www.goafricaonline.com/ci/emploi/job-22227-formateurtrice-experte-chef-de-projet-en-intelligence-artificielle",
+        "location_raw": "Marcory, Abidjan - Côte d’Ivoire",
+        "salary_raw": null,
+        "published_at": "2026-09-14T00:00:00.000Z",
+        "collected_at": "2026-09-14T22:37:41.715Z",
+        "first_seen_at": "2026-09-14T22:37:41.715Z",
+        "last_seen_at": "2026-09-14T22:37:41.715Z",
+        "expires_at": null,
+        "application_deadline_at": null,
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": "Marcory",
+            "label": "Marcory, Abidjan - Côte d’Ivoire"
+        },
+        "contract_type": {
+            "code": "INTERIM",
+            "label": "Intérim / Freelance"
+        },
+        "experience_level": {
+            "code": "SENIOR",
+            "label": "+ de 7 ans d’expérience",
+            "min_years": 7,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_5",
+            "label": "BAC+5",
+            "rank": 5
+        },
+        "description": "Missions et responsabilités ● Concevoir un curriculum de formation sur le cycle de vie des projets IA (cadrage, collecte et gouvernance des données, modélisation, déploiement, suivi de la performance). ● Animer des ateliers pratiques basés sur des cas d'usage sectoriels pertinents pour la Côte d'Ivoire (agriculture de précision, services financiers/mobile money, santé, administration publique). ● Former les participants aux méthodologies de gestion de projet agile appliquées à l'IA (Scrum, Kanban, CRISP-DM). ● Sensibiliser les participants aux enjeux d'éthique, de biais algorithmique et de gouvernance des données. ● Évaluer le niveau de maturité IA des organisations participantes et formuler des recommandations. ● Accompagner les équipes projets dans la structuration de leur feuille de route IA. Profil et compétences requises ● Bac+5 en informatique, data science, intelligence artificielle ou ingénierie, ou expérience équivalente. ● Minimum 7 ans d'expérience professionnelle, dont au moins 3 ans en pilotage de projets liés à l'IA ou à la donnée. ● Une certification en gestion de projet (PMP, PRINCE2, Agile/Scrum) est un atout. ● Machine learning et principes de MLOps. ● Gestion de projet (cadrage, planification, gestion des risques et des parties prenantes). ● Gouvernance et qualité des données. ● Excellentes capacités pédagogiques, rigueur et sens de l'écoute interculturelle. Spécificités liées au contexte de la Côte d'Ivoire ● Connaissance de la stratégie nationale de transformation numérique et du rôle des institutions telles que l'ARTCI (Autorité de Régulation des Télécommunications/TIC de Côte d'Ivoire). ● Maîtrise du cadre légal ivoirien de protection des données à caractère personnel (loi n°2013-450). ● Connaissance des priorités sectorielles nationales : agriculture (cacao, anacarde), services financiers digitaux, santé publique. Livrables attendus et candidature Livrables : support de formation adapté au contexte ivoirien, outils d'évaluation des participants, rapport de mission avec recommandations. Dossier de candidature : CV détaillé, lettre de motivation, copies des diplômes/certifications, références professionnelles, exemple de support pédagogique le cas échéant. À transmettre selon les modalités de l'appel à candidatures publié par Trust Africa pour la Côte d'Ivoire.",
+        "company": {
+            "name": "TRUST AFRICA CÔTE D'IVOIRE",
+            "website_url": "https://www.goafricaonline.com/ci/1197692-trust-africa-agences-recrutement-abidjan-cote-ivoire",
+            "type": "Emploi > Agences de recrutement",
+            "description": "TRUST AFRICA, qui poursuit aujourd’hui son développement avec une implantation à Abidjan est le leader des solutions RH en Afrique de l’Ouest et accompagne aujourd’hui plus de 450 entreprises dans leurs enjeux de recrutement et de développement des talents. Avec plus de 6 700 postes pourvus, notamment dans les secteurs bancaire, minier et industriel, nous proposons des solutions adaptées aux besoins de chaque organisation, à travers notamment le recrutement, la formation et l’accompagnement ..."
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": "Sans télétravail",
+        "raw_fields": {
+            "contract_raw": "Intérim / Freelance",
+            "experience_raw": "+ de 7 ans d’expérience",
+            "education_raw": "Bac+5 et plus",
+            "published_raw": "Posté le 14 septembre 2026",
+            "expires_raw": null
+        },
+        "télétravail": "Sans télétravail",
+        "is_télétravail": false,
+        "active": "2026-09-14T00:00:00.000Z"
+    },
+    {
+        "title": "Formateur(trice) / Expert(e) – Maintenance des Équipements Agricoles",
+        "source_url": "https://www.goafricaonline.com/ci/emploi/job-22224-formateurtrice-experte-maintenance-des-equipements-agricoles",
+        "canonical_url": "https://www.goafricaonline.com/ci/emploi/job-22224-formateurtrice-experte-maintenance-des-equipements-agricoles",
+        "location_raw": "Marcory, Abidjan - Côte d’Ivoire",
+        "salary_raw": null,
+        "published_at": "2026-09-14T00:00:00.000Z",
+        "collected_at": "2026-09-14T22:37:52.826Z",
+        "first_seen_at": "2026-09-14T22:37:52.826Z",
+        "last_seen_at": "2026-09-14T22:37:52.826Z",
+        "expires_at": null,
+        "application_deadline_at": null,
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": "Marcory",
+            "label": "Marcory, Abidjan - Côte d’Ivoire"
+        },
+        "contract_type": {
+            "code": "INTERIM",
+            "label": "Intérim / Freelance"
+        },
+        "experience_level": {
+            "code": "SENIOR",
+            "label": "+ de 5 ans d’expérience",
+            "min_years": 5,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_2",
+            "label": "BAC+2",
+            "rank": 2
+        },
+        "description": "Missions et responsabilités ● Former à la maintenance préventive et curative des équipements agricoles (tracteurs, décortiqueuses, matériel de transformation). ● Enseigner les techniques de diagnostic de pannes mécaniques, hydrauliques et électromécaniques. ● Former à la gestion des stocks de pièces détachées et à la planification de la maintenance (GMAO). ● Sensibiliser aux règles de sécurité au travail en milieu agricole et agro-industriel. ● Accompagner les coopératives et unités de transformation dans la structuration de leur fonction maintenance. ● Élaborer des supports pédagogiques et exercices pratiques adaptés au matériel utilisé localement Profil et compétences requises ● Bac+2/3 en mécanique, machinisme agricole ou maintenance industrielle. ● Minimum 5 ans d'expérience terrain en maintenance d'équipements agricoles ou agro-industriels. ● Bonne connaissance du matériel utilisé dans les filières agricoles ivoiriennes. ● Mécanique diesel et hydraulique appliquée aux équipements agricoles. ● Électromécanique et diagnostic de pannes. ● Gestion de la maintenance assistée par ordinateur (GMAO). ● Excellentes capacités pédagogiques, rigueur et sens de l'écoute interculturelle. Spécificités liées au contexte de la Côte d'Ivoire ● Connaissance des équipements spécifiques aux filières cacao, anacarde, hévéa et palmier à huile. ● Collaboration avec les structures d'appui agricole telles que l'ANADER (Agence Nationale d'Appui au Développement Rural) et le Conseil du Café-Cacao. ● Prise en compte des contraintes logistiques et climatiques propres aux zones rurales ivoiriennes. Livrables attendus et candidature Livrables : support de formation adapté au contexte ivoirien, outils d'évaluation des participants, rapport de mission avec recommandations. Dossier de candidature : CV détaillé, lettre de motivation, copies des diplômes/certifications, références professionnelles, exemple de support pédagogique le cas échéant. À transmettre selon les modalités de l'appel à candidatures publié par Trust Africa pour la Côte d'Ivoire.",
+        "company": {
+            "name": "TRUST AFRICA CÔTE D'IVOIRE",
+            "website_url": "https://www.goafricaonline.com/ci/1197692-trust-africa-agences-recrutement-abidjan-cote-ivoire",
+            "type": "Emploi > Agences de recrutement",
+            "description": "Leader des solutions RH en Afrique de l’Ouest, TRUST AFRICA est présent en Guinée depuis 2016 et accompagne aujourd’hui plus de 450 entreprises dans leurs enjeux de recrutement et de développement des talents. Avec plus de 6 700 postes pourvus, notamment dans les secteurs des énergies renouvelables, bancaire, minier, industriel, nous proposons des solutions adaptées aux besoins de chaque organisation, à travers notamment le recrutement, la formation et l’accompagnement de projets RSE."
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": "Sans télétravail",
+        "raw_fields": {
+            "contract_raw": "Intérim / Freelance",
+            "experience_raw": "+ de 5 ans d’expérience",
+            "education_raw": "Bac+2",
+            "published_raw": "Posté le 14 septembre 2026",
+            "expires_raw": null
+        },
+        "télétravail": "Sans télétravail",
+        "is_télétravail": false,
+        "active": "2026-09-14T00:00:00.000Z"
+    },
+    {
+        "title": "Formateur(trice) / Expert(e) – Mécanique Industrielle",
+        "source_url": "https://www.goafricaonline.com/ci/emploi/job-22226-formateurtrice-experte-mecanique-industrielle",
+        "canonical_url": "https://www.goafricaonline.com/ci/emploi/job-22226-formateurtrice-experte-mecanique-industrielle",
+        "location_raw": "Marcory, Abidjan - Côte d’Ivoire",
+        "salary_raw": null,
+        "published_at": "2026-09-14T00:00:00.000Z",
+        "collected_at": "2026-09-14T22:38:05.167Z",
+        "first_seen_at": "2026-09-14T22:38:05.167Z",
+        "last_seen_at": "2026-09-14T22:38:05.167Z",
+        "expires_at": null,
+        "application_deadline_at": null,
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": "Marcory",
+            "label": "Marcory, Abidjan - Côte d’Ivoire"
+        },
+        "contract_type": {
+            "code": "INTERIM",
+            "label": "Freelance / Intérim"
+        },
+        "experience_level": {
+            "code": "SENIOR",
+            "label": "+ de 5 ans d’expérience",
+            "min_years": 5,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_3",
+            "label": "BAC+3",
+            "rank": 3
+        },
+        "description": "● Former à la lecture de plans mécaniques et à l'analyse fonctionnelle des équipements industriels. ● Enseigner les techniques de maintenance préventive et curative des équipements mécaniques. ● Former aux systèmes hydrauliques et pneumatiques industriels. ● Présenter les techniques de base d'usinage et de soudure appliquées à la maintenance. ● Former à l'utilisation d'outils de gestion de la maintenance assistée par ordinateur (GMAO). ● Sensibiliser aux normes de sécurité industrielle et à la prévention des accidents du travail Profil et compétences requises ● Bac+2/3 en mécanique industrielle, maintenance industrielle ou domaine équivalent. ● Minimum 5 ans d'expérience professionnelle en maintenance mécanique industrielle. ● Bonne connaissance des normes de sécurité applicables en milieu industriel. ● Mécanique générale, hydraulique et pneumatique industrielle. ● Techniques de base d'usinage et de soudure. ● Gestion de la maintenance assistée par ordinateur (GMAO). ● Excellentes capacités pédagogiques, rigueur et sens de l'écoute interculturelle. Spécificités liées au contexte de la Côte d'Ivoire ● Connaissance des équipements utilisés dans les industries agroalimentaires (huileries, brasseries, cimenteries) et dans les zones industrielles ivoiriennes. ● Collaboration avec les dispositifs de prévention de la CNPS en matière de sécurité au travail. ● Prise en compte de la disponibilité locale des pièces détachées et des contraintes logistiques d'approvisionnement. Livrables attendus et candidature Livrables : support de formation adapté au contexte ivoirien, outils d'évaluation des participants, rapport de mission avec recommandations. Dossier de candidature : CV détaillé, lettre de motivation, copies des diplômes/certifications, références professionnelles, exemple de support pédagogique le cas échéant. À transmettre selon les modalités de l'appel à candidatures publié par Trust Africa pour la Côte d'Ivoire.",
+        "company": {
+            "name": "TRUST AFRICA CÔTE D'IVOIRE",
+            "website_url": "https://www.goafricaonline.com/ci/1197692-trust-africa-agences-recrutement-abidjan-cote-ivoire",
+            "type": "Emploi > Agences de recrutement",
+            "description": "TRUST AFRICA, qui poursuit aujourd’hui son développement avec une implantation à Abidjan. Leader des solutions RH en Afrique de l’Ouest, TRUST AFRICA est présent en Guinée depuis 2016 et accompagne aujourd’hui plus de 450 entreprises dans leurs enjeux de recrutement et de développement des talents. Avec plus de 6 700 postes pourvus, notamment dans les secteurs des énergies renouvelables, bancaire, minier, industriel, nous proposons des solutions adaptées aux besoins de chaque organisation, ..."
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": "Sans télétravail",
+        "raw_fields": {
+            "contract_raw": "Freelance / Intérim",
+            "experience_raw": "+ de 5 ans d’expérience",
+            "education_raw": "Bac+3",
+            "published_raw": "Posté le 14 septembre 2026",
+            "expires_raw": null
+        },
+        "télétravail": "Sans télétravail",
+        "is_télétravail": false,
+        "active": "2026-09-14T00:00:00.000Z"
+    },
+    {
+        "title": "Formateur(trice) / Expert(e) – Communication",
+        "source_url": "https://www.goafricaonline.com/ci/emploi/job-22223-formateurtrice-experte-communication",
+        "canonical_url": "https://www.goafricaonline.com/ci/emploi/job-22223-formateurtrice-experte-communication",
+        "location_raw": "Marcory, Abidjan - Côte d’Ivoire",
+        "salary_raw": null,
+        "published_at": "2026-09-14T00:00:00.000Z",
+        "collected_at": "2026-09-14T22:38:17.038Z",
+        "first_seen_at": "2026-09-14T22:38:17.038Z",
+        "last_seen_at": "2026-09-14T22:38:17.038Z",
+        "expires_at": null,
+        "application_deadline_at": null,
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": "Marcory",
+            "label": "Marcory, Abidjan - Côte d’Ivoire"
+        },
+        "contract_type": {
+            "code": "INTERIM",
+            "label": "Intérim / Freelance"
+        },
+        "experience_level": {
+            "code": "SENIOR",
+            "label": "+ de 7 ans d’expérience",
+            "min_years": 7,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_5",
+            "label": "BAC+5",
+            "rank": 5
+        },
+        "description": "Missions et responsabilités ● Former aux techniques de communication interpersonnelle et de négociation. ● Enseigner l'élaboration de stratégies de communication institutionnelle et de relations publiques. ● Former à la gestion de la communication de crise et à la protection de la réputation. ● Renforcer les compétences en prise de parole en public et en animation de réunions. ● Former à la communication digitale et à la gestion des réseaux sociaux institutionnels. ● Accompagner les participants dans la rédaction de supports de communication (communiqués, discours, rapports). Profil et compétences requises ● Bac+5 en communication, journalisme, sciences sociales ou domaine équivalent. ● Minimum 7 ans d'expérience en communication d'entreprise, relations publiques ou communication institutionnelle. ● Expérience confirmée en formation ou accompagnement de cadres et de porte-parole. ● Communication institutionnelle, relations publiques et relations presse. ● Gestion de la communication de crise et protection de la réputation. ● Communication digitale et gestion des réseaux sociaux. ● Excellentes capacités pédagogiques, rigueur et sens de l'écoute interculturelle. Spécificités liées au contexte de la Côte d'Ivoire ● Connaissance du paysage médiatique ivoirien (presse écrite, radio, télévision, réseaux sociaux) et de ses spécificités. ● Maîtrise de la communication interculturelle adaptée à la diversité linguistique et sociale de la Côte d'Ivoire. ● Connaissance des enjeux de communication propres au secteur public et aux grandes entreprises ivoiriennes. Livrables attendus et candidature Livrables : support de formation adapté au contexte ivoirien, outils d'évaluation des participants, rapport de mission avec recommandations. Dossier de candidature : CV détaillé, lettre de motivation, copies des diplômes/certifications, références professionnelles, exemple de support pédagogique le cas échéant. À transmettre selon les modalités de l'appel à candidatures publié par Trust Africa pour la Côte d'Ivoire.",
+        "company": {
+            "name": "TRUST AFRICA CÔTE D'IVOIRE",
+            "website_url": "https://www.goafricaonline.com/ci/1197692-trust-africa-agences-recrutement-abidjan-cote-ivoire",
+            "type": "Emploi > Agences de recrutement",
+            "description": "Leader des solutions RH en Afrique de l’Ouest, TRUST AFRICA est présent en Guinée depuis 2016 et accompagne aujourd’hui plus de 450 entreprises dans leurs enjeux de recrutement et de développement des talents. Avec plus de 6 700 postes pourvus, notamment dans les secteurs des énergies renouvelables, bancaire, minier, industriel, nous proposons des solutions adaptées aux besoins de chaque organisation, à travers notamment le recrutement, la formation et l’accompagnement de projets RSE."
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": "Sans télétravail",
+        "raw_fields": {
+            "contract_raw": "Intérim / Freelance",
+            "experience_raw": "+ de 7 ans d’expérience",
+            "education_raw": "Bac+5 et plus",
+            "published_raw": "Posté le 14 septembre 2026",
+            "expires_raw": null
+        },
+        "télétravail": "Sans télétravail",
+        "is_télétravail": false,
+        "active": "2026-09-14T00:00:00.000Z"
+    },
+    {
+        "title": "Formateur(trice) / Expert(e) – Cloud Computing",
+        "source_url": "https://www.goafricaonline.com/ci/emploi/job-22225-formateurtrice-experte-cloud-computing",
+        "canonical_url": "https://www.goafricaonline.com/ci/emploi/job-22225-formateurtrice-experte-cloud-computing",
+        "location_raw": "Marcory, Abidjan - Côte d’Ivoire",
+        "salary_raw": null,
+        "published_at": "2026-09-14T00:00:00.000Z",
+        "collected_at": "2026-09-14T22:38:28.358Z",
+        "first_seen_at": "2026-09-14T22:38:28.358Z",
+        "last_seen_at": "2026-09-14T22:38:28.358Z",
+        "expires_at": null,
+        "application_deadline_at": null,
+        "location": {
+            "country_code": "CI",
+            "city": "Abidjan",
+            "district": "Marcory",
+            "label": "Marcory, Abidjan - Côte d’Ivoire"
+        },
+        "contract_type": {
+            "code": "INTERIM",
+            "label": "Intérim / Freelance"
+        },
+        "experience_level": {
+            "code": "SENIOR",
+            "label": "+ de 6 ans d’expérience",
+            "min_years": 6,
+            "max_years": null
+        },
+        "education_level": {
+            "code": "BAC_PLUS_5",
+            "label": "BAC+5",
+            "rank": 5
+        },
+        "description": "Missions et responsabilités ● Former aux architectures cloud (IaaS, PaaS, SaaS) et à leurs cas d'usage. ● Enseigner les méthodologies de migration d'infrastructures on-premise vers le cloud. ● Former à la sécurité des environnements cloud et à la gestion des accès. ● Présenter les solutions hybrides adaptées aux contraintes locales de connectivité. ● Sensibiliser à la gestion des coûts et à l'optimisation des ressources cloud. ● Présenter les principes DevOps et d'automatisation associés aux environnements cloud. Profil et compétences requises ● Bac+5 en informatique, réseaux ou systèmes d'information. ● Certifications cloud (AWS, Microsoft Azure ou Google Cloud) souhaitées. ● Minimum 6 ans d'expérience en administration ou architecture de systèmes d'information. ● Architectures cloud (IaaS/PaaS/SaaS) et virtualisation. ● Sécurité des environnements cloud et gestion des identités et accès. ● Gestion de la continuité d'activité et des sauvegardes. ● Excellentes capacités pédagogiques, rigueur et sens de l'écoute interculturelle. Spécificités liées au contexte de la Côte d'Ivoire ● Prise en compte des contraintes de connectivité internet et du coût de la bande passante en Côte d'Ivoire. ● Connaissance de l'émergence des data centers locaux et des offres des opérateurs de télécommunications nationaux. ● Connaissance du cadre réglementaire de l'ARTCI relatif à l'hébergement et à la localisation des données. Livrables attendus et candidature Livrables : support de formation adapté au contexte ivoirien, outils d'évaluation des participants, rapport de mission avec recommandations. Dossier de candidature : CV détaillé, lettre de motivation, copies des diplômes/certifications, références professionnelles, exemple de support pédagogique le cas échéant. À transmettre selon les modalités de l'appel à candidatures publié par Trust Africa pour la Côte d'Ivoire.",
+        "company": {
+            "name": "TRUST AFRICA CÔTE D'IVOIRE",
+            "website_url": "https://www.goafricaonline.com/ci/1197692-trust-africa-agences-recrutement-abidjan-cote-ivoire",
+            "type": "Emploi > Agences de recrutement",
+            "description": "Leader des solutions RH en Afrique de l’Ouest, TRUST AFRICA est présent en Guinée depuis 2016 et accompagne aujourd’hui plus de 450 entreprises dans leurs enjeux de recrutement et de développement des talents. Avec plus de 6 700 postes pourvus, notamment dans les secteurs des énergies renouvelables, bancaire, minier, industriel, nous proposons des solutions adaptées aux besoins de chaque organisation, à travers notamment le recrutement, la formation et l’accompagnement de projets RSE."
+        },
+        "company_hint": null,
+        "application_email": null,
+        "application_emails": [],
+        "remote_work": "Sans télétravail",
+        "raw_fields": {
+            "contract_raw": "Intérim / Freelance",
+            "experience_raw": "+ de 6 ans d’expérience",
+            "education_raw": "Bac+5 et plus",
+            "published_raw": "Posté le 14 septembre 2026",
+            "expires_raw": null
+        },
+        "télétravail": "Sans télétravail",
+        "is_télétravail": false,
+        "active": "2026-09-14T00:00:00.000Z"
+    }
+]

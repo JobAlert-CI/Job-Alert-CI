@@ -88,16 +88,10 @@ task_routes = {
     "tasks.scrapers.run_source_scraper": {"queue": "ingestion"},
     "tasks.scrapers.run_active_scrapers": {"queue": "ingestion"},
     "tasks.maintenance.requalify_stale_runs": {"queue": "ingestion"},
-    # Audit 4, lot 4 (F.1-F.4) : les 3 tasks maintenance ci-dessous etaient
-    # absentes de task_routes — un .delay() manuel partait sur la queue par
-    # defaut "celery", jamais consommee par les workers du projet (le beat
-    # les contourne via options.queue, mais pas les appels directs).
     "tasks.maintenance.purge_expired_refresh_tokens": {"queue": "emails"},
     "tasks.maintenance.flush_offer_metrics": {"queue": "emails"},
     "tasks.maintenance.purge_ai_alerts": {"queue": "emails"},
-    # Audit 4, lot 5 (A.3) : purge des evenements d'ingestion (2 vitesses).
     "tasks.maintenance.purge_ingestion_events": {"queue": "ingestion"},
-    # Audit 4, lot 6 (G.1) : purge du journal des evenements systeme (90 j).
     "tasks.maintenance.purge_system_events": {"queue": "emails"},
     "tasks.digests.prepare_daily_digests": {"queue": "emails"},
     "tasks.digests.build_and_queue_digest": {"queue": "emails"},

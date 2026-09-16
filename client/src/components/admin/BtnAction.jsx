@@ -75,6 +75,7 @@ const VARIANTS = {
  * @param {boolean} props.pleineLargeur
  * @param {boolean} props.asChild
  * @param {function} props.onClick
+ * @param {string} props.className
  */
 
 const BtnAction = forwardRef(
@@ -108,7 +109,7 @@ const BtnAction = forwardRef(
         aria-busy={chargement || undefined}
         className={cn(
           "group inline-flex cursor-pointer select-none items-center justify-center whitespace-nowrap font-bold rounded-md!",
-          "transition-all duration-300 ease-out",
+          "transition-all duration-300 ease-out [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
           "motion-reduce:transform-none motion-reduce:transition-none",
           TAILLES[size] ?? TAILLES.md,
           VARIANTS[variant] ?? VARIANTS.primary,

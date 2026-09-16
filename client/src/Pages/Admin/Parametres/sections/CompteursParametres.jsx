@@ -2,18 +2,11 @@ import { useMemo } from "react"
 import { FileEdit, History, Settings2, UserCog, Users } from "lucide-react"
 import CarteCompteur from "@/components/admin/CarteCompteur"
 import { useParametresQuery } from "@/features/admin-parametres.tools"
+import { SectionErreur, TransitionEtat } from "@/components/admin/EtatsSection"
 
-/* ─────────────────────────────────────────────────────────────────────
-   Compteurs de la page Paramètres (cycle 18, doc v3 §18).
-   Refonte :
-   • La borne « 30 derniers jours » est recalculée DANS le useMemo, à
-     chaque dérivation : un onglet laissé ouvert plusieurs jours ne
-     travaille plus avec une fenêtre obsolète (l'ancienne constante
-     module IL_Y_A_30J était figée au chargement du bundle).
-   • État de chargement propagé aux cartes (skeleton fidèle).
-   ───────────────────────────────────────────────────────────────────── */
+
 const CompteursParametres = () => {
-  const { data: parametres, isLoading } = useParametresQuery()
+  const { data: parametres, isError, refetch } = useParametresQuery()
 
   const valeurs = useMemo(() => {
     const liste = parametres ?? []
@@ -38,30 +31,37 @@ const CompteursParametres = () => {
       " " + d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })
   }, [valeurs.derniere])
 
+  const etat = isError ? "erreur" : "donnees"
+
   return (
-    <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-      <CarteCompteur label="Total paramètres" valeur={valeurs.total} icone={Settings2} chargement={isLoading} />
-      <CarteCompteur label="Modifiés par un admin" valeur={valeurs.modifiesParAdmin} icone={UserCog} chargement={isLoading} />
-      <CarteCompteur label="Modifiés (30 j)" valeur={valeurs.fenetre30j} icone={FileEdit} chargement={isLoading} />
-      <CarteCompteur
-        label="Dernière modification"
-        texte={dateDerniere}
-        icone={History}
-        chargement={isLoading}
-        description={
-          valeurs.derniere && (
-            <span className="flex items-center gap-1 truncate text-[10px] text-muted-foreground">
-              {valeurs.derniere.updated_by_admin_id ? (
-                <><UserCog className="size-3 shrink-0" aria-hidden /> par un administrateur</>
-              ) : (
-                <><Users className="size-3 shrink-0" aria-hidden /> par le seed (aucun admin)</>
-              )}
-              <span className="truncate font-mono">· {valeurs.derniere.key}</span>
-            </span>
-          )
-        }
-      />
-    </div>
+    <TransitionEtat etat={etat} >
+      {isError ? (
+        <SectionErreur onRetry={refetch} message="Impossible de charger les paramètres." />
+      ) : (
+        <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+          <CarteCompteur label="Total paramètres" valeur={valeurs.total} icone={Settings2} />
+          <CarteCompteur label="Modifiés par un admin" valeur={valeurs.modifiesParAdmin} icone={UserCog} />
+          <CarteCompteur label="Modifiés (30 j)" valeur={valeurs.fenetre30j} icone={FileEdit} />
+          <CarteCompteur
+            label="Dernière modification"
+            texte={dateDerniere}
+            icone={History}
+            description={
+              valeurs.derniere && (
+                <span className="flex items-center gap-1 truncate text-[10px] text-muted-foreground">
+                  {valeurs.derniere.updated_by_admin_id ? (
+                    <><UserCog className="size-3 shrink-0" aria-hidden /> par un administrateur</>
+                  ) : (
+                    <><Users className="size-3 shrink-0" aria-hidden /> par le seed (aucun admin)</>
+                  )}
+                  <span className="truncate font-mono">· {valeurs.derniere.key}</span>
+                </span>
+              )
+            }
+          />
+        </div>
+      )}
+    </TransitionEtat>
   )
 }
 

@@ -2,27 +2,11 @@ import { useMemo } from "react"
 import { useAdminAdministrateursQuery } from "@/features/admin-administrateurs.tools"
 import CarteCompteur from "@/components/admin/CarteCompteur"
 import { Clock, Crown, LogIn, UserCheck, UserX } from "lucide-react"
+import { SectionErreur, TransitionEtat } from "@/components/admin/EtatsSection"
 
-/* ─────────────────────────────────────────────────────────────────────
-   Compteurs de la page Administrateurs (cycle 15, sélection validée
-   par l'utilisateur : 2-3-4-5-6).
-   Tous DÉRIVÉS de la liste chargée — zéro appel réseau en plus
-   (pattern Sources). Les valeurs sont des compteurs de PAGE : si plus
-   d'admins existent que la page n'en montre, les filtres restent le
-   chemin vers les chiffres globaux (chips cliquables).
-   ⚠️ « Connectés (7 j) » : last_login_at dans les 7 derniers jours.
 
-   Refonte :
-   • Un seul passage sur la liste (reduce) au lieu de cinq filter
-     successifs — O(N) au lieu de O(5N).
-   • La borne « 7 derniers jours » est recalculée DANS le useMemo, à
-     chaque dérivation : une page laissée ouverte plusieurs jours ne
-     travaille plus avec une fenêtre obsolète (l'ancienne constante
-     module IL_Y_A_7J était figée au chargement du bundle). Précision
-     amplement suffisante : un rechargement de page rafraîchit aussi.
-   ───────────────────────────────────────────────────────────────────── */
 const CompteursAdministrateurs = () => {
-  const { data: admins, isLoading } = useAdminAdministrateursQuery()
+  const { data: admins, isError, refetch } = useAdminAdministrateursQuery()
 
   const c = useMemo(() => {
     const liste = admins ?? []
@@ -46,35 +30,41 @@ const CompteursAdministrateurs = () => {
   }, [admins])
 
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-5">
-      <CarteCompteur
-        label="Actifs"
-        valeur={c.actifs}
-        suffixe={`/${c.total}`}
-        icone={UserCheck}
-        href="/admin/administrateurs"
-        query="?actif=actifs"
-        chargement={isLoading}
-      />
-      <CarteCompteur
-        label="Super admins"
-        valeur={c.superAdmins}
-        icone={Crown}
-        href="/admin/administrateurs"
-        query="?role=super_admin"
-        chargement={isLoading}
-      />
-      <CarteCompteur label="Jamais connectés" valeur={c.jamaisConnectes} icone={UserX} chargement={isLoading} />
-      <CarteCompteur
-        label="Inactifs"
-        valeur={c.inactifs}
-        icone={Clock}
-        href="/admin/administrateurs"
-        query="?actif=inactifs"
-        chargement={isLoading}
-      />
-      <CarteCompteur label="Connectés (7 j)" valeur={c.connectes7j} icone={LogIn} chargement={isLoading} />
-    </div>
+    <TransitionEtat etat={isError ? "erreur" : "donnees"} >
+      {isError ? (
+        <SectionErreur onRetry={refetch} message="Impossible de charger les administrateurs." />
+      ) : (
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-6 xl:grid-cols-5">
+          <CarteCompteur
+            label="Actifs"
+            valeur={c.actifs}
+            suffixe={`/${c.total}`}
+            icone={UserCheck}
+            href="/admin/administrateurs"
+            query="?actif=actifs"
+            className="sm:col-span-2 xl:col-span-1"
+          />
+          <CarteCompteur
+            label="Super admins"
+            valeur={c.superAdmins}
+            icone={Crown}
+            href="/admin/administrateurs"
+            query="?role=super_admin"
+            className="sm:col-span-2 xl:col-span-1"
+          />
+          <CarteCompteur label="Jamais connectés" valeur={c.jamaisConnectes} icone={UserX} className="sm:col-span-2 xl:col-span-1" />
+          <CarteCompteur
+            label="Inactifs"
+            valeur={c.inactifs}
+            icone={Clock}
+            href="/admin/administrateurs"
+            query="?actif=inactifs"
+            className="sm:col-span-3 xl:col-span-1"
+          />
+          <CarteCompteur label="Connectés (7 j)" valeur={c.connectes7j} icone={LogIn} className="col-span-2 sm:col-span-3 xl:col-span-1" />
+        </div>
+      )}
+    </TransitionEtat>
   )
 }
 

@@ -17,7 +17,7 @@ import {
 import {
   Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,
 } from "@/components/ui/tooltip"
-import CompteurCaracteres from "@/Pages/Admin/Scraping/components/CompteurCaracteres"
+import CompteurCaracteres from "@/components/shared/CompteurCaracteres"
 
 
 const MAX_NOTES = 1000

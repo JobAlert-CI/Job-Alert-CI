@@ -6,7 +6,7 @@ import {
 import { useAdminTierStatsQuery, TIER_LABELS, etatQualiteMatching, usePeutVoirEnvois } from "@/features/admin-matching.tools"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
-import { SectionErreur, SectionVide } from "../components/EtatsSection"
+import { SectionErreur, SectionVide } from "../../../../components/admin/EtatsSection"
 import SectionCardAdmin from "@/components/admin/SectionCardAdmin"
 
 /* ─────────────────────────────────────────────────────────────────────
@@ -34,19 +34,108 @@ const ETATS_WIDGET = {
 
 const formatNombre = (v) => (Number(v) || 0).toLocaleString("fr-FR")
 
-const TooltipPerso = ({ active, payload, label }) => {
+const TooltipMatching = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null
+
   return (
-    <div className="rounded-lg border border-border bg-popover px-2.5 py-1.5 text-xs shadow-md">
-      <p className="font-semibold">{label}</p>
-      {payload.map((p) => (
-        <p key={p.dataKey} className="text-muted-foreground">
-          {TIER_LABELS[p.dataKey] ?? p.dataKey} : {formatNombre(p.value)}
-        </p>
-      ))}
+    <div className="flex flex-col gap-3 rounded-xl border border-border bg-popover p-3.5 text-sm shadow-lg min-w-50">
+      {/* En-tête (Titre du tooltip) séparé par une bordure discrète */}
+      <div className="font-semibold text-foreground border-b border-border/40 pb-2">
+        {label}
+      </div>
+
+      {/* Liste des données */}
+      <div className="flex flex-col gap-2">
+        {payload.map((p) => (
+          <div 
+            key={p.dataKey} 
+            className="flex items-center justify-between gap-8"
+          >
+            {/* Gauche : Pastille de couleur + Libellé */}
+            <div className="flex items-center gap-2">
+              <div 
+                className="h-2 w-2 rounded-full shrink-0 shadow-sm" 
+                style={{ 
+                  backgroundColor: p.color || p.fill || p.stroke || "currentColor" 
+                }} 
+              />
+              <span className="text-muted-foreground">
+                {TIER_LABELS[p.dataKey] ?? p.dataKey}
+              </span>
+            </div>
+
+            {/* Droite : Valeur formatée */}
+            <span className="font-medium text-foreground tabular-nums">
+              {formatNombre(p.value)}
+            </span>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
+
+
+const SEGMENTS_BARRES = [
+  [62, 18, 6, 2],
+  [48, 22, 8, 3],
+  [70, 14, 4, 2],
+  [40, 26, 10, 4],
+  [58, 20, 7, 2],
+  [34, 16, 5, 2],
+  [66, 12, 5, 3],
+];
+
+/**
+ * État de chargement du BarChart empilé de qualité du matching.
+ * `height` doit correspondre à la hauteur du ResponsiveContainer réel
+ * pour éviter tout layout shift.
+ */
+const ChartMatchingSkeleton = ({ height = 220 }) => (
+  <div
+    role="status"
+    aria-label="Chargement du graphique de qualité du matching"
+    className="flex w-full gap-2"
+    style={{ height }}
+  >
+    {/* Axe Y : 3 graduations fictives */}
+    <div className="flex w-6 flex-col justify-between py-1" aria-hidden="true">
+      {[0, 1, 2].map((i) => (
+        <Skeleton key={i} className="h-2 w-full rounded-sm" />
+      ))}
+    </div>
+
+    {/* Zone du graphique */}
+    <div className="flex flex-1 flex-col">
+      {/* Barres empilées, alignées en bas comme le BarChart réel */}
+      <div className="flex flex-1 items-end gap-3 border-b border-border pb-px">
+        {SEGMENTS_BARRES.map((segments, i) => (
+          <div key={i} className="flex h-full flex-1 flex-col justify-end gap-px">
+            {/* Rendu haut → bas : on inverse l'ordre des segments */}
+            {[...segments].reverse().map((h, k) => (
+              <Skeleton
+                key={k}
+                className="w-full"
+                style={{
+                  height: `${h}%`,
+                  animationDelay: `${i * 70 + k * 30}ms`,
+                }}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
+
+      {/* Libellés de l'axe X (dates) */}
+      <div className="mt-2 flex gap-3" aria-hidden="true">
+        {SEGMENTS_BARRES.map((_, i) => (
+          <Skeleton key={i} className="h-2 flex-1 rounded-sm" />
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
 
 const QualiteMatching = () => {
   const autorise = usePeutVoirEnvois()
@@ -82,7 +171,7 @@ const QualiteMatching = () => {
       ) : isError ? (
         <SectionErreur onRetry={refetch} message="Impossible de charger la qualité du matching." />
       ) : isLoading ? (
-        <Skeleton className="h-48 w-full" />
+        <ChartMatchingSkeleton />
       ) : !parJour.length ? (
         <SectionVide message="Aucun digest envoyé sur les 7 derniers jours." />
       ) : (
@@ -99,7 +188,7 @@ const QualiteMatching = () => {
                   tickLine={false}
                 />
                 <YAxis tick={{ fontSize: 10 }} axisLine={false} tickLine={false} allowDecimals={false} />
-                <Tooltip content={<TooltipPerso />} cursor={{ fill: "var(--color-muted)", opacity: 0.5 }} />
+                <Tooltip content={<TooltipMatching />} cursor={{ fill: "var(--color-muted)", opacity: 0.5 }} />
                 {Object.keys(TIER_LABELS).map((tier) => (
                   <Bar
                     key={tier}

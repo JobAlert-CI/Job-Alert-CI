@@ -8,13 +8,12 @@ import { cn } from "cn"
 import { useNotify } from "@/contexts/Notify.context"
 import { useSimulateFiliere, messageErreurReferentiel } from "@/features/admin-filieres.tools"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Slider } from "@/components/ui/slider"
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"
-import {
-  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
-} from "@/components/ui/dialog"
+import DialogConfirmVidageFilieres from "@/components/dialog/DialogConfirmVidageFilieres"
+import { SectionVide, TransitionEtat } from "@/components/admin/EtatsSection"
+import BtnAction from "@/components/admin/BtnAction"
 
 /* ─────────────────────────────────────────────────────────────────────
   Éditeur de mots-clés d'une filière (doc v3 §12).
@@ -127,101 +126,110 @@ const EditeurMotsCles = ({ filiere, mutation, onFermer, compact = false }) => {
           Mots-clés — <span className="text-primary">{filiere.label}</span>
           <Badge variant="outline" className="font-mono">{filiere.code}</Badge>
         </h2>
-        <Button variant="ghost" size="sm" onClick={onFermer}>
+        <BtnAction variant="ghost" size="xs" onClick={onFermer}>
           <X aria-hidden /> Fermer
-        </Button>
+        </BtnAction>
       </div>
 
       {/* Avertissement permanent (doc v3 §12) */}
-      <Alert>
-        <Info aria-hidden />
-        <AlertTitle>Effet au prochain scraping uniquement</AlertTitle>
-        <AlertDescription>
-          Ces mots-clés s'appliqueront au <strong>prochain</strong> passage de scraping —
-          jamais rétroactivement aux offres déjà collectées.
-        </AlertDescription>
-      </Alert>
+      {fields.length > 0 && (
+        <Alert>
+          <Info aria-hidden />
+          <AlertTitle>Effet au prochain scraping uniquement</AlertTitle>
+          <AlertDescription>
+            Ces mots-clés s'appliqueront au <strong>prochain</strong> passage de scraping —
+            jamais rétroactivement aux offres déjà collectées.
+          </AlertDescription>
+        </Alert>
+      )}
 
       {/* ─── Liste dynamique keyword + poids ─── */}
       <div className="flex flex-col gap-2">
-        {fields.length === 0 && (
-          <p className="rounded-lg border border-dashed border-border px-3 py-4 text-center text-xs text-muted-foreground">
-            Aucun mot-clé — la filière n'est détectée par aucun matcher automatique.
-          </p>
-        )}
-        <AnimatePresence initial={false}>
-          {fields.map((ligne, index) => (
-            <motion.div
-              key={ligne.id}
-              layout
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.97 }}
-              transition={{ duration: 0.18 }}
-              className="flex items-start gap-2"
-            >
-              {/* Mot-clé */}
-              <Controller
-                name={`lignes.${index}.keyword`}
-                control={control}
-                render={({ field, fieldState }) => (
-                  <div className="flex-1">
-                    <Input
-                      {...field}
-                      placeholder="Mot-clé (ex. supply chain)"
-                      aria-label={`Mot-clé ${index + 1}`}
-                      aria-invalid={fieldState.invalid}
-                      className={cn(fieldState.invalid && "border-destructive focus-visible:ring-destructive/30")}
-                    />
-                    {fieldState.invalid && (
-                      <p className="mt-0.5 text-[10px] text-destructive" role="alert">
-                        {fieldState.error?.message}
-                      </p>
+        <TransitionEtat
+          etat={fields.length === 0 ? "vide" : "rempli"}
+        >
+          {fields.length === 0 ? (
+            <SectionVide
+              titre="Liste des mots-clés"
+              message="Aucun mot-clé — la filière n'est détectée par aucun matcher automatique."
+            />
+          ) : (
+            <AnimatePresence initial={false}>
+              {fields.map((ligne, index) => (
+                <motion.div
+                  key={ligne.id}
+                  layout
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.97 }}
+                  transition={{ duration: 0.18 }}
+                  className="flex items-center gap-2"
+                >
+                  {/* Mot-clé */}
+                  <Controller
+                    name={`lignes.${index}.keyword`}
+                    control={control}
+                    render={({ field, fieldState }) => (
+                      <div className="flex-1">
+                        <Input
+                          {...field}
+                          placeholder="Mot-clé (ex. supply chain)"
+                          aria-label={`Mot-clé ${index + 1}`}
+                          aria-invalid={fieldState.invalid}
+                          className={cn(fieldState.invalid && "border-destructive focus-visible:ring-destructive/30")}
+                        />
+                        {fieldState.invalid && (
+                          <p className="mt-0.5 text-[10px] text-destructive" role="alert">
+                            {fieldState.error?.message}
+                          </p>
+                        )}
+                      </div>
                     )}
-                  </div>
-                )}
-              />
+                  />
 
-              {/* Poids : Slider + input numérique synchronisés */}
-              <Controller
-                name={`lignes.${index}.weight`}
-                control={control}
-                render={({ field, fieldState }) => (
-                  <div className="flex w-60 items-center gap-2 pt-1.5">
-                    <Slider
-                      value={field.value}
-                      onValueChange={(v) => field.onChange(typeof v === "number" ? v : v[0])}
-                      min={1}
-                      max={100}
-                      step={1}
-                      aria-label={`Poids du mot-clé ${index + 1} (1 à 100)`}
-                      className="flex-1"
-                    />
-                    <Input
-                      type="number"
-                      min={1}
-                      max={100}
-                      value={field.value}
-                      onChange={(e) => field.onChange(e.target.value === "" ? 0 : Number(e.target.value))}
-                      aria-label={`Poids numérique du mot-clé ${index + 1}`}
-                      aria-invalid={fieldState.invalid}
-                      className={cn("w-16 tabular-nums", fieldState.invalid && "border-destructive")}
-                    />
-                  </div>
-                )}
-              />
+                  {/* Poids : Slider + input numérique synchronisés */}
+                  <Controller
+                    name={`lignes.${index}.weight`}
+                    control={control}
+                    render={({ field, fieldState }) => (
+                      <div className="flex w-60 items-center gap-2 pt-1.5">
+                        <Slider
+                          value={field.value}
+                          onValueChange={(v) => field.onChange(typeof v === "number" ? v : v[0])}
+                          min={1}
+                          max={100}
+                          step={1}
+                          aria-label={`Poids du mot-clé ${index + 1} (1 à 100)`}
+                          className="flex-1"
+                        />
+                        <Input
+                          type="number"
+                          min={1}
+                          max={100}
+                          value={field.value}
+                          onChange={(e) => field.onChange(e.target.value === "" ? 0 : Number(e.target.value))}
+                          aria-label={`Poids numérique du mot-clé ${index + 1}`}
+                          aria-invalid={fieldState.invalid}
+                          className={cn("w-16 tabular-nums", fieldState.invalid && "border-destructive")}
+                        />
+                      </div>
+                    )}
+                  />
 
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                onClick={() => remove(index)}
-                aria-label={`Supprimer le mot-clé ${index + 1}`}
-              >
-                <Trash2 aria-hidden />
-              </Button>
-            </motion.div>
-          ))}
-        </AnimatePresence>
+                  <BtnAction
+                    variant="danger"
+                    size="xs"
+                    onClick={() => remove(index)}
+                    aria-label={`Supprimer le mot-clé ${index + 1}`}
+                    className="mt-1.5"
+                  >
+                    <Trash2 aria-hidden />
+                  </BtnAction>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          )}
+        </TransitionEtat>
       </div>
 
       {/* Résultat de simulation (live, sans écriture) */}
@@ -242,22 +250,22 @@ const EditeurMotsCles = ({ filiere, mutation, onFermer, compact = false }) => {
       )}
 
       {/* Actions */}
-      <div className="flex flex-wrap items-center gap-2">
-        <Button variant="outline" size="sm" onClick={() => append({ keyword: "", weight: 50 })}>
+      <div className="flex flex-wrap items-center gap-2 mt-2">
+        <BtnAction variant="outline" size="xs" onClick={() => append({ keyword: "", weight: 50 })}>
           <Plus aria-hidden /> Ajouter un mot-clé
-        </Button>
+        </BtnAction>
         <div className="ml-auto flex flex-wrap items-center gap-2">
-          <Button
+          <BtnAction
             variant="outline"
             size="sm"
             onClick={testerImpact}
             disabled={simulateMutation.isPending}
           >
             <FlaskConical aria-hidden /> {simulateMutation.isPending ? "Simulation…" : "Tester l'impact"}
-          </Button>
-          <Button size="sm" onClick={demanderSauvegarde} disabled={mutation.isPending}>
+          </BtnAction>
+          <BtnAction size="sm" onClick={demanderSauvegarde} disabled={mutation.isPending}>
             <Save aria-hidden /> {mutation.isPending ? "Enregistrement…" : "Enregistrer la liste"}
-          </Button>
+          </BtnAction>
         </div>
       </div>
       <p className="text-[10px] text-muted-foreground">
@@ -265,24 +273,14 @@ const EditeurMotsCles = ({ filiere, mutation, onFermer, compact = false }) => {
       </p>
 
       {/* Confirmation vidage / rétrécissement */}
-      <Dialog open={confirmation} onOpenChange={setConfirmation}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Confirmer le remplacement de la liste</DialogTitle>
-            <DialogDescription>
-              {nbInitial > 0
-                ? `La liste passerait de ${nbInitial} à ${lignesValides().length} mot(s)-clé(s) valide(s). La sauvegarde REMPLACE l'intégralité de la liste actuelle.`
-                : "Vous êtes sur le point de vider tous les mots-clés de cette filière."}
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setConfirmation(false)}>Annuler</Button>
-            <Button onClick={sauvegarder} disabled={mutation.isPending}>
-              {mutation.isPending ? "Enregistrement…" : "Confirmer et enregistrer"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <DialogConfirmVidageFilieres
+        confirmation={confirmation}
+        setConfirmation={setConfirmation}
+        mutation={mutation}
+        lignesValides={lignesValides}
+        nbInitial={nbInitial}
+        sauvegarder={sauvegarder}
+      />
     </section>
   )
 }

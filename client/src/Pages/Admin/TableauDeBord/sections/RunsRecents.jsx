@@ -6,7 +6,6 @@ import {
 import { cn } from "cn"
 import { useAdminRunsQuery } from "@/features/admin-dashboard.tools"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
   Select, SelectContent, SelectItem, SelectTrigger,
@@ -14,10 +13,11 @@ import {
 import {
   Table, TableHeader, TableBody, TableHead, TableRow, TableCell,
 } from "@/components/ui/table"
-import { SectionErreur, SectionVide, SectionAucunResultat } from "../components/EtatsSection"
+import { SectionErreur, SectionVide, SectionAucunResultat, TransitionEtat } from "@/components/admin/EtatsSection"
 import SectionCardAdmin from "@/components/admin/SectionCardAdmin"
 import EnteteTriable from "@/components/admin/EnteteTriable"
-
+import { usePeutVoirEnvois } from "@/features/admin-matching.tools"
+import BtnAction from "@/components/admin/BtnAction"
 
 const STYLES_STATUT = {
   success: { libelle: "Réussi", badge: "border-transparent bg-emerald-100 text-emerald-800", pastille: "bg-emerald-500" },
@@ -73,12 +73,10 @@ const COLONNES = [
   { cle: "duree", libelle: "Durée", directionInitiale: "desc", triValeur: dureeMsValeur },
 ]
 
-
-/* ── Ligne mémoïsée (listes répétées, cf. exigences perf) ─────────── */
+/* ── Ligne desktop mémoïsée (inchangée) ──────────────────────────── */
 const LigneRun = memo(({ run }) => {
   const meta = STYLES_STATUT[run.status] ?? { libelle: run.status, badge: "", pastille: "bg-muted-foreground" }
   const declenchementAdmin = run.triggered_by?.startsWith("admin")
-
   return (
     <TableRow className="transition-colors hover:bg-muted/50">
       <TableCell className="whitespace-nowrap">
@@ -99,7 +97,6 @@ const LigneRun = memo(({ run }) => {
           </Link>
         </span>
       </TableCell>
-
       <TableCell>
         <Badge variant="outline" className={cn("gap-1.5 font-medium", meta.badge)}>
           <span className="relative flex size-1.5" aria-hidden="true">
@@ -111,7 +108,6 @@ const LigneRun = memo(({ run }) => {
           {meta.libelle}
         </Badge>
       </TableCell>
-
       <TableCell className="text-right tabular-nums">{formatNombre(run.total_raw)}</TableCell>
       <TableCell className="text-right tabular-nums">{formatNombre(run.total_inserted)}</TableCell>
       <TableCell className="text-right tabular-nums">{formatNombre(run.total_updated)}</TableCell>
@@ -132,7 +128,219 @@ const LigneRun = memo(({ run }) => {
 })
 LigneRun.displayName = "LigneRun"
 
+/* ── Filtre statut mutualisé : en-tête desktop + barre mobile ────── */
+const SelectStatutRuns = memo(function SelectStatutRuns({ valeur, onChange, compteurs, total, varianteEntete = false }) {
+  return (
+    <Select value={valeur} onValueChange={onChange}>
+      <SelectTrigger
+        aria-label="Filtrer par statut"
+        className={varianteEntete
+          ? cn(
+            "h-7 w-auto gap-1.5 rounded-md px-2 text-xs font-medium shadow-none",
+            valeur === "tous"
+              ? "border-transparent text-muted-foreground/90 hover:text-foreground"
+              : "border-brand-navy/30 bg-secondary text-secondary-foreground"
+          )
+          : "h-8 w-full text-xs"}
+      >
+        {valeur === "tous" ? (
+          <span>{varianteEntete ? "Statut" : "Tous les statuts"}</span>
+        ) : (
+          <span className="flex items-center gap-1.5">
+            <span className={cn("size-1.5 rounded-full", STYLES_STATUT[valeur]?.pastille)} aria-hidden="true" />
+            {STYLES_STATUT[valeur]?.libelle}
+          </span>
+        )}
+      </SelectTrigger>
+      <SelectContent align="start">
+        <SelectItem value="tous">Tous les statuts ({formatNombre(total)})</SelectItem>
+        {OPTIONS_STATUT.map((o) => (
+          <SelectItem key={o.valeur} value={o.valeur}>
+            <span className="flex items-center gap-1.5">
+              <span className={cn("size-1.5 rounded-full", o.pastille)} aria-hidden="true" />
+              {o.libelle}
+              <span className="tabular-nums text-muted-foreground">({compteurs[o.valeur] ?? 0})</span>
+            </span>
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  )
+})
+
+/* ── Carte mobile (miroir de la ligne desktop) ─────────────────────
+   Toute la carte est un seul <Link> vers le détail du run. */
+const CarteRunRecentMobile = memo(function CarteRunRecentMobile({ run }) {
+  const meta = STYLES_STATUT[run.status] ?? { libelle: run.status, badge: "", pastille: "bg-muted-foreground" }
+  const declenchementAdmin = run.triggered_by?.startsWith("admin")
+  const stats = [
+    { label: "Brutes", valeur: formatNombre(run.total_raw) },
+    { label: "Insérées", valeur: formatNombre(run.total_inserted) },
+    { label: "M. à jour", valeur: formatNombre(run.total_updated) },
+    { label: "Doublons", valeur: formatNombre(run.total_duplicates) },
+    {
+      label: "Erreurs",
+      valeur: formatNombre(run.total_errors),
+      enErreur: (run.total_errors ?? 0) > 0,
+    },
+    { label: "Durée", valeur: dureeAffichage(run.started_at, run.finished_at) },
+  ]
+  return (
+    <Link
+      to={`/admin/scraping/runs/${run.id}`}
+      aria-label={`Voir le détail du run du ${dateHeure(run.started_at)}`}
+      className="block rounded-xl border border-border bg-card p-4 shadow-soft transition-colors hover:bg-muted/50"
+    >
+      {/* En-tête : date + déclencheur / badge de statut à pastille */}
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <p className="flex items-center gap-1.5 font-medium leading-tight text-primary">
+            {declenchementAdmin ? (
+              <UserRound className="size-3.5 shrink-0 text-muted-foreground" aria-hidden="true" />
+            ) : (
+              <CalendarClock className="size-3.5 shrink-0 text-muted-foreground" aria-hidden="true" />
+            )}
+            {dateHeure(run.started_at)}
+          </p>
+          <p className="text-[10px] text-muted-foreground">
+            {declenchementAdmin ? "Déclenché par un admin" : "Exécution planifiée"}
+          </p>
+        </div>
+        <Badge variant="outline" className={cn("gap-1.5 font-medium", meta.badge)}>
+          <span className="relative flex size-1.5" aria-hidden="true">
+            {meta.ping && (
+              <span className="absolute inline-flex size-full animate-ping rounded-full bg-brand-navy opacity-50" />
+            )}
+            <span className={cn("relative inline-flex size-1.5 rounded-full", meta.pastille)} />
+          </span>
+          {meta.libelle}
+        </Badge>
+      </div>
+
+      {/* 6 indicateurs en grille 3×2 — mêmes données que la table */}
+      <dl className="mt-3 grid grid-cols-3 gap-2">
+        {stats.map(({ label, valeur, enErreur }) => (
+          <div key={label} className="rounded-lg bg-muted/40 px-2 py-1.5">
+            <dt className="truncate text-[10px] text-muted-foreground">{label}</dt>
+            <dd className={cn("text-sm font-medium tabular-nums", enErreur && "font-semibold text-destructive")}>
+              {valeur}
+            </dd>
+          </div>
+        ))}
+      </dl>
+
+      {/* Pied : affordance de navigation */}
+      <span className="mt-3 flex items-center gap-1 text-xs font-medium text-primary">
+        Voir le détail
+        <ChevronRight className="size-3.5" aria-hidden="true" />
+      </span>
+    </Link>
+  )
+})
+
+/* ── SKELETONS FIDÈLES ───────────────────────────────────────────── */
+
+const Bloc = ({ className, delay = 0 }) => (
+  <Skeleton className={className} style={delay ? { animationDelay: `${delay}ms` } : undefined} />
+)
+
+/* Géométrie des 6 tuiles : Brutes, Insérées, M. à jour, Doublons, Erreurs, Durée. */
+const TUILES_STATS_RUN = [
+  { dt: "w-9", dd: "w-8" },
+  { dt: "w-11", dd: "w-8" },
+  { dt: "w-14", dd: "w-8" },
+  { dt: "w-11", dd: "w-9" },
+  { dt: "w-10", dd: "w-6" },
+  { dt: "w-9", dd: "w-12" },
+]
+
+const RunsRecentsSkeleton = ({ nbLignes = 8 }) => {
+  const lignes = Array.from({ length: nbLignes }, (_, i) => i)
+  return (
+    <div role="status" aria-label="Chargement des derniers runs de scraping">
+      {/* Mobile : filtre statut + cartes */}
+      <div className="px-4 pb-2 md:hidden" aria-hidden="true">
+        <Skeleton className="h-8 w-full" />
+      </div>
+      <ul className="flex flex-col gap-3 px-4 pb-2 md:hidden" aria-hidden="true">
+        {lignes.map((i) => {
+          const delay = i * 80
+          return (
+            <li key={i}>
+              <div className="rounded-xl border border-border bg-card p-4 shadow-soft">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="min-w-0 space-y-1">
+                    <Bloc className="h-3.5 w-32" delay={delay} />
+                    <Bloc className="h-2.5 w-20" delay={delay} />
+                  </div>
+                  <Bloc className="h-5 w-20 shrink-0 rounded-full" delay={delay} />
+                </div>
+                <div className="mt-3 grid grid-cols-3 gap-2">
+                  {TUILES_STATS_RUN.map(({ dt, dd }, k) => (
+                    <div key={k} className="rounded-lg bg-muted/40 px-2 py-1.5">
+                      <Bloc className={cn("h-2", dt)} delay={delay} />
+                      <Bloc className={cn("mt-1 h-3.5", dd)} delay={delay} />
+                    </div>
+                  ))}
+                </div>
+                <Bloc className="mt-3 h-3 w-24" delay={delay} />
+              </div>
+            </li>
+          )
+        })}
+      </ul>
+
+      {/* Desktop : tableau (8 colonnes, toutes visibles à ce breakpoint) */}
+      <div className="hidden overflow-x-auto scrollbar-thin md:block">
+        <Table aria-hidden="true">
+          <TableHeader>
+            <TableRow className="hover:bg-transparent">
+              <TableHead><Bloc className="h-3 w-28" /></TableHead>
+              <TableHead className="w-40"><Bloc className="h-3 w-24" /></TableHead>
+              <TableHead className="text-right"><Bloc className="ml-auto h-3 w-10" /></TableHead>
+              <TableHead className="text-right"><Bloc className="ml-auto h-3 w-10" /></TableHead>
+              <TableHead className="text-right"><Bloc className="ml-auto h-3 w-10" /></TableHead>
+              <TableHead className="text-right"><Bloc className="ml-auto h-3 w-12" /></TableHead>
+              <TableHead className="text-right"><Bloc className="ml-auto h-3 w-10" /></TableHead>
+              <TableHead className="text-right"><Bloc className="ml-auto h-3 w-12" /></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {lignes.map((i) => {
+              const delay = i * 80
+              return (
+                <TableRow key={i} className="hover:bg-transparent">
+                  <TableCell>
+                    <div className="flex items-center gap-1.5">
+                      <Bloc className="size-3.5 rounded-sm" delay={delay} />
+                      <Bloc className="h-3.5 w-24" delay={delay} />
+                    </div>
+                  </TableCell>
+                  <TableCell><Bloc className="h-5 w-20 rounded-full" delay={delay} /></TableCell>
+                  <TableCell className="text-right"><Bloc className="ml-auto h-3 w-8" delay={delay} /></TableCell>
+                  <TableCell className="text-right"><Bloc className="ml-auto h-3 w-8" delay={delay} /></TableCell>
+                  <TableCell className="text-right"><Bloc className="ml-auto h-3 w-8" delay={delay} /></TableCell>
+                  <TableCell className="text-right"><Bloc className="ml-auto h-3 w-9" delay={delay} /></TableCell>
+                  <TableCell className="text-right"><Bloc className="ml-auto h-3 w-6" delay={delay} /></TableCell>
+                  <TableCell className="text-right"><Bloc className="ml-auto h-3 w-12" delay={delay} /></TableCell>
+                </TableRow>
+              )
+            })}
+          </TableBody>
+        </Table>
+      </div>
+
+      {/* Pied : compteur */}
+      <div className="border-t border-border px-4 py-2.5" aria-hidden="true">
+        <Skeleton className="h-3 w-40" />
+      </div>
+    </div>
+  )
+}
+
+/* ── COMPOSANT PRINCIPAL ─────────────────────────────────────────── */
 const RunsRecents = () => {
+  const autorise = usePeutVoirEnvois()
   const { data, isLoading, isError, refetch } = useAdminRunsQuery({ limit: 30 })
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const donnees = data ?? []
@@ -168,6 +376,18 @@ const RunsRecents = () => {
 
   const cleCorps = `${filtreStatut}-${tri?.cle ?? "aucun"}-${tri?.direction ?? ""}`
 
+  /* Clé d'état pour la transition — le tri est exclu (le fondu du tri
+     est porté par le key du TableBody / de la liste mobile). */
+  const etat = !autorise
+    ? "refuse"
+    : isError
+      ? "erreur"
+      : isLoading
+        ? "chargement"
+        : !donnees.length
+          ? "vide"
+          : "donnees"
+
   return (
     <SectionCardAdmin
       title="Derniers runs de scraping"
@@ -182,127 +402,114 @@ const RunsRecents = () => {
           Tout voir <ChevronRight className="size-3.5" aria-hidden="true" />
         </Link>
       }
-    >
-      {isError ? (
-        <div className="p-4">
-          <SectionErreur onRetry={refetch} message="Impossible de charger l'historique des runs." />
-        </div>
-      ) : isLoading ? (
-        <div className="flex flex-col gap-2 p-4" aria-busy="true">
-          {[...Array(5)].map((_, i) => (
-            <Skeleton key={i} className="h-10 w-full" />
-          ))}
-        </div>
-      ) : !donnees.length ? (
-        <div className="p-4">
-          <SectionVide message="Aucun run de scraping enregistré." />
-        </div>
-      ) : (
-        <>
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow className="hover:bg-transparent">
-                  {/* Date — triable */}
-                  <EnteteTriable
-                    colonne={COLONNES.find((c) => c.cle === "started_at")}
-                    tri={tri}
-                    onTri={basculerTri}
-                  />
+    >      
+      <TransitionEtat etat={`${filtreStatut}-${etat}`}>
+        {!autorise ? (
+          <SectionVide message="Statistiques d'envoi réservées aux super admins et gestionnaires utilisateurs." />
+        ) : isError ? (
+          <div className="p-4">
+            <SectionErreur onRetry={refetch} message="Impossible de charger l'historique des runs." />
+          </div>
+        ) : isLoading ? (
+          <RunsRecentsSkeleton nbLignes={8} />
+        ) : !donnees.length ? (
+          <div className="p-4">
+            <SectionVide message="Aucun run de scraping enregistré." />
+          </div>
+        ) : (
+          <>
+            {/* Filtre statut — mobile (desktop : select dans l'en-tête de table) */}
+            <div className="px-4 pb-2 md:hidden">
+              <SelectStatutRuns
+                valeur={filtreStatut}
+                onChange={setFiltreStatut}
+                compteurs={compteurs}
+                total={donnees.length}
+              />
+            </div>
 
-                  {/* Statut — filtre directement dans l'en-tête */}
-                  <TableHead className="w-40">
-                    <Select value={filtreStatut} onValueChange={setFiltreStatut}>
-                      <SelectTrigger
-                        aria-label="Filtrer par statut"
-                        className={cn(
-                          "h-7 w-auto gap-1.5 rounded-md px-2 text-xs font-medium shadow-none",
-                          filtreStatut === "tous"
-                            ? "border-transparent text-muted-foreground/90 hover:text-foreground"
-                            : "border-brand-navy/30 bg-secondary text-secondary-foreground"
-                        )}
-                      >
-                        {filtreStatut === "tous" ? (
-                          <span>Statut</span>
-                        ) : (
-                          <span className="flex items-center gap-1.5">
-                            <span
-                              className={cn("size-1.5 rounded-full", STYLES_STATUT[filtreStatut]?.pastille)}
-                              aria-hidden="true"
-                            />
-                            {STYLES_STATUT[filtreStatut]?.libelle}
-                          </span>
-                        )}
-                      </SelectTrigger>
-                      <SelectContent align="start">
-                        <SelectItem value="tous">Tous les statuts ({donnees.length})</SelectItem>
-                        {OPTIONS_STATUT.map((o) => (
-                          <SelectItem key={o.valeur} value={o.valeur}>
-                            <span className="flex items-center gap-1.5">
-                              <span className={cn("size-1.5 rounded-full", o.pastille)} aria-hidden="true" />
-                              {o.libelle}
-                              <span className="tabular-nums text-muted-foreground">({compteurs[o.valeur] ?? 0})</span>
-                            </span>
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </TableHead>
-
-                  {/* Colonnes numériques + durée — triables, alignées à droite */}
-                  {COLONNES.filter((c) => c.cle !== "started_at").map((colonne) => (
-                    <EnteteTriable
-                      key={colonne.cle}
-                      colonne={colonne}
-                      tri={tri}
-                      onTri={basculerTri}
-                      aligneDroite
-                    />
+            {runsAffiches.length === 0 ? (
+                <SectionAucunResultat
+                  message={`Aucun run avec le statut « ${STYLES_STATUT[filtreStatut]?.libelle} ».`}
+                  onReset={() => setFiltreStatut("tous")}
+                  className="m-4"
+                />
+            ) : (
+              <>
+                {/* ── Mobile : cartes ────────────────────────────── */}
+                <ul
+                  key={cleCorps}
+                  className="flex animate-in flex-col gap-3 px-4 pb-2 duration-200 motion-reduce:animate-none md:hidden"
+                >
+                  {runsAffiches.map((run) => (
+                    <li key={run.id}>
+                      <CarteRunRecentMobile run={run} />
+                    </li>
                   ))}
-                </TableRow>
-              </TableHeader>
+                </ul>
 
-              {/* key = fondu léger à chaque changement de tri / filtre */}
-              <TableBody key={cleCorps} className="animate-in fade-in duration-200 motion-reduce:animate-none">
-                {runsAffiches.length === 0 ? (
-                  <TableRow className="hover:bg-transparent">
-                    <TableCell colSpan={9}>
-                      <div className="flex flex-col items-center gap-3 py-6">
-                        <SectionAucunResultat
-                          message={`Aucun run avec le statut « ${STYLES_STATUT[filtreStatut]?.libelle} ».`}
+                {/* ── Desktop : tableau ──────────────────────────── */}
+                <div className="hidden overflow-x-auto scrollbar-thin md:block">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="hover:bg-transparent">
+                        {/* Date — triable */}
+                        <EnteteTriable
+                          colonne={COLONNES.find((c) => c.cle === "started_at")}
+                          tri={tri}
+                          onTri={basculerTri}
                         />
-                        <Button variant="outline" size="sm" onClick={() => setFiltreStatut("tous")}>
-                          <X className="size-3.5" aria-hidden="true" /> Réinitialiser le filtre
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  runsAffiches.map((run) => <LigneRun key={run.id} run={run} />)
-                )}
-              </TableBody>
-            </Table>
-          </div>
-
-          {/* Pied : compteur + reset du filtre actif */}
-          <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border px-4 py-2.5 text-xs text-muted-foreground">
-            <span className="tabular-nums">
-              {formatNombre(runsAffiches.length)} run{runsAffiches.length > 1 ? "s" : ""} affiché
-              {runsAffiches.length > 1 ? "s" : ""} sur {formatNombre(donnees.length)}
-            </span>
-            {filtreStatut !== "tous" && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-7 gap-1 px-2 text-xs text-muted-foreground hover:text-foreground"
-                onClick={() => setFiltreStatut("tous")}
-              >
-                <X className="size-3.5" aria-hidden="true" /> Réinitialiser
-              </Button>
+                        {/* Statut — filtre directement dans l'en-tête */}
+                        <TableHead className="w-40">
+                          <SelectStatutRuns
+                            valeur={filtreStatut}
+                            onChange={setFiltreStatut}
+                            compteurs={compteurs}
+                            total={donnees.length}
+                            varianteEntete
+                          />
+                        </TableHead>
+                        {/* Colonnes numériques + durée — triables, alignées à droite */}
+                        {COLONNES.filter((c) => c.cle !== "started_at").map((colonne) => (
+                          <EnteteTriable
+                            key={colonne.cle}
+                            colonne={colonne}
+                            tri={tri}
+                            onTri={basculerTri}
+                            aligneDroite
+                          />
+                        ))}
+                      </TableRow>
+                    </TableHeader>
+                    {/* key = fondu léger à chaque changement de tri / filtre */}
+                    <TableBody key={cleCorps} className="animate-in fade-in duration-200 motion-reduce:animate-none">
+                      {runsAffiches.map((run) => <LigneRun key={run.id} run={run} />)}
+                    </TableBody>
+                  </Table>
+                </div>
+              </>
             )}
-          </div>
-        </>
-      )}
+
+            {/* Pied : compteur + reset du filtre actif */}
+            <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border px-4 py-2.5 text-xs text-muted-foreground">
+              <span className="tabular-nums">
+                {formatNombre(runsAffiches.length)} run{runsAffiches.length > 1 ? "s" : ""} affiché
+                {runsAffiches.length > 1 ? "s" : ""} sur {formatNombre(donnees.length)}
+              </span>
+              {filtreStatut !== "tous" && (
+                <BtnAction
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 gap-1 px-2 text-xs text-muted-foreground hover:text-foreground"
+                  onClick={() => setFiltreStatut("tous")}
+                >
+                  <X className="size-3.5" aria-hidden="true" /> Réinitialiser
+                </BtnAction>
+              )}
+            </div>
+          </>
+        )}
+      </TransitionEtat>
     </SectionCardAdmin>
   )
 }

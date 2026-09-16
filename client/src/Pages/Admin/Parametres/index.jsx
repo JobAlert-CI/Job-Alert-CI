@@ -6,7 +6,7 @@ import TableauParametres from "./sections/TableauParametres"
 import Bloc, { VARIANTS_PAGE } from "@/components/admin/Bloc"
 import HeroAdmin from "@/components/admin/HeroAdmin"
 import BtnAction from "@/components/admin/BtnAction"
-import DialogCreationParametre from "./components/DialogCreationParametre"
+import DialogCreationParametre from "@/components/dialog/DialogCreationParametre"
 
 /* ─────────────────────────────────────────────────────────────────────
    Page Paramètres du site — /admin/parametres (super_admin, doc v3 §18).
@@ -21,7 +21,8 @@ import DialogCreationParametre from "./components/DialogCreationParametre"
      tableau reçoit l'action via la prop `onNouvelleCle`.
    • Dialog monté EN PERMANENCE (prop `open`) : animations Radix
      préservées, champs réinitialisés par useEffect à l'ouverture.
-   ───────────────────────────────────────────────────────────────────── */
+───────────────────────────────────────────────────────────────────── */
+
 const ParametresAdmin = () => {
   /* UNIQUE source de vérité pour le dialog de création. */
   const [creationOuverte, setCreationOuverte] = useState(false)
@@ -47,7 +48,7 @@ const ParametresAdmin = () => {
         </BtnAction>
       </HeroAdmin>
 
-      {/* ─── Compteurs P1-P4 ─── */}
+      {/* ─── Compteurs ─── */}
       <Bloc>
         <CompteursParametres />
       </Bloc>

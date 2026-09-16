@@ -4,7 +4,7 @@ import { useAdminSendingStatsQuery, usePeutVoirEnvois } from "@/features/admin-m
 import CountUp from "@/components/shared/CountUp"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
-import { SectionErreur, SectionVide } from "../components/EtatsSection"
+import { SectionErreur, SectionVide } from "../../../../components/admin/EtatsSection"
 import SectionCardAdmin from "@/components/admin/SectionCardAdmin"
 
 

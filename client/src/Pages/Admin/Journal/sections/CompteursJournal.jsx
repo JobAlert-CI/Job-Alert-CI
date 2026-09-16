@@ -2,6 +2,7 @@ import { useMemo } from "react"
 import { useJournalStatsQuery } from "@/features/admin-journal.tools"
 import CarteCompteur from "@/components/admin/CarteCompteur"
 import { FileEdit, FilePlus2, LogIn, ScrollText, UserCheck } from "lucide-react"
+import { SectionErreur, TransitionEtat } from "@/components/admin/EtatsSection"
 
 /* ─────────────────────────────────────────────────────────────────────
    Compteurs du Journal d'activité (cycle 16, sélection validée :
@@ -23,7 +24,7 @@ import { FileEdit, FilePlus2, LogIn, ScrollText, UserCheck } from "lucide-react"
    ───────────────────────────────────────────────────────────────────── */
 
 const CompteursJournal = () => {
-  const { data: stats, isLoading } = useJournalStatsQuery(30)
+  const { data: stats, isError, refetch } = useJournalStatsQuery(30)
 
   const valeurs = useMemo(() => {
     const parAction = stats?.by_action ?? {}
@@ -37,34 +38,44 @@ const CompteursJournal = () => {
   }, [stats])
 
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-5">
-      <CarteCompteur label="Total (30 j)" valeur={valeurs.total} icone={ScrollText} chargement={isLoading} />
-      <CarteCompteur label="Auteurs distincts" valeur={valeurs.auteurs} icone={UserCheck} chargement={isLoading} />
-      <CarteCompteur
-        label="Connexions (30 j)"
-        valeur={valeurs.connexions}
-        icone={LogIn}
-        href="/admin/journal"
-        query="?action=connexion"
-        chargement={isLoading}
-      />
-      <CarteCompteur
-        label="Modifications (30 j)"
-        valeur={valeurs.modifications}
-        icone={FileEdit}
-        href="/admin/journal"
-        query="?action=modification"
-        chargement={isLoading}
-      />
-      <CarteCompteur
-        label="Créations (30 j)"
-        valeur={valeurs.creations}
-        icone={FilePlus2}
-        href="/admin/journal"
-        query="?action=creation"
-        chargement={isLoading}
-      />
-    </div>
+    <TransitionEtat etat={isError ? "erreur" : "donnees"} >
+      {isError ? (
+        <SectionErreur onRetry={refetch} message="Impossible de charger le journal d'activité." />
+      ) : (
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-6 xl:grid-cols-5">
+          <CarteCompteur
+            label="Total (30 j)"
+            valeur={valeurs.total}
+            icone={ScrollText}
+            className="sm:col-span-2 xl:col-span-1"
+          />
+          <CarteCompteur label="Auteurs distincts" valeur={valeurs.auteurs} icone={UserCheck} className="sm:col-span-2 xl:col-span-1" />
+          <CarteCompteur
+            label="Connexions (30 j)"
+            valeur={valeurs.connexions}
+            icone={LogIn}
+            href="/admin/journal"
+            query="?action=connexion"
+            className="sm:col-span-2 xl:col-span-1"
+          />
+          <CarteCompteur
+            label="Modifications (30 j)"
+            valeur={valeurs.modifications}
+            icone={FileEdit}
+            href="/admin/journal"
+            query="?action=modification"
+            className="sm:col-span-3 xl:col-span-1"
+          />
+          <CarteCompteur
+            label="Créations (30 j)"
+            valeur={valeurs.creations}
+            icone={FilePlus2}
+            href="/admin/journal"
+            className="col-span-2 sm:col-span-3 xl:col-span-1"
+          />
+        </div>
+      )}
+    </TransitionEtat>
   )
 }
 

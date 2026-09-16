@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { motion, AnimatePresence } from "framer-motion"
-import { ArrowLeft, Inbox, SearchX, SlidersHorizontal, Loader2 } from "lucide-react"
+import { ArrowLeft, SearchX, SlidersHorizontal, Loader2 } from "lucide-react"
 import { useAdminDoublonsQuery } from "@/features/admin-offres.tools"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -9,9 +9,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Slider } from "@/components/ui/slider"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from "@/components/ui/empty"
 import SectionCardAdmin from "@/components/admin/SectionCardAdmin"
-import { SectionErreur } from "../components/EtatsSection"
+import { SectionAucunResultat, SectionErreur } from "@/components/admin/EtatsSection"
 import CarteDoublon from "../components/CarteDoublon"
 import Bloc, { VARIANTS_PAGE } from "@/components/admin/Bloc"
 
@@ -86,7 +85,7 @@ const DoublonsPage = () => {
       animate="visible"
       className="mx-auto flex w-full max-w-6xl flex-col gap-6"
     >
-      <Bloc>
+      <Bloc className="flex flex-col gap-5">
         <EnTete onRetour={() => navigate("/admin/offres")} />
 
         {/* ─── Réglages : seuil + filtre entreprise ─── */}
@@ -177,32 +176,26 @@ const DoublonsPage = () => {
           </div>
         ) : pairesFiltrees.length === 0 ? (
           filtreEntreprise ? (
-            <div className="rounded-xl border border-dashed border-border bg-card/50">
-              <Empty>
-                <EmptyHeader>
-                  <EmptyMedia variant="icon"><SearchX /></EmptyMedia>
-                  <EmptyTitle>Aucune paire pour ce filtre</EmptyTitle>
-                  <EmptyDescription>
-                    Aucune paire ne correspond à « {filtreEntreprise} » au seuil de {seuil}%.
-                  </EmptyDescription>
-                </EmptyHeader>
-                <Button variant="outline" size="sm" onClick={() => setFiltreEntreprise("")}>
-                  Vider le filtre
-                </Button>
-              </Empty>
-            </div>
+            <SectionAucunResultat
+              message={
+                isFetching
+                  ? "Le scan est en cours, merci de patienter..."
+                  : `Aucune paire ne correspond à « ${filtreEntreprise} » au seuil de ${seuil}%.`
+              }
+              titre={isFetching ? "Scan en cours" : "Aucune paire pour ce filtre"}
+              icone={isFetching ? Loader2 : SearchX}
+              onReset={() => setFiltreEntreprise("")}
+              libelleReset="Effacer la recherche"
+            />
           ) : (
-            <div className="rounded-xl border border-dashed border-border bg-card/50">
-              <Empty>
-                <EmptyHeader>
-                  <EmptyMedia variant="icon"><Inbox /></EmptyMedia>
-                  <EmptyTitle>Aucun doublon potentiel</EmptyTitle>
-                  <EmptyDescription>
-                    Le scan n'a détecté aucune paire au seuil de {seuil}%. Baissez le seuil pour élargir la recherche.
-                  </EmptyDescription>
-                </EmptyHeader>
-              </Empty>
-            </div>
+            <SectionAucunResultat
+              message={
+                isFetching ? "Le scan est en cours, merci de patienter..." : `Le scan n'a détecté aucune paire au seuil de ${seuil}%. Baissez le seuil pour élargir la recherche.`
+              }
+              titre={isFetching ? "Scan en cours" : "Aucun doublon potentiel"}
+              icone={isFetching ? Loader2 : SearchX}
+              description="Essayez d'élargir vos critères ou de réinitialiser les filtres actifs."
+            />
           )
         ) : (
           <AnimatePresence mode="popLayout">

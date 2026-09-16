@@ -7,13 +7,14 @@ import {
   STATUTS_ACTIFS,
 } from "@/features/admin-scraping.tools"
 import CarteCompteur from "@/components/admin/CarteCompteur"
-import { dureeLisible } from "../components/statuts-scraping"
+import { sufixDuree } from "../components/statuts-scraping"
+import { SectionErreur, TransitionEtat } from "@/components/admin/EtatsSection"
 
 
 const CompteursScraping = () => {
-  const { data: sources } = useAdminScrapingStatusQuery()
-  const { data: runs } = useAdminScrapingRunsQuery({ limit: 10 })
-  const { data: summary } = useAdminScrapingSummaryQuery()
+  const { data: sources, isError: isErrorSources, refetch: refetchSources } = useAdminScrapingStatusQuery()
+  const { data: runs, isError: isErrorRuns, refetch: refetchRuns } = useAdminScrapingRunsQuery({ limit: 10 })
+  const { data: summary, isError: isErrorSummary, refetch: refetchSummary } = useAdminScrapingSummaryQuery()
 
   const sourcesOk = useMemo(
     () => (sources ?? []).filter((s) => s.last_status === "success").length,
@@ -31,32 +32,46 @@ const CompteursScraping = () => {
     return Math.round(terminees.reduce((a, b) => a + b, 0) / terminees.length)
   }, [runs])
 
+  const isError = isErrorSources || isErrorRuns || isErrorSummary
+
+  const refetch = () => {
+    refetchSources()
+    refetchRuns({ limit: 10 })
+    refetchSummary()
+  }
+
   return (
-    <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-      <CarteCompteur
-        label="Sources opérationnelles"
-        valeur={sourcesOk}
-        suffixe={`/${totalSources}`}
-        icone={Globe}
-      />
-      <CarteCompteur
-        label="Durée moy. (10 derniers runs)"
-        valeur={dureeMoyenne ?? 0}
-        suffixe={dureeMoyenne !== null ? `ms (${dureeLisible(dureeMoyenne)})` : ""}
-        icone={Timer}
-      />
-      <CarteCompteur
-        label="Offres collectées (all-time)"
-        valeur={summary?.total_raw_all_time}
-        icone={Package}
-      />
-      <CarteCompteur
-        label="Taux de réussite"
-        valeur={summary?.success_rate ?? 0}
-        texte={summary?.success_rate == null ? "—" : `${summary.success_rate} %`}
-        icone={Target}
-      />
-    </div>
+    <TransitionEtat etat={isError ? "erreur" : "donnees"} >
+      {isError ? (
+        <SectionErreur onRetry={refetch} message="Impossible de charger ces données." />
+      ) : (
+        <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+          <CarteCompteur
+            label="Sources opérationnelles"
+            valeur={sourcesOk}
+            suffixe={`/${totalSources}`}
+            icone={Globe}
+          />
+          <CarteCompteur
+            label="Durée moy. (10 derniers runs)"
+            valeur={sufixDuree(dureeMoyenne)[0] ?? 0}
+            suffixe={sufixDuree(dureeMoyenne)[1]}
+            icone={Timer}
+          />
+          <CarteCompteur
+            label="Offres collectées (all-time)"
+            valeur={summary?.total_raw_all_time}
+            icone={Package}
+          />
+          <CarteCompteur
+            label="Taux de réussite"
+            valeur={summary?.success_rate ?? 0}
+            suffixe="%"
+            icone={Target}
+          />
+        </div>
+      )}
+    </TransitionEtat>
   )
 }
 

@@ -8,20 +8,39 @@ import {
 import { useNotify } from "@/contexts/Notify.context"
 import { ApercuOffre, BoutonApercu } from "@/components/admin/ApercuOffre"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import {
-  Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
-} from "@/components/ui/dialog"
+import BtnAction from "@/components/admin/BtnAction"
+import DialogFusionOffre from "@/components/dialog/DialogFusionOffre"
 
 /* ─────────────────────────────────────────────────────────────────────
    Carte d'une paire de doublons potentiels.
-   Shape (vérifiée API live) : { offer_a_id, offer_b_id, offer_a_title,
-   offer_b_title, offer_a_company, similarity_score, reason }.
-   Refonte : la racine est un motion.article avec `layout` + exit —
-   dans l'AnimatePresence de DoublonsPage, la carte traitée s'estompe
-   en douceur pendant que les suivantes remontent sans à-coup.
+   Mode mobile intégré en responsive interne (pas de composant dupliqué) :
+   la carte porte des mutations + un Dialog + un aperçu — une version
+   mobile séparée les monterait deux fois.
+     • Comparaison A|B : empilée avec séparateur à lignes en < sm,
+       côte à côte en sm+.
+     • Actions : boutons pleine largeur empilés en mobile (cibles
+       tactiles larges), alignés à droite en sm+.
 ───────────────────────────────────────────────────────────────────── */
+
+/* Panneau d'une offre (A ou B) — mutualisé. */
+const BlocOffre = ({ libelle, offreId, titre, onApercu }) => (
+  <div className="flex flex-col gap-1 rounded-lg border border-border/60 bg-muted/20 p-2.5">
+    <span className="text-[9px] font-bold tracking-wider text-muted-foreground/70 uppercase">{libelle}</span>
+    <div className="flex items-center gap-1.5">
+      <BoutonApercu
+        onClick={() => onApercu(offreId)}
+        libelle={`Aperçu de ${titre}`}
+      />
+      <Link
+        to={`/admin/offres/${offreId}`}
+        className="min-w-0 truncate text-sm font-medium text-primary underline-offset-4 hover:underline"
+        title={titre}
+      >
+        {titre}
+      </Link>
+    </div>
+  </div>
+)
 
 const CarteDoublon = ({ paire, onTraitee }) => {
   const notify = useNotify()
@@ -72,7 +91,8 @@ const CarteDoublon = ({ paire, onTraitee }) => {
       className="flex flex-col gap-3 rounded-xl border border-border bg-card p-4 transition-colors hover:border-primary/25"
       data-testid="paire-doublon"
     >
-      {/* En-tête : score + entreprise + raison */}
+      {/* En-tête : score + entreprise + raison
+          (la raison prend sa propre ligne en mobile). */}
       <div className="flex flex-wrap items-center gap-2">
         <Badge
           variant={score >= 90 ? "destructive" : score >= 80 ? "warning" : "secondary"}
@@ -83,87 +103,59 @@ const CarteDoublon = ({ paire, onTraitee }) => {
         <span className="text-xs font-medium text-muted-foreground">
           {paire.offer_a_company || "Entreprise inconnue"}
         </span>
-        <span className="ml-auto flex items-center gap-1 truncate text-[10px] text-muted-foreground/70" title={paire.reason}>
+        <span
+          className="ml-auto flex w-full items-center justify-end gap-1 truncate text-[10px] text-muted-foreground/70 sm:w-auto"
+          title={paire.reason}
+        >
           {paire.reason}
         </span>
       </div>
 
-      {/* Comparaison A | B */}
-      <div className="grid items-center gap-2 sm:grid-cols-[1fr_auto_1fr]">
-        <div className="flex flex-col gap-1 rounded-lg border border-border/60 bg-muted/20 p-2.5">
-          <span className="text-[9px] font-bold tracking-wider text-muted-foreground/70 uppercase">Offre A (conservée)</span>
-          <div className="flex items-center gap-1.5">
-            <BoutonApercu
-              onClick={() => setApercuOffreId(paire.offer_a_id)}
-              libelle={`Aperçu de ${paire.offer_a_title}`}
-            />
-            <Link
-              to={`/admin/offres/${paire.offer_a_id}`}
-              className="truncate text-sm font-medium text-primary underline-offset-4 hover:underline"
-              title={paire.offer_a_title}
-            >
-              {paire.offer_a_title}
-            </Link>
-          </div>
+      {/* Comparaison A | B : empilée en mobile avec séparateur à lignes,
+          côte à côte en sm+. */}
+      <div className="grid items-stretch gap-2 sm:grid-cols-[1fr_auto_1fr] sm:items-center">
+        <BlocOffre
+          libelle="Offre A (conservée)"
+          offreId={paire.offer_a_id}
+          titre={paire.offer_a_title}
+          onApercu={setApercuOffreId}
+        />
+        {/* Séparateur : lignes horizontales + icône en mobile, icône seule en sm+ */}
+        <div className="flex items-center justify-center gap-2 text-muted-foreground/50" aria-hidden="true">
+          <span className="h-px flex-1 bg-border sm:hidden" />
+          <ArrowLeftRight className="size-4 shrink-0" />
+          <span className="h-px flex-1 bg-border sm:hidden" />
         </div>
-        <div className="flex items-center justify-center text-muted-foreground/50" aria-hidden>
-          <ArrowLeftRight className="size-4" />
-        </div>
-        <div className="flex flex-col gap-1 rounded-lg border border-border/60 bg-muted/20 p-2.5">
-          <span className="text-[9px] font-bold tracking-wider text-muted-foreground/70 uppercase">Offre B (candidate au doublon)</span>
-          <div className="flex items-center gap-1.5">
-            <BoutonApercu
-              onClick={() => setApercuOffreId(paire.offer_b_id)}
-              libelle={`Aperçu de ${paire.offer_b_title}`}
-            />
-            <Link
-              to={`/admin/offres/${paire.offer_b_id}`}
-              className="truncate text-sm font-medium text-primary underline-offset-4 hover:underline"
-              title={paire.offer_b_title}
-            >
-              {paire.offer_b_title}
-            </Link>
-          </div>
-        </div>
+        <BlocOffre
+          libelle="Offre B (candidate au doublon)"
+          offreId={paire.offer_b_id}
+          titre={paire.offer_b_title}
+          onApercu={setApercuOffreId}
+        />
       </div>
 
-      {/* Actions */}
-      <div className="flex flex-wrap items-center justify-end gap-2">
-        <Button variant="outline" size="sm" onClick={rejeter} disabled={mutationEnCours}>
+      {/* Actions : pleine largeur empilées en mobile (cibles tactiles),
+          alignées à droite en sm+. */}
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end">
+        <BtnAction variant="outline" size="sm" onClick={rejeter} disabled={mutationEnCours} className="w-full sm:w-auto">
           <Check aria-hidden /> Ce n'est pas un doublon
-        </Button>
-        <Button size="sm" variant="destructive" onClick={() => setDialogOuvert(true)} disabled={mutationEnCours}>
+        </BtnAction>
+        <BtnAction size="sm" variant="danger" onClick={() => setDialogOuvert(true)} disabled={mutationEnCours} className="w-full sm:w-auto">
           <X aria-hidden /> Fusionner
-        </Button>
+        </BtnAction>
       </div>
 
       {/* Confirmation fusion (motif optionnel). */}
-      <Dialog open={dialogOuvert} onOpenChange={setDialogOuvert}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Marquer comme doublon ?</DialogTitle>
-            <DialogDescription>
-              « {paire.offer_b_title} » sera marquée comme doublon de « {paire.offer_a_title} ».
-              L'offre B reste en base mais n'apparaîtra plus dans les scans de doublons.
-              Vous pourrez toujours la retrouver dans la liste des offres.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="flex flex-col gap-1.5">
-            <Input
-              value={motif}
-              onChange={(e) => setMotif(e.target.value)}
-              placeholder="Motif (optionnel) — ex. même poste reposté"
-              maxLength={255}
-            />
-          </div>
-          <DialogFooter>
-            <Button variant="ghost" size="sm" onClick={() => setDialogOuvert(false)}>Annuler</Button>
-            <Button variant="destructive" size="sm" onClick={fusionner} disabled={marquerMutation.isPending}>
-              {marquerMutation.isPending ? "Marquage…" : "Marquer comme doublon"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <DialogFusionOffre
+        open={dialogOuvert}
+        setOpen={setDialogOuvert}
+        paire={paire}
+        marquerMutation={marquerMutation}
+        motif={motif}
+        setMotif={setMotif}
+        fusionner={fusionner}
+      />
+
 
       {/* Aperçu rapide de l'offre A ou B (comparaison avant décision). */}
       <ApercuOffre
@@ -174,5 +166,7 @@ const CarteDoublon = ({ paire, onTraitee }) => {
     </motion.article>
   )
 }
+
+
 
 export default CarteDoublon

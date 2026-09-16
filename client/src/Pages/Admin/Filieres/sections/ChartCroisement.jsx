@@ -1,7 +1,7 @@
 import { useMemo } from "react"
 import { useReducedMotion } from "framer-motion"
 import {
-  Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis,
+  Bar, BarChart, CartesianGrid, Legend, Tooltip, XAxis, YAxis,
 } from "recharts"
 import { Scale } from "lucide-react"
 import {
@@ -9,10 +9,11 @@ import {
   useStatsOffresParFiliere,
   useStatsAbonnesParFiliere,
 } from "@/features/admin-filieres.tools"
-import { Empty, EmptyHeader, EmptyMedia, EmptyTitle, EmptyDescription } from "@/components/ui/empty"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import SectionCardAdmin from "@/components/admin/SectionCardAdmin"
+import { SectionErreur, TransitionEtat } from "@/components/admin/EtatsSection"
+import CadreChart from "@/components/admin/CadreChart"
 
 
 /* Couleurs de marque : navy = offre, orange = demande (aplats OK). */
@@ -24,40 +25,136 @@ const formatNombre = (v) => (v ?? 0).toLocaleString("fr-FR")
 /* Tooltip stylé, cohérent avec les autres charts admin. */
 const TooltipCroisement = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null
+
   return (
-    <div className="rounded-lg border border-border bg-popover px-3 py-2 text-xs shadow-md">
-      <p className="mb-1 font-semibold">{label}</p>
-      {payload.map((p) => (
-        <p key={p.dataKey} className="flex items-center gap-1.5 text-muted-foreground">
-          <span
-            className="size-2 shrink-0 rounded-sm"
-            style={{ backgroundColor: p.fill ?? p.color }}
-            aria-hidden="true"
-          />
-          {p.name} : <span className="font-medium tabular-nums">{formatNombre(p.value)}</span>
-        </p>
-      ))}
+    <div className="flex flex-col gap-1.5 rounded-xl border border-border bg-popover p-3.5 text-sm shadow-lg min-w-55">
+      {/* En-tête avec trait de séparation */}
+      <div className="font-semibold text-foreground border-b border-border/40 pb-2">
+        {label}
+      </div>
+
+      {/* Liste des croisements */}
+      <div className="flex flex-col gap-1">
+        {payload.map((p) => (
+          <div
+            key={p.dataKey || p.name}
+            className="flex items-center justify-between gap-6"
+          >
+            {/* Gauche : Carré de couleur + Nom de la métrique */}
+            <div className="flex items-center gap-2.5">
+              <span
+                className="h-2 w-2 shrink-0 rounded-sm shadow-sm"
+                style={{ backgroundColor: p.fill || p.color || p.stroke || "currentColor" }}
+                aria-hidden="true"
+              />
+              <span className="text-muted-foreground truncate max-w-35" title={p.name}>
+                {p.name}
+              </span>
+            </div>
+
+            {/* Droite : Valeur poussée à l'extrémité */}
+            <span className="font-medium text-foreground tabular-nums">
+              {formatNombre(p.value)}
+            </span>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
 
-/* Skeleton en fausses barres duales — évite le saut visuel. */
-const SkeletonCroisement = () => (
-  <div className="flex h-70 items-end justify-around gap-2 px-4 pb-8" aria-hidden="true">
-    {[72, 96, 48, 84, 58, 90, 40, 66].map((h, i) => (
-      <div key={i} className="flex h-full flex-1 items-end justify-center gap-1">
-        <Skeleton className="w-2/5 self-end rounded-t-sm" style={{ height: `${h}%` }} />
-        <Skeleton className="w-2/5 self-end rounded-t-sm" style={{ height: `${Math.max(22, h - 28)}%` }} />
+
+/**
+ * Groupes de barres : [offres, abonnes] — hauteurs en %.
+ * Profil réaliste : tantôt l'offre domine, tantôt la demande,
+ * comme un vrai croisement filière × marché.
+ */
+const GROUPES_BARRES = [
+  [72, 40],
+  [52, 52],
+  [48, 64],
+  [60, 44],
+  [60, 28],
+  [64, 40],
+  [34, 52],
+  [80, 46],
+  [48, 42],
+  [42, 22],
+  [42, 28],
+  [38, 52],
+];
+
+/**
+ * État de chargement du BarChart groupé offres/demande par filière.
+ * Reprend les spécificités du chart réel :
+ *  - 2 barres juxtaposées par filière (groupé, pas empilé), maxBarSize 28 ;
+ *  - hauts de barres arrondis (radius [3,3,0,0]) ;
+ *  - axe X incliné à -35° sur 70px de haut ;
+ *  - légende 2 séries en bas (fontSize 11).
+ * `height` doit correspondre à la hauteur du ResponsiveContainer réel.
+ */
+const ChartCroisementSkeleton = ({ height = 280 }) => (
+  <div
+    role="status"
+    aria-label="Chargement du graphique offres / demande par filière"
+    className="flex w-full flex-col gap-3"
+    style={{ height }}
+  >
+    <div className="flex flex-1 gap-2">
+      {/* Axe Y : 3 graduations fictives */}
+      <div className="flex w-6 flex-col justify-between py-1" aria-hidden="true">
+        {[0, 1, 2].map((i) => (
+          <Skeleton key={i} className="h-2 w-full rounded-sm" />
+        ))}
       </div>
-    ))}
+
+      {/* Zone du graphique */}
+      <div className="flex flex-1 flex-col">
+        {/* Groupes de 2 barres juxtaposées, alignées en bas */}
+        <div className="flex flex-1 items-end gap-4 border-b border-border pb-px">
+          {GROUPES_BARRES.map(([offres, abonnes], i) => (
+            <div key={i} className="flex h-full flex-1 items-end justify-center gap-1">
+              <Skeleton
+                className="w-full max-w-7 rounded-t-[3px]"
+                style={{ height: `${offres}%`, animationDelay: `${i * 80}ms` }}
+              />
+              <Skeleton
+                className="w-full max-w-7 rounded-t-[3px]"
+                style={{ height: `${abonnes}%`, animationDelay: `${i * 80 + 30}ms` }}
+              />
+            </div>
+          ))}
+        </div>
+
+        {/* Libellés de l'axe X : inclinés à -35° comme le XAxis réel
+            (angle={-35}, textAnchor="end", height={70}) */}
+        <div className="flex h-17.5 gap-4" aria-hidden="true">
+          {GROUPES_BARRES.map((_, i) => (
+            <div key={i} className="flex flex-1 justify-center pt-2">
+              <Skeleton className="h-2 w-12 rotate-[-35deg] rounded-sm" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    {/* Légende : équivalent du <Legend wrapperStyle={{ fontSize: 11 }}> — 2 séries */}
+    <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1" aria-hidden="true">
+      {[0, 1].map((i) => (
+        <div key={i} className="flex items-center gap-1.5">
+          <Skeleton className="h-2.5 w-2.5 rounded-xs" />
+          <Skeleton className="h-2.5 w-20 rounded-xs" />
+        </div>
+      ))}
+    </div>
   </div>
-)
+);
 
 const ChartCroisement = () => {
   const mouvementReduit = useReducedMotion()
-  const { data: filieres, isLoading: filieresChargement } = useAdminFilieresQuery()
-  const { data: statsOffres, isLoading: offresChargement } = useStatsOffresParFiliere()
-  const { data: statsAbonnes, isLoading: abonnesChargement } = useStatsAbonnesParFiliere()
+  const { data: filieres, isLoading: filieresChargement, isError: filieresErreur, refetch: refetchFilieres } = useAdminFilieresQuery()
+  const { data: statsOffres, isLoading: offresChargement, isError: offresErreur, refetch: refetchOffres } = useStatsOffresParFiliere()
+  const { data: statsAbonnes, isLoading: abonnesChargement, isError: abonnesErreur, refetch: refetchAbonnes } = useStatsAbonnesParFiliere()
 
   /* Croisement local + tri par volume total décroissant (plus parlant). */
   const donnees = useMemo(() => {
@@ -72,11 +169,21 @@ const ChartCroisement = () => {
       .sort((a, b) => (b.offres + b.abonnes) - (a.offres + a.abonnes))
   }, [filieres, statsOffres, statsAbonnes])
 
-  const chargement = filieresChargement || offresChargement || abonnesChargement
+  const isError = filieresErreur || offresErreur || abonnesErreur
+
+  const refetch = () => {
+    refetchFilieres()
+    refetchOffres()
+    refetchAbonnes()
+  }
+
+  const isLoading = filieresChargement || offresChargement || abonnesChargement
   const aDesDonnees = donnees.some((d) => d.offres > 0 || d.abonnes > 0)
 
   const totalOffres = donnees.reduce((acc, d) => acc + d.offres, 0)
   const totalAbonnes = donnees.reduce((acc, d) => acc + d.abonnes, 0)
+
+  const etat = isError ? "erreur" : isLoading ? "chargement" : !donnees.length ? "vide" : "donnees"
 
   return (
     <SectionCardAdmin
@@ -84,7 +191,7 @@ const ChartCroisement = () => {
       description="Offres actives rattachées face aux abonnés inscrits — un déséquilibre marque une attente insatisfaite ou un gisement d'offres non exploité."
       icon={Scale}
       badge={
-        !chargement &&
+        !isLoading &&
         aDesDonnees && (
           <Badge variant="secondary" className="tabular-nums">
             {formatNombre(totalOffres)} offres · {formatNombre(totalAbonnes)} abonnements
@@ -92,22 +199,13 @@ const ChartCroisement = () => {
         )
       }
     >
-      {chargement ? (
-        <SkeletonCroisement />
-      ) : !aDesDonnees ? (
-        <Empty className="py-8">
-          <EmptyHeader>
-            <EmptyMedia variant="icon" />
-            <EmptyTitle>Pas encore de données</EmptyTitle>
-            <EmptyDescription>
-              Aucune offre ni abonné rattaché à une filière — le croisement apparaîtra dès les
-              premières données de matching.
-            </EmptyDescription>
-          </EmptyHeader>
-        </Empty>
-      ) : (
-        <div style={{ height: 280 }}>
-          <ResponsiveContainer width="100%" height="100%">
+      <TransitionEtat etat={etat}>
+        {isError ? (
+          <SectionErreur onRetry={refetch} message="Impossible de charger l'état du croisement." />
+        ) : isLoading ? (
+          <ChartCroisementSkeleton />
+        ) : (
+          <CadreChart vide={!aDesDonnees} videMessage="Aucune donnée pour le moment." minHeight={220}>
             <BarChart data={donnees} margin={{ top: 8, right: 8, bottom: 0, left: -18 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.3} />
               <XAxis
@@ -147,9 +245,9 @@ const ChartCroisement = () => {
                 animationEasing="ease-out"
               />
             </BarChart>
-          </ResponsiveContainer>
-        </div>
-      )}
+          </CadreChart>
+        )}
+      </TransitionEtat>
     </SectionCardAdmin>
   )
 }

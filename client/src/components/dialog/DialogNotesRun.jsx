@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea"
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog"
-import CompteurCaracteres from "@/Pages/Admin/Scraping/components/CompteurCaracteres"
+import CompteurCaracteres from "@/components/shared/CompteurCaracteres"
 import { useNotify } from "@/contexts/Notify.context"
 
 const DialogNotesRun = ({ ouvert, onFermer, run, mutation }) => {

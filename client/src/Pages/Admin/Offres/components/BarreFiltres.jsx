@@ -4,12 +4,12 @@ import { useFiltresOffresAdmin } from "@/contexts/FiltresOffresAdmin.context"
 import { STATUTS_OFFRE, ORIGINES_OFFRE } from "@/features/admin-offres.tools"
 import { useRechercheDebouncee } from "@/hooks/use-recherche-debouncee"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Spinner } from "@/components/ui/spinner"
 import {
   Select, SelectTrigger, SelectValue, SelectContent, SelectItem,
 } from "@/components/ui/select"
+import BtnAction from "@/components/admin/BtnAction"
 
 
 const FILTRES_VISIBLES = [
@@ -100,9 +100,9 @@ const BarreFiltres = ({ chargement = false }) => {
                 <Badge variant="secondary" className="gap-1 tabular-nums">
                   <Filter aria-hidden className="size-3" /> {nbFiltresActifs} filtre{nbFiltresActifs > 1 ? "s" : ""}
                 </Badge>
-                <Button variant="ghost" size="sm" className="h-8 text-xs" onClick={reinitialiser}>
+                <BtnAction variant="outline" size="xs" onClick={reinitialiser}>
                   <RotateCcw aria-hidden className="size-3" /> Réinitialiser
-                </Button>
+                </BtnAction>
               </motion.div>
             )}
           </AnimatePresence>

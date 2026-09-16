@@ -5,12 +5,13 @@ import {
 } from "@/features/admin-filieres.tools"
 import CarteCompteur from "@/components/admin/CarteCompteur"
 import { Briefcase, FolderGit2, Tag, Users } from "lucide-react"
+import { SectionErreur, TransitionEtat } from "@/components/admin/EtatsSection"
 
 
 const CompteursFilieres = () => {
-  const { data: filieres, isLoading } = useAdminFilieresQuery()
-  const { data: statsOffres, isLoading: offresChargement } = useStatsOffresParFiliere()
-  const { data: statsAbonnes, isLoading: abonnesChargement } = useStatsAbonnesParFiliere()
+  const { data: filieres, isError: filieresErreur, refetch: refetchFilieres } = useAdminFilieresQuery()
+  const { data: statsOffres, isError: offresErreur, refetch: refetchOffres } = useStatsOffresParFiliere()
+  const { data: statsAbonnes, isError: abonnesErreur, refetch: refetchAbonnes } = useStatsAbonnesParFiliere()
 
   const actives = useMemo(
     () => (filieres ?? []).filter((f) => f.is_active).length,
@@ -31,34 +32,45 @@ const CompteursFilieres = () => {
     [statsAbonnes]
   )
 
+  const isError = filieresErreur || offresErreur || abonnesErreur
+
+  const refetch = () => {
+    refetchFilieres()
+    refetchOffres()
+    refetchAbonnes()
+  }
+
   return (
-    <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-      <CarteCompteur
-        label="Filières actives"
-        valeur={actives}
-        suffixe={`/${filieres?.length ?? 0}`}
-        icone={FolderGit2}
-        chargement={isLoading}
-      />
-      <CarteCompteur
-        label="Offres rattachées"
-        valeur={offresTotal}
-        icone={Briefcase}
-        chargement={offresChargement}
-      />
-      <CarteCompteur
-        label="Abonnés rattachés"
-        valeur={abonnesTotal}
-        icone={Users}
-        chargement={abonnesChargement}
-      />
-      <CarteCompteur
-        label="Filières sans mot-clé"
-        valeur={sansMotCle}
-        icone={Tag}
-        chargement={isLoading}
-      />
-    </div>
+    <TransitionEtat etat={isError ? "erreur" : "donnees"} >
+      {isError ? (
+        <SectionErreur onRetry={refetch} message="Impossible de charger les filieres." />
+      ) : (
+        <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
+          <CarteCompteur
+            label="Filières actives"
+            valeur={actives}
+            suffixe={`/${filieres?.length ?? 0}`}
+            icone={FolderGit2}
+          />
+          <CarteCompteur
+            label="Offres rattachées"
+            valeur={offresTotal}
+            icone={Briefcase}
+          />
+          <CarteCompteur
+            label="Abonnés rattachés"
+            valeur={abonnesTotal}
+            icone={Users}
+          />
+          <CarteCompteur
+            label="Filières sans mot-clé"
+            valeur={sansMotCle}
+            icone={Tag}
+          />
+        </div>
+      )
+      }
+    </TransitionEtat>
   )
 }
 

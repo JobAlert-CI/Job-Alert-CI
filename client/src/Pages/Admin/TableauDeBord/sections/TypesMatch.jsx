@@ -4,8 +4,7 @@ import { Tags } from "lucide-react"
 import { cn } from "cn"
 import { useAdminTierStatsQuery, usePeutVoirEnvois } from "@/features/admin-matching.tools"
 import { Badge } from "@/components/ui/badge"
-import { Skeleton } from "@/components/ui/skeleton"
-import { SectionErreur, SectionVide } from "../components/EtatsSection"
+import { SectionErreur, SectionVide } from "@/components/admin/EtatsSection"
 import SectionCardAdmin from "@/components/admin/SectionCardAdmin"
 
 
@@ -45,6 +44,43 @@ const SecteurActif = ({ cx, cy, innerRadius, outerRadius, startAngle, endAngle, 
   />
 )
 
+
+/**
+ * État de chargement du PieChart de répartition des types de matching (donut).
+ * Reproduit la géométrie réelle :
+ *  - anneau entre 60% et 85% du rayon → trou central de (1 - 60/85)/2 ≈ 14,7% d'inset ;
+ *  - gaps de 2° entre segments (paddingAngle) ;
+ *  - 3 segments proportionnels à la fixture
+ *    (filiere_keyword ≈ 72%, city_match ≈ 24%, fallback_tier ≈ 4%).
+ */
+const ChartTypesMatchSkeleton = ({ height = 220 }) => (
+  <div
+    role="status"
+    aria-label="Chargement du graphique de répartition des types de matching"
+    className="flex h-full w-full animate-pulse items-center justify-center"
+    style={{ height }}
+  >
+    <div className="relative aspect-square w-full max-w-37.5">
+      {/* Donut : 3 segments neutres séparés par des gaps de 2° */}
+      <div
+        className="absolute inset-0 rounded-full"
+        style={{
+          background: `conic-gradient(
+            var(--color-muted) 0deg 257deg,
+            transparent 257deg 259deg,
+            var(--color-surface-container-high) 259deg 342deg,
+            transparent 342deg 344deg,
+            var(--color-muted) 344deg 358deg,
+            transparent 358deg 360deg
+          )`,
+        }}
+      />
+      {/* Trou central (innerRadius 60% / outerRadius 85%) */}
+      <div className="absolute rounded-full bg-card" style={{ inset: "14.7%" }} />
+    </div>
+  </div>
+);
+
 const TypesMatch = () => {
   const autorise = usePeutVoirEnvois()
   const { data, isLoading, isError, refetch } = useAdminTierStatsQuery(7)
@@ -79,10 +115,10 @@ const TypesMatch = () => {
     >
       {!autorise ? (
         <SectionVide message="Statistiques d'envoi réservées aux super admins et gestionnaires utilisateurs." />
-      ) :isError ? (
+      ) : isError ? (
         <SectionErreur onRetry={refetch} message="Impossible de charger les types de match." />
       ) : isLoading ? (
-        <Skeleton className="h-48 w-full" />
+        <ChartTypesMatchSkeleton />
       ) : !parts.length ? (
         <SectionVide message="Aucune offre rattachée sur les 7 derniers jours." />
       ) : (

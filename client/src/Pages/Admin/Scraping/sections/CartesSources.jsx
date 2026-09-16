@@ -5,7 +5,7 @@ import { useAdminScrapingStatusQuery } from "@/features/admin-scraping.tools"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import SectionCardAdmin from "@/components/admin/SectionCardAdmin"
-import { SectionErreur, SectionVide } from "../components/EtatsSection"
+import { SectionErreur, SectionVide, TransitionEtat } from "@/components/admin/EtatsSection"
 import { dureeLisible, dateHeure, ilYA } from "../components/statuts-scraping"
 
 
@@ -101,9 +101,63 @@ const CarteSource = ({ source }) => {
   )
 }
 
+
+/**
+ * État de chargement d'une carte source (page /admin/scraping).
+ * Reprend la géométrie exacte de CarteSource : icône size-8, nom + code,
+ * badge à droite, dl 2 colonnes, bandeau d'erreur optionnel.
+ */
+const CarteSourceSkeleton = () => {
+  return (
+    <article
+      className="flex animate-pulse flex-col gap-3 rounded-xl border border-border border-l-[3px] border-l-border bg-card p-4 shadow-soft"
+      aria-hidden="true"
+    >
+      {/* En-tête : icône + nom/code + badge */}
+      <div className="flex items-start justify-between gap-2">
+        <div className="flex min-w-0 items-center gap-2.5">
+          <span
+            className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-brand-navy text-brand-orange"
+          >
+            <Globe className="size-4" />
+          </span>
+          <div className="min-w-0 space-y-1">
+            <Skeleton className="h-3.5 w-24" />
+            <Skeleton className="h-2.5 w-16" />
+          </div>
+        </div>
+        {/* Badge de statut */}
+        <Skeleton className="h-5 w-16 shrink-0 rounded-full" />
+      </div>
+
+      {/* dl : dernier passage pleine largeur, puis durée / runs totaux */}
+      <div className="grid grid-cols-2 gap-x-3 gap-y-1.5">
+        <div className="col-span-2 flex items-center justify-between gap-2">
+          <Skeleton className="h-3 w-24" />
+          <Skeleton className="h-3 w-36" />
+        </div>
+        <div className="flex items-center justify-between gap-2">
+          <Skeleton className="h-3 w-10" />
+          <Skeleton className="h-3 w-12" />
+        </div>
+        <div className="flex items-center justify-between gap-2">
+          <Skeleton className="h-3 w-16" />
+          <Skeleton className="h-3 w-8" />
+        </div>
+      </div>
+
+      {/* Bandeau d'erreur (miroir du bloc role="alert") */}
+      <Skeleton className="h-7.5 w-full rounded-lg" />
+    </article>
+  );
+}
+
 const CartesSources = () => {
-  const { data, isLoading, isError, refetch } = useAdminScrapingStatusQuery()
-  const sourcesOk = (data ?? []).filter((s) => s.last_status === "success").length
+  const { data, isLoading, isError, refetch } = useAdminScrapingStatusQuery();
+  const sourcesOk = (data ?? []).filter((s) => s.last_status === "success").length;
+
+  const etat = isError ? "erreur" : isLoading ? "chargement" : !data?.length ? "vide" : "donnees";
+
 
   return (
     <SectionCardAdmin
@@ -117,16 +171,21 @@ const CartesSources = () => {
           </Badge>
         )
       }
-    >
-      {isError ? (
-        <SectionErreur onRetry={refetch} message="Impossible de charger l'état des sources." />
-      ) : isLoading ? (
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3" aria-busy="true">
-          {[...Array(3)].map((_, i) => <Skeleton key={i} className="h-40 rounded-xl" />)}
-        </div>
-      ) : !data?.length ? (
-        <SectionVide message="Aucune source configurée. Lancez le seed des sources (npm run seed:scraper-sources)." />
-      ) : (
+    >      
+      <TransitionEtat etat={etat}>
+        {isError ? (
+          <SectionErreur onRetry={refetch} message="Impossible de charger l'état des sources." />
+        ) : isLoading ? (
+          <div role="status" aria-label="Chargement de l'état des sources" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            {Array.from({ length: 6 }, (_, i) => (
+              <div key={i} style={{ animationDelay: `${i * 100}ms` }}>
+                <CarteSourceSkeleton />
+              </div>
+            ))}
+          </div>
+        ) : !data?.length ? (
+          <SectionVide message="Aucune source configurée. Lancez le seed des sources (npm run seed:scraper-sources)." />
+        ) : (
         /* Apparition en cascade des cartes à l'arrivée des données. */
         <motion.div
           variants={VARIANTS_GRILLE}
@@ -139,6 +198,7 @@ const CartesSources = () => {
           ))}
         </motion.div>
       )}
+      </TransitionEtat>
     </SectionCardAdmin>
   )
 }

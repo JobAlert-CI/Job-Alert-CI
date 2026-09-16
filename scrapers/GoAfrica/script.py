@@ -29,6 +29,7 @@ from extract_offer import parse_job_html_go
 # CHARGEMENT DU .ENV
 # =============================================================================
 
+
 def load_env_file_fallback() -> None:
     """
     Charge manuellement un fichier .env si python-dotenv n'est pas installé.
@@ -64,7 +65,10 @@ def load_env_file_fallback() -> None:
 
             return
         except Exception as exc:
-            print(f"Impossible de charger manuellement le fichier .env : {exc}", file=sys.stderr)
+            print(
+                f"Impossible de charger manuellement le fichier .env : {exc}",
+                file=sys.stderr,
+            )
             return
 
 
@@ -174,9 +178,21 @@ PUBLISHED_DATE_ICON_SELECTORS = (
 )
 
 MOIS_FR_CARD = {
-    "janvier": 1, "février": 2, "fevrier": 2, "mars": 3, "avril": 4,
-    "mai": 5, "juin": 6, "juillet": 7, "août": 8, "aout": 8,
-    "septembre": 9, "octobre": 10, "novembre": 11, "décembre": 12, "decembre": 12
+    "janvier": 1,
+    "février": 2,
+    "fevrier": 2,
+    "mars": 3,
+    "avril": 4,
+    "mai": 5,
+    "juin": 6,
+    "juillet": 7,
+    "août": 8,
+    "aout": 8,
+    "septembre": 9,
+    "octobre": 10,
+    "novembre": 11,
+    "décembre": 12,
+    "decembre": 12,
 }
 
 try:
@@ -190,7 +206,15 @@ except ValueError:
     ACTION_TIMEOUT_MS = 8000
 
 LOG_LEVEL = os.getenv("GO_LOG_LEVEL", "INFO").strip().upper()
-if LOG_LEVEL not in {"TRACE", "DEBUG", "INFO", "SUCCESS", "WARNING", "ERROR", "CRITICAL"}:
+if LOG_LEVEL not in {
+    "TRACE",
+    "DEBUG",
+    "INFO",
+    "SUCCESS",
+    "WARNING",
+    "ERROR",
+    "CRITICAL",
+}:
     LOG_LEVEL = "INFO"
 
 BLOCKED_RESOURCE_TYPES = {"image", "font"}
@@ -328,6 +352,7 @@ BADGE_CLASS_HINTS = (
 # LOGGING
 # =============================================================================
 
+
 def setup_logger() -> None:
     """
     Configure les logs :
@@ -365,13 +390,14 @@ def setup_logger() -> None:
 # OUTILS GÉNÉRIQUES
 # =============================================================================
 
+
 def retry_sync(
-        func: Callable[[], Any],
-        *,
-        attempts: int = 3,
-        min_delay: float = 1.0,
-        max_delay: float = 8.0,
-        what: str = "opération",
+    func: Callable[[], Any],
+    *,
+    attempts: int = 3,
+    min_delay: float = 1.0,
+    max_delay: float = 8.0,
+    what: str = "opération",
 ) -> Any:
     """
     Réessaie une fonction avec backoff exponentiel.
@@ -382,11 +408,11 @@ def retry_sync(
         try:
             return func()
         except (
-                PlaywrightError,
-                PlaywrightTimeoutError,
-                ConnectionError,
-                TimeoutError,
-                OSError,
+            PlaywrightError,
+            PlaywrightTimeoutError,
+            ConnectionError,
+            TimeoutError,
+            OSError,
         ) as exc:
             last_exception = exc
 
@@ -426,7 +452,9 @@ def human_wait(page: Optional[Page], min_s: float = 1.0, max_s: float = 3.0) -> 
     try:
         page.wait_for_timeout(int(delay * 1000))
     except Exception as exc:
-        logger.debug(f"human_wait via Playwright impossible, fallback time.sleep : {exc}")
+        logger.debug(
+            f"human_wait via Playwright impossible, fallback time.sleep : {exc}"
+        )
         time.sleep(delay)
 
 
@@ -557,7 +585,9 @@ def build_html_parser(page: Page) -> Optional[HTMLParser]:
         content = page.content()
         return HTMLParser(content)
     except Exception as exc:
-        logger.opt(exception=True).error(f"Impossible de récupérer le HTML de la page : {exc}")
+        logger.opt(exception=True).error(
+            f"Impossible de récupérer le HTML de la page : {exc}"
+        )
         return None
 
 
@@ -579,7 +609,9 @@ def save_json(data: Any, path: Path, description: str) -> None:
         count = len(data) if hasattr(data, "__len__") else "?"
         logger.debug(f"{description} sauvegardé : {path} ({count} élément(s)).")
     except Exception as exc:
-        logger.opt(exception=True).error(f"Échec de la sauvegarde JSON vers {path} : {exc}")
+        logger.opt(exception=True).error(
+            f"Échec de la sauvegarde JSON vers {path} : {exc}"
+        )
 
 
 def close_safely(closeable: Any, name: str) -> None:
@@ -599,6 +631,7 @@ def close_safely(closeable: Any, name: str) -> None:
 # =============================================================================
 # PLAYWRIGHT : NAVIGATION / ACTIONS
 # =============================================================================
+
 
 def block_resources(route: Route) -> None:
     """
@@ -622,7 +655,9 @@ def apply_stealth(context: Any) -> None:
     Applique playwright-stealth si disponible.
     """
     if STEALTH_MODE is None:
-        logger.warning("playwright-stealth n'est pas installé. Continuation sans stealth.")
+        logger.warning(
+            "playwright-stealth n'est pas installé. Continuation sans stealth."
+        )
         return
 
     try:
@@ -674,7 +709,9 @@ def create_context(browser: Any) -> Any:
     try:
         context.route("**/*", block_resources)
     except Exception as exc:
-        logger.warning(f"Impossible de mettre en place le blocage de ressources : {exc}")
+        logger.warning(
+            f"Impossible de mettre en place le blocage de ressources : {exc}"
+        )
 
     apply_stealth(context)
 
@@ -723,9 +760,9 @@ def wait_for_page_ready(page: Page) -> None:
 
 
 def safe_click_locator(
-        locator: Locator,
-        description: str,
-        timeout_ms: int = ACTION_TIMEOUT_MS,
+    locator: Locator,
+    description: str,
+    timeout_ms: int = ACTION_TIMEOUT_MS,
 ) -> bool:
     """
     Clique sur un locator de manière sécurisée.
@@ -902,44 +939,49 @@ def goto_next_page(page: Page, current_page_number: int) -> bool:
 # FILTRE DE FRAÎCHEUR - GoAfricaOnline
 # =============================================================================
 
+
 def parse_card_date(text: Optional[str]) -> Optional[datetime]:
     """
-    Parse une date au format "Posté le 13 août 2026" ou "13 août 2026".
+    Parse une date au format "Posté le 13 août 2026", "13 août 2026" ou "2 sept. 2026".
     Retourne un datetime UTC ou None.
     """
     if not text:
         return None
-    
+
     # Nettoyage
     cleaned = clean_text(text)
     if not cleaned:
         return None
-    
+
     # Enlever le préfixe "Posté le "
     cleaned = re.sub(r"^post[ée]e?\s+le\s*", "", cleaned, flags=re.IGNORECASE).strip()
-    
-    # Format texte FR : "13 août 2026", "1er août 2026"
+
+    # Format texte FR : "13 août 2026", "1er août 2026", "2 sept. 2026"
     normalized = remove_accents(cleaned).lower()
-    
-    # Pattern : jour (1 ou 2 chiffres, optionnel "er"), mois (lettres), année
-    match = re.search(r"(\d{1,2})(?:er)?\s+([a-zûé]+)\s+(\d{4})", normalized)
+
+    # Pattern : jour (1 ou 2 chiffres, optionnel "er"), mois (lettres avec point optionnel), année
+    match = re.search(r"(\d{1,2})(?:er)?\s+([a-zûé]+)\.?\s+(\d{4})", normalized)
     if match:
         jour = int(match.group(1))
         mois_texte = match.group(2)
         annee = int(match.group(3))
-        
+
+        # Gestion des abréviations (ex: "sept" -> "septembre")
+        month_key = mois_texte[:3]
+        mois_texte = MONTH_ALIASES.get(month_key, mois_texte)
+
         if mois_texte not in MOIS_FR_CARD:
             logger.debug(f"Mois inconnu : '{mois_texte}' dans '{text}'")
             return None
-        
         mois_chiffre = MOIS_FR_CARD[mois_texte]
-        
         try:
             return datetime(annee, mois_chiffre, jour, tzinfo=timezone.utc)
         except ValueError as exc:
-            logger.debug(f"Date invalide : {jour}/{mois_chiffre}/{annee} <- '{text}' : {exc}")
+            logger.debug(
+                f"Date invalide : {jour}/{mois_chiffre}/{annee} <- '{text}' : {exc}"
+            )
             return None
-    
+
     # Format numérique FR : 13/08/2026
     match = re.search(r"(\d{1,2})[/.-](\d{1,2})[/.-](\d{4})", cleaned)
     if match:
@@ -948,7 +990,7 @@ def parse_card_date(text: Optional[str]) -> Optional[datetime]:
             return datetime(int(year), int(month), int(day), tzinfo=timezone.utc)
         except ValueError:
             return None
-    
+
     logger.debug(f"Format de date non reconnu : '{text}'")
     return None
 
@@ -956,12 +998,12 @@ def parse_card_date(text: Optional[str]) -> Optional[datetime]:
 def extract_card_published_date(card: Any) -> Optional[datetime]:
     """
     Extrait la date de publication depuis une carte GoAfricaOnline.
-    
+
     HTML typique :
         <div class="flex ... [grid-area:date]">
             <i class="tnp tnp-clock"></i> Posté le 13 août 2026
         </div>
-    
+
     Stratégie : trouver l'icône i.tnp.tnp-clock, puis prendre le texte du parent.
     """
     for icon_selector in PUBLISHED_DATE_ICON_SELECTORS:
@@ -969,40 +1011,42 @@ def extract_card_published_date(card: Any) -> Optional[datetime]:
             icon_node = card.css_first(icon_selector)
             if icon_node is None:
                 continue
-            
+
             # Remonter au parent pour récupérer le texte complet
             parent = icon_node.parent
             if parent is None:
                 continue
-            
+
             text = clean_text(safe_text(parent))
             if not text:
                 continue
-            
+
             dt = parse_card_date(text)
             if dt:
                 logger.debug(f"Date de publication extraite : {dt.date()} <- '{text}'")
                 return dt
         except Exception as exc:
             logger.debug(f"Erreur extraction date avec icône '{icon_selector}' : {exc}")
-    
+
     # Fallback : chercher directement dans le texte de la carte
     try:
         card_text = clean_text(safe_text(card))
         if card_text:
             match = re.search(
-                r"post[ée]e?\s+le\s+(\d{1,2}(?:er)?\s+[a-zûé]+\s+\d{4})",
+                r"post[ée]e?\s+le\s+(\d{1,2}(?:er)?\s+[a-zûé]+\.?\s+\d{4})",
                 card_text,
                 re.IGNORECASE,
             )
             if match:
                 dt = parse_card_date(match.group(1))
                 if dt:
-                    logger.debug(f"Date de publication extraite via fallback : {dt.date()}")
+                    logger.debug(
+                        f"Date de publication extraite via fallback : {dt.date()}"
+                    )
                     return dt
     except Exception as exc:
         logger.debug(f"Erreur extraction date via fallback : {exc}")
-    
+
     logger.debug("Date de publication non trouvée sur cette carte.")
     return None
 
@@ -1015,38 +1059,46 @@ def is_offer_fresh(
     """
     Vérifie si une offre est fraîche (publiée récemment).
     Sur GoAfricaOnline, pas de date d'expiration sur les cartes.
-    
+
     Retourne un tuple (is_valid, reason).
     """
     now = reference_date or datetime.now(timezone.utc)
     today_date = now.date()
-    
-    logger.debug(f"[{url}] Vérification de fraîcheur (date de référence : {today_date})")
-    
+
+    logger.debug(
+        f"[{url}] Vérification de fraîcheur (date de référence : {today_date})"
+    )
+
     published_dt = extract_card_published_date(card)
-    
+
     if published_dt is None:
-        logger.debug(f"[{url}] Date de publication introuvable, offre acceptée par défaut.")
+        logger.debug(
+            f"[{url}] Date de publication introuvable, offre acceptée par défaut."
+        )
         return True, "date non détectée, offre acceptée"
-    
+
     days_old = (today_date - published_dt.date()).days
-    logger.debug(f"[{url}] Offre publiée il y a {days_old} jour(s) (le {published_dt.date()})")
-    
+    logger.debug(
+        f"[{url}] Offre publiée il y a {days_old} jour(s) (le {published_dt.date()})"
+    )
+
     # Si MAX_DAYS_OLD < 0, on désactive le filtre de fraîcheur
     if MAX_DAYS_OLD >= 0 and days_old > MAX_DAYS_OLD:
         reason = f"offre trop ancienne (publiée il y a {days_old} jour(s), le {published_dt.date()})"
         return False, reason
-    
+
     if days_old < 0:
-        logger.debug(f"[{url}] Date de publication dans le futur ({published_dt.date()}), offre acceptée.")
-    
+        logger.debug(
+            f"[{url}] Date de publication dans le futur ({published_dt.date()}), offre acceptée."
+        )
+
     return True, f"publiée le {published_dt.date()}"
 
 
 def extract_links_from_current_page(page: Page) -> tuple[list[str], list[str], bool]:
     """
     Extrait les liens de la page courante avec filtrage de fraîcheur.
-    
+
     Retourne un tuple :
       - fresh_links : offres fraîches (récentes)
       - fallback_links : tous les liens valides (pour le fallback si aucune offre fraîche)
@@ -1054,45 +1106,47 @@ def extract_links_from_current_page(page: Page) -> tuple[list[str], list[str], b
                       (signale qu'il faut arrêter la pagination)
     """
     html = build_html_parser(page)
-    
+
     if html is None:
         return [], [], False
-    
+
     fresh_links: list[str] = []
     fallback_links: list[str] = []
     seen_local: set[str] = set()
     stop_signal = False
-    
+
     stats = {
         "total_cards": 0,
         "fresh": 0,
         "rejected_too_old": 0,
         "rejected_no_link": 0,
     }
-    
+
     # Récupérer les cartes - essayer div.grid.grid-header d'abord
     cards = []
     for card_selector in CARD_SELECTORS:
         try:
             cards = html.css(card_selector)
             if cards:
-                logger.debug(f"Cartes trouvées avec le sélecteur '{card_selector}' : {len(cards)}")
+                logger.debug(
+                    f"Cartes trouvées avec le sélecteur '{card_selector}' : {len(cards)}"
+                )
                 break
         except Exception as exc:
             logger.debug(f"Sélecteur de carte invalide '{card_selector}' : {exc}")
             continue
-    
+
     if not cards:
         logger.warning("Aucune carte d'offre trouvée sur cette page.")
         return [], [], False
-    
+
     stats["total_cards"] = len(cards)
-    
+
     # Parcourir chaque carte
     for card_index, card in enumerate(cards, start=1):
         # --- Extraction du lien ---
         href = None
-        
+
         for link_selector in CARD_LINK_SELECTORS:
             try:
                 a_tag = card.css_first(link_selector)
@@ -1104,34 +1158,34 @@ def extract_links_from_current_page(page: Page) -> tuple[list[str], list[str], b
                     break
             except Exception:
                 continue
-        
+
         url = normalize_url(href)
         if not url:
             stats["rejected_no_link"] += 1
             logger.debug(f"Carte {card_index} : lien invalide ou absent")
             continue
-        
+
         # --- On ajoute TOUJOURS le lien au fallback ---
         if url not in seen_local:
             seen_local.add(url)
             fallback_links.append(url)
-        
+
         # --- Vérification de fraîcheur ---
         is_valid, reason = is_offer_fresh(card, url)
-        
+
         if not is_valid:
             stats["rejected_too_old"] += 1
             logger.info(f"🛑 Offre non fraîche [{url}] : {reason}")
             logger.info("   -> ARRÊT IMMÉDIAT de la collecte sur cette page")
             stop_signal = True
             break  # On arrête immédiatement la boucle sur les cartes
-        
+
         # --- Offre fraîche : on l'ajoute ---
         if url not in fresh_links:
             fresh_links.append(url)
             stats["fresh"] += 1
             logger.info(f"✅ Offre fraîche acceptée [{url}] : {reason}")
-    
+
     # Log récapitulatif
     logger.info(
         f"📊 Filtrage page terminé : "
@@ -1140,17 +1194,19 @@ def extract_links_from_current_page(page: Page) -> tuple[list[str], list[str], b
         f"{stats['rejected_no_link']} sans lien "
         f"(sur {stats['total_cards']} carte(s) analysée(s))"
     )
-    
+
     if stop_signal:
-        logger.warning("🛑 SIGNAL D'ARRÊT ÉMIS : une offre non fraîche a été rencontrée.")
-    
+        logger.warning(
+            "🛑 SIGNAL D'ARRÊT ÉMIS : une offre non fraîche a été rencontrée."
+        )
+
     return fresh_links, fallback_links, stop_signal
 
 
 def collect_all_job_links(page: Page) -> list[str]:
     """
     Collecte les liens de postes sur plusieurs pages.
-    
+
     Logique :
       - Si on rencontre une offre non fraîche → arrêt immédiat
       - Si à la fin on a au moins 1 offre fraîche → on les retourne
@@ -1160,42 +1216,42 @@ def collect_all_job_links(page: Page) -> list[str]:
     all_fallback_links: list[str] = []
     seen_fresh: set[str] = set()
     seen_fallback: set[str] = set()
-    
+
     current_page_number = 1
     max_pages = max(1, MAX_PAGES)
-    
+
     logger.info(
         f"Filtre de fraîcheur actif : MAX_DAYS_OLD={MAX_DAYS_OLD} "
         f"(pas de vérification d'expiration sur GoAfricaOnline)"
     )
-    
+
     while current_page_number <= max_pages:
         logger.info(f"Collecte des liens sur la page {current_page_number}.")
-        
+
         wait_for_page_ready(page)
         auto_scroll(page)
-        
+
         page_fresh, page_fallback, stop_signal = extract_links_from_current_page(page)
-        
+
         # Ajoute les offres fraîches (dédupliquées)
         new_fresh = [link for link in page_fresh if link not in seen_fresh]
         if new_fresh:
             seen_fresh.update(new_fresh)
             fresh_links.extend(new_fresh)
-        
+
         # Ajoute les offres de fallback (dédupliquées)
         new_fallback = [link for link in page_fallback if link not in seen_fallback]
         if new_fallback:
             seen_fallback.update(new_fallback)
             all_fallback_links.extend(new_fallback)
-        
+
         logger.info(
             f"Page {current_page_number} : "
             f"{len(page_fresh)} fraîche(s), "
             f"{len(page_fallback)} totale(s), "
             f"total fraîches collectées : {len(fresh_links)}."
         )
-        
+
         # --- Cas 1 : arrêt demandé (offre non fraîche rencontrée) ---
         if stop_signal:
             logger.info(
@@ -1203,34 +1259,36 @@ def collect_all_job_links(page: Page) -> list[str]:
                 f"On conserve les {len(fresh_links)} offre(s) fraîche(s) déjà collectée(s)."
             )
             break
-        
+
         # --- Cas 2 : aucune nouvelle offre fraîche et page > 1 ---
         if not new_fresh and current_page_number > 1:
-            logger.info("Aucune nouvelle offre fraîche sur cette page. Arrêt de la pagination.")
+            logger.info(
+                "Aucune nouvelle offre fraîche sur cette page. Arrêt de la pagination."
+            )
             break
-        
+
         # --- Cas 3 : nombre max de pages atteint ---
         if current_page_number >= max_pages:
             logger.info("Nombre maximum de pages atteint.")
             break
-        
+
         # --- Pagination ---
         if not goto_next_page(page, current_page_number):
             logger.info("Fin de la pagination.")
             break
-        
+
         current_page_number += 1
-    
+
     # ============================================================
     # DÉCISION FINALE
     # ============================================================
-    
+
     if fresh_links:
         logger.info(
             f"✅ Collecte terminée avec {len(fresh_links)} offre(s) fraîche(s)."
         )
         return fresh_links
-    
+
     # Aucune offre fraîche → fallback
     fallback_count = min(10, len(all_fallback_links))
     logger.warning(
@@ -1241,10 +1299,10 @@ def collect_all_job_links(page: Page) -> list[str]:
     return all_fallback_links[:10]
 
 
-
 # =============================================================================
 # EXTRACTION DES DONNÉES D'UN POSTE
 # =============================================================================
+
 
 def is_true_teletravail(text: Optional[str]) -> bool:
     """
@@ -1274,9 +1332,9 @@ def get_data_job(html: HTMLParser, url: str) -> dict[str, Any]:
     Extrait les données d'une page de poste en utilisant le parser unifié.
     """
     logger.info(f"Début de l'extraction des données sur {url} via extract_offer_Go.")
-    
+
     job_data = parse_job_html_go(html, source_url=url)
-    
+
     useful_fields = (
         job_data.get("title"),
         job_data.get("description"),
@@ -1284,27 +1342,31 @@ def get_data_job(html: HTMLParser, url: str) -> dict[str, Any]:
     )
     if not any(useful_fields):
         logger.warning(f"Aucun champ réellement utile trouvé sur {url}.")
-        
+
     # 3. Couche d'adaptation (Adapter) pour la rétrocompatibilité
     # (Au cas où ton API ou la suite du script attend les anciennes clés)
-        
+
     # Mapping du télétravail
     remote_raw = job_data.get("remote_work")
     if remote_raw:
         job_data["télétravail"] = remote_raw
         job_data["is_télétravail"] = is_true_teletravail(remote_raw)
-        
+
     # Le statut "active" peut être déduit de la date de publication
     if not job_data.get("active"):
         job_data["active"] = job_data.get("published_at")
 
     return job_data
 
+
 # =============================================================================
 # TRAITEMENT DES LIENS DE POSTES
 # =============================================================================
 
-def scrape_job_links(page: Page, links: list[str]) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+
+def scrape_job_links(
+    page: Page, links: list[str]
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     """
     Parcourt chaque lien de poste et extrait les données.
     """
@@ -1322,7 +1384,9 @@ def scrape_job_links(page: Page, links: list[str]) -> tuple[list[dict[str, Any]]
                     {
                         "url": link,
                         "erreur": "Navigation impossible ou page non chargée.",
-                        "timestamp": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                        "timestamp": datetime.now(timezone.utc).isoformat(
+                            timespec="seconds"
+                        ),
                     }
                 )
                 continue
@@ -1336,7 +1400,9 @@ def scrape_job_links(page: Page, links: list[str]) -> tuple[list[dict[str, Any]]
                     {
                         "url": link,
                         "erreur": "HTML de la page inaccessible.",
-                        "timestamp": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                        "timestamp": datetime.now(timezone.utc).isoformat(
+                            timespec="seconds"
+                        ),
                     }
                 )
                 continue
@@ -1346,16 +1412,22 @@ def scrape_job_links(page: Page, links: list[str]) -> tuple[list[dict[str, Any]]
             if job and (job.get("title") or job.get("description")):
                 jobs.append(job)
                 save_json(jobs, OUTPUT_FILE, "Données des jobs")
-                logger.info(f"[{index}/{total}] Données extraites avec succès pour {link}.")
+                logger.info(
+                    f"[{index}/{total}] Données extraites avec succès pour {link}."
+                )
             else:
                 failures.append(
                     {
                         "url": link,
                         "erreur": "Aucune donnée pertinente trouvée.",
-                        "timestamp": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                        "timestamp": datetime.now(timezone.utc).isoformat(
+                            timespec="seconds"
+                        ),
                     }
                 )
-                logger.warning(f"[{index}/{total}] Aucune donnée pertinente pour {link}.")
+                logger.warning(
+                    f"[{index}/{total}] Aucune donnée pertinente pour {link}."
+                )
 
         except Exception as exc:
             logger.opt(exception=True).error(
@@ -1366,7 +1438,9 @@ def scrape_job_links(page: Page, links: list[str]) -> tuple[list[dict[str, Any]]
                 {
                     "url": link,
                     "erreur": str(exc),
-                    "timestamp": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+                    "timestamp": datetime.now(timezone.utc).isoformat(
+                        timespec="seconds"
+                    ),
                 }
             )
 
@@ -1379,6 +1453,7 @@ def scrape_job_links(page: Page, links: list[str]) -> tuple[list[dict[str, Any]]
 # =============================================================================
 # FONCTION PRINCIPALE
 # =============================================================================
+
 
 def main() -> int:
     setup_logger()
@@ -1409,7 +1484,9 @@ def main() -> int:
                 page = context.new_page()
 
                 if not goto_safe(page, BASE_URL):
-                    logger.critical(f"Impossible de charger la page de base : {BASE_URL}")
+                    logger.critical(
+                        f"Impossible de charger la page de base : {BASE_URL}"
+                    )
                     exit_code = 1
                 else:
                     human_wait(page, 1.0, 3.0)
@@ -1429,11 +1506,15 @@ def main() -> int:
                     jobs, failures = scrape_job_links(page, links)
 
             except KeyboardInterrupt:
-                logger.warning("Interruption manuelle du script. Sauvegarde des données partielles.")
+                logger.warning(
+                    "Interruption manuelle du script. Sauvegarde des données partielles."
+                )
                 exit_code = 130
 
             except Exception as exc:
-                logger.opt(exception=True).critical(f"Erreur globale pendant le scraping : {exc}")
+                logger.opt(exception=True).critical(
+                    f"Erreur globale pendant le scraping : {exc}"
+                )
                 exit_code = 1
 
             finally:
@@ -1442,9 +1523,16 @@ def main() -> int:
 
                 if jobs:
                     try:
-                        maybe_send_jobs_to_api("goafrica", jobs, run_reference="goafrica:script", logger=logger)
+                        maybe_send_jobs_to_api(
+                            "goafrica",
+                            jobs,
+                            run_reference="goafrica:script",
+                            logger=logger,
+                        )
                     except Exception as exc:
-                        logger.opt(exception=True).error(f"Envoi API impossible pour GoAfrica : {exc}")
+                        logger.opt(exception=True).error(
+                            f"Envoi API impossible pour GoAfrica : {exc}"
+                        )
                         if exit_code == 0:
                             exit_code = 1
 
@@ -1453,12 +1541,12 @@ def main() -> int:
                 close_safely(browser, "navigateur")
 
     except Exception as exc:
-        logger.opt(exception=True).critical(f"Impossible d'initialiser Playwright : {exc}")
+        logger.opt(exception=True).critical(
+            f"Impossible d'initialiser Playwright : {exc}"
+        )
         return 1
 
-    logger.info(
-        f"Scraping terminé. Succès : {len(jobs)} | Échecs : {len(failures)}."
-    )
+    logger.info(f"Scraping terminé. Succès : {len(jobs)} | Échecs : {len(failures)}.")
 
     if failures and not jobs and exit_code == 0:
         exit_code = 1

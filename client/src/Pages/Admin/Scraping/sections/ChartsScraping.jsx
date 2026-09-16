@@ -1,15 +1,15 @@
 import { useMemo } from "react"
 import { useReducedMotion } from "framer-motion"
 import {
-  Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart,
-  ResponsiveContainer, Tooltip, XAxis, YAxis,
+  Bar, BarChart, CartesianGrid, Cell, Legend, Pie, PieChart, Tooltip, XAxis, YAxis,
 } from "recharts"
-import { BarChart3 } from "lucide-react"
+import { PieChartIcon, Timer } from "lucide-react"
 import { useAdminScrapingRunsQuery } from "@/features/admin-scraping.tools"
 import { Skeleton } from "@/components/ui/skeleton"
 import SectionCardAdmin from "@/components/admin/SectionCardAdmin"
-import { SectionVide } from "../components/EtatsSection"
 import { LIBELLE_STATUT_RUN } from "../components/statuts-scraping"
+import { SectionErreur, TransitionEtat } from "@/components/admin/EtatsSection"
+import CadreChart from "@/components/admin/CadreChart"
 
 
 const COULEURS_STATUT = {
@@ -23,13 +23,32 @@ const COULEURS_STATUT = {
 const TooltipDuree = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null
   const p = payload[0]
+  
   return (
-    <div className="rounded-lg border border-border bg-popover px-2.5 py-1.5 text-xs shadow-md">
-      <p className="font-semibold">{label}</p>
-      <p className="text-muted-foreground">Durée : {p.value} s</p>
-      <p className="text-muted-foreground">
-        Statut : {LIBELLE_STATUT_RUN[p.payload.statut] ?? p.payload.statut}
-      </p>
+    <div className="flex flex-col gap-2 rounded-lg border border-border bg-popover p-3 text-sm shadow-md">
+      <p className="font-semibold text-foreground">{label}</p>
+      
+      <div className="flex flex-col gap-1">
+        {/* Ligne Durée */}
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-1.5">
+            <div 
+              className="h-2 w-2 rounded-full" 
+              style={{ backgroundColor: p.fill || p.color || "currentColor" }} 
+            />
+            <span className="text-muted-foreground">Durée</span>
+          </div>
+          <span className="font-medium tabular-nums">{p.value} s</span>
+        </div>
+
+        {/* Ligne Statut */}
+        <div className="flex items-center justify-between gap-4">
+          <span className="ml-3.5 text-muted-foreground">Statut</span>
+          <span className="font-medium">
+            {LIBELLE_STATUT_RUN[p.payload.statut] ?? p.payload.statut}
+          </span>
+        </div>
+      </div>
     </div>
   )
 }
@@ -37,36 +56,117 @@ const TooltipDuree = ({ active, payload, label }) => {
 const TooltipStatut = ({ active, payload }) => {
   if (!active || !payload?.length) return null
   const p = payload[0]
+  
   return (
-    <div className="rounded-lg border border-border bg-popover px-2.5 py-1.5 text-xs shadow-md">
-      <p className="font-semibold">{p.name}</p>
-      <p className="text-muted-foreground">{p.value} run{p.value > 1 ? "s" : ""}</p>
+    <div className="flex flex-col gap-1.5 rounded-lg border border-border bg-popover p-3 text-sm shadow-md">
+      {/* En-tête avec pastille de couleur */}
+      <div className="flex items-center gap-1.5">
+        <div 
+          className="h-2 w-2 rounded-full" 
+          style={{ backgroundColor: p.fill || p.color || "currentColor" }} 
+        />
+        <p className="font-semibold text-foreground">{p.name}</p>
+      </div>
+      
+      {/* Valeur */}
+      <div className="flex items-center justify-between gap-4 mt-0.5">
+        <span className="ml-3.5 text-muted-foreground">Total</span>
+        <span className="font-medium tabular-nums">
+          {p.value} run{p.value > 1 ? "s" : ""}
+        </span>
+      </div>
     </div>
   )
 }
 
-/* Cadre interne : titre + skeleton / vide / chart (chaque chart garde
-   son propre cycle d'états). */
-const CadreChart = ({ titre, chargement, vide, videMessage, minHeight = 220, className = "", children }) => (
-  <div className={`flex flex-col gap-2 rounded-xl border border-border bg-muted/30 p-4 ${className}`}>
-    <h3 className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/80">{titre}</h3>
-    {chargement ? (
-      <Skeleton className="w-full rounded-lg" style={{ height: minHeight }} />
-    ) : vide ? (
-      <SectionVide message={videMessage} />
-    ) : (
-      <div style={{ height: minHeight }}>
-        <ResponsiveContainer width="100%" height="100%">
-          {children}
-        </ResponsiveContainer>
+
+/** Hauteurs fictives (%) qui imitent le profil réel du BarChart. */
+const HAUTEURS_BARRES = [58, 42, 76, 30, 88, 50, 68];
+
+const ChartDureeSkeleton = ({ height = 220 }) => {
+  return (
+    <div
+      role="status"
+      aria-label="Chargement du graphique des durées"
+      className="flex w-full gap-2"
+      style={{ height }}
+    >
+      {/* Axe Y : 3 graduations fictives */}
+      <div className="flex w-6 flex-col justify-between py-1" aria-hidden="true">
+        {[0, 1, 2].map((i) => (
+          <Skeleton key={i} className="h-2 w-full rounded-sm" />
+        ))}
       </div>
-    )}
-  </div>
-)
+
+      {/* Zone du graphique */}
+      <div className="flex flex-1 flex-col">
+        {/* Barres, alignées en bas comme le BarChart */}
+        <div className="flex flex-1 items-end gap-3 border-b border-border pb-px">
+          {HAUTEURS_BARRES.map((h, i) => (
+            <Skeleton
+              key={i}
+              className="flex-1 rounded-t-sm"
+              style={{ height: `${h}%`, animationDelay: `${i * 90}ms` }}
+            />
+          ))}
+        </div>
+
+        {/* Libellés de l'axe X */}
+        <div className="mt-2 flex gap-3" aria-hidden="true">
+          {HAUTEURS_BARRES.map((_, i) => (
+            <Skeleton key={i} className="h-2 flex-1 rounded-sm" />
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const ChartStatutsSkeleton = ({ height = 220 }) => {
+  return (
+    <div
+      role="status"
+      aria-label="Chargement du graphique de répartition par statut"
+      className="flex h-full w-full animate-pulse flex-col items-center justify-center gap-3"
+      style={{ height }}
+    >
+      {/* Donut : 4 segments neutres séparés par des gaps de 2° */}
+      <div className="relative aspect-square w-full max-w-37.5">
+        <div
+          className="absolute inset-0 rounded-full"
+          style={{
+            background: `conic-gradient(
+              var(--color-muted) 0deg 138deg,
+              transparent 138deg 140deg,
+              var(--color-surface-container-high) 140deg 228deg,
+              transparent 228deg 230deg,
+              var(--color-muted) 230deg 288deg,
+              transparent 288deg 290deg,
+              var(--color-surface-container-high) 290deg 358deg,
+              transparent 358deg 360deg
+            )`,
+          }}
+        />
+        {/* Trou central (innerRadius 55% / outerRadius 80%) */}
+        <div className="absolute rounded-full bg-card" style={{ inset: "15.6%" }} />
+      </div>
+
+      {/* Légende : pastilles + libellés, équivalent fontSize 10 */}
+      <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1" aria-hidden="true">
+        {[0, 1, 2, 3].map((i) => (
+          <div key={i} className="flex items-center gap-1.5">
+            <Skeleton className="h-2.5 w-2.5 rounded-xs" />
+            <Skeleton className="h-2 w-12 rounded-xs" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 const ChartsScraping = () => {
   const mouvementReduit = useReducedMotion()
-  const { data: runs, isLoading } = useAdminScrapingRunsQuery({ limit: 30 })
+  const { data: runs, isLoading, isError, refetch } = useAdminScrapingRunsQuery({ limit: 30 })  
 
   /* Durée par run (plus ancien → plus récent, lecture gauche → droite). */
   const donneesDuree = useMemo(
@@ -96,70 +196,92 @@ const ChartsScraping = () => {
     }))
   }, [runs])
 
-  return (
-    <SectionCardAdmin
-      title="Analyse des runs"
-      description="Durée d'exécution et répartition des statuts sur les 30 derniers runs."
-      icon={BarChart3}
-    >
-      <div className="grid gap-4 xl:grid-cols-4">
-        {/* 1. Durée par run — barres colorées par statut (2 colonnes) */}
-        <CadreChart
-          titre="Durée par run"
-          chargement={isLoading}
-          vide={!donneesDuree.length}
-          videMessage="Aucun run terminé avec durée connue."
-          className="xl:col-span-3"
-        >
-          <BarChart data={donneesDuree} margin={{ top: 4, right: 8, bottom: 0, left: -20 }}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.3} />
-            <XAxis dataKey="run" fontSize={10} tickLine={false} axisLine={false} />
-            <YAxis allowDecimals={false} fontSize={10} tickLine={false} axisLine={false} unit=" s" />
-            <Tooltip content={<TooltipDuree />} cursor={{ fill: "var(--color-muted)", opacity: 0.5 }} />
-            <Bar
-              dataKey="secondes"
-              name="Durée"
-              radius={[4, 4, 0, 0]}
-              isAnimationActive={!mouvementReduit}
-              animationDuration={700}
-              animationEasing="ease-out"
-            >
-              {donneesDuree.map((d, i) => (
-                <Cell key={i} fill={COULEURS_STATUT[d.statut] ?? "#2563eb"} />
-              ))}
-            </Bar>
-          </BarChart>
-        </CadreChart>
+  /* Clé d'état propre à chaque chart : chargement / erreur / vide / données. */
+  const etatDuree = isError ? "erreur" : isLoading ? "chargement" : !donneesDuree.length ? "vide" : "donnees";
+  const etatStatuts = isError ? "erreur" : isLoading ? "chargement" : !donneesStatuts.length ? "vide" : "donnees";
 
-        {/* 2. Donut statuts des derniers runs */}
-        <CadreChart
-          titre="Statut des runs"
-          chargement={isLoading}
-          vide={!donneesStatuts.length}
-          videMessage="Aucun run enregistré."
+
+  return (
+    <div className="grid gap-4 xl:grid-cols-3">
+      {/* 1. Durée par run — barres colorées par statut (2 colonnes) */}
+      <div className="xl:col-span-2">
+        <SectionCardAdmin
+          title="Durée par run"
+          description="Durée d'exécution des 30 derniers runs, par statut."
+          icon={Timer}
         >
-          <ResponsiveContainer width="100%" height={250}>
-            <PieChart>
-              <Tooltip content={<TooltipStatut />} />
-              <Legend wrapperStyle={{ fontSize: 10 }} />
-              <Pie
-                data={donneesStatuts}
-                dataKey="value"
-                nameKey="name"
-                innerRadius="55%"
-                outerRadius="80%"
-                paddingAngle={2}
-                strokeWidth={0}
+          <TransitionEtat etat={etatDuree}>
+            {isError ? (
+              <SectionErreur onRetry={refetch} message="Impossible de charger les durées des runs." />
+            ) : isLoading ? (
+              <ChartDureeSkeleton />
+            ) : (
+              <CadreChart
+                vide={!donneesDuree.length}
+                videMessage="Aucun run terminé avec durée connue."
               >
-                {donneesStatuts.map((d) => (
-                  <Cell key={d.name} fill={d.couleur} />
-                ))}
-              </Pie>
-            </PieChart>
-          </ResponsiveContainer>
-        </CadreChart>
+                <BarChart data={donneesDuree} margin={{ top: 4, right: 8, bottom: 0, left: -20 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} opacity={0.3} />
+                  <XAxis dataKey="run" fontSize={10} tickLine={false} axisLine={false} />
+                  <YAxis allowDecimals={false} fontSize={10} tickLine={false} axisLine={false} unit=" s" />
+                  <Tooltip content={<TooltipDuree />} cursor={{ fill: "var(--color-muted)", opacity: 0.5 }} />
+                  <Bar
+                    dataKey="secondes"
+                    name="Durée"
+                    radius={[4, 4, 0, 0]}
+                    isAnimationActive={!mouvementReduit}
+                    animationDuration={700}
+                    animationEasing="ease-out"
+                  >
+                    {donneesDuree.map((d, i) => (
+                      <Cell key={i} fill={COULEURS_STATUT[d.statut] ?? "#2563eb"} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </CadreChart>
+            )}
+          </TransitionEtat>
+        </SectionCardAdmin>
       </div>
-    </SectionCardAdmin>
+
+      {/* 2. Donut statuts des derniers runs */}
+      <SectionCardAdmin
+        title="Statut des runs"
+        description="Statut des 30 derniers runs."
+        icon={PieChartIcon}
+      >
+        <TransitionEtat etat={etatStatuts}>
+          {isError ? (
+            <SectionErreur onRetry={refetch} message="Impossible de charger les statuts des runs." />
+          ) : isLoading ? (
+            <ChartStatutsSkeleton />
+          ) : (
+            <CadreChart
+              vide={!donneesStatuts.length}
+              videMessage="Aucun run enregistré."
+            >
+              <PieChart>
+                <Tooltip content={<TooltipStatut />} />
+                <Legend wrapperStyle={{ fontSize: 10 }} />
+                <Pie
+                  data={donneesStatuts}
+                  dataKey="value"
+                  nameKey="name"
+                  innerRadius="55%"
+                  outerRadius="80%"
+                  paddingAngle={2}
+                  strokeWidth={0}
+                >
+                  {donneesStatuts.map((d) => (
+                    <Cell key={d.name} fill={d.couleur} />
+                  ))}
+                </Pie>
+              </PieChart>
+            </CadreChart>
+          )}
+        </TransitionEtat>
+      </SectionCardAdmin>
+    </div>
   )
 }
 

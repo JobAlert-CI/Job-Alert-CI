@@ -51,6 +51,16 @@ export const formaterDuree = (ms) => {
   return r ? `${m} min ${r} s` : `${m} min`
 }
 
+export const sufixDuree = (ms) => {
+  if (ms < 1000) return [ms, "ms"]
+  const s = Math.round(ms / 1000)
+  const r_ms = ms % 1000
+  if (s < 60) return [s, `s${r_ms ? ` ${r_ms} ms` : ""}`]
+  const m = Math.floor(s / 60)
+  const r = s % 60
+  return r ? [m, `min${r ? ` ${r} s` : ""}`] : [m, "min"]
+}
+
 /* Date + heure courtes (fr-FR). */
 export const dateHeure = (iso) => {
   if (!iso) return null
