@@ -5,10 +5,11 @@ import {
 import { Database } from "lucide-react"
 import { useAdminRunsQuery } from "@/features/admin-dashboard.tools"
 import { Skeleton } from "@/components/ui/skeleton"
-import { SectionErreur, SectionVide } from "../../../../components/admin/EtatsSection"
+import { SectionErreur, SectionVide } from "@/components/admin/EtatsSection"
 import SectionCardAdmin from "@/components/admin/SectionCardAdmin"
 import { usePeutVoirEnvois } from "@/features/admin-matching.tools"
 import CadreChart from "@/components/admin/CadreChart"
+import { formatNombre } from "@/lib/utils"
 
 
 const SERIES = [
@@ -16,8 +17,6 @@ const SERIES = [
   { key: "total_updated", libelle: "Mises à jour", couleur: "#0891b2" },
   { key: "total_duplicates", libelle: "Doublons", couleur: "#F5A623" },
 ]
-
-const formatNombre = (v) => (Number(v) || 0).toLocaleString("fr-FR")
 
 const TooltipIngestion = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null

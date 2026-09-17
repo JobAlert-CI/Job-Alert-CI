@@ -9,7 +9,9 @@ import { useSystemeSanteQuery } from "@/features/admin-systeme.tools"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import SectionCardAdmin from "@/components/admin/SectionCardAdmin"
-
+import { dateHeure } from "@/lib/dates"
+import { formatNombre } from "@/lib/utils"
+import { Spinner } from "@/components/ui/spinner"
 
 const ICONES = {
   database: Database,
@@ -68,8 +70,6 @@ const VARIANTS_TUILE = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] } },
 }
 
-const formatNombre = (v) => (v ?? 0).toLocaleString("fr-FR")
-
 /** « il y a 3 h », « il y a 2 j » — la fraîcheur du heartbeat parle mieux qu'une date brute. */
 const ilYA = (iso) => {
   if (!iso) return "jamais"
@@ -80,17 +80,10 @@ const ilYA = (iso) => {
   return `il y a ${Math.floor(secondes / 86400)} j`
 }
 
-const dateHeure = (iso) => {
-  if (!iso) return "—"
-  const d = new Date(iso)
-  return (
-    d.toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "2-digit" }) +
-    " " + d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })
-  )
-}
-
-const IconeStatut = ({ statut }) =>
-  statut === "ok" ? (
+const IconeStatut = ({ statut, isLoading }) =>
+  isLoading ? (
+    <Spinner className="size-4" />
+  ) : statut === "ok" ? (
     <CircleCheck className="size-4 text-emerald-600" aria-hidden="true" />
   ) : statut === "error" ? (
     <CircleX className="size-4 text-destructive" aria-hidden="true" />
@@ -122,7 +115,7 @@ const OngletSante = () => {
           {Object.entries(ICONES).map(([cle, Icone]) => {
             const indicateur = sante?.[cle]
             const statut = indicateur?.status ?? "warning"
-            const style = COULEUR_STATUT[statut] ?? COULEUR_STATUT.warning
+            const style = isFetching ? COULEUR_STATUT.disabled : COULEUR_STATUT[statut] ?? COULEUR_STATUT.warning
             const raccourci = LIENS_RACCOURCIS[cle]
 
             return (
@@ -137,8 +130,12 @@ const OngletSante = () => {
                     <Icone className={cn("size-4", style.icone)} aria-hidden="true" /> {TITRES[cle]}
                   </p>
                   <span className="flex items-center gap-1.5">
-                    <IconeStatut statut={statut} />
-                    <Badge variant={style.badge}>{LIBELLE_STATUT[statut] ?? "Attention"}</Badge>
+                    <IconeStatut statut={statut} isLoading={chargement} />
+                    {chargement ? (
+                      <Badge variant="outline">En verification...</Badge>
+                    ) : (
+                      <Badge variant={style.badge}>{LIBELLE_STATUT[statut] ?? "Attention"}</Badge>
+                    )}                    
                   </span>
                 </div>
 
@@ -166,16 +163,7 @@ const OngletSante = () => {
               </motion.div>
             )
           })}
-        </motion.div>
-
-        {/* ─── Note pédagogique ─── */}
-        <p className="text-[11px] text-muted-foreground">
-          Lecture : « Attention » sur les workers signifie <em>aucun worker détecté dans le délai imparti</em> (2 s) —
-          un worker lent répond peut-être simplement en retard, ce n'est pas nécessairement une panne. Les fournisseurs
-          email/IA sont évalués <em>sans ping</em> : un « Dégradé » reflète un échec réel des 15 dernières minutes
-          (audit 4, O.4) ; les profondeurs affichées sont lues directement dans le broker Redis (LLEN — audit 4, H.3),
-          « N/A » ne survient que si le broker est injoignable.
-        </p>
+        </motion.div>        
       </div>
     </SectionCardAdmin>
   )

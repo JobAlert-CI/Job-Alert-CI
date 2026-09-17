@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import SectionCardAdmin from "@/components/admin/SectionCardAdmin"
 import { SectionErreur, SectionVide, TransitionEtat } from "@/components/admin/EtatsSection"
 import Bloc from "@/components/admin/Bloc"
+import { formatNombre } from "@/lib/utils"
 
 /* ─────────────────────────────────────────────────────────────────────
    Widget Top recruteurs — dashboard admin.
@@ -28,7 +29,6 @@ const STYLE_PODIUM = [
   "bg-orange-300 text-orange-950",
 ]
 const styleRang = (i) => STYLE_PODIUM[i] ?? "bg-muted text-muted-foreground"
-const formatNombre = (v) => (v ?? 0).toLocaleString("fr-FR")
 
 /* ── Skeleton fidèle à la ligne réelle ─────────────────────────────
    Géométrie exacte du motion.li : pastille de rang (size-5), nom

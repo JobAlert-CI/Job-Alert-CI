@@ -22,7 +22,6 @@ import {
   AlertDialogHeader, AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -36,7 +35,8 @@ import {
   Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription,
 } from "@/components/ui/sheet"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { SectionErreur, SectionVide } from "./EtatsSection"
+import { SectionErreur, SectionVide } from "@/components/admin/EtatsSection"
+import BtnAction from "@/components/admin/BtnAction"
 
 /* ─────────────────────────────────────────────────────────────────────
    Éditeur d'article complet (doc v3 §14.1) — Sheet plein écran.
@@ -196,6 +196,7 @@ const FormulaireCreation = ({ onFermer, onCree }) => {
 
   /* Slug auto-généré depuis le titre tant que le champ slug n'a pas été
      modifié à la main. */
+  // eslint-disable-next-line react-hooks/incompatible-library
   const titre = watch("title")
   useEffect(() => {
     if (!slugModifie.current) setValue("slug", slugifier(titre))
@@ -251,10 +252,10 @@ const FormulaireCreation = ({ onFermer, onCree }) => {
             </AlertDescription>
           </Alert>
           <div className="flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={onFermer}>Annuler</Button>
-            <Button type="submit" disabled={creerMutation.isPending}>
+            <BtnAction type="button" variant="outline" size="sm" onClick={onFermer}>Annuler</BtnAction>
+            <BtnAction type="submit" size="sm" disabled={creerMutation.isPending}>
               {creerMutation.isPending ? "Création…" : "Créer le brouillon"}
-            </Button>
+            </BtnAction>
           </div>
         </form>
       </SheetContent>
@@ -297,9 +298,9 @@ const EditeurExistant = ({ articleId, onFermer }) => {
               {/* react-router : aperçu public de l'article publié. */}
               {article.status === "published" && (
                 <div className="flex justify-end">
-                  <Button variant="outline" size="sm" onClick={() => navigate(`/actualites/${article.slug}`)}>
+                  <BtnAction variant="ghost" size="xs" onClick={() => navigate(`/actualites/${article.slug}`)}>
                     <ExternalLink aria-hidden /> Voir sur le site
-                  </Button>
+                  </BtnAction>
                 </div>
               )}
               <FormulaireArticle key={article.id} article={article} articleId={articleId} />
@@ -355,6 +356,7 @@ const FormulaireArticle = ({ article, articleId }) => {
     },
     mode: "onBlur",
   })
+  // eslint-disable-next-line react-hooks/incompatible-library
   const aLaUne = watch("is_featured")
 
   const enregistrerMeta = handleSubmit((valeurs) => {
@@ -550,10 +552,10 @@ const FormulaireArticle = ({ article, articleId }) => {
             <Input id="ed-tags" {...register("tags")} placeholder="cv, entretien, carrière" />
           </Champ>
           <div className="flex flex-wrap items-center gap-3 border-t border-border pt-4 sm:col-span-2">
-            <Button type="submit" disabled={metaMutation.isPending || !isDirty}>
+            <BtnAction type="submit" size="sm" disabled={metaMutation.isPending || !isDirty}>
               <Save aria-hidden />
               {metaMutation.isPending ? "Enregistrement…" : "Enregistrer les métadonnées"}
-            </Button>
+            </BtnAction>
             {isDirty && !metaMutation.isPending && (
               <p className="text-[10px] text-muted-foreground">Des modifications ne sont pas encore enregistrées.</p>
             )}
@@ -569,9 +571,9 @@ const FormulaireArticle = ({ article, articleId }) => {
               L'ordre des sections est celui de l'article public — chaque action est
               enregistrée immédiatement.
             </p>
-            <Button variant="outline" size="sm" onClick={ajouterSection} disabled={ajouterSectionMutation.isPending}>
+            <BtnAction variant="outline" size="xs" onClick={ajouterSection} disabled={ajouterSectionMutation.isPending}>
               <Plus aria-hidden /> Section
-            </Button>
+            </BtnAction>
           </div>
           {!sections.length ? (
             <SectionVide message="Aucune section — l'article public n'affichera que l'extrait." />
@@ -654,12 +656,12 @@ const CarteSection = ({
       <CardContent className="flex flex-col gap-2 p-3">
         <div className="flex items-center gap-2">
           <div className="flex flex-col">
-            <Button variant="ghost" size="icon-sm" onClick={onMonter} disabled={premier} aria-label="Monter la section">
+            <BtnAction variant="ghost" size="xs" onClick={onMonter} disabled={premier} aria-label="Monter la section">
               <ChevronUp aria-hidden />
-            </Button>
-            <Button variant="ghost" size="icon-sm" onClick={onDescendre} disabled={dernier} aria-label="Descendre la section">
+            </BtnAction>
+            <BtnAction variant="ghost" size="xs" onClick={onDescendre} disabled={dernier} aria-label="Descendre la section">
               <ChevronDown aria-hidden />
-            </Button>
+            </BtnAction>
           </div>
           <Badge variant="outline" className="font-mono">{section.position}</Badge>
           <div className="min-w-0 flex-1">
@@ -683,18 +685,19 @@ const CarteSection = ({
             />
             {erreurTitre && <p className="mt-0.5 text-[10px] text-destructive" role="alert">{erreurTitre}</p>}
           </div>
-          <Button variant="ghost" size="sm" onClick={() => setOuvert((o) => !o)} aria-expanded={ouvert}>
+          <BtnAction variant="ghost" size="xs" onClick={() => setOuvert((o) => !o)} aria-expanded={ouvert}>
             {ouvert ? "Replier" : "Blocs"} ({blocs.length})
-          </Button>
-          <Button
+          </BtnAction>
+          
+          <BtnAction
             variant="ghost"
-            size="icon-sm"
+            size="xs"
             onClick={() => setConfirmation(true)}
             aria-label="Supprimer la section"
             className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
           >
             <Trash2 aria-hidden />
-          </Button>
+          </BtnAction>
         </div>
         {ouvert && (
           <div className="flex flex-col gap-2 border-t border-border pt-2">
@@ -714,9 +717,9 @@ const CarteSection = ({
                 }
               />
             ))}
-            <Button variant="outline" size="sm" onClick={onAjouterBloc} className="w-fit">
+            <BtnAction variant="outline" size="xs" onClick={onAjouterBloc} className="w-fit">
               <Plus aria-hidden /> Bloc
-            </Button>
+            </BtnAction>
           </div>
         )}
       </CardContent>
@@ -733,17 +736,18 @@ const CarteSection = ({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <Button variant="outline" onClick={() => setConfirmation(false)}>Annuler</Button>
-            <Button
+            <BtnAction variant="outline" size="sm" onClick={() => setConfirmation(false)}>Annuler</BtnAction>
+            <BtnAction
               variant="destructive"
               disabled={supprimerEnCours}
               onClick={() => {
                 setConfirmation(false)
                 onSupprimer()
               }}
+              size="sm"
             >
               Supprimer
-            </Button>
+            </BtnAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -796,9 +800,9 @@ const BlocContenu = ({ bloc, mutation, onSupprimer }) => {
               ))}
             </SelectContent>
           </Select>
-          <Button variant="ghost" size="icon-sm" onClick={onSupprimer} aria-label="Supprimer le bloc">
+          <BtnAction variant="ghost" size="xs" onClick={onSupprimer} aria-label="Supprimer le bloc">
             <X aria-hidden />
-          </Button>
+          </BtnAction>
         </div>
       </div>
       <Textarea
@@ -857,18 +861,19 @@ const ListeTakeaways = ({ articleId, takeaways, ajouterMutation, supprimerMutati
             <li key={t.id} className="flex items-center gap-2 text-xs">
               <Badge variant="outline" className="font-mono">{t.position}</Badge>
               <span className="min-w-0 flex-1">{t.text}</span>
-              <Button
+              <BtnAction
                 variant="ghost"
-                size="icon-sm"
+                size="xs"
                 aria-label={`Supprimer le point clé ${t.position}`}
                 onClick={() =>
                   supprimerMutation.mutate(t.id, {
                     onError: (err) => notify(messageErreurContenu(err), "error"),
                   })
                 }
+                className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
               >
                 <Trash2 aria-hidden />
-              </Button>
+              </BtnAction>
             </li>
           ))}
         </ul>
@@ -877,9 +882,9 @@ const ListeTakeaways = ({ articleId, takeaways, ajouterMutation, supprimerMutati
             <Input {...register("text")} placeholder="Nouveau point clé…" aria-label="Nouveau point clé" className="text-xs" />
             {errors.text && <p className="mt-1 text-[10px] text-destructive">{errors.text.message}</p>}
           </div>
-          <Button type="submit" size="sm" disabled={ajouterMutation.isPending} aria-label="Ajouter le point clé">
+          <BtnAction type="submit" size="xs" disabled={ajouterMutation.isPending} aria-label="Ajouter le point clé">
             <Plus aria-hidden />
-          </Button>
+          </BtnAction>
         </form>
       </CardContent>
     </Card>
@@ -935,18 +940,19 @@ const ListeKeyFigures = ({ articleId, figures, ajouterMutation, supprimerMutatio
                 {f.prefix ?? ""}{f.value}{f.suffix ?? ""}
               </span>
               <span className="min-w-0 flex-1 truncate text-muted-foreground">{f.label}</span>
-              <Button
+              <BtnAction
                 variant="ghost"
-                size="icon-sm"
+                size="xs"
                 aria-label={`Supprimer le chiffre clé ${f.label}`}
                 onClick={() =>
                   supprimerMutation.mutate(f.id, {
                     onError: (err) => notify(messageErreurContenu(err), "error"),
                   })
                 }
+                className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
               >
                 <Trash2 aria-hidden />
-              </Button>
+              </BtnAction>
             </li>
           ))}
         </ul>
@@ -964,9 +970,9 @@ const ListeKeyFigures = ({ articleId, figures, ajouterMutation, supprimerMutatio
               <Input {...register("suffix")} placeholder="%" maxLength={10} aria-label="Suffixe (optionnel)" className="text-xs" />
               {errors.suffix && <p className="mt-1 text-[9px] text-destructive">{errors.suffix.message}</p>}
             </div>
-            <Button type="submit" size="sm" disabled={ajouterMutation.isPending} aria-label="Ajouter le chiffre clé">
+            <BtnAction type="submit" size="xs" disabled={ajouterMutation.isPending} aria-label="Ajouter le chiffre clé">
               <Plus aria-hidden />
-            </Button>
+            </BtnAction>
           </div>
         </form>
       </CardContent>

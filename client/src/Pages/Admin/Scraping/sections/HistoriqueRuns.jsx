@@ -16,10 +16,9 @@ import {
   LIBELLE_STATUT_RUN, VARIANTE_STATUT_RUN, statutRunActif, dureeLisible, dateHeure,
 } from "../components/statuts-scraping"
 import { SectionErreur, SectionVide, SectionAucunResultat, TransitionEtat } from "@/components/admin/EtatsSection";
+import { formatNombre } from "@/lib/utils"
 
 const TAILLE_PAGE = 20
-
-const formatNombre = (v) => (v ?? 0).toLocaleString("fr-FR")
 
 const dureeMsValeur = (run) => {
   if (!run.started_at || !run.finished_at) return null

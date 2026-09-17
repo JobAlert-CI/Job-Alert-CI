@@ -1,15 +1,13 @@
 import { motion, AnimatePresence } from "framer-motion"
 import { FileText, FolderTree, Globe, Layers, Lightbulb, Newspaper } from "lucide-react"
-import { ErrorBoundary } from "react-error-boundary"
 import { cn } from "cn"
-import AdminSectionFallback from "@/components/admin/AdminSectionFallback"
 import { useFiltresContenuAdmin, FiltresContenuAdminProvider } from "@/contexts/FiltresContenuAdmin.context"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import OngletArticles from "./sections/OngletArticles"
-import OngletCategories from "./sections/OngletCategories"
-import OngletSeries from "./sections/OngletSeries"
-import OngletConseils from "./sections/OngletConseils"
-import OngletPages from "./sections/OngletPages"
+import OngletArticles from "./onglets/OngletArticles"
+import OngletCategories from "./onglets/OngletCategories"
+import OngletSeries from "./onglets/OngletSeries"
+import OngletConseils from "./onglets/OngletConseils"
+import OngletPages from "./onglets/OngletPages"
 import Bloc, { VARIANTS_PAGE } from "@/components/admin/Bloc"
 import HeroAdmin from "@/components/admin/HeroAdmin"
 
@@ -52,7 +50,6 @@ const VARIANTS_PANNEAU = {
 
 const ContenuAdmin = () => {
   const { onglet, setOnglet } = useFiltresContenuAdmin()
-  const ongletActif = ONGLETS.find((o) => o.valeur === onglet)
 
   return (
     <motion.div
@@ -62,14 +59,12 @@ const ContenuAdmin = () => {
       className="mx-auto flex w-full max-w-6xl flex-col gap-6"
     >
       {/* ─── En-tête ─── */}
-      <Bloc>
-        <HeroAdmin
-          title="Gestion du contenu"
-          titleBdge="Contenu & sécurité"
-          icon={Newspaper}
-          description="Articles, catégories, séries, conseils du jour et pages statiques du site public."
-        />
-      </Bloc>
+      <HeroAdmin
+        title="Gestion du contenu"
+        titleBdge="Contenu & sécurité"
+        icon={Newspaper}
+        description="Articles, catégories, séries, conseils du jour et pages statiques du site public."
+      />
 
       {/* ─── Onglets (synchronisés URL, pattern page IA) ─── */}
       <Tabs value={onglet} onValueChange={setOnglet} className="mt-1 w-full">
@@ -101,22 +96,38 @@ const ContenuAdmin = () => {
           <motion.div
             key={onglet}
             role="tabpanel"
-            aria-label={ongletActif?.libelle}
+            aria-label={ONGLETS.find((o) => o.valeur === onglet)?.libelle}
             variants={VARIANTS_PANNEAU}
             initial="cache"
             animate="visible"
             exit="cache"
             className="mt-4"
           >
-            <Bloc>
-              <ErrorBoundary FallbackComponent={AdminSectionFallback}>
-                {onglet === "articles" && <OngletArticles />}
-                {onglet === "categories" && <OngletCategories />}
-                {onglet === "series" && <OngletSeries />}
-                {onglet === "conseils" && <OngletConseils />}
-                {onglet === "pages" && <OngletPages />}
-              </ErrorBoundary>
-            </Bloc>
+            {onglet === "articles" ? (
+              <Bloc>
+                <OngletArticles />
+              </Bloc>
+            ) : onglet === "categories" ? (
+              <Bloc>
+                <OngletCategories />
+              </Bloc>
+            ) : onglet === "series" ? (
+              <Bloc>
+                <OngletSeries />
+              </Bloc>
+            ) : onglet === "conseils" ? (
+              <Bloc>
+                <OngletConseils />
+              </Bloc>
+            ) : onglet === "pages" ? (
+              <Bloc>
+                <OngletPages />
+              </Bloc>
+            ) : (
+              <Bloc>
+                <OngletArticles />
+              </Bloc>
+            )}
           </motion.div>
         </AnimatePresence>
       </Tabs>

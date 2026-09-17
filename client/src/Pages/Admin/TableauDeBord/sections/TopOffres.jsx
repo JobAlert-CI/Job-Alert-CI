@@ -12,13 +12,12 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { SectionErreur, SectionVide, TransitionEtat } from "@/components/admin/EtatsSection"
 import SectionCardAdmin from "@/components/admin/SectionCardAdmin"
 import { usePeutVoirEnvois } from "@/features/admin-matching.tools"
+import { formatNombre } from "@/lib/utils"
 
 const FENETRES = [
   { valeur: 7, libelle: "7 jours" },
   { valeur: 30, libelle: "30 jours" },
 ]
-
-const formatNombre = (v) => (v ?? 0).toLocaleString("fr-FR")
 
 /** Initiales de l'entreprise pour l'avatar (ex. "TransCargo CI" → "TC"). */
 const initiales = (nom = "") =>

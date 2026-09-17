@@ -30,6 +30,7 @@ import CarteCompteur from "@/components/admin/CarteCompteur"
 import { TransitionEtat } from "@/components/admin/EtatsSection"
 import { cn } from "@/lib/utils"
 import PaginationListe from "@/components/admin/PaginationListe"
+import { formatNombre } from "@/lib/utils"
 
 /* ─────────────────────────────────────────────────────────────────────
    Page Détail d'un run — /admin/scraping/runs/:id (super_admin).
@@ -71,7 +72,6 @@ const LIBELLE_ACTION = {
 }
 
 const TAILLE_PAGE_JOURNAL = 20
-const formatNombre = (v) => (v ?? 0).toLocaleString("fr-FR")
 
 /* Comparateur générique (même implémentation qu'HistoriqueRuns). */
 const comparerValeurs = (a, b) => {

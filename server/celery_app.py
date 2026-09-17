@@ -153,12 +153,12 @@ if SCRAPER_BEAT_ENABLED:
 # Digest: phase 1 (07:30 Abidjan) et phase 2 (08:00 Abidjan).
 beat_schedule["digest-prepare"] = {
     "task": "tasks.digests.prepare_daily_digests",
-    "schedule": _abidjan_crontab(settings.daily_digest_prepare_hour, settings.daily_digest_prepare_minute),
+    "schedule": crontab(hour=20, minute=54),  # _abidjan_crontab(settings.daily_digest_prepare_hour, settings.daily_digest_prepare_minute),
     "options": {"queue": "emails"},
 }
 beat_schedule["digest-send"] = {
     "task": "tasks.digests.send_daily_digests",
-    "schedule": _abidjan_crontab(settings.daily_digest_send_hour, settings.daily_digest_send_minute),
+    "schedule": crontab(hour=21, minute=0),  # _abidjan_crontab(settings.daily_digest_send_hour, settings.daily_digest_send_minute),
     "options": {"queue": "emails"},
 }
 
@@ -171,7 +171,7 @@ _no_offer_hour, _no_offer_minute = _local_plus_minutes(
 )
 beat_schedule["digest-send-no-offer"] = {
     "task": "tasks.digests.send_no_offer_emails",
-    "schedule": _abidjan_crontab(_no_offer_hour, _no_offer_minute),
+    "schedule": crontab(hour=21, minute=12),  # _abidjan_crontab(_no_offer_hour, _no_offer_minute),
     "options": {"queue": "emails"},
 }
 

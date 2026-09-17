@@ -6,13 +6,10 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import HeroAdmin from "@/components/admin/HeroAdmin"
 import { useNotify } from "@/contexts/Notify.context"
 import { messageErreurIa, useLancerCycleIa } from "@/features/admin-ia.tools"
-import OngletPilotage from "./sections/OngletPilotage"
-import OngletStats from "./sections/OngletStats"
-import SectionCles from "./sections/SectionCles"
-import SectionAlertes from "./sections/SectionAlertes"
-import SectionSuggestions from "./sections/SectionSuggestions"
+import OngletStats from "./onglets/OngletStats"
 import BtnAction from "@/components/admin/BtnAction"
 import Bloc, { VARIANTS_PAGE } from "@/components/admin/Bloc"
+import OngletPilotage from "./onglets/OngletPilotage"
 
 /* ─────────────────────────────────────────────────────────────────────
   Page Normalisation IA — /admin/ia (super_admin, doc v3 §19).
@@ -112,46 +109,26 @@ const IaAdmin = () => {
 
         {/* ─── Fondu enchaîné entre onglets + cascade des sections ─── */}
         <AnimatePresence mode="wait" initial={false}>
-          {onglet === "pilotage" ? (
-            <motion.div
-              key="pilotage"
-              role="tabpanel"
-              aria-label="Pilotage du pipeline"
-              variants={VARIANTS_PANNEAU}
-              initial="cache"
-              animate="visible"
-              exit="cache"
-              className="mt-4 flex flex-col gap-6"
-            >
+          <motion.div
+            key={onglet}
+            role="tabpanel"
+            aria-label={ONGLETS.find((o) => o.valeur === onglet)?.libelle}
+            variants={VARIANTS_PANNEAU}
+            initial="cache"
+            animate="visible"
+            exit="cache"
+            className="mt-4"
+          >
+            {onglet === "pilotage" ? (
               <Bloc>
                 <OngletPilotage />
               </Bloc>
-              <Bloc>
-                <SectionCles />
-              </Bloc>
-              <Bloc>
-                <SectionAlertes />
-              </Bloc>
-              <Bloc>
-                <SectionSuggestions />
-              </Bloc>
-            </motion.div>
-          ) : (
-            <motion.div
-              key="statistiques"
-              role="tabpanel"
-              aria-label="Statistiques du pipeline"
-              variants={VARIANTS_PANNEAU}
-              initial="cache"
-              animate="visible"
-              exit="cache"
-              className="mt-4"
-            >
+            ) : (
               <Bloc>
                 <OngletStats />
               </Bloc>
-            </motion.div>
-          )}
+            )}
+          </motion.div>
         </AnimatePresence>
       </Tabs>
     </motion.div >

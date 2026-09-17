@@ -15,3 +15,5 @@ export function getInitials(name) {
   // S'il n'y a qu'un seul mot (ex: "JobIvoire"), on prend les deux premières lettres
   return name.substring(0, 2).toUpperCase()
 }
+
+export const formatNombre = (v) => (v ?? 0).toLocaleString("fr-FR")

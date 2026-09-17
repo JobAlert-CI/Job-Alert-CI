@@ -6,8 +6,9 @@ import {
 import { useAdminTierStatsQuery, TIER_LABELS, etatQualiteMatching, usePeutVoirEnvois } from "@/features/admin-matching.tools"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
-import { SectionErreur, SectionVide } from "../../../../components/admin/EtatsSection"
+import { SectionErreur, SectionVide } from "@/components/admin/EtatsSection"
 import SectionCardAdmin from "@/components/admin/SectionCardAdmin"
+import { formatNombre } from "@/lib/utils"
 
 /* ─────────────────────────────────────────────────────────────────────
   Section — Qualité du matching cette semaine (T0 à T5).
@@ -31,8 +32,6 @@ const ETATS_WIDGET = {
   critique: { libelle: "Alerte", variante: "destructive", classe: "text-red-600" },
   vide: { libelle: "Aucune donnée", variante: "outline", classe: "text-muted-foreground" },
 }
-
-const formatNombre = (v) => (Number(v) || 0).toLocaleString("fr-FR")
 
 const TooltipMatching = ({ active, payload, label }) => {
   if (!active || !payload?.length) return null

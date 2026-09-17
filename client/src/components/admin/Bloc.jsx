@@ -28,6 +28,16 @@ export const VARIANTS_BLOC = {
   },
 }
 
+export const VARIANTS_SECTION = {
+  cache: { opacity: 0, y: 16 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } },
+}
+
+export const VARIANTS_CONTENEUR = {
+  cache: {},
+  visible: { transition: { staggerChildren: 0.07, delayChildren: 0.03 } },
+}
+
 /** Une section = un bloc animé + son ErrorBoundary dédié. */
 const Bloc = ({ className, children }) => (
   <motion.div variants={VARIANTS_BLOC} className={cn("min-w-0", className)}>

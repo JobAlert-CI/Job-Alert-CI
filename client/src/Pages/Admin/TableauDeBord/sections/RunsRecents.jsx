@@ -18,6 +18,8 @@ import SectionCardAdmin from "@/components/admin/SectionCardAdmin"
 import EnteteTriable from "@/components/admin/EnteteTriable"
 import { usePeutVoirEnvois } from "@/features/admin-matching.tools"
 import BtnAction from "@/components/admin/BtnAction"
+import { dateHeure } from "@/lib/dates"
+import { formatNombre } from "@/lib/utils"
 
 const STYLES_STATUT = {
   success: { libelle: "Réussi", badge: "border-transparent bg-emerald-100 text-emerald-800", pastille: "bg-emerald-500" },
@@ -29,14 +31,6 @@ const STYLES_STATUT = {
 const OPTIONS_STATUT = ["success", "running", "pending", "failed"].map(
   (valeur) => ({ valeur, ...STYLES_STATUT[valeur] })
 )
-
-const formatNombre = (v) => (v ?? 0).toLocaleString("fr-FR")
-
-const dateHeure = (iso) => {
-  if (!iso) return "—"
-  const d = new Date(iso)
-  return d.toLocaleString("fr-FR", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })
-}
 
 const dureeAffichage = (debut, fin) => {
   if (!debut || !fin) return "—"

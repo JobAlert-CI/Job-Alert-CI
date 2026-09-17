@@ -1,9 +1,9 @@
 import { useCallback, useState } from "react"
 import { motion } from "framer-motion"
-import {ShieldCheck, Plus} from "lucide-react"
+import { ShieldCheck, Plus } from "lucide-react"
 import { useNotify } from "@/contexts/Notify.context"
-import {FiltresAdministrateursAdminProvider} from "@/contexts/FiltresAdministrateursAdmin.context"
-import {useCreateAdministrateur} from "@/features/admin-administrateurs.tools"
+import { FiltresAdministrateursAdminProvider } from "@/contexts/FiltresAdministrateursAdmin.context"
+import { useCreateAdministrateur } from "@/features/admin-administrateurs.tools"
 import HeroAdmin from "@/components/admin/HeroAdmin"
 import BtnAction from "@/components/admin/BtnAction"
 import CompteursAdministrateurs from "./sections/CompteursAdministrateurs"
@@ -69,7 +69,9 @@ const Administrateurs = () => {
       </Bloc>
 
       {/* ─── Table des administrateurs (carte de section, pattern Filières) ─── */}
-      <ListeAdmins />
+      <Bloc>
+        <ListeAdmins />
+      </Bloc>
 
       {/* ─── Dialogs (montés en permanence, pilotés par `open`) ─── */}
       <DialogCreation

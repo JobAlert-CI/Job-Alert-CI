@@ -9,7 +9,7 @@ import { useUrlFilters } from "@/hooks/use-url-filters"
    le nom du param URL — sinon no-op silencieux (bug pagination).
 ───────────────────────────────────────────────────────────────────── */
 
-const TAILLE_PAGE_EVENEMENTS = 50
+const TAILLE_PAGE_EVENEMENTS = 30
 const FENETRES_VALIDES = [1, 7, 30, 90]
 
 const CONFIG_FILTRES_SYSTEME = {

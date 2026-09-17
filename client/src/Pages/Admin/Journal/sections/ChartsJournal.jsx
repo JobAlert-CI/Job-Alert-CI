@@ -9,6 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import SectionCardAdmin from "@/components/admin/SectionCardAdmin"
 import CadreChart from "@/components/admin/CadreChart"
 import { SectionErreur, SectionVide, TransitionEtat } from "@/components/admin/EtatsSection"
+import { formatNombre } from "@/lib/utils"
 
 /* ─────────────────────────────────────────────────────────────────────
    Charts du Journal d'activité (cycle 16, sélection validée : H-I).
@@ -28,8 +29,6 @@ import { SectionErreur, SectionVide, TransitionEtat } from "@/components/admin/E
      lieu d'une désactivation globale qui pénalisait tout le monde.
    • Tooltip personnalisé stylé shadcn (popover, bordure, ombre).
    ───────────────────────────────────────────────────────────────────── */
-
-const formatNombre = (v) => (v ?? 0).toLocaleString("fr-FR")
 
 /* Tooltip personnalisé — fond popover + bordure + ombre, façon
    ChartCroisement (le formatter natif était trop basique). */

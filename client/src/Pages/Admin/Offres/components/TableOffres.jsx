@@ -58,7 +58,7 @@ const BoutonVisibilite = ({ offre, enCours, desactive, onBasculer }) => (
       "inline-flex size-6 items-center justify-center rounded-md transition-colors",
       offre.visible_site
         ? "text-emerald-600 hover:bg-emerald-500/10"
-        : "text-muted-foreground hover:bg-muted"
+        : "text-destructive hover:bg-muted"
     )}
   >
     {enCours ? (

@@ -5,7 +5,8 @@ import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table"
 import SectionCardAdmin from "@/components/admin/SectionCardAdmin"
-import { SectionErreur, SectionVide } from "../components/EtatsSection"
+import { SectionErreur, SectionVide, TransitionEtat } from "@/components/admin/EtatsSection"
+import Bloc from "@/components/admin/Bloc"
 
 const ICONE_RYTHME = {
   daily: Clock,
@@ -60,9 +61,109 @@ const BoutonCopie = ({ texte }) => {
   )
 }
 
+
+/** Bloc skeleton avec délai décalé (cascade ligne par ligne). */
+const BlocSkel = ({ className, delay = 0 }) => (
+  <Skeleton
+    className={className}
+    style={delay ? { animationDelay: `${delay}ms` } : undefined}
+  />
+);
+
+/**
+ * Nombre de lignes de la colonne « Configuration » par rang —
+ * répartition déterministe (2 / 1 / 0) qui miroire la fixture :
+ * entrées avec variable d'env + bascule, variable seule, ou aucune
+ * (affiché « — » dans la vraie table).
+ */
+const nbLignesConfig = (i) => (i % 3 === 0 ? 2 : i % 3 === 1 ? 1 : 0);
+
+/**
+ * État de chargement de la table de planification (Santé système).
+ * Miroir des 6 colonnes réelles :
+ *  - Tâche : libellé (2 lignes) + nom de tâche mono tronqué ;
+ *  - Rythme : badge outline avec icône ;
+ *  - Heures locale / UTC : valeurs tabulaires ;
+ *  - File : badge secondary mono ;
+ *  - Configuration : 0 à 2 lignes avec bouton de copie.
+ * La fixture getSystemSchedule compte 11 entrées.
+ */
+const PlanificationSkeleton = ({ nbLignes = 11 }) => {
+  const lignes = Array.from({ length: nbLignes }, (_, i) => i);
+  return (
+    <div role="status" aria-label="Chargement de la planification des tâches">
+      <div className="overflow-x-auto scrollbar-thin">
+        <Table aria-hidden="true">
+          <TableHeader>
+            <TableRow className="hover:bg-transparent">
+              <TableHead><BlocSkel className="h-3 w-12" /></TableHead>
+              <TableHead><BlocSkel className="h-3 w-14" /></TableHead>
+              <TableHead><BlocSkel className="h-3 w-20" /></TableHead>
+              <TableHead><BlocSkel className="h-3 w-16" /></TableHead>
+              <TableHead><BlocSkel className="h-3 w-8" /></TableHead>
+              <TableHead><BlocSkel className="h-3 w-24" /></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {lignes.map((i) => {
+              const delay = i * 70;
+              const nbConfig = nbLignesConfig(i);
+              return (
+                <TableRow key={i} className="hover:bg-transparent">
+                  {/* Tâche : libellé + nom de tâche mono */}
+                  <TableCell>
+                    <BlocSkel className="h-3 w-40" delay={delay} />
+                    <BlocSkel className="mt-1 h-2.5 w-32" delay={delay} />
+                  </TableCell>
+                  {/* Rythme : badge outline avec icône */}
+                  <TableCell>
+                    <BlocSkel className="h-5 w-24 rounded-full" delay={delay} />
+                  </TableCell>
+                  {/* Heure locale */}
+                  <TableCell>
+                    <BlocSkel className="h-3 w-20" delay={delay} />
+                  </TableCell>
+                  {/* Heure UTC */}
+                  <TableCell>
+                    <BlocSkel className="h-3 w-14" delay={delay} />
+                  </TableCell>
+                  {/* File : badge secondary mono */}
+                  <TableCell>
+                    <BlocSkel className="h-5 w-14 rounded-full" delay={delay} />
+                  </TableCell>
+                  {/* Configuration : 0, 1 ou 2 lignes (variable / bascule + bouton copie) */}
+                  <TableCell>
+                    {nbConfig === 0 ? (
+                      /* « — » de la vraie table */
+                      <BlocSkel className="h-3 w-4" delay={delay} />
+                    ) : (
+                      <div className="space-y-1.5">
+                        {Array.from({ length: nbConfig }, (_, k) => (
+                          <div key={k} className="flex items-center gap-1">
+                            <BlocSkel className="h-2.5 w-36" delay={delay} />
+                            {/* BoutonCopie */}
+                            <BlocSkel className="size-4 rounded-sm" delay={delay} />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
+  );
+};
+
+
 const OngletPlanification = () => {
   const { data: schedule, isLoading, isError, refetch } = useSystemePlanificationQuery()
   const entrees = schedule?.entries ?? []
+
+  const etat = isError ? "erreur" : isLoading ? "chargement" : !entrees?.length ? "vide" : "donnees"
 
   return (
     <SectionCardAdmin
@@ -94,97 +195,91 @@ const OngletPlanification = () => {
       </div>
 
       {/* ─── Table des entrées ─── */}
-      {isError ? (
-        <div className="p-4">
-          <SectionErreur onRetry={refetch} message="Impossible de charger la planification." />
-        </div>
-      ) : isLoading ? (
-        <div className="flex flex-col gap-2 p-4" aria-busy="true">
-          {[...Array(6)].map((_, i) => <Skeleton key={i} className="h-12 w-full rounded-lg" />)}
-        </div>
-      ) : !entrees.length ? (
-        <div className="p-4">
-          <SectionVide message="Aucune entrée de planification configurée." />
-        </div>
-      ) : (
-        <div className="overflow-x-auto scrollbar-thin">
-          <Table>
-            <TableHeader>
-              <TableRow className="hover:bg-transparent">
-                <TableHead>Tâche</TableHead>
-                <TableHead>Rythme</TableHead>
-                <TableHead>Heure locale</TableHead>
-                <TableHead>Heure UTC</TableHead>
-                <TableHead>File</TableHead>
-                <TableHead>Configuration</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {entrees.map((entree) => {
-                const IconeRythme = ICONE_RYTHME[entree.schedule_kind] ?? Clock
-                return (
-                  <TableRow key={entree.name} className="transition-colors hover:bg-muted/50">
-                    <TableCell>
-                      <span className="block text-xs font-medium" title={entree.description ?? undefined}>
-                        {entree.label ?? entree.name}
-                      </span>
-                      <span className="block truncate font-mono text-[10px] text-muted-foreground" title={entree.task}>
-                        {entree.task}
-                      </span>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className="gap-1">
-                        <IconeRythme className="size-3" aria-hidden="true" />
-                        {RYTHME[entree.schedule_kind] ?? entree.schedule_kind}
-                        {entree.schedule_kind === "interval" && entree.interval_seconds
-                          ? ` · ${formatIntervalle(entree.interval_seconds)}`
-                          : ""}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-xs tabular-nums">
-                      {entree.schedule_kind === "interval"
-                        ? `toutes les ${formatIntervalle(entree.interval_seconds)}`
-                        : entree.local_time ?? "—"}
-                    </TableCell>
-                    <TableCell className="text-xs tabular-nums text-muted-foreground">
-                      {entree.utc_time ?? "—"}
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant="secondary" className="font-mono text-[10px]">
-                        {entree.queue ?? "celery"}
-                      </Badge>
-                    </TableCell>
-                    {/* Variables d'env copiables en un clic (→ Render). */}
-                    <TableCell className="text-[10px] text-muted-foreground">
-                      {entree.env_key && (
-                        <p className="flex items-center gap-1">
-                          Variable : <span className="font-mono">{entree.env_key}</span>
-                          <BoutonCopie texte={entree.env_key} />
-                        </p>
-                      )}
-                      {entree.toggle && (
-                        <p className="flex items-center gap-1">
-                          Bascule : <span className="font-mono">{entree.toggle}</span>
-                          <BoutonCopie texte={entree.toggle} />
-                        </p>
-                      )}
-                      {!entree.env_key && !entree.toggle && "—"}
-                    </TableCell>
+      <Bloc>
+        <TransitionEtat etat={etat} >
+          {isError ? (
+            <div className="p-4">
+              <SectionErreur onRetry={refetch} message="Impossible de charger la planification." />
+            </div>
+          ) : isLoading ? (
+            <PlanificationSkeleton />
+          ) : !entrees.length ? (
+            <div className="p-4">
+              <SectionVide message="Aucune entrée de planification configurée." />
+            </div>
+          ) : (
+            <div className="overflow-x-auto scrollbar-thin">
+              <Table>
+                <TableHeader>
+                  <TableRow className="hover:bg-transparent">
+                    <TableHead>Tâche</TableHead>
+                    <TableHead>Rythme</TableHead>
+                    <TableHead>Heure locale</TableHead>
+                    <TableHead>Heure UTC</TableHead>
+                    <TableHead>File</TableHead>
+                    <TableHead>Configuration</TableHead>
                   </TableRow>
-                )
-              })}
-            </TableBody>
-          </Table>
-        </div>
-      )}
-
-      {/* ─── Note ─── */}
-      <p className="border-t border-border px-4 py-3 text-[11px] text-muted-foreground">
-        Les heures affichées sont celles du <em>prochain redémarrage</em> du stack : le rechargement à chaud de l'API
-        (uvicorn --reload) ne recharge <em>ni</em> le beat ni les workers Celery. Après un changement de variable{" "}
-        <span className="font-mono">DAILY_*</span>, redémarrez la stack complète pour que la nouvelle planification
-        s'applique.
-      </p>
+                </TableHeader>
+                <TableBody>
+                  {entrees.map((entree) => {
+                    const IconeRythme = ICONE_RYTHME[entree.schedule_kind] ?? Clock
+                    return (
+                      <TableRow key={entree.name} className="transition-colors hover:bg-muted/50">
+                        <TableCell>
+                          <span className="block text-xs font-medium" title={entree.description ?? undefined}>
+                            {entree.label ?? entree.name}
+                          </span>
+                          <span className="block truncate font-mono text-[10px] text-muted-foreground" title={entree.task}>
+                            {entree.task}
+                          </span>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className="gap-1">
+                            <IconeRythme className="size-3" aria-hidden="true" />
+                            {RYTHME[entree.schedule_kind] ?? entree.schedule_kind}
+                            {entree.schedule_kind === "interval" && entree.interval_seconds
+                              ? ` · ${formatIntervalle(entree.interval_seconds)}`
+                              : ""}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="text-xs tabular-nums">
+                          {entree.schedule_kind === "interval"
+                            ? `toutes les ${formatIntervalle(entree.interval_seconds)}`
+                            : entree.local_time ?? "—"}
+                        </TableCell>
+                        <TableCell className="text-xs tabular-nums text-muted-foreground">
+                          {entree.utc_time ?? "—"}
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="secondary" className="font-mono text-[10px]">
+                            {entree.queue ?? "celery"}
+                          </Badge>
+                        </TableCell>
+                        {/* Variables d'env copiables en un clic (→ Render). */}
+                        <TableCell className="text-[10px] text-muted-foreground">
+                          {entree.env_key && (
+                            <p className="flex items-center gap-1">
+                              Variable : <span className="font-mono">{entree.env_key}</span>
+                              <BoutonCopie texte={entree.env_key} />
+                            </p>
+                          )}
+                          {entree.toggle && (
+                            <p className="flex items-center gap-1">
+                              Bascule : <span className="font-mono">{entree.toggle}</span>
+                              <BoutonCopie texte={entree.toggle} />
+                            </p>
+                          )}
+                          {!entree.env_key && !entree.toggle && "—"}
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })}
+                </TableBody>
+              </Table>
+            </div>
+          )}
+        </TransitionEtat>
+      </Bloc>
     </SectionCardAdmin>
   )
 }

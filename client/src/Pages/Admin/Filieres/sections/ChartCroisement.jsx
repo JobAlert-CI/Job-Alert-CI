@@ -14,13 +14,11 @@ import { Skeleton } from "@/components/ui/skeleton"
 import SectionCardAdmin from "@/components/admin/SectionCardAdmin"
 import { SectionErreur, TransitionEtat } from "@/components/admin/EtatsSection"
 import CadreChart from "@/components/admin/CadreChart"
-
+import { formatNombre } from "@/lib/utils"
 
 /* Couleurs de marque : navy = offre, orange = demande (aplats OK). */
 const COULEUR_OFFRE = "#0F2D4D"
 const COULEUR_DEMANDE = "#F5A623"
-
-const formatNombre = (v) => (v ?? 0).toLocaleString("fr-FR")
 
 /* Tooltip stylé, cohérent avec les autres charts admin. */
 const TooltipCroisement = ({ active, payload, label }) => {

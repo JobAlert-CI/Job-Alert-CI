@@ -2,9 +2,9 @@ import { AnimatePresence, motion } from "framer-motion"
 import { FileClock, Mail, MessageSquare, Terminal } from "lucide-react"
 import { useFiltresLogsAdmin, FiltresLogsAdminProvider } from "@/contexts/FiltresLogsAdmin.context"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import OngletEvents from "./sections/OngletEvents"
-import OngletContacts from "./sections/OngletContacts"
-import OngletEmailsTx from "./sections/OngletEmailsTx"
+import OngletEvents from "./onglets/OngletEvents"
+import OngletContacts from "./onglets/OngletContacts"
+import OngletEmailsTx from "./onglets/OngletEmailsTx"
 import HeroAdmin from "@/components/admin/HeroAdmin"
 import Bloc, { VARIANTS_PAGE, VARIANTS_PANNEAU } from "@/components/admin/Bloc"
 import { cn } from "@/lib/utils"
@@ -73,53 +73,32 @@ const LogsAdmin = () => {
             className="pointer-events-none absolute inset-y-0 right-0 w-10 rounded-r-lg bg-linear-to-l from-surface-container-lowest to-transparent lg:hidden"
           />
         </div>
+
         <AnimatePresence mode="wait" initial={false}>
-          {onglet === "events" ? (
-            <motion.div
-              key="events"
-              role="tabpanel"
-              aria-label="Événements techniques"
-              variants={VARIANTS_PANNEAU}
-              initial="cache"
-              animate="visible"
-              exit="cache"
-              className="mt-4 flex flex-col gap-6"
-            >
+          <motion.div
+            key={onglet}
+            role="tabpanel"
+            aria-label={ONGLETS.find((o) => o.valeur === onglet)?.libelle}
+            variants={VARIANTS_PANNEAU}
+            initial="cache"
+            animate="visible"
+            exit="cache"
+            className="mt-4"
+          >
+            {onglet === "events" ? (
               <Bloc>
                 <OngletEvents />
               </Bloc>
-            </motion.div>
-          ) : onglet === "contacts" ? (
-            <motion.div
-              key="contacts"
-              role="tabpanel"
-              aria-label="Messages de contact"
-              variants={VARIANTS_PANNEAU}
-              initial="cache"
-              animate="visible"
-              exit="cache"
-              className="mt-4 flex flex-col gap-6"
-            >
+            ) : onglet === "contacts" ? (
               <Bloc>
                 <OngletContacts />
               </Bloc>
-            </motion.div>
-          ) : (
-            <motion.div
-              key="emails"
-              role="tabpanel"
-              aria-label="Emails transactionnels"
-              variants={VARIANTS_PANNEAU}
-              initial="cache"
-              animate="visible"
-              exit="cache"
-              className="mt-4 flex flex-col gap-6"
-            >
+            ) : (
               <Bloc>
                 <OngletEmailsTx />
               </Bloc>
-            </motion.div>
-          )}
+            )}
+          </motion.div>
         </AnimatePresence>
       </Tabs>
     </motion.div>

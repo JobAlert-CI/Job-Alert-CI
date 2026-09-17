@@ -5,14 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import CelluleAuteur from "./CelluleAuteur"
 import { LIBELLE_COURT_ACTION, VARIANTE_ACTION } from "./CONSTANTES"
 import BtnAction from "@/components/admin/BtnAction"
-
-
-const dateHeure = (iso) => {
-  if (!iso) return "—"
-  const d = new Date(iso)
-  return d.toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "2-digit" }) +
-    " " + d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })
-}
+import { dateHeure } from "@/lib/dates"
 
 /* ─── Carte mobile : lecture verticale, sans défilement horizontal ─── */
 export const CarteJournalMobile = memo(function CarteJournalMobile({ entree, auteurResolu, onDetail }) {

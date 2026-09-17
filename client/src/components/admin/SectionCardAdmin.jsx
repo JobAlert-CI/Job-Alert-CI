@@ -32,7 +32,8 @@ const SectionCardAdmin = ({
   badge,
   action,
   children,
-  className = "",
+  className="",
+  classNameCard = "",  
   contentClassName,
 }) => (
   <motion.div
@@ -40,9 +41,9 @@ const SectionCardAdmin = ({
     initial="hidden"
     whileInView="visible"
     viewport={{ once: true, amount: 0.1 }}
-    className="min-w-0"
+    className={cn("min-w-0", className)}
   >
-    <Card className={cn("overflow-hidden border-border bg-card text-brand-navy shadow-soft pb-0", className)}>
+    <Card className={cn("overflow-hidden border-border bg-card text-brand-navy shadow-soft pb-0", classNameCard)}>
       <CardHeader className="border-b border-border px-4 py-4 sm:px-6 sm:py-5">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex min-w-0 items-center gap-3">

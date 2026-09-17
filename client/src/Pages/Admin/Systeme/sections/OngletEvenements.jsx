@@ -1,17 +1,19 @@
-import { memo, useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import { memo, useRef, useState } from "react"
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion"
 import { CheckCircle2, ChevronRight, Loader2, RefreshCw, ScrollText } from "lucide-react"
 import { cn } from "cn"
 import { useSystemeEvenementsQuery } from "@/features/admin-systeme.tools"
 import { useFiltresSysteme } from "@/contexts/FiltresSysteme.context"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select"
 import SectionCardAdmin from "@/components/admin/SectionCardAdmin"
-import { SectionErreur, SectionAucunResultat } from "../components/EtatsSection"
+import { SectionErreur, SectionAucunResultat, TransitionEtat } from "@/components/admin/EtatsSection"
 import BtnAction from "@/components/admin/BtnAction"
-
+import { dateHeure } from "@/lib/dates"
+import { formatNombre } from "@/lib/utils"
+import Bloc from "@/components/admin/Bloc"
+import PaginationListe from "@/components/admin/PaginationListe"
 
 const SOURCES = [
   { valeur: "celery", libelle: "Celery" },
@@ -55,16 +57,6 @@ const VARIANTS_CARTE = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: [0.22, 1, 0.36, 1] } },
 }
 
-const formatNombre = (v) => (v ?? 0).toLocaleString("fr-FR")
-
-const dateHeure = (iso) => {
-  if (!iso) return "—"
-  const d = new Date(iso)
-  return (
-    d.toLocaleDateString("fr-FR", { day: "2-digit", month: "short", year: "2-digit" }) +
-    " " + d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit", second: "2-digit" })
-  )
-}
 
 /* ── Coloration JSON maison (zéro dépendance) ── */
 const TeinteJson = ({ valeur }) => {
@@ -98,6 +90,48 @@ const JsonView = ({ valeur }) => {
   }
   return <TeinteJson valeur={valeur} />
 }
+
+/** Bloc skeleton avec délai décalé (cascade carte par carte). */
+const BlocSkel = ({ className, delay = 0 }) => (
+  <Skeleton className={className} style={delay ? { animationDelay: `${delay}ms` } : undefined} />
+);
+
+/**
+ * État de chargement d'une carte d'événement (timeline d'activité).
+ * Reprend la géométrie exacte de CarteEvenement :
+ *  - même wrapper `border-l-4` (liséré de sévérité) ;
+ *  - en-tête : badge sévérité + badge source + event_type mono + date ;
+ *  - 2 lignes de message ;
+ *  - bouton « Contexte technique » (présent dans ~50 % des événements).
+ */
+const CarteEvenementSkeleton = ({ avecContexte = true, delay = 0 }) => (
+  <li
+    className="flex flex-col gap-1.5 rounded-xl border border-border border-l-4 border-l-border bg-card p-3"
+    aria-hidden="true"
+  >
+    {/* En-tête : badge sévérité + source + event_type + date */}
+    <div className="flex flex-wrap items-center gap-2">
+      <BlocSkel className="h-5 w-20 rounded-full" delay={delay} />
+      <BlocSkel className="h-5 w-16 rounded-full" delay={delay} />
+      <BlocSkel className="h-2.5 w-24" delay={delay} />
+      <BlocSkel className="ml-auto h-2.5 w-28" delay={delay} />
+    </div>
+
+    {/* Message : 2 lignes de texte */}
+    <div className="space-y-1.5 py-0.5">
+      <BlocSkel className="h-2.5 w-full" delay={delay} />
+      <BlocSkel className="h-2.5 w-4/5" delay={delay} />
+    </div>
+
+    {/* Bouton « Contexte technique » (chevron + libellé) */}
+    {avecContexte && (
+      <div className="flex items-center gap-1 pt-0.5">
+        <BlocSkel className="size-3 rounded-sm" delay={delay} />
+        <BlocSkel className="h-2.5 w-28" delay={delay} />
+      </div>
+    )}
+  </li>
+);
 
 /* ── Carte événement : liseré sévérité + contexte en accordéon animé ── */
 const CarteEvenement = memo(({ evenement }) => {
@@ -162,7 +196,6 @@ const CarteEvenement = memo(({ evenement }) => {
     </motion.li>
   )
 })
-CarteEvenement.displayName = "CarteEvenement"
 
 /* État vide positif : pas d'événement = le système va bien. */
 const EtatPositif = () => (
@@ -182,12 +215,24 @@ const OngletEvenements = () => {
   } = useFiltresSysteme()
 
   const { data, isLoading, isError, isFetching, refetch } = useSystemeEvenementsQuery(paramsEvenements)
+  const mouvementReduit = useReducedMotion()
 
   const evenements = data?.events ?? []
   const total = data?.total ?? 0
-  const pageMax = Math.max(1, Math.ceil(total / 50))
   const filtresActifs = !!source || !!severity || days !== 7
 
+  const refEve = useRef(null)
+  const changerPageEvenements = (nouvellePage) => {
+    setPage(nouvellePage)
+    refEve.current?.scrollIntoView({
+      behavior: mouvementReduit ? "auto" : "smooth",
+      block: "start",
+    })
+  }
+
+  const pageSuivantePossible = evenements?.length === paramsEvenements.limit
+
+  const etat = isError ? "erreur" : isLoading ? "chargement" : !evenements.length ? "vide" : "donnees"
 
   return (
     <SectionCardAdmin
@@ -239,9 +284,9 @@ const OngletEvenements = () => {
         </Select>
 
         {filtresActifs && (
-          <Button variant="ghost" size="sm" className="text-xs" onClick={reinitialiserEvenements}>
+          <BtnAction variant="outline" size="xs" className="text-xs" onClick={reinitialiserEvenements}>
             Réinitialiser
-          </Button>
+          </BtnAction>
         )}
 
         <span className="ml-auto text-[11px] tabular-nums text-muted-foreground" aria-live="polite">
@@ -250,22 +295,22 @@ const OngletEvenements = () => {
       </div>
 
       {/* ─── Fondu enchaîné au changement de filtres / page / état ─── */}
-      <AnimatePresence mode="wait" initial={false}>
-        <motion.div
-          key={`${source}-${severity}-${days}-${page}-${isLoading ? "chargement" : isError ? "erreur" : "donnees"}`}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -6 }}
-          transition={{ duration: 0.18, ease: "easeOut" }}
-        >
+      <Bloc>
+        <TransitionEtat etat={etat} >
           {isError ? (
             <div className="p-4">
               <SectionErreur onRetry={refetch} message="Impossible de charger les événements système." />
             </div>
           ) : isLoading ? (
-            <div className="flex flex-col gap-2 p-4" aria-busy="true">
-              {[...Array(5)].map((_, i) => <Skeleton key={i} className="h-20 w-full rounded-xl" />)}
-            </div>
+            <ul className="flex flex-col gap-2 p-4" role="status" aria-label="Chargement de la timeline">
+              {Array.from({ length: 5 }, (_, i) => (
+                <CarteEvenementSkeleton
+                  key={i}
+                  avecContexte={i % 2 === 0}
+                  delay={i * 80}
+                />
+              ))}
+            </ul>
           ) : !evenements.length ? (
             <div className="p-4">
               {filtresActifs ? (
@@ -291,38 +336,13 @@ const OngletEvenements = () => {
                 ))}
               </motion.ol>
 
-              {/* Pagination servie (total exact). */}
-              {total > 50 && (
-                <nav aria-label="Pagination" className="flex flex-wrap items-center justify-between gap-2 border-t border-border px-4 py-3">
-                  <p className="text-xs tabular-nums text-muted-foreground">
-                    {formatNombre(total)} événement{total > 1 ? "s" : ""} · Page {page} sur {pageMax}
-                  </p>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setPage(Math.max(1, page - 1))}
-                      disabled={page <= 1}
-                      aria-label="Page précédente"
-                    >
-                      Précédent
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setPage(Math.min(pageMax, page + 1))}
-                      disabled={page >= pageMax}
-                      aria-label="Page suivante"
-                    >
-                      Suivant
-                    </Button>
-                  </div>
-                </nav>
+              {!isFetching && (
+                <PaginationListe page={page} pagePleine={pageSuivantePossible} total={total} onPageChange={changerPageEvenements} className="p-2 border-t" />
               )}
             </>
           )}
-        </motion.div>
-      </AnimatePresence>
+        </TransitionEtat>
+      </Bloc>
     </SectionCardAdmin>
   )
 }
